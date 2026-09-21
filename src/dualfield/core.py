@@ -134,7 +134,7 @@ class GaborAtom(nn.Module):
         self._last_amplitude = None
         self._last_gate = None
         
-    def forward(self, x, t, sigma_addition=0.0):
+    def _compute_gabor_events(self, x, t, sigma_addition=0.0):
         if t.dim() == 1:
             t = t.unsqueeze(0).expand(x.shape[0], -1)
         if t.dim() == 3:
@@ -146,10 +146,10 @@ class GaborAtom(nn.Module):
         h_pooled = h.mean(dim=1)
         amplitude_raw = self.amplitude_head(h_pooled).view(B, self.num_atoms, D)
         gate_logits = self.gate_head(h_pooled)
-        gate = torch.sigmoid(gate_logits * 5).unsqueeze(-1)
-        amplitude = amplitude_raw * gate
+        gate = torch.sigmoid(gate_logits * 5)
+        amplitude = amplitude_raw * gate.unsqueeze(-1)
         self._last_amplitude = amplitude.detach()
-        self._last_gate = gate.squeeze(-1).detach()
+        self._last_gate = gate.detach()
         
         t_expanded = t.unsqueeze(-1)
         tau = self.tau.view(1, 1, -1)
@@ -162,6 +162,13 @@ class GaborAtom(nn.Module):
         basis = envelope * oscillation
         
         gabor_out = torch.einsum('btk,bkd->btd', basis, amplitude)
+        return gabor_out, amplitude, gate
+
+    def extract_events(self, x, t, sigma_addition=0.0):
+        return self._compute_gabor_events(x, t, sigma_addition)
+
+    def forward(self, x, t, sigma_addition=0.0):
+        gabor_out, _, _ = self._compute_gabor_events(x, t, sigma_addition)
         residual_out = self.residual_net(x)
         
         return gabor_out + residual_out
@@ -194,6 +201,9 @@ class DiscreteGeometricField(nn.Module):
         
     def forward(self, x, t, sigma_addition=0.0):
         return self.atoms(x, t, sigma_addition)
+
+    def extract_events(self, x, t, sigma_addition=0.0):
+        return self.atoms.extract_events(x, t, sigma_addition)
     
     def compute_sparsity_loss(self):
         if self.atoms._last_gate is None:
