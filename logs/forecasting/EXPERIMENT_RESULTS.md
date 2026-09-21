@@ -58,9 +58,9 @@ The machine exposes eight NVIDIA L40 GPUs with 46,068 MiB each. The exact physic
 
 | Region | Console log | Metrics | Training history | Best checkpoint |
 |---|---|---|---|---|
-| NSW1 | [`nsw1.log`](nsw1.log) | [`metrics.json`](../../outputs/forecasting/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/NSW1/best_model.pt) |
-| QLD1 | [`qld1.log`](qld1.log) | [`metrics.json`](../../outputs/forecasting/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/QLD1/best_model.pt) |
-| TAS1 | [`tas1.log`](tas1.log) | [`metrics.json`](../../outputs/forecasting/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/TAS1/best_model.pt) |
+| NSW1 | [`nsw1.log`](nsw1.log) | [`metrics.json`](../../outputs/forecasting/static_train/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/static_train/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/static_train/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](qld1.log) | [`metrics.json`](../../outputs/forecasting/static_train/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/static_train/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/static_train/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](tas1.log) | [`metrics.json`](../../outputs/forecasting/static_train/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/static_train/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/static_train/TAS1/best_model.pt) |
 
 ## Local results
 
