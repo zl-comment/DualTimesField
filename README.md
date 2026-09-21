@@ -147,6 +147,20 @@ $$
 
 ## Experimental Results
 
+### External AEMO Reference: RE-Price (Paper-Reported)
+
+The closest published reference for the forecasting task in this repository is RE-Price, evaluated separately on hourly NSW, QLD, and TAS data from 2015-01-01 to 2024-12-31. It uses the previous 72 hours to forecast the next 24 hours with a chronological 70%/10%/20% split.
+
+| Region | MAE | RMSE | CRPS |
+|--------|----:|-----:|-----:|
+| NSW | 23.48 | 34.15 | 17.36 |
+| QLD | 25.85 | 37.15 | 20.58 |
+| TAS | 18.96 | 22.81 | 13.13 |
+
+These values are **paper-reported**, not reproduced by this repository. The authors report average improvements of 15.63% in MAE, 17.72% in RMSE, and 15.70% in CRPS over the five selected baselines. RE-Price uses price, load forecast, temperature, and more than 2,000 WattClarity news articles, whereas the current DualTimesField forecasting pipeline uses numerical inputs without news. The values therefore serve as an external reference under a closely related data protocol, not as a directly comparable local leaderboard or proof of a global Australian SOTA.
+
+Reference: Chen, H., Xu, Y., Wu, W., and Sun, H. *Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models*. Applied Energy (2026). [DOI: 10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">
