@@ -37,7 +37,22 @@ class DualFieldForecastLoss(nn.Module):
         self.target_sparsity = float(target_sparsity)
         self.sparsity_excess_weight = float(sparsity_excess_weight)
 
-    def forward(self, outputs, history_values, target_price):
+    @staticmethod
+    def _reduce_per_sample(values, sample_weight=None):
+        per_sample = values.reshape(values.shape[0], -1).mean(dim=1)
+        if sample_weight is None:
+            return per_sample.mean()
+        weights = sample_weight.reshape(-1).to(
+            device=values.device,
+            dtype=values.dtype,
+        )
+        if weights.shape[0] != per_sample.shape[0]:
+            raise ValueError("sample_weight must contain one value per batch item")
+        if torch.any(weights < 0) or weights.sum() <= 0:
+            raise ValueError("sample_weight must be non-negative with a positive sum")
+        return (per_sample * weights).sum() / weights.sum()
+
+    def forward(self, outputs, history_values, target_price, sample_weight=None):
         point_forecast = outputs["point_forecast"]
         quantile_forecast = outputs["quantile_forecast"]
         ctf_signal = outputs["ctf_signal"]
@@ -49,22 +64,28 @@ class DualFieldForecastLoss(nn.Module):
                 "quantile_forecast's final dimension must match configured quantiles"
             )
 
-        point_loss = F.mse_loss(point_forecast, target_price)
+        point_loss = self._reduce_per_sample(
+            (point_forecast - target_price).square(), sample_weight
+        )
 
         quantile_error = target_price - quantile_forecast
         quantiles = self.quantiles.to(
             device=quantile_forecast.device,
             dtype=quantile_forecast.dtype,
         )
-        quantile_loss = torch.maximum(
+        quantile_loss = self._reduce_per_sample(torch.maximum(
             quantiles * quantile_error,
             (quantiles - 1.0) * quantile_error,
-        ).mean()
+        ), sample_weight)
 
-        decomposition_loss = F.mse_loss(ctf_signal + event_signal, history_values)
-        smoothness_loss = ((ctf_signal[:, 1:] - ctf_signal[:, :-1]) ** 2).mean()
+        decomposition_loss = self._reduce_per_sample(
+            (ctf_signal + event_signal - history_values).square(), sample_weight
+        )
+        smoothness_loss = self._reduce_per_sample(
+            (ctf_signal[:, 1:] - ctf_signal[:, :-1]).square(), sample_weight
+        )
 
-        mean_gate = event_gate.mean()
+        mean_gate = self._reduce_per_sample(event_gate, sample_weight)
         sparsity_loss = mean_gate + self.sparsity_excess_weight * F.relu(
             mean_gate - self.target_sparsity
         )

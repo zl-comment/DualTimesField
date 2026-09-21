@@ -204,6 +204,30 @@ class AEMOForecastDataset(Dataset):
             frame[data_config["delivery_column"]]
         )
         self.origin_indices = _valid_origins(frame, config, split)
+        self.temporal_weights = self._build_temporal_weights(config)
+
+    def _build_temporal_weights(self, config: Mapping) -> np.ndarray:
+        """Return leakage-free recency weights for training forecast origins."""
+        weighting = config.get("training", {}).get("temporal_weighting", {})
+        if self.split != "train" or not weighting.get("enabled", False):
+            return np.ones(len(self.origin_indices), dtype=np.float32)
+
+        half_life_days = float(weighting.get("half_life_days", 365.0))
+        minimum_weight = float(weighting.get("minimum_weight", 0.0))
+        if half_life_days <= 0:
+            raise ValueError("temporal_weighting.half_life_days must be positive")
+        if not 0.0 <= minimum_weight <= 1.0:
+            raise ValueError("temporal_weighting.minimum_weight must be in [0, 1]")
+        if len(self.origin_indices) == 0:
+            return np.empty(0, dtype=np.float32)
+
+        origin_seconds = self.delivery_unix_seconds[self.origin_indices]
+        age_days = (origin_seconds.max() - origin_seconds) / (24.0 * 60.0 * 60.0)
+        weights = np.exp2(-age_days / half_life_days)
+        weights = np.maximum(weights, minimum_weight)
+        if weighting.get("normalize_mean", True):
+            weights = weights / weights.mean()
+        return weights.astype(np.float32)
 
     def __len__(self) -> int:
         return len(self.origin_indices)
@@ -230,6 +254,9 @@ class AEMOForecastDataset(Dataset):
             ),
             "target_delivery_unix": torch.from_numpy(
                 self.delivery_unix_seconds[forecast_start:forecast_end].copy()
+            ),
+            "temporal_weight": torch.tensor(
+                self.temporal_weights[index], dtype=torch.float32
             ),
         }
 

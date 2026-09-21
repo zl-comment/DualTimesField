@@ -113,8 +113,14 @@ def train_epoch(
     sample_count = 0
     for batch in loader:
         history, calendar, target = move_inputs(batch, device)
+        temporal_weight = batch["temporal_weight"].to(device)
         optimizer.zero_grad(set_to_none=True)
-        losses = criterion(model(history, calendar), history, target)
+        losses = criterion(
+            model(history, calendar),
+            history,
+            target,
+            sample_weight=temporal_weight,
+        )
         losses["total"].backward()
         optimizer.step()
         batch_size = history.shape[0]
@@ -291,6 +297,14 @@ def run_training(config_path: Path | str, region: str) -> Path:
     results = {
         "region": region,
         "seed": training_config["seed"],
+        "temporal_weighting": training_config.get(
+            "temporal_weighting", {"enabled": False}
+        ),
+        "training_weight_summary": {
+            "minimum": float(datasets["train"].temporal_weights.min()),
+            "maximum": float(datasets["train"].temporal_weights.max()),
+            "mean": float(datasets["train"].temporal_weights.mean()),
+        },
         "best_epoch": checkpoint["best_epoch"],
         "best_validation_loss": checkpoint["best_validation_loss"],
         "dataset_sizes": {name: len(dataset) for name, dataset in datasets.items()},

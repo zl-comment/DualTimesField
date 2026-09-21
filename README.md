@@ -161,6 +161,23 @@ These values are **paper-reported**, not reproduced by this repository. The auth
 
 Reference: Chen, H., Xu, Y., Wu, W., and Sun, H. *Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models*. Applied Energy (2026). [DOI: 10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
 
+### Time-weighted AEMO training
+
+The optional time-weighted configuration gives more influence to recent training
+origins while preserving the chronological train/validation/test split. With a
+two-year half-life, an observation loses half its relative weight for every 730
+days of age; weights are clipped and normalized to mean one. Validation and test
+metrics remain unweighted.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_time_weighted.yaml \
+  --region NSW1
+```
+
+Outputs are written below `outputs/forecasting/time_weighted/` so the static
+baseline remains untouched.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">
