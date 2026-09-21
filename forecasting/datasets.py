@@ -9,6 +9,9 @@ from omegaconf import OmegaConf
 from torch.utils.data import Dataset
 
 
+NORMALIZATION_MODES = ("static_train", "dynamic_window")
+
+
 @dataclass(frozen=True)
 class Standardizer:
     mean: np.ndarray
@@ -21,6 +24,14 @@ class Standardizer:
 def load_forecast_config(config_path: Path | str) -> dict:
     path = Path(config_path).resolve()
     config = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
+    normalization = config["normalization"]
+    if normalization["mode"] not in NORMALIZATION_MODES:
+        raise ValueError(
+            f"Normalization mode must be one of {NORMALIZATION_MODES}, "
+            f"got {normalization['mode']}"
+        )
+    if normalization["mode"] == "dynamic_window" and normalization["epsilon"] <= 0:
+        raise ValueError("Dynamic normalization epsilon must be positive")
     config["project_root"] = str(path.parent.parent)
     return config
 
@@ -110,6 +121,12 @@ def _fit_standardizer(values: np.ndarray) -> Standardizer:
     return Standardizer(mean=mean, std=std)
 
 
+def _fit_window_standardizer(values: np.ndarray, epsilon: float) -> Standardizer:
+    mean = values.mean(axis=0, dtype=np.float64)
+    std = values.std(axis=0, dtype=np.float64)
+    return Standardizer(mean=mean, std=np.maximum(std, epsilon))
+
+
 def _calendar_feature_map(delivery: pd.Series, train_mask: np.ndarray) -> Dict[str, np.ndarray]:
     hour = delivery.dt.hour.to_numpy()
     day_of_week = delivery.dt.dayofweek.to_numpy()
@@ -185,18 +202,30 @@ class AEMOForecastDataset(Dataset):
         self.output_hours = protocol["output_hours"]
         self.history_feature_names = tuple(data_config["history_columns"])
         self.calendar_feature_names = tuple(protocol["calendar_features"])
+        self.normalization_mode = config["normalization"]["mode"]
+        self.normalization_epsilon = (
+            float(config["normalization"]["epsilon"])
+            if self.normalization_mode == "dynamic_window"
+            else None
+        )
         split_values = frame[data_config["split_column"]].to_numpy()
         train_mask = split_values == "train"
-        raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64)
-        self.history_standardizer = _fit_standardizer(raw_history[train_mask])
-        self.history_values = self.history_standardizer.transform(raw_history)
-        target_index = self.history_feature_names.index(data_config["target_column"])
+        self.raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64)
+        self.history_standardizer = _fit_standardizer(self.raw_history[train_mask])
+        self.history_values = (
+            self.history_standardizer.transform(self.raw_history)
+            if self.normalization_mode == "static_train"
+            else None
+        )
+        self.target_index = self.history_feature_names.index(data_config["target_column"])
         raw_target = frame[data_config["target_column"]].to_numpy(dtype=np.float32)
         self.target_values_raw = raw_target
-        self.target_values = (
-            (raw_target - self.history_standardizer.mean[target_index])
-            / self.history_standardizer.std[target_index]
-        ).astype(np.float32)
+        self.target_values = None
+        if self.normalization_mode == "static_train":
+            self.target_values = (
+                (raw_target - self.history_standardizer.mean[self.target_index])
+                / self.history_standardizer.std[self.target_index]
+            ).astype(np.float32)
         self.calendar_values = _build_calendar_matrix(
             frame[data_config["delivery_column"]], train_mask, self.calendar_feature_names
         )
@@ -208,23 +237,52 @@ class AEMOForecastDataset(Dataset):
     def __len__(self) -> int:
         return len(self.origin_indices)
 
+    def _normalized_window(
+        self,
+        history_start: int,
+        forecast_start: int,
+        forecast_end: int,
+    ) -> tuple[np.ndarray, np.ndarray, float, float]:
+        if self.normalization_mode == "static_train":
+            return (
+                self.history_values[history_start:forecast_start],
+                self.target_values[forecast_start:forecast_end],
+                float(self.history_standardizer.mean[self.target_index]),
+                float(self.history_standardizer.std[self.target_index]),
+            )
+        raw_window = self.raw_history[history_start:forecast_start]
+        standardizer = _fit_window_standardizer(
+            raw_window,
+            self.normalization_epsilon,
+        )
+        target_location = float(standardizer.mean[self.target_index])
+        target_scale = float(standardizer.std[self.target_index])
+        target = (
+            (self.target_values_raw[forecast_start:forecast_end] - target_location)
+            / target_scale
+        ).astype(np.float32)
+        return standardizer.transform(raw_window), target, target_location, target_scale
+
     def __getitem__(self, index: int) -> Dict[str, torch.Tensor]:
         forecast_start = int(self.origin_indices[index])
         history_start = forecast_start - self.input_hours
         forecast_end = forecast_start + self.output_hours
+        history, target, target_location, target_scale = self._normalized_window(
+            history_start,
+            forecast_start,
+            forecast_end,
+        )
         return {
-            "history_values": torch.from_numpy(
-                self.history_values[history_start:forecast_start].copy()
-            ),
+            "history_values": torch.from_numpy(history.copy()),
             "future_calendar": torch.from_numpy(
                 self.calendar_values[forecast_start:forecast_end].copy()
             ),
-            "target_price": torch.from_numpy(
-                self.target_values[forecast_start:forecast_end, None].copy()
-            ),
+            "target_price": torch.from_numpy(target[:, None].copy()),
             "target_price_raw": torch.from_numpy(
                 self.target_values_raw[forecast_start:forecast_end, None].copy()
             ),
+            "target_location": torch.tensor(target_location, dtype=torch.float32),
+            "target_scale": torch.tensor(target_scale, dtype=torch.float32),
             "forecast_origin_unix": torch.tensor(
                 self.delivery_unix_seconds[forecast_start], dtype=torch.int64
             ),

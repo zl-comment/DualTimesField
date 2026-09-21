@@ -18,16 +18,16 @@ This file records the first completed three-region forecasting run. All values u
 ## Reproduction commands
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python -m forecasting.train --config configs/aemo_forecast.yaml --region NSW1 2>&1 | tee logs/forecasting/nsw1.log
-CUDA_VISIBLE_DEVICES=1 python -m forecasting.train --config configs/aemo_forecast.yaml --region QLD1 2>&1 | tee logs/forecasting/qld1.log
-CUDA_VISIBLE_DEVICES=2 python -m forecasting.train --config configs/aemo_forecast.yaml --region TAS1 2>&1 | tee logs/forecasting/tas1.log
+CUDA_VISIBLE_DEVICES=0 python -m forecasting.train --config configs/aemo_forecast_static.yaml --region NSW1 2>&1 | tee logs/forecasting/nsw1.log
+CUDA_VISIBLE_DEVICES=1 python -m forecasting.train --config configs/aemo_forecast_static.yaml --region QLD1 2>&1 | tee logs/forecasting/qld1.log
+CUDA_VISIBLE_DEVICES=2 python -m forecasting.train --config configs/aemo_forecast_static.yaml --region TAS1 2>&1 | tee logs/forecasting/tas1.log
 ```
 
 These commands reproduce the three-GPU layout. The original log files do not record `CUDA_VISIBLE_DEVICES`, so the exact GPU indices used by the completed run are unknown.
 
 ## Configuration
 
-Source: [`configs/aemo_forecast.yaml`](../../configs/aemo_forecast.yaml)
+Source: [`configs/aemo_forecast_static.yaml`](../../configs/aemo_forecast_static.yaml)
 
 | Group | Setting | Value |
 |---|---|---|

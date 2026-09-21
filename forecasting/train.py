@@ -128,7 +128,6 @@ def evaluate(
     model: DualFieldLinearForecaster,
     criterion: DualFieldForecastLoss,
     loader: DataLoader,
-    dataset,
     device: torch.device,
 ) -> Dict[str, Dict[str, float]]:
     model.eval()
@@ -138,8 +137,6 @@ def evaluate(
     squared_error = 0.0
     target_count = 0
     interval_totals = {"80": [0.0, 0.0], "90": [0.0, 0.0]}
-    price_mean = dataset.history_standardizer.mean[0]
-    price_std = dataset.history_standardizer.std[0]
     quantiles = list(model.quantiles)
     interval_indices = {
         "80": (quantiles.index(0.10), quantiles.index(0.90)),
@@ -155,8 +152,10 @@ def evaluate(
             for name in LOSS_NAMES:
                 loss_sums[name] += losses[name].item() * batch_size
             actual = batch["target_price_raw"].to(device)
-            point = outputs["point_forecast"] * price_std + price_mean
-            quantile = outputs["quantile_forecast"] * price_std + price_mean
+            target_location = batch["target_location"].to(device).view(-1, 1, 1)
+            target_scale = batch["target_scale"].to(device).view(-1, 1, 1)
+            point = outputs["point_forecast"] * target_scale + target_location
+            quantile = outputs["quantile_forecast"] * target_scale + target_location
             error = point - actual
             absolute_error += error.abs().sum().item()
             squared_error += error.square().sum().item()
@@ -209,6 +208,7 @@ def save_checkpoint(
             "loss_config": config["loss"],
             "training_config": config["training"],
             "forecast_protocol": config["forecast_protocol"],
+            "normalization_config": config["normalization"],
             "history_feature_names": dataset.history_feature_names,
             "calendar_feature_names": dataset.calendar_feature_names,
             "history_mean": dataset.history_standardizer.mean.tolist(),
@@ -254,7 +254,7 @@ def run_training(config_path: Path | str, region: str) -> Path:
     for epoch in range(training_config["epochs"]):
         model.set_epoch(epoch)
         train_losses = train_epoch(model, criterion, loaders["train"], optimizer, device)
-        validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
+        validation = evaluate(model, criterion, loaders["validation"], device)
         history.append(
             {
                 "epoch": epoch,
@@ -286,11 +286,12 @@ def run_training(config_path: Path | str, region: str) -> Path:
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model_state"])
     model.set_epoch(checkpoint["best_epoch"])
-    validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
-    test = evaluate(model, criterion, loaders["test"], datasets["test"], device)
+    validation = evaluate(model, criterion, loaders["validation"], device)
+    test = evaluate(model, criterion, loaders["test"], device)
     results = {
         "region": region,
         "seed": training_config["seed"],
+        "normalization": config["normalization"],
         "best_epoch": checkpoint["best_epoch"],
         "best_validation_loss": checkpoint["best_validation_loss"],
         "dataset_sizes": {name: len(dataset) for name, dataset in datasets.items()},
@@ -305,7 +306,7 @@ def run_training(config_path: Path | str, region: str) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train the dual-field linear AEMO forecaster")
-    parser.add_argument("--config", default="configs/aemo_forecast.yaml")
+    parser.add_argument("--config", default="configs/aemo_forecast_static.yaml")
     parser.add_argument("--region", required=True, choices=("NSW1", "QLD1", "TAS1"))
     args = parser.parse_args()
     output_dir = run_training(args.config, args.region)

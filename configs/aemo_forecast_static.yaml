@@ -43,6 +43,9 @@ forecast_protocol:
     - is_weekend
     - year_standardized
 
+normalization:
+  mode: static_train
+
 model:
   num_variables: 2
   num_frequencies: 16
@@ -76,4 +79,4 @@ training:
   seed: 2026
   device: cuda
   num_workers: 0
-  output_directory: outputs/forecasting
+  output_directory: outputs/forecasting/static_train

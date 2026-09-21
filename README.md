@@ -74,6 +74,18 @@ python -m interpolation.visualize
 
 > **Note:** On high-dimensional datasets (e.g. `traffic` with 862 variables), transformer baselines such as PatchTST may require a smaller `--batch_size` to fit in GPU memory.
 
+### AEMO Day-Ahead Forecasting
+
+```bash
+# Static train-set normalization baseline
+python -m forecasting.train --config configs/aemo_forecast_static.yaml --region NSW1
+
+# Dynamic 72-hour window normalization
+python -m forecasting.train --config configs/aemo_forecast_dynamic.yaml --region NSW1
+```
+
+The static and dynamic configurations write to `outputs/forecasting/static_train/` and `outputs/forecasting/dynamic_window/`, respectively. Dynamic normalization computes location and scale independently for each historical 72-hour input window and applies the same past-only statistics to its 24-hour target and predictions.
+
 ## Project Structure
 
 The layout below matches the repository code (excluding generated artifacts such as `outputs/`, checkpoints, and downloaded data under `data/`):
