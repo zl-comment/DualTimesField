@@ -104,6 +104,62 @@ The machine exposes eight NVIDIA L40 GPUs with 46,068 MiB each. The exact physic
 | QLD1 | 2.728067 | 1.912101 | 0.086434 | 0.729157 | 0.068527 | 0.307171 |
 | TAS1 | 7.622208 | 5.533191 | 0.173170 | 1.914390 | 0.075824 | 1.381370 |
 
+## Daily grouped-sampling experiment
+
+This run retains every hourly forecast window but trains on one global local-hour
+group per epoch. The selected hour rotates from 00 through 23, so the 24-hour
+targets inside an epoch do not overlap. Validation and test remain identical to
+the static baseline's full rolling protocol.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_daily_grouped_sampling.yaml`](../../configs/aemo_forecast_daily_grouped_sampling.yaml) |
+| Full train / validation / test windows | 61,273 / 8,737 / 17,521 per region |
+| Windows per training epoch | 2,553 or 2,554 |
+| Coverage completed in 30 epochs | One 24-hour rotation plus six hour groups |
+| Best epochs, NSW1 / QLD1 / TAS1 | 29 / 30 / 24 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/daily_grouped_sampling/` |
+
+### Grouped-sampling artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](daily_grouped_sampling/nsw1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](daily_grouped_sampling/qld1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](daily_grouped_sampling/tas1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling/TAS1/best_model.pt) |
+
+### Grouped-sampling validation metrics
+
+| Region | MAE | RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 73.9278 | 192.7844 | 50.19% | 108.4290 | 77.17% | 200.4791 |
+| QLD1 | 110.0947 | 439.3766 | 51.81% | 141.2803 | 82.45% | 292.5864 |
+| TAS1 | 62.8204 | 272.9647 | 39.54% | 73.4055 | 67.04% | 145.5246 |
+
+### Grouped-sampling test metrics
+
+| Region | MAE | RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 74.9601 | 404.2411 | 47.07% | 78.4644 | 76.35% | 168.2612 |
+| QLD1 | 75.9566 | 286.0601 | 56.38% | 108.2197 | 85.93% | 237.6447 |
+| TAS1 | 38.8590 | 161.9001 | 40.17% | 48.8170 | 70.01% | 98.1377 |
+
+### Change from the static baseline
+
+| Region | MAE | MAE change | RMSE | RMSE change | 80% coverage change | 90% coverage change |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 74.9601 | +23.04% | 404.2411 | +0.91% | -15.48 pp | -7.61 pp |
+| QLD1 | 75.9566 | +15.76% | 286.0601 | +2.18% | -10.98 pp | -4.69 pp |
+| TAS1 | 38.8590 | +4.67% | 161.9001 | +0.13% | +0.80 pp | +1.35 pp |
+
+This 30-epoch run is materially undertrained relative to the baseline: one grouped
+epoch contains about one twenty-fourth as many optimizer steps, and the selected
+checkpoints occur at epochs 29, 30, and 24 rather than early in training. The run
+shows that grouped sampling removes within-epoch target duplication, but it does
+not establish that the sampling method harms accuracy. A compute-matched run needs
+multiple complete 24-hour rotations or a scheduler defined in rotation cycles.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |

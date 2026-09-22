@@ -1,0 +1,60 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField-grouped-sampling/outputs/forecasting/daily_grouped_sampling/QLD1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField-grouped-sampling/outputs/forecasting/daily_grouped_sampling/QLD1/training_history.csv"
+  },
+  "best_epoch": 29,
+  "best_validation_loss": 6.361796265989252,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "region": "QLD1",
+  "seed": 2026,
+  "test": {
+    "losses": {
+      "decomposition": 0.7313876863604953,
+      "point": 1.9962361175408512,
+      "quantile": 0.10761462263926667,
+      "smoothness": 0.06033029863457247,
+      "sparsity": 1.9332179712396012,
+      "total": 2.8372320420195964
+    },
+    "metrics": {
+      "coverage_80": 0.5638115214124003,
+      "coverage_90": 0.859276011643171,
+      "mae_aud_per_mwh": 75.95660921180298,
+      "mean_width_80_aud_per_mwh": 108.21965780200664,
+      "mean_width_90_aud_per_mwh": 237.6447471367692,
+      "rmse_aud_per_mwh": 286.06011057668485
+    }
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 1.468996060983368,
+      "point": 4.709461088505598,
+      "quantile": 0.18131297584241488,
+      "smoothness": 0.09844411213214875,
+      "sparsity": 1.9276780429005937,
+      "total": 6.361796265989252
+    },
+    "metrics": {
+      "coverage_80": 0.5181412384113541,
+      "coverage_90": 0.8244773186829957,
+      "mae_aud_per_mwh": 110.09473118245917,
+      "mean_width_80_aud_per_mwh": 141.28032302754568,
+      "mean_width_90_aud_per_mwh": 292.5863980056083,
+      "rmse_aud_per_mwh": 439.3766404800168
+    }
+  }
+}
