@@ -158,6 +158,36 @@ QLD1. NSW1 trades worse MAE for slightly lower RMSE and sharper intervals, while
 TAS1 point accuracy is effectively unchanged. The result is retained as a
 protocol experiment rather than treated as a universal improvement.
 
+### Extended fixed-origin run: 100 epochs, learning rate 0.001
+
+This follow-up changes both the epoch budget and learning rate relative to the
+30-epoch run. Results are therefore interpreted as a joint hyperparameter change,
+not as an isolated epoch ablation.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_fixed_origin_extended.yaml`](../../configs/aemo_forecast_fixed_origin_extended.yaml) |
+| Epochs / learning rate | 100 / 0.001 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 14 / 14 / 9 |
+| Output directory | `outputs/forecasting/fixed_origin_extended/` |
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](fixed_origin_extended/nsw1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin_extended/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin_extended/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin_extended/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](fixed_origin_extended/qld1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin_extended/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin_extended/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin_extended/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](fixed_origin_extended/tas1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin_extended/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin_extended/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin_extended/TAS1/best_model.pt) |
+
+| Region | Best validation loss | Test MAE | Test RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 1.655866 | 64.6936 | 401.1091 | 56.02% | 82.0377 | 83.77% | 165.3407 |
+| QLD1 | 5.825380 | 66.1955 | 275.7724 | 63.16% | 106.6811 | 90.44% | 213.5958 |
+| TAS1 | 20.494336 | 37.0200 | 161.3795 | 46.13% | 54.1984 | 76.09% | 106.9093 |
+
+Validation loss improves slightly, but test point accuracy does not improve in
+any region relative to the 30-epoch fixed-origin run. The higher learning rate
+also moves the selected checkpoints much earlier, and later epochs overfit. This
+run is retained as a negative hyperparameter result.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
