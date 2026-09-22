@@ -195,6 +195,23 @@ python -m forecasting.train \
 Outputs are isolated under
 `outputs/forecasting/additive_trigonometric_gate/`.
 
+### Temporal convolutional forecast heads
+
+The TCN-head ablation keeps the complementary additive CTF/DGF fusion but
+preserves each field's 72-step time axis. Separate CTF and DGF heads use five
+causal residual blocks with kernel size 3 and dilations 1, 2, 4, 8, and 16.
+Their 125-step receptive field covers the full history. The final historical
+state is combined separately with each of the 24 known-future calendar vectors
+before point and quantile decoding.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_tcn_head.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/additive_tcn_head/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

@@ -7,8 +7,103 @@ import torch.nn as nn
 from src.dualfield.core import DualTimesField
 
 
+class CausalResidualBlock(nn.Module):
+    """Two causal dilated convolutions with a residual connection."""
+
+    def __init__(self, channels: int, kernel_size: int, dilation: int):
+        super().__init__()
+        padding = (kernel_size - 1) * dilation
+        self.conv1 = nn.Conv1d(
+            channels,
+            channels,
+            kernel_size,
+            padding=padding,
+            dilation=dilation,
+        )
+        self.conv2 = nn.Conv1d(
+            channels,
+            channels,
+            kernel_size,
+            padding=padding,
+            dilation=dilation,
+        )
+        self.activation = nn.GELU()
+
+    @staticmethod
+    def _trim_future(output: torch.Tensor, input_length: int) -> torch.Tensor:
+        return output[..., :input_length]
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        sequence_length = inputs.shape[-1]
+        hidden = self._trim_future(self.conv1(inputs), sequence_length)
+        hidden = self.activation(hidden)
+        hidden = self._trim_future(self.conv2(hidden), sequence_length)
+        return self.activation(hidden + inputs)
+
+
+class TemporalConvForecastHead(nn.Module):
+    """Encode history with a TCN and decode each future calendar step."""
+
+    def __init__(
+        self,
+        num_variables: int,
+        calendar_dim: int,
+        num_quantiles: int,
+        channels: int = 40,
+        kernel_size: int = 3,
+        dilations: Sequence[int] = (1, 2, 4, 8, 16),
+    ):
+        super().__init__()
+        if channels <= 0:
+            raise ValueError("channels must be positive")
+        if kernel_size <= 1:
+            raise ValueError("kernel_size must be greater than one")
+        if not dilations or any(dilation <= 0 for dilation in dilations):
+            raise ValueError("dilations must contain positive integers")
+
+        self.receptive_field = 1 + 2 * (kernel_size - 1) * sum(dilations)
+        self.input_projection = nn.Conv1d(num_variables, channels, 1)
+        self.temporal_blocks = nn.Sequential(
+            *[
+                CausalResidualBlock(channels, kernel_size, dilation)
+                for dilation in dilations
+            ]
+        )
+        self.calendar_projection = nn.Linear(calendar_dim, channels)
+        self.future_fusion = nn.Linear(2 * channels, channels)
+        self.activation = nn.GELU()
+        self.point_output = nn.Linear(channels, 1)
+        self.quantile_output = nn.Linear(channels, num_quantiles)
+
+    def forward(
+        self,
+        history_signal: torch.Tensor,
+        future_calendar: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        temporal = history_signal.transpose(1, 2)
+        temporal = self.input_projection(temporal)
+        temporal = self.temporal_blocks(temporal)
+        history_context = temporal[..., -1]
+
+        calendar_context = self.activation(
+            self.calendar_projection(future_calendar)
+        )
+        history_context = history_context.unsqueeze(1).expand(
+            -1, future_calendar.shape[1], -1
+        )
+        future_hidden = self.activation(
+            self.future_fusion(
+                torch.cat([history_context, calendar_context], dim=-1)
+            )
+        )
+        return (
+            self.point_output(future_hidden),
+            self.quantile_output(future_hidden),
+        )
+
+
 class DualFieldLinearForecaster(nn.Module):
-    """Forecast from constrained CTF and DGF features with linear heads only."""
+    """Forecast from constrained CTF and DGF features."""
 
     def __init__(
         self,
@@ -26,6 +121,10 @@ class DualFieldLinearForecaster(nn.Module):
         sparsity_lambda: float = 0.001,
         smoothness_lambda: float = 0.001,
         fusion_mode: str = "concatenate",
+        forecast_head_type: str = "linear",
+        tcn_channels: int = 40,
+        tcn_kernel_size: int = 3,
+        tcn_dilations: Sequence[int] = (1, 2, 4, 8, 16),
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -34,6 +133,7 @@ class DualFieldLinearForecaster(nn.Module):
         self.calendar_dim = calendar_dim
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
+        self.forecast_head_type = forecast_head_type
         if fusion_mode not in {
             "concatenate",
             "trigonometric_gate",
@@ -42,6 +142,12 @@ class DualFieldLinearForecaster(nn.Module):
             raise ValueError(
                 "fusion_mode must be 'concatenate', 'trigonometric_gate', "
                 "or 'additive_trigonometric_gate'"
+            )
+        if forecast_head_type not in {"linear", "tcn"}:
+            raise ValueError("forecast_head_type must be 'linear' or 'tcn'")
+        if fusion_mode == "concatenate" and forecast_head_type == "tcn":
+            raise ValueError(
+                "TCN heads require a gated fusion mode with separate fields"
             )
 
         self.dual_field = DualTimesField(
@@ -71,14 +177,36 @@ class DualFieldLinearForecaster(nn.Module):
                 input_length * num_variables
                 + forecast_horizon * calendar_dim
             )
-            self.ctf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
-            self.dgf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
-            self.ctf_quantile_head = nn.Linear(
-                expert_feature_dim, forecast_horizon * len(self.quantiles)
-            )
-            self.dgf_quantile_head = nn.Linear(
-                expert_feature_dim, forecast_horizon * len(self.quantiles)
-            )
+            if forecast_head_type == "tcn":
+                head_arguments = {
+                    "num_variables": num_variables,
+                    "calendar_dim": calendar_dim,
+                    "num_quantiles": len(self.quantiles),
+                    "channels": tcn_channels,
+                    "kernel_size": tcn_kernel_size,
+                    "dilations": tuple(tcn_dilations),
+                }
+                self.ctf_forecast_head = TemporalConvForecastHead(
+                    **head_arguments
+                )
+                self.dgf_forecast_head = TemporalConvForecastHead(
+                    **head_arguments
+                )
+            else:
+                self.ctf_point_head = nn.Linear(
+                    expert_feature_dim, forecast_horizon
+                )
+                self.dgf_point_head = nn.Linear(
+                    expert_feature_dim, forecast_horizon
+                )
+                self.ctf_quantile_head = nn.Linear(
+                    expert_feature_dim,
+                    forecast_horizon * len(self.quantiles),
+                )
+                self.dgf_quantile_head = nn.Linear(
+                    expert_feature_dim,
+                    forecast_horizon * len(self.quantiles),
+                )
             self.fusion_gate = nn.Linear(combined_feature_dim, forecast_horizon)
             nn.init.zeros_(self.fusion_gate.weight)
             nn.init.zeros_(self.fusion_gate.bias)
@@ -119,20 +247,32 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
         calendar_flat = future_calendar.flatten(start_dim=1)
-        ctf_features = torch.cat([ctf_flat, calendar_flat], dim=1)
-        dgf_features = torch.cat([event_flat, calendar_flat], dim=1)
         gate_features = torch.cat(
             [ctf_flat, event_flat, calendar_flat], dim=1
         )
 
-        ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
-        dgf_point = self.dgf_point_head(dgf_features).unsqueeze(-1)
-        ctf_quantile = self.ctf_quantile_head(ctf_features).view(
-            ctf_signal.shape[0], self.forecast_horizon, len(self.quantiles)
-        )
-        dgf_quantile = self.dgf_quantile_head(dgf_features).view(
-            ctf_signal.shape[0], self.forecast_horizon, len(self.quantiles)
-        )
+        if self.forecast_head_type == "tcn":
+            ctf_point, ctf_quantile = self.ctf_forecast_head(
+                ctf_signal, future_calendar
+            )
+            dgf_point, dgf_quantile = self.dgf_forecast_head(
+                event_signal, future_calendar
+            )
+        else:
+            ctf_features = torch.cat([ctf_flat, calendar_flat], dim=1)
+            dgf_features = torch.cat([event_flat, calendar_flat], dim=1)
+            ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
+            dgf_point = self.dgf_point_head(dgf_features).unsqueeze(-1)
+            ctf_quantile = self.ctf_quantile_head(ctf_features).view(
+                ctf_signal.shape[0],
+                self.forecast_horizon,
+                len(self.quantiles),
+            )
+            dgf_quantile = self.dgf_quantile_head(dgf_features).view(
+                ctf_signal.shape[0],
+                self.forecast_horizon,
+                len(self.quantiles),
+            )
         ctf_quantile = torch.sort(ctf_quantile, dim=-1).values
         dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
 
