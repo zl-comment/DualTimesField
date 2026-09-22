@@ -104,6 +104,37 @@ The machine exposes eight NVIDIA L40 GPUs with 46,068 MiB each. The exact physic
 | QLD1 | 2.728067 | 1.912101 | 0.086434 | 0.729157 | 0.068527 | 0.307171 |
 | TAS1 | 7.622208 | 5.533191 | 0.173170 | 1.914390 | 0.075824 | 1.381370 |
 
+## Time-weighted ablation
+
+This run changes only the training objective weighting. Forecast origins receive
+an exponentially decaying weight with a 730-day half-life, a configured minimum
+weight of 0.05, and mean-one normalization. Validation and test observations
+remain unweighted. The resulting training weights range from 0.235527 to
+2.659625. Source configuration:
+[`configs/aemo_forecast_time_weighted.yaml`](../../configs/aemo_forecast_time_weighted.yaml).
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](time_weighted/nsw1.log) | [`metrics.json`](../../outputs/forecasting/time_weighted/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/time_weighted/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/time_weighted/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](time_weighted/qld1.log) | [`metrics.json`](../../outputs/forecasting/time_weighted/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/time_weighted/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/time_weighted/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](time_weighted/tas1.log) | [`metrics.json`](../../outputs/forecasting/time_weighted/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/time_weighted/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/time_weighted/TAS1/best_model.pt) |
+
+### Selected checkpoints and test metrics
+
+| Region | Best epoch | Best validation loss | Test MAE | Test RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 10/30 | 1.762864 | 64.6695 | 399.3576 | 67.95% | 102.5703 | 89.13% | 200.5918 |
+| QLD1 | 4/30 | 6.111930 | 69.1589 | 278.7452 | 75.59% | 128.1955 | 94.93% | 239.0798 |
+| TAS1 | 2/30 | 21.150181 | 37.2753 | 161.4482 | 40.72% | 47.0050 | 70.97% | 93.6269 |
+
+Compared with the static baseline, MAE worsens by 6.15%, 5.40%, and 0.40% for
+NSW1, QLD1, and TAS1, while RMSE improves by only 0.31%, 0.44%, and 0.15%.
+Coverage generally increases together with wider intervals. This configuration
+is therefore retained as an ablation rather than promoted over the static
+baseline.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |

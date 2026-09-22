@@ -1,0 +1,71 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField-time-weighted/outputs/forecasting/time_weighted/NSW1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField-time-weighted/outputs/forecasting/time_weighted/NSW1/training_history.csv"
+  },
+  "best_epoch": 9,
+  "best_validation_loss": 1.7628643276903058,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "region": "NSW1",
+  "seed": 2026,
+  "temporal_weighting": {
+    "enabled": true,
+    "half_life_days": 730,
+    "minimum_weight": 0.05,
+    "normalize_mean": true
+  },
+  "test": {
+    "losses": {
+      "decomposition": 1.832918643495987,
+      "point": 5.867087511804681,
+      "quantile": 0.12233733577179308,
+      "smoothness": 0.13566681928943297,
+      "sparsity": 0.2828785427121782,
+      "total": 7.822762088511546
+    },
+    "metrics": {
+      "coverage_80": 0.6794703498658753,
+      "coverage_90": 0.8912661948518921,
+      "mae_aud_per_mwh": 64.66948220543087,
+      "mean_width_80_aud_per_mwh": 102.57034791137539,
+      "mean_width_90_aud_per_mwh": 200.59176703729335,
+      "rmse_aud_per_mwh": 399.35758763567395
+    }
+  },
+  "training_weight_summary": {
+    "maximum": 2.6596250534057617,
+    "mean": 1.0,
+    "minimum": 0.23552671074867249
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 0.49724395330315246,
+      "point": 1.1561374257134158,
+      "quantile": 0.10915813100923659,
+      "smoothness": 0.04391841199157357,
+      "sparsity": 0.28092438645666845,
+      "total": 1.7628643276903058
+    },
+    "metrics": {
+      "coverage_80": 0.6772872076609058,
+      "coverage_90": 0.9005474800656214,
+      "mae_aud_per_mwh": 56.38588099119287,
+      "mean_width_80_aud_per_mwh": 141.70509608322843,
+      "mean_width_90_aud_per_mwh": 243.16114328192361,
+      "rmse_aud_per_mwh": 177.27821785773918
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField-time-weighted/outputs/forecasting/time_weighted/QLD1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField-time-weighted/outputs/forecasting/time_weighted/QLD1/training_history.csv"
+  },
+  "best_epoch": 3,
+  "best_validation_loss": 6.111929983990449,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "region": "QLD1",
+  "seed": 2026,
+  "temporal_weighting": {
+    "enabled": true,
+    "half_life_days": 730,
+    "minimum_weight": 0.05,
+    "normalize_mean": true
+  },
+  "test": {
+    "losses": {
+      "decomposition": 0.7297736387041788,
+      "point": 1.8954485691747898,
+      "quantile": 0.08625854421095498,
+      "smoothness": 0.07018005661379358,
+      "sparsity": 0.44944485258269573,
+      "total": 2.71200036865467
+    },
+    "metrics": {
+      "coverage_80": 0.7559048189791298,
+      "coverage_90": 0.9492799117249776,
+      "mae_aud_per_mwh": 69.15885700923772,
+      "mean_width_80_aud_per_mwh": 128.19546796820006,
+      "mean_width_90_aud_per_mwh": 239.07981003153358,
+      "rmse_aud_per_mwh": 278.7451736080477
+    }
+  },
+  "training_weight_summary": {
+    "maximum": 2.6596250534057617,
+    "mean": 1.0,
+    "minimum": 0.23552671074867249
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 1.4687337503647304,
+      "point": 4.482786181553281,
+      "quantile": 0.1596838696146122,
+      "smoothness": 0.11722405612126761,
+      "sparsity": 0.6088371358208953,
+      "total": 6.111929983990449
+    },
+    "metrics": {
+      "coverage_80": 0.7597048948914578,
+      "coverage_90": 0.9324329479989317,
+      "mae_aud_per_mwh": 96.65516022055685,
+      "mean_width_80_aud_per_mwh": 209.026481624634,
+      "mean_width_90_aud_per_mwh": 357.548483416433,
+      "rmse_aud_per_mwh": 428.6722416524083
+    }
+  }
+}
