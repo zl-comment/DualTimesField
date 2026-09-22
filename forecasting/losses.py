@@ -16,6 +16,9 @@ class DualFieldForecastLoss(nn.Module):
         sparsity_weight=0.001,
         target_sparsity=0.3,
         sparsity_excess_weight=10.0,
+        point_loss_type="mse",
+        huber_delta=1.0,
+        mse_fraction=0.5,
     ):
         super().__init__()
         quantile_tensor = torch.as_tensor(quantiles, dtype=torch.float32)
@@ -36,6 +39,17 @@ class DualFieldForecastLoss(nn.Module):
         self.sparsity_weight = float(sparsity_weight)
         self.target_sparsity = float(target_sparsity)
         self.sparsity_excess_weight = float(sparsity_excess_weight)
+        if point_loss_type not in {"mse", "blended_huber_mse"}:
+            raise ValueError(
+                "point_loss_type must be 'mse' or 'blended_huber_mse'"
+            )
+        if huber_delta <= 0:
+            raise ValueError("huber_delta must be positive")
+        if not 0.0 <= mse_fraction <= 1.0:
+            raise ValueError("mse_fraction must be between zero and one")
+        self.point_loss_type = point_loss_type
+        self.huber_delta = float(huber_delta)
+        self.mse_fraction = float(mse_fraction)
 
     def forward(self, outputs, history_values, target_price):
         point_forecast = outputs["point_forecast"]
@@ -49,7 +63,19 @@ class DualFieldForecastLoss(nn.Module):
                 "quantile_forecast's final dimension must match configured quantiles"
             )
 
-        point_loss = F.mse_loss(point_forecast, target_price)
+        mse_loss = F.mse_loss(point_forecast, target_price)
+        if self.point_loss_type == "mse":
+            point_loss = mse_loss
+        else:
+            huber_loss = F.huber_loss(
+                point_forecast,
+                target_price,
+                delta=self.huber_delta,
+            )
+            point_loss = (
+                self.mse_fraction * mse_loss
+                + (1.0 - self.mse_fraction) * huber_loss
+            )
 
         quantile_error = target_price - quantile_forecast
         quantiles = self.quantiles.to(

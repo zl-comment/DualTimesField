@@ -269,6 +269,25 @@ python -m forecasting.train \
 Outputs are isolated under
 `outputs/forecasting/max_spare_dgf_residual_adapter/`.
 
+### Stable progressive DGF fine-tuning
+
+The stable fine-tuning experiment preserves the DGF-only maximum-spare model
+and extends only its optimization procedure. It trains for at most 120 epochs,
+uses adapter, decoder, and temporal stages with discriminative learning rates,
+five-epoch stage-local warmups followed by cosine decay, gradient clipping,
+EMA validation weights, and a validation-relative MAE/RMSE composite for model
+selection. Early stopping cannot activate before epoch 80, ensuring every
+fine-tuning stage is exercised. CTF and the dual-field decomposition remain
+frozen throughout.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_stable_dgf_finetuning.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/stable_dgf_finetuning/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

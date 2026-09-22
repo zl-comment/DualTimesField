@@ -1,7 +1,9 @@
 import argparse
 import json
+import math
 import random
 import sys
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from typing import Dict, Mapping
 
@@ -18,6 +20,42 @@ from .models import DualFieldLinearForecaster
 
 
 LOSS_NAMES = ("total", "point", "quantile", "decomposition", "smoothness", "sparsity")
+
+
+class ExponentialMovingAverage:
+    def __init__(self, model: torch.nn.Module, decay: float):
+        if not 0.0 < decay < 1.0:
+            raise ValueError("EMA decay must be between zero and one")
+        self.decay = float(decay)
+        self.shadow = {
+            name: value.detach().clone()
+            for name, value in model.state_dict().items()
+            if value.is_floating_point()
+        }
+
+    def update(self, model: torch.nn.Module) -> None:
+        with torch.no_grad():
+            for name, value in model.state_dict().items():
+                if name in self.shadow:
+                    self.shadow[name].lerp_(value.detach(), 1.0 - self.decay)
+
+    @contextmanager
+    def average_parameters(self, model: torch.nn.Module):
+        state = model.state_dict()
+        backup = {
+            name: state[name].detach().clone()
+            for name in self.shadow
+        }
+        with torch.no_grad():
+            for name, value in self.shadow.items():
+                state[name].copy_(value)
+        try:
+            yield
+        finally:
+            with torch.no_grad():
+                state = model.state_dict()
+                for name, value in backup.items():
+                    state[name].copy_(value)
 
 
 def set_seed(seed: int) -> None:
@@ -126,21 +164,39 @@ def train_epoch(
     loader: DataLoader,
     optimizer: torch.optim.Optimizer,
     device: torch.device,
+    gradient_clip_norm: float | None = None,
+    ema: ExponentialMovingAverage | None = None,
 ) -> Dict[str, float]:
     model.train()
     loss_sums = {name: 0.0 for name in LOSS_NAMES}
+    gradient_norm_sum = 0.0
     sample_count = 0
     for batch in loader:
         history, calendar, exogenous, target = move_inputs(batch, device)
         optimizer.zero_grad(set_to_none=True)
         losses = criterion(model(history, calendar, exogenous), history, target)
         losses["total"].backward()
+        if gradient_clip_norm is not None:
+            gradient_norm = torch.nn.utils.clip_grad_norm_(
+                [
+                    parameter
+                    for parameter in model.parameters()
+                    if parameter.requires_grad and parameter.grad is not None
+                ],
+                gradient_clip_norm,
+            )
+            gradient_norm_sum += float(gradient_norm) * history.shape[0]
         optimizer.step()
+        if ema is not None:
+            ema.update(model)
         batch_size = history.shape[0]
         sample_count += batch_size
         for name in LOSS_NAMES:
             loss_sums[name] += losses[name].item() * batch_size
-    return average_losses(loss_sums, sample_count)
+    averaged = average_losses(loss_sums, sample_count)
+    if gradient_clip_norm is not None:
+        averaged["gradient_norm"] = gradient_norm_sum / sample_count
+    return averaged
 
 
 def evaluate(
@@ -346,12 +402,184 @@ def initialize_from_warm_start(
     }
 
 
-def validation_selection_values(validation: Mapping) -> Dict[str, float]:
-    return {
+def _fine_tuning_group_name(parameter_name: str) -> str | None:
+    if parameter_name.startswith("dgf_forecast_head.exogenous_adapter."):
+        return "adapter"
+    if parameter_name.startswith(
+        (
+            "dgf_forecast_head.future_fusion.",
+            "dgf_forecast_head.point_output.",
+            "dgf_forecast_head.quantile_output.",
+        )
+    ):
+        return "decoder"
+    if parameter_name.startswith("dgf_forecast_head."):
+        return "temporal"
+    if parameter_name.startswith("fusion_gate."):
+        return "fusion"
+    return None
+
+
+def build_optimizer(
+    model: DualFieldLinearForecaster,
+    training_config: Mapping,
+) -> tuple[torch.optim.Optimizer, list[dict]]:
+    fine_tuning = training_config.get("fine_tuning", {})
+    optimizer_config = training_config.get("optimizer", {})
+    betas = tuple(optimizer_config.get("betas", (0.9, 0.999)))
+    epsilon = float(optimizer_config.get("eps", 1e-8))
+    if not fine_tuning.get("enabled", False):
+        parameters = [
+            parameter for parameter in model.parameters()
+            if parameter.requires_grad
+        ]
+        optimizer = torch.optim.AdamW(
+            parameters,
+            lr=training_config["learning_rate"],
+            weight_decay=training_config["weight_decay"],
+            betas=betas,
+            eps=epsilon,
+        )
+        return optimizer, []
+
+    configured_groups = fine_tuning["parameter_groups"]
+    grouped_parameters = {name: [] for name in configured_groups}
+    unmatched_trainable = []
+    for parameter_name, parameter in model.named_parameters():
+        group_name = _fine_tuning_group_name(parameter_name)
+        parameter.requires_grad = False
+        if group_name in grouped_parameters:
+            grouped_parameters[group_name].append(parameter)
+        elif group_name is not None:
+            unmatched_trainable.append(parameter_name)
+    if unmatched_trainable:
+        raise RuntimeError(
+            "Fine-tuning parameters have no configured group: "
+            f"{unmatched_trainable}"
+        )
+
+    optimizer_groups = []
+    group_metadata = []
+    for group_name, group_config in configured_groups.items():
+        parameters = grouped_parameters[group_name]
+        if not parameters:
+            raise RuntimeError(
+                f"Fine-tuning group {group_name!r} has no parameters"
+            )
+        start_epoch = int(group_config["start_epoch"])
+        max_lr = float(group_config["learning_rate"])
+        weight_decay = float(
+            group_config.get("weight_decay", training_config["weight_decay"])
+        )
+        for parameter in parameters:
+            parameter.requires_grad = start_epoch == 0
+        optimizer_groups.append(
+            {
+                "params": parameters,
+                "lr": 0.0,
+                "weight_decay": weight_decay,
+                "group_name": group_name,
+            }
+        )
+        group_metadata.append(
+            {
+                "name": group_name,
+                "parameters": parameters,
+                "start_epoch": start_epoch,
+                "max_lr": max_lr,
+                "parameter_count": sum(
+                    parameter.numel() for parameter in parameters
+                ),
+            }
+        )
+    optimizer = torch.optim.AdamW(
+        optimizer_groups,
+        betas=betas,
+        eps=epsilon,
+    )
+    return optimizer, group_metadata
+
+
+def _scheduled_learning_rate(
+    epoch: int,
+    start_epoch: int,
+    total_epochs: int,
+    warmup_epochs: int,
+    max_lr: float,
+    min_lr_ratio: float,
+) -> float:
+    if epoch < start_epoch:
+        return 0.0
+    local_epoch = epoch - start_epoch
+    if warmup_epochs > 0 and local_epoch < warmup_epochs:
+        return max_lr * (local_epoch + 1) / warmup_epochs
+    decay_epochs = max(total_epochs - start_epoch - warmup_epochs - 1, 1)
+    progress = min(max((local_epoch - warmup_epochs) / decay_epochs, 0.0), 1.0)
+    cosine = 0.5 * (1.0 + math.cos(math.pi * progress))
+    return max_lr * (min_lr_ratio + (1.0 - min_lr_ratio) * cosine)
+
+
+def configure_fine_tuning_epoch(
+    optimizer: torch.optim.Optimizer,
+    group_metadata: list[dict],
+    training_config: Mapping,
+    epoch: int,
+) -> tuple[str, Dict[str, float], int]:
+    if not group_metadata:
+        return (
+            "training",
+            {"default": optimizer.param_groups[0]["lr"]},
+            sum(
+                parameter.numel()
+                for group in optimizer.param_groups
+                for parameter in group["params"]
+                if parameter.requires_grad
+            ),
+        )
+    schedule = training_config["fine_tuning"]["schedule"]
+    total_epochs = int(training_config["epochs"])
+    warmup_epochs = int(schedule["warmup_epochs"])
+    min_lr_ratio = float(schedule["min_lr_ratio"])
+    learning_rates = {}
+    active_names = []
+    trainable_count = 0
+    for optimizer_group, metadata in zip(
+        optimizer.param_groups, group_metadata
+    ):
+        active = epoch >= metadata["start_epoch"]
+        for parameter in metadata["parameters"]:
+            parameter.requires_grad = active
+        learning_rate = _scheduled_learning_rate(
+            epoch=epoch,
+            start_epoch=metadata["start_epoch"],
+            total_epochs=total_epochs,
+            warmup_epochs=warmup_epochs,
+            max_lr=metadata["max_lr"],
+            min_lr_ratio=min_lr_ratio,
+        )
+        optimizer_group["lr"] = learning_rate
+        learning_rates[metadata["name"]] = learning_rate
+        if active:
+            active_names.append(metadata["name"])
+            trainable_count += metadata["parameter_count"]
+    return "+".join(active_names), learning_rates, trainable_count
+
+
+def validation_selection_values(
+    validation: Mapping,
+    baseline_metrics: Mapping[str, float] | None = None,
+) -> Dict[str, float]:
+    values = {
         "total": validation["losses"]["total"],
         "mae": validation["metrics"]["mae_aud_per_mwh"],
         "rmse": validation["metrics"]["rmse_aud_per_mwh"],
     }
+    if baseline_metrics is not None:
+        values["composite"] = 0.5 * (
+            values["mae"] / baseline_metrics["mae"]
+            + values["rmse"] / baseline_metrics["rmse"]
+        )
+    return values
 
 
 def run_training(config_path: Path | str, region: str) -> Path:
@@ -374,22 +602,41 @@ def run_training(config_path: Path | str, region: str) -> Path:
         )
         initialization_batch = next(iter(initialization_loader))
         model.initialize_atoms(initialization_batch["history_values"].to(device))
-    optimizer = torch.optim.AdamW(
-        [parameter for parameter in model.parameters() if parameter.requires_grad],
-        lr=training_config["learning_rate"],
-        weight_decay=training_config["weight_decay"],
+    optimizer, fine_tuning_groups = build_optimizer(model, training_config)
+    gradient_clip_norm = training_config.get("gradient_clip_norm")
+    if gradient_clip_norm is not None:
+        gradient_clip_norm = float(gradient_clip_norm)
+        if gradient_clip_norm <= 0:
+            raise ValueError("gradient_clip_norm must be positive")
+    ema_decay = training_config.get("ema_decay")
+    ema = (
+        ExponentialMovingAverage(model, float(ema_decay))
+        if ema_decay is not None
+        else None
     )
     output_dir = Path(config["project_root"]) / training_config["output_directory"] / region
     output_dir.mkdir(parents=True, exist_ok=True)
+    selection_names = tuple(
+        training_config.get(
+            "checkpoint_metrics", ("total", "mae", "rmse")
+        )
+    )
+    primary_selection = training_config.get("primary_selection", "total")
+    if primary_selection not in selection_names:
+        raise ValueError("primary_selection must be in checkpoint_metrics")
     checkpoint_paths = {
-        "total": output_dir / "best_model.pt",
-        "mae": output_dir / "best_mae_model.pt",
-        "rmse": output_dir / "best_rmse_model.pt",
+        name: (
+            output_dir / "best_model.pt"
+            if name == primary_selection
+            else output_dir / f"best_{name}_model.pt"
+        )
+        for name in selection_names
     }
     history_path = output_dir / "training_history.csv"
     history = []
     best_epochs = {name: -1 for name in checkpoint_paths}
     best_values = {name: float("inf") for name in checkpoint_paths}
+    baseline_metrics = None
     fixed_model_epoch = (
         warm_start_metadata["base_best_epoch"]
         if warm_start_metadata is not None
@@ -403,6 +650,10 @@ def run_training(config_path: Path | str, region: str) -> Path:
             datasets["validation"],
             device,
         )
+        baseline_metrics = {
+            "mae": initial_validation["metrics"]["mae_aud_per_mwh"],
+            "rmse": initial_validation["metrics"]["rmse_aud_per_mwh"],
+        }
         history.append(
             {
                 "epoch": -1,
@@ -418,8 +669,11 @@ def run_training(config_path: Path | str, region: str) -> Path:
                 },
             }
         )
-        initial_values = validation_selection_values(initial_validation)
-        for selection_name, selection_value in initial_values.items():
+        initial_values = validation_selection_values(
+            initial_validation, baseline_metrics
+        )
+        for selection_name in selection_names:
+            selection_value = initial_values[selection_name]
             best_values[selection_name] = selection_value
             save_checkpoint(
                 checkpoint_paths[selection_name],
@@ -438,18 +692,105 @@ def run_training(config_path: Path | str, region: str) -> Path:
             "warm_start "
             f"validation={initial_values['total']:.6f} "
             f"mae={initial_values['mae']:.6f} "
-            f"rmse={initial_values['rmse']:.6f}"
+            f"rmse={initial_values['rmse']:.6f} "
+            f"composite={initial_values.get('composite', float('nan')):.6f}"
         )
+    if "composite" in selection_names and baseline_metrics is None:
+        raise ValueError("Composite checkpoint selection requires a warm start")
+
+    early_stopping = training_config.get("early_stopping", {})
+    early_stopping_enabled = bool(early_stopping.get("enabled", False))
+    early_monitor = early_stopping.get("monitor", primary_selection)
+    if early_monitor not in selection_names:
+        raise ValueError("Early-stopping monitor must be checkpointed")
+    minimum_epochs = int(early_stopping.get("minimum_epochs", 0))
+    patience = int(early_stopping.get("patience", training_config["epochs"]))
+    relative_min_delta = float(
+        early_stopping.get("relative_min_delta", 0.0)
+    )
+    if minimum_epochs < 0 or patience <= 0 or relative_min_delta < 0:
+        raise ValueError("Invalid early-stopping configuration")
+    early_best = best_values.get(early_monitor, float("inf"))
+    early_wait = 0
+    stopped_early = False
+    completed_epochs = 0
     for epoch in range(training_config["epochs"]):
         model.set_epoch(
             fixed_model_epoch if fixed_model_epoch is not None else epoch
         )
-        train_losses = train_epoch(model, criterion, loaders["train"], optimizer, device)
-        validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
+        stage, learning_rates, trainable_parameter_count = (
+            configure_fine_tuning_epoch(
+                optimizer,
+                fine_tuning_groups,
+                training_config,
+                epoch,
+            )
+        )
+        train_losses = train_epoch(
+            model,
+            criterion,
+            loaders["train"],
+            optimizer,
+            device,
+            gradient_clip_norm=gradient_clip_norm,
+            ema=ema,
+        )
+        evaluation_context = (
+            ema.average_parameters(model) if ema is not None else nullcontext()
+        )
+        with evaluation_context:
+            validation = evaluate(
+                model,
+                criterion,
+                loaders["validation"],
+                datasets["validation"],
+                device,
+            )
+            selection_values = validation_selection_values(
+                validation, baseline_metrics
+            )
+            for selection_name in selection_names:
+                selection_value = selection_values[selection_name]
+                if selection_value < best_values[selection_name]:
+                    best_epochs[selection_name] = epoch
+                    best_values[selection_name] = selection_value
+                    save_checkpoint(
+                        checkpoint_paths[selection_name],
+                        model,
+                        config,
+                        datasets["train"],
+                        region,
+                        epoch,
+                        validation["losses"]["total"],
+                        model_epoch=(
+                            fixed_model_epoch
+                            if fixed_model_epoch is not None
+                            else epoch
+                        ),
+                        selection_metric=selection_name,
+                        selection_value=selection_value,
+                    )
+
+        current_early_value = selection_values[early_monitor]
+        significant_threshold = early_best * (1.0 - relative_min_delta)
+        if current_early_value < significant_threshold:
+            early_best = current_early_value
+            early_wait = 0
+        elif epoch + 1 < minimum_epochs:
+            early_wait = 0
+        else:
+            early_wait += 1
+        completed_epochs = epoch + 1
         history.append(
             {
                 "epoch": epoch,
-                "stage": "adapter_training" if warm_start_metadata else "training",
+                "stage": stage,
+                "trainable_parameter_count": trainable_parameter_count,
+                "early_stopping_wait": early_wait,
+                **{
+                    f"learning_rate_{name}": value
+                    for name, value in learning_rates.items()
+                },
                 **{f"train_{key}": value for key, value in train_losses.items()},
                 **{
                     f"validation_{key}": value
@@ -459,40 +800,41 @@ def run_training(config_path: Path | str, region: str) -> Path:
                     f"validation_{key}": value
                     for key, value in validation["metrics"].items()
                 },
+                **{
+                    f"validation_selection_{key}": value
+                    for key, value in selection_values.items()
+                },
             }
         )
         pd.DataFrame(history).to_csv(history_path, index=False)
-        selection_values = validation_selection_values(validation)
-        for selection_name, selection_value in selection_values.items():
-            if selection_value < best_values[selection_name]:
-                best_epochs[selection_name] = epoch
-                best_values[selection_name] = selection_value
-                save_checkpoint(
-                    checkpoint_paths[selection_name],
-                    model,
-                    config,
-                    datasets["train"],
-                    region,
-                    epoch,
-                    validation["losses"]["total"],
-                    model_epoch=(
-                        fixed_model_epoch
-                        if fixed_model_epoch is not None
-                        else epoch
-                    ),
-                    selection_metric=selection_name,
-                    selection_value=selection_value,
-                )
+        learning_rate_text = ",".join(
+            f"{name}:{value:.2e}"
+            for name, value in learning_rates.items()
+        )
         print(
             f"epoch={epoch + 1}/{training_config['epochs']} "
+            f"stage={stage} "
+            f"lr={learning_rate_text} "
             f"train={train_losses['total']:.6f} "
             f"validation={selection_values['total']:.6f} "
             f"mae={selection_values['mae']:.6f} "
             f"rmse={selection_values['rmse']:.6f} "
-            f"best_total_epoch={best_epochs['total'] + 1} "
-            f"best_mae_epoch={best_epochs['mae'] + 1} "
-            f"best_rmse_epoch={best_epochs['rmse'] + 1}"
+            f"composite={selection_values.get('composite', float('nan')):.6f} "
+            f"best_{primary_selection}_epoch="
+            f"{best_epochs[primary_selection] + 1} "
+            f"early_stop_wait={early_wait}"
         )
+        if (
+            early_stopping_enabled
+            and completed_epochs >= minimum_epochs
+            and early_wait >= patience
+        ):
+            stopped_early = True
+            print(
+                f"early_stopping epoch={completed_epochs} "
+                f"monitor={early_monitor} best={early_best:.6f}"
+            )
+            break
     selection_results = {}
     for selection_name, checkpoint_path in checkpoint_paths.items():
         checkpoint = torch.load(
@@ -519,10 +861,11 @@ def run_training(config_path: Path | str, region: str) -> Path:
             ),
             "checkpoint": str(checkpoint_path),
         }
-    primary = selection_results["total"]
+    primary = selection_results[primary_selection]
     results = {
         "region": region,
         "seed": training_config["seed"],
+        "primary_selection": primary_selection,
         "best_epoch": primary["best_epoch"],
         "best_validation_loss": primary["validation"]["losses"]["total"],
         "dataset_sizes": {name: len(dataset) for name, dataset in datasets.items()},
@@ -530,11 +873,29 @@ def run_training(config_path: Path | str, region: str) -> Path:
         "test": primary["test"],
         "selection_results": selection_results,
         "warm_start": warm_start_metadata,
+        "training_summary": {
+            "completed_epochs": completed_epochs,
+            "stopped_early": stopped_early,
+            "early_stopping_monitor": early_monitor,
+            "ema_decay": ema_decay,
+            "gradient_clip_norm": gradient_clip_norm,
+            "fine_tuning_groups": [
+                {
+                    key: value
+                    for key, value in metadata.items()
+                    if key != "parameters"
+                }
+                for metadata in fine_tuning_groups
+            ],
+        },
         "environment": environment_fingerprint(),
         "artifacts": {
-            "checkpoint": str(checkpoint_paths["total"]),
-            "mae_checkpoint": str(checkpoint_paths["mae"]),
-            "rmse_checkpoint": str(checkpoint_paths["rmse"]),
+            "checkpoint": str(checkpoint_paths[primary_selection]),
+            **{
+                f"{name}_checkpoint": str(path)
+                for name, path in checkpoint_paths.items()
+                if name != primary_selection
+            },
             "history": str(history_path),
         },
     }

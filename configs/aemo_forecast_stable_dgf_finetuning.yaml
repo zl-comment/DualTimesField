@@ -1,0 +1,152 @@
+data:
+  timezone: Australia/Brisbane
+  delivery_column: delivery_start_aest
+  available_column: available_at_aest
+  region_column: region
+  split_column: split
+  history_columns:
+    - rrp_aud_per_mwh
+    - total_demand_mw
+  target_column: rrp_aud_per_mwh
+  split_names:
+    - train
+    - validation
+    - test
+  split_boundaries:
+    train:
+      start: 2015-01-01 00:00:00
+      end_exclusive: 2022-01-01 00:00:00
+    validation:
+      start: 2022-01-01 00:00:00
+      end_exclusive: 2023-01-01 00:00:00
+    test:
+      start: 2023-01-01 00:00:00
+      end_exclusive: 2025-01-01 00:00:00
+  region_files:
+    NSW1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/nsw1_hourly.csv
+    QLD1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/qld1_hourly.csv
+    TAS1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/tas1_hourly.csv
+
+future_exogenous:
+  enabled: true
+  name: max_spare_capacity_mw
+  dimension: 1
+  aggregation: min
+  standardization: train_zscore
+  vintage_rule: latest_available_pdpasa_with_stpasa_tail
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_max_spare.npz
+    QLD1: data/aemo_exogenous/qld1_max_spare.npz
+    TAS1: data/aemo_exogenous/tas1_max_spare.npz
+
+forecast_protocol:
+  input_hours: 72
+  output_hours: 24
+  stride_hours: 1
+  calendar_features:
+    - hour_sin
+    - hour_cos
+    - day_of_week_sin
+    - day_of_week_cos
+    - day_of_year_sin
+    - day_of_year_cos
+    - month_sin
+    - month_cos
+    - is_weekend
+    - year_standardized
+
+model:
+  num_variables: 2
+  num_frequencies: 16
+  hidden_dim: 64
+  num_layers: 3
+  freq_cutoff: 10
+  num_atoms: 16
+  sigma_base: 0.05
+  scale_warmup_ratio: 0.3
+  fusion_mode: additive_trigonometric_gate
+  forecast_head_type: tcn_attention
+  future_exogenous_mode: post_attention_residual
+  exogenous_adapter_hidden_dim: 16
+  tcn_channels: 40
+  tcn_kernel_size: 3
+  tcn_dilations:
+    - 1
+    - 2
+    - 4
+    - 8
+    - 16
+  quantiles:
+    - 0.05
+    - 0.10
+    - 0.50
+    - 0.90
+    - 0.95
+
+loss:
+  point_weight: 1.0
+  quantile_weight: 1.0
+  decomposition_weight: 1.0
+  smoothness_weight: 0.001
+  sparsity_weight: 0.001
+  target_sparsity: 0.3
+  sparsity_excess_weight: 10.0
+  point_loss_type: blended_huber_mse
+  huber_delta: 1.0
+  mse_fraction: 0.5
+
+training:
+  batch_size: 128
+  epochs: 120
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  seed: 2026
+  device: cuda
+  num_workers: 0
+  optimizer:
+    name: AdamW
+    betas:
+      - 0.9
+      - 0.95
+    eps: 1.0e-8
+  gradient_clip_norm: 1.0
+  ema_decay: 0.999
+  checkpoint_metrics:
+    - total
+    - mae
+    - rmse
+    - composite
+  primary_selection: composite
+  early_stopping:
+    enabled: true
+    monitor: composite
+    minimum_epochs: 80
+    patience: 20
+    relative_min_delta: 0.001
+  warm_start:
+    enabled: true
+    checkpoint_directory: outputs/forecasting/additive_tcn_attention_head
+    adapter_only: true
+  fine_tuning:
+    enabled: true
+    schedule:
+      warmup_epochs: 5
+      min_lr_ratio: 0.01
+    parameter_groups:
+      adapter:
+        start_epoch: 0
+        learning_rate: 0.0003
+        weight_decay: 0.001
+      decoder:
+        start_epoch: 10
+        learning_rate: 0.00005
+        weight_decay: 0.0001
+      temporal:
+        start_epoch: 60
+        learning_rate: 0.000005
+        weight_decay: 0.0001
+      fusion:
+        start_epoch: 60
+        learning_rate: 0.000005
+        weight_decay: 0.0001
+  output_directory: outputs/forecasting/stable_dgf_finetuning
