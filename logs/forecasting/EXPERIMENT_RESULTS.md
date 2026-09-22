@@ -264,6 +264,65 @@ the TCN learns stronger temporal patterns but also widens the generalization
 gap. Retaining only the final TCN state as a single summary of all 72 hours is
 a likely information bottleneck and is recorded as part of this ablation.
 
+## Horizon-specific TCN history-attention experiment
+
+This experiment retains the complete 72-step output from each CTF/DGF TCN.
+Each of the 24 future calendar embeddings produces a query over historical
+key/value vectors, yielding separate `[24, 72]` attention maps for the two
+fields. The convolutional encoder, additive trigonometric gate, data, loss,
+optimizer, learning rate, epoch budget, and seed remain unchanged. The two
+attention TCN heads contain 114,492 parameters, close to the 104,892-parameter
+last-state TCN and 117,280-parameter GELU alternatives.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_additive_tcn_attention_head.yaml`](../../configs/aemo_forecast_additive_tcn_attention_head.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 7 / 4 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/additive_tcn_attention_head/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Attention diagnostics | Best checkpoint |
+|---|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](additive_tcn_attention_head/nsw1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_attention_head/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_attention_head/NSW1/training_history.csv) | [`attention_diagnostics.json`](../../outputs/forecasting/additive_tcn_attention_head/NSW1/attention_diagnostics.json) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_attention_head/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](additive_tcn_attention_head/qld1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_attention_head/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_attention_head/QLD1/training_history.csv) | [`attention_diagnostics.json`](../../outputs/forecasting/additive_tcn_attention_head/QLD1/attention_diagnostics.json) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_attention_head/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](additive_tcn_attention_head/tas1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_attention_head/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_attention_head/TAS1/training_history.csv) | [`attention_diagnostics.json`](../../outputs/forecasting/additive_tcn_attention_head/TAS1/attention_diagnostics.json) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_attention_head/TAS1/best_model.pt) |
+
+![Attention-TCN training and validation loss](additive_tcn_attention_head/training_loss_curves.png)
+
+![Attention-TCN validation DGF gate](additive_tcn_attention_head/dgf_gate_curves.png)
+
+![Mean test attention maps](additive_tcn_attention_head/mean_attention_heatmaps.png)
+
+### Test metrics and last-state TCN comparison
+
+| Region | MAE | MAE change | RMSE | RMSE change | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|
+| NSW1 | 70.9050 | +7.74% | 409.3162 | +1.94% | 40.27% |
+| QLD1 | 60.2609 | -19.90% | 280.3577 | -2.00% | 47.07% |
+| TAS1 | 41.9712 | +2.04% | 163.9216 | +0.80% | 59.12% |
+
+Negative changes are improvements. Full-history attention substantially fixes
+the QLD1 degradation of the last-state TCN and approaches the additive linear
+head (59.5623 MAE), but it degrades NSW1 and TAS1. The effect of removing the
+single-state bottleneck is therefore market-dependent.
+
+### Attention selectivity on the test split
+
+| Region | CTF normalized entropy | DGF normalized entropy | CTF max weight | DGF max weight | CTF adjacent-horizon TV | DGF adjacent-horizon TV |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 0.9361 | 0.8562 | 3.78% | 6.11% | 0.0166 | 0.0480 |
+| QLD1 | 0.9033 | 0.9485 | 4.16% | 2.75% | 0.0148 | 0.0106 |
+| TAS1 | 0.9781 | 0.9458 | 2.72% | 4.07% | 0.0102 | 0.0112 |
+
+Normalized entropy is one for uniform attention; a uniform maximum over 72
+positions is 1.39%. The learned maps are non-uniform but remain diffuse, and
+adjacent forecast hours have very similar distributions. Thus the QLD1 gain is
+mainly attributable to full-history weighted pooling rather than strongly
+horizon-specific historical selection.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |

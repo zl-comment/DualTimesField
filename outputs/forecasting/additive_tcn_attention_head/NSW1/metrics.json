@@ -1,0 +1,66 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField-tcn-attention-head/outputs/forecasting/additive_tcn_attention_head/NSW1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField-tcn-attention-head/outputs/forecasting/additive_tcn_attention_head/NSW1/training_history.csv"
+  },
+  "best_epoch": 6,
+  "best_validation_loss": 2.112104535515581,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "region": "NSW1",
+  "seed": 2026,
+  "test": {
+    "losses": {
+      "decomposition": 1.8529341269719717,
+      "point": 6.163345086556099,
+      "quantile": 0.1409709159220832,
+      "smoothness": 0.12961324859276788,
+      "sparsity": 0.41752480464155534,
+      "total": 8.157797150237737
+    },
+    "metrics": {
+      "coverage_80": 0.5804915054315773,
+      "coverage_90": 0.7403282727393794,
+      "mae_aud_per_mwh": 70.90499313769905,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.40265898189889765,
+      "mean_width_80_aud_per_mwh": 109.00163215599613,
+      "mean_width_90_aud_per_mwh": 162.66364584968275,
+      "rmse_aud_per_mwh": 409.3161650396937,
+      "std_dgf_fusion_weight": 0.34989023950629955
+    }
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 0.4971625649591865,
+      "point": 1.4618518123145445,
+      "quantile": 0.1526176888507196,
+      "smoothness": 0.04203165993836347,
+      "sparsity": 0.4304447278177437,
+      "total": 2.112104535515581
+    },
+    "metrics": {
+      "coverage_80": 0.5840057609400633,
+      "coverage_90": 0.7288590668040136,
+      "mae_aud_per_mwh": 81.44609336624532,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.2935915001609089,
+      "mean_width_80_aud_per_mwh": 151.706813217733,
+      "mean_width_90_aud_per_mwh": 207.78858180069912,
+      "rmse_aud_per_mwh": 199.34360812539046,
+      "std_dgf_fusion_weight": 0.32577379293155667
+    }
+  }
+}
