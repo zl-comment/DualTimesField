@@ -49,6 +49,10 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         num_atoms=model_config["num_atoms"],
         sigma_base=model_config["sigma_base"],
         fusion_mode=model_config.get("fusion_mode", "concatenate"),
+        forecast_head_type=model_config.get("forecast_head_type", "linear"),
+        forecast_head_hidden_dim=model_config.get(
+            "forecast_head_hidden_dim", 64
+        ),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]

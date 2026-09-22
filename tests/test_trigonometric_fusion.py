@@ -6,7 +6,11 @@ from forecasting.models import DualFieldLinearForecaster
 
 
 class TrigonometricFusionTest(unittest.TestCase):
-    def _model(self, fusion_mode="trigonometric_gate"):
+    def _model(
+        self,
+        fusion_mode="trigonometric_gate",
+        forecast_head_type="linear",
+    ):
         return DualFieldLinearForecaster(
             num_variables=2,
             input_length=8,
@@ -19,6 +23,8 @@ class TrigonometricFusionTest(unittest.TestCase):
             freq_cutoff=2.0,
             num_atoms=2,
             fusion_mode=fusion_mode,
+            forecast_head_type=forecast_head_type,
+            forecast_head_hidden_dim=8,
         )
 
     def test_initial_gate_is_equal_convex_fusion(self):
@@ -106,6 +112,27 @@ class TrigonometricFusionTest(unittest.TestCase):
 
         self.assertGreater(model.ctf_point_head.weight.grad.abs().sum().item(), 0.0)
         self.assertLess(outputs["dgf_fusion_weight"].max().item(), 1e-6)
+
+    def test_nonlinear_heads_preserve_additive_interface_and_gradients(self):
+        torch.manual_seed(19)
+        model = self._model(
+            fusion_mode="additive_trigonometric_gate",
+            forecast_head_type="nonlinear",
+        )
+        history = torch.randn(4, 8, 2)
+        calendar = torch.randn(4, 3, 2)
+        model.initialize_atoms(history)
+        outputs = model(history, calendar)
+
+        self.assertIsInstance(model.ctf_point_head, torch.nn.Sequential)
+        self.assertIsInstance(model.ctf_point_head[1], torch.nn.GELU)
+        self.assertEqual(outputs["point_forecast"].shape, (4, 3, 1))
+        self.assertEqual(outputs["quantile_forecast"].shape, (4, 3, 3))
+        loss = outputs["point_forecast"].square().mean()
+        loss.backward()
+        for head in (model.ctf_point_head, model.dgf_point_head):
+            self.assertGreater(head[0].weight.grad.abs().sum().item(), 0.0)
+            self.assertGreater(head[2].weight.grad.abs().sum().item(), 0.0)
 
     def test_default_mode_preserves_concatenation_interface(self):
         model = self._model(fusion_mode="concatenate")

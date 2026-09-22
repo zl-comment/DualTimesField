@@ -8,7 +8,7 @@ from src.dualfield.core import DualTimesField
 
 
 class DualFieldLinearForecaster(nn.Module):
-    """Forecast from constrained CTF and DGF features with linear heads only."""
+    """Forecast from constrained CTF and DGF features with compact heads."""
 
     def __init__(
         self,
@@ -26,6 +26,8 @@ class DualFieldLinearForecaster(nn.Module):
         sparsity_lambda: float = 0.001,
         smoothness_lambda: float = 0.001,
         fusion_mode: str = "concatenate",
+        forecast_head_type: str = "linear",
+        forecast_head_hidden_dim: int = 64,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -34,6 +36,8 @@ class DualFieldLinearForecaster(nn.Module):
         self.calendar_dim = calendar_dim
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
+        self.forecast_head_type = forecast_head_type
+        self.forecast_head_hidden_dim = forecast_head_hidden_dim
         if fusion_mode not in {
             "concatenate",
             "trigonometric_gate",
@@ -43,6 +47,12 @@ class DualFieldLinearForecaster(nn.Module):
                 "fusion_mode must be 'concatenate', 'trigonometric_gate', "
                 "or 'additive_trigonometric_gate'"
             )
+        if forecast_head_type not in {"linear", "nonlinear"}:
+            raise ValueError(
+                "forecast_head_type must be 'linear' or 'nonlinear'"
+            )
+        if forecast_head_hidden_dim <= 0:
+            raise ValueError("forecast_head_hidden_dim must be positive")
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -62,26 +72,46 @@ class DualFieldLinearForecaster(nn.Module):
             + forecast_horizon * calendar_dim
         )
         if fusion_mode == "concatenate":
-            self.point_head = nn.Linear(combined_feature_dim, forecast_horizon)
-            self.quantile_head = nn.Linear(
-                combined_feature_dim, forecast_horizon * len(self.quantiles)
+            self.point_head = self._build_forecast_head(
+                combined_feature_dim, forecast_horizon
+            )
+            self.quantile_head = self._build_forecast_head(
+                combined_feature_dim,
+                forecast_horizon * len(self.quantiles),
             )
         else:
             expert_feature_dim = (
                 input_length * num_variables
                 + forecast_horizon * calendar_dim
             )
-            self.ctf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
-            self.dgf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
-            self.ctf_quantile_head = nn.Linear(
-                expert_feature_dim, forecast_horizon * len(self.quantiles)
+            self.ctf_point_head = self._build_forecast_head(
+                expert_feature_dim, forecast_horizon
             )
-            self.dgf_quantile_head = nn.Linear(
-                expert_feature_dim, forecast_horizon * len(self.quantiles)
+            self.dgf_point_head = self._build_forecast_head(
+                expert_feature_dim, forecast_horizon
+            )
+            self.ctf_quantile_head = self._build_forecast_head(
+                expert_feature_dim,
+                forecast_horizon * len(self.quantiles),
+            )
+            self.dgf_quantile_head = self._build_forecast_head(
+                expert_feature_dim,
+                forecast_horizon * len(self.quantiles),
             )
             self.fusion_gate = nn.Linear(combined_feature_dim, forecast_horizon)
             nn.init.zeros_(self.fusion_gate.weight)
             nn.init.zeros_(self.fusion_gate.bias)
+
+    def _build_forecast_head(
+        self, input_dim: int, output_dim: int
+    ) -> nn.Module:
+        if self.forecast_head_type == "linear":
+            return nn.Linear(input_dim, output_dim)
+        return nn.Sequential(
+            nn.Linear(input_dim, self.forecast_head_hidden_dim),
+            nn.GELU(),
+            nn.Linear(self.forecast_head_hidden_dim, output_dim),
+        )
 
     def _concatenated_forecast(
         self,

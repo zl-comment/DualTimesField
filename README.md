@@ -195,6 +195,22 @@ python -m forecasting.train \
 Outputs are isolated under
 `outputs/forecasting/additive_trigonometric_gate/`.
 
+### Minimal nonlinear forecast heads
+
+The nonlinear-head ablation preserves the complementary additive CTF/DGF
+fusion and replaces each direct linear point/quantile head with a one-hidden-
+layer MLP: `Linear(input, 64) -> GELU -> Linear(64, output)`. The gate,
+decomposition constraints, data protocol, and training settings remain
+unchanged.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_nonlinear_head.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/additive_nonlinear_head/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">
