@@ -161,6 +161,32 @@ These values are **paper-reported**, not reproduced by this repository. The auth
 
 Reference: Chen, H., Xu, Y., Wu, W., and Sun, H. *Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models*. Applied Energy (2026). [DOI: 10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
 
+### Fixed-Origin Day-Ahead Forecasting
+
+`configs/aemo_forecast_fixed_origin.yaml` implements one forecast per local day. With
+`forecast_protocol.origin_hour: 0`, every training, validation, and test example uses
+the local 00:00 delivery hour as its origin, the preceding 72 hours as input, and the
+following 24 hours as its target. Consecutive target windows therefore meet at their
+boundaries and never overlap. Change `origin_hour` to any integer from 0 through 23 to
+select a different local issue hour. Omitting `origin_hour` preserves the original
+rolling-window behavior controlled by `stride_hours`.
+
+The 24-hour targets no longer overlap, although consecutive 72-hour history windows
+still share 48 hours. This protocol removes repeated target scoring and the much
+stronger overlap between adjacent hourly origins; it does not claim that daily time
+series examples are statistically independent.
+
+Run one region with:
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_fixed_origin.yaml \
+  --region NSW1
+```
+
+Results are written below `outputs/forecasting/fixed_origin/`, separately from the
+rolling-window baseline.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

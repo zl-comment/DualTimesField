@@ -157,7 +157,21 @@ def _valid_origins(
     input_hours = protocol["input_hours"]
     output_hours = protocol["output_hours"]
     stride_hours = protocol["stride_hours"]
-    starts = np.arange(input_hours, len(frame) - output_hours + 1, stride_hours)
+    origin_hour = protocol.get("origin_hour")
+    if origin_hour is None:
+        starts = np.arange(input_hours, len(frame) - output_hours + 1, stride_hours)
+    else:
+        if isinstance(origin_hour, bool) or not isinstance(origin_hour, int):
+            raise ValueError("forecast_protocol.origin_hour must be an integer from 0 to 23")
+        if not 0 <= origin_hour <= 23:
+            raise ValueError("forecast_protocol.origin_hour must be an integer from 0 to 23")
+        if output_hours > 24:
+            raise ValueError(
+                "A daily fixed origin requires output_hours <= 24 to avoid overlapping targets"
+            )
+        all_starts = np.arange(input_hours, len(frame) - output_hours + 1)
+        delivery_hours = frame[data_config["delivery_column"]].dt.hour.to_numpy()
+        starts = all_starts[delivery_hours[all_starts] == origin_hour]
     split_values = frame[data_config["split_column"]].to_numpy()
     targets_in_split = np.array(
         [np.all(split_values[start:start + output_hours] == split) for start in starts]
