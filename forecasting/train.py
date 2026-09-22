@@ -46,6 +46,12 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             if config.get("future_exogenous", {}).get("enabled", False)
             else 0
         ),
+        future_exogenous_mode=model_config.get(
+            "future_exogenous_mode", "query"
+        ),
+        exogenous_adapter_hidden_dim=model_config.get(
+            "exogenous_adapter_hidden_dim", 16
+        ),
         quantiles=model_config["quantiles"],
         num_frequencies=model_config["num_frequencies"],
         hidden_dim=model_config["hidden_dim"],
@@ -237,13 +243,21 @@ def save_checkpoint(
     region: str,
     epoch: int,
     validation_loss: float,
+    model_epoch: int | None = None,
+    selection_metric: str = "total",
+    selection_value: float | None = None,
 ) -> None:
     torch.save(
         {
             "model_state": model.state_dict(),
             "region": region,
             "best_epoch": epoch,
+            "model_epoch": epoch if model_epoch is None else model_epoch,
             "best_validation_loss": validation_loss,
+            "selection_metric": selection_metric,
+            "selection_value": (
+                validation_loss if selection_value is None else selection_value
+            ),
             "seed": config["training"]["seed"],
             "model_config": config["model"],
             "loss_config": config["loss"],
@@ -275,6 +289,71 @@ def save_results(path: Path, results: Mapping) -> None:
         json.dump(results, output_file, indent=2, sort_keys=True)
 
 
+def initialize_from_warm_start(
+    model: DualFieldLinearForecaster,
+    config: Mapping,
+    region: str,
+    device: torch.device,
+) -> dict | None:
+    warm_start = config["training"].get("warm_start", {})
+    if not warm_start.get("enabled", False):
+        return None
+    checkpoint_path = (
+        Path(config["project_root"])
+        / warm_start["checkpoint_directory"]
+        / region
+        / "best_model.pt"
+    )
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    incompatible = model.load_state_dict(checkpoint["model_state"], strict=False)
+    expected_missing = {
+        name for name in model.state_dict() if ".exogenous_adapter." in name
+    }
+    if set(incompatible.missing_keys) != expected_missing:
+        raise RuntimeError(
+            "Warm-start checkpoint has unexpected missing keys: "
+            f"{sorted(set(incompatible.missing_keys) - expected_missing)}"
+        )
+    if incompatible.unexpected_keys:
+        raise RuntimeError(
+            "Warm-start checkpoint has unexpected keys: "
+            f"{sorted(incompatible.unexpected_keys)}"
+        )
+    model_epoch = int(checkpoint["best_epoch"])
+    model.set_epoch(model_epoch)
+    if warm_start.get("adapter_only", False):
+        for parameter in model.parameters():
+            parameter.requires_grad = False
+        for name, parameter in model.named_parameters():
+            if ".exogenous_adapter." in name:
+                parameter.requires_grad = True
+    trainable_names = [
+        name for name, parameter in model.named_parameters()
+        if parameter.requires_grad
+    ]
+    if not trainable_names:
+        raise RuntimeError("Warm start left no trainable parameters")
+    return {
+        "checkpoint": str(checkpoint_path),
+        "base_best_epoch": model_epoch,
+        "adapter_only": bool(warm_start.get("adapter_only", False)),
+        "trainable_parameter_names": trainable_names,
+        "trainable_parameter_count": sum(
+            parameter.numel()
+            for parameter in model.parameters()
+            if parameter.requires_grad
+        ),
+    }
+
+
+def validation_selection_values(validation: Mapping) -> Dict[str, float]:
+    return {
+        "total": validation["losses"]["total"],
+        "mae": validation["metrics"]["mae_aud_per_mwh"],
+        "rmse": validation["metrics"]["rmse_aud_per_mwh"],
+    }
+
+
 def run_training(config_path: Path | str, region: str) -> Path:
     config = load_forecast_config(config_path)
     training_config = config["training"]
@@ -284,32 +363,93 @@ def run_training(config_path: Path | str, region: str) -> Path:
     loaders = build_loaders(datasets, training_config)
     model = build_model(config).to(device)
     criterion = build_loss(config).to(device)
+    warm_start_metadata = initialize_from_warm_start(
+        model, config, region, device
+    )
+    if warm_start_metadata is None:
+        initialization_loader = DataLoader(
+            datasets["train"],
+            batch_size=training_config["batch_size"],
+            shuffle=False,
+        )
+        initialization_batch = next(iter(initialization_loader))
+        model.initialize_atoms(initialization_batch["history_values"].to(device))
     optimizer = torch.optim.AdamW(
-        model.parameters(),
+        [parameter for parameter in model.parameters() if parameter.requires_grad],
         lr=training_config["learning_rate"],
         weight_decay=training_config["weight_decay"],
     )
-    initialization_loader = DataLoader(
-        datasets["train"],
-        batch_size=training_config["batch_size"],
-        shuffle=False,
-    )
-    initialization_batch = next(iter(initialization_loader))
-    model.initialize_atoms(initialization_batch["history_values"].to(device))
     output_dir = Path(config["project_root"]) / training_config["output_directory"] / region
     output_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = output_dir / "best_model.pt"
+    checkpoint_paths = {
+        "total": output_dir / "best_model.pt",
+        "mae": output_dir / "best_mae_model.pt",
+        "rmse": output_dir / "best_rmse_model.pt",
+    }
     history_path = output_dir / "training_history.csv"
     history = []
-    best_epoch = -1
-    best_validation_loss = float("inf")
+    best_epochs = {name: -1 for name in checkpoint_paths}
+    best_values = {name: float("inf") for name in checkpoint_paths}
+    fixed_model_epoch = (
+        warm_start_metadata["base_best_epoch"]
+        if warm_start_metadata is not None
+        else None
+    )
+    if warm_start_metadata is not None:
+        initial_validation = evaluate(
+            model,
+            criterion,
+            loaders["validation"],
+            datasets["validation"],
+            device,
+        )
+        history.append(
+            {
+                "epoch": -1,
+                "stage": "warm_start",
+                **{f"train_{key}": float("nan") for key in LOSS_NAMES},
+                **{
+                    f"validation_{key}": value
+                    for key, value in initial_validation["losses"].items()
+                },
+                **{
+                    f"validation_{key}": value
+                    for key, value in initial_validation["metrics"].items()
+                },
+            }
+        )
+        initial_values = validation_selection_values(initial_validation)
+        for selection_name, selection_value in initial_values.items():
+            best_values[selection_name] = selection_value
+            save_checkpoint(
+                checkpoint_paths[selection_name],
+                model,
+                config,
+                datasets["train"],
+                region,
+                -1,
+                initial_validation["losses"]["total"],
+                model_epoch=fixed_model_epoch,
+                selection_metric=selection_name,
+                selection_value=selection_value,
+            )
+        pd.DataFrame(history).to_csv(history_path, index=False)
+        print(
+            "warm_start "
+            f"validation={initial_values['total']:.6f} "
+            f"mae={initial_values['mae']:.6f} "
+            f"rmse={initial_values['rmse']:.6f}"
+        )
     for epoch in range(training_config["epochs"]):
-        model.set_epoch(epoch)
+        model.set_epoch(
+            fixed_model_epoch if fixed_model_epoch is not None else epoch
+        )
         train_losses = train_epoch(model, criterion, loaders["train"], optimizer, device)
         validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
         history.append(
             {
                 "epoch": epoch,
+                "stage": "adapter_training" if warm_start_metadata else "training",
                 **{f"train_{key}": value for key, value in train_losses.items()},
                 **{
                     f"validation_{key}": value
@@ -322,34 +462,81 @@ def run_training(config_path: Path | str, region: str) -> Path:
             }
         )
         pd.DataFrame(history).to_csv(history_path, index=False)
-        validation_loss = validation["losses"]["total"]
-        if validation_loss < best_validation_loss:
-            best_epoch = epoch
-            best_validation_loss = validation_loss
-            save_checkpoint(checkpoint_path, model, config, datasets["train"], region, epoch, validation_loss)
+        selection_values = validation_selection_values(validation)
+        for selection_name, selection_value in selection_values.items():
+            if selection_value < best_values[selection_name]:
+                best_epochs[selection_name] = epoch
+                best_values[selection_name] = selection_value
+                save_checkpoint(
+                    checkpoint_paths[selection_name],
+                    model,
+                    config,
+                    datasets["train"],
+                    region,
+                    epoch,
+                    validation["losses"]["total"],
+                    model_epoch=(
+                        fixed_model_epoch
+                        if fixed_model_epoch is not None
+                        else epoch
+                    ),
+                    selection_metric=selection_name,
+                    selection_value=selection_value,
+                )
         print(
             f"epoch={epoch + 1}/{training_config['epochs']} "
             f"train={train_losses['total']:.6f} "
-            f"validation={validation_loss:.6f} "
-            f"best_epoch={best_epoch + 1}"
+            f"validation={selection_values['total']:.6f} "
+            f"mae={selection_values['mae']:.6f} "
+            f"rmse={selection_values['rmse']:.6f} "
+            f"best_total_epoch={best_epochs['total'] + 1} "
+            f"best_mae_epoch={best_epochs['mae'] + 1} "
+            f"best_rmse_epoch={best_epochs['rmse'] + 1}"
         )
-    if best_epoch < 0:
-        raise RuntimeError("Training completed without a finite validation checkpoint")
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
-    model.load_state_dict(checkpoint["model_state"])
-    model.set_epoch(checkpoint["best_epoch"])
-    validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
-    test = evaluate(model, criterion, loaders["test"], datasets["test"], device)
+    selection_results = {}
+    for selection_name, checkpoint_path in checkpoint_paths.items():
+        checkpoint = torch.load(
+            checkpoint_path, map_location=device, weights_only=False
+        )
+        model.load_state_dict(checkpoint["model_state"])
+        model.set_epoch(checkpoint["model_epoch"])
+        selection_results[selection_name] = {
+            "best_epoch": checkpoint["best_epoch"],
+            "selection_value": checkpoint["selection_value"],
+            "validation": evaluate(
+                model,
+                criterion,
+                loaders["validation"],
+                datasets["validation"],
+                device,
+            ),
+            "test": evaluate(
+                model,
+                criterion,
+                loaders["test"],
+                datasets["test"],
+                device,
+            ),
+            "checkpoint": str(checkpoint_path),
+        }
+    primary = selection_results["total"]
     results = {
         "region": region,
         "seed": training_config["seed"],
-        "best_epoch": checkpoint["best_epoch"],
-        "best_validation_loss": checkpoint["best_validation_loss"],
+        "best_epoch": primary["best_epoch"],
+        "best_validation_loss": primary["validation"]["losses"]["total"],
         "dataset_sizes": {name: len(dataset) for name, dataset in datasets.items()},
-        "validation": validation,
-        "test": test,
+        "validation": primary["validation"],
+        "test": primary["test"],
+        "selection_results": selection_results,
+        "warm_start": warm_start_metadata,
         "environment": environment_fingerprint(),
-        "artifacts": {"checkpoint": str(checkpoint_path), "history": str(history_path)},
+        "artifacts": {
+            "checkpoint": str(checkpoint_paths["total"]),
+            "mae_checkpoint": str(checkpoint_paths["mae"]),
+            "rmse_checkpoint": str(checkpoint_paths["rmse"]),
+            "history": str(history_path),
+        },
     }
     save_results(output_dir / "metrics.json", results)
     return output_dir

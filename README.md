@@ -251,6 +251,24 @@ The future margin is projected into each horizon-specific attention query.
 Outputs are isolated under
 `outputs/forecasting/max_spare_future_context/`.
 
+### DGF-only maximum-spare residual adapter
+
+The follow-up experiment preserves the TCN-attention baseline exactly at
+initialization. It loads the selected regional baseline checkpoint, freezes all
+existing parameters, and trains only a zero-initialized nonlinear adapter. The
+calendar embedding continues to form the attention query; maximum spare is
+added only after attention in the DGF event forecast head. Validation total
+loss, MAE, and RMSE each receive an independently selected checkpoint.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_max_spare_dgf_adapter.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/max_spare_dgf_residual_adapter/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

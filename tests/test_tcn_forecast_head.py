@@ -72,6 +72,38 @@ class TemporalConvForecastHeadTest(unittest.TestCase):
             head.exogenous_projection.weight.grad.abs().sum().item(), 0.0
         )
 
+    def test_post_attention_adapter_starts_as_exact_zero_residual(self):
+        torch.manual_seed(41)
+        head = TemporalConvForecastHead(
+            num_variables=2,
+            calendar_dim=3,
+            future_exogenous_dim=1,
+            future_exogenous_mode="post_attention_residual",
+            num_quantiles=5,
+            channels=8,
+            dilations=(1, 2),
+            summary_mode="attention",
+        )
+        history = torch.randn(4, 12, 2)
+        calendar = torch.randn(4, 5, 3)
+        exogenous_a = torch.randn(4, 5, 1)
+        exogenous_b = torch.randn(4, 5, 1)
+
+        point_a, quantile_a, attention_a = head(
+            history, calendar, exogenous_a
+        )
+        point_b, quantile_b, attention_b = head(
+            history, calendar, exogenous_b
+        )
+
+        torch.testing.assert_close(point_a, point_b)
+        torch.testing.assert_close(quantile_a, quantile_b)
+        torch.testing.assert_close(attention_a, attention_b)
+        point_a.square().mean().backward()
+        self.assertGreater(
+            head.exogenous_adapter[-1].weight.grad.abs().sum().item(), 0.0
+        )
+
     def test_tcn_heads_preserve_additive_fusion_and_gradients(self):
         torch.manual_seed(23)
         model = DualFieldLinearForecaster(
@@ -184,6 +216,31 @@ class TemporalConvForecastHeadTest(unittest.TestCase):
         self.assertEqual(outputs["point_forecast"].shape, (4, 3, 1))
         self.assertEqual(outputs["quantile_forecast"].shape, (4, 3, 3))
         self.assertEqual(outputs["ctf_history_attention"].shape, (4, 3, 8))
+
+    def test_post_attention_factor_is_attached_only_to_dgf_head(self):
+        model = DualFieldLinearForecaster(
+            num_variables=2,
+            input_length=8,
+            forecast_horizon=3,
+            calendar_dim=2,
+            future_exogenous_dim=1,
+            future_exogenous_mode="post_attention_residual",
+            quantiles=(0.1, 0.5, 0.9),
+            num_frequencies=2,
+            hidden_dim=8,
+            num_layers=1,
+            freq_cutoff=2.0,
+            num_atoms=2,
+            fusion_mode="additive_trigonometric_gate",
+            forecast_head_type="tcn_attention",
+            tcn_channels=8,
+            tcn_dilations=(1, 2),
+        )
+
+        self.assertEqual(model.ctf_forecast_head.future_exogenous_dim, 0)
+        self.assertIsNone(model.ctf_forecast_head.exogenous_adapter)
+        self.assertEqual(model.dgf_forecast_head.future_exogenous_dim, 1)
+        self.assertIsNotNone(model.dgf_forecast_head.exogenous_adapter)
 
 
 if __name__ == "__main__":

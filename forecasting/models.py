@@ -50,6 +50,8 @@ class TemporalConvForecastHead(nn.Module):
         calendar_dim: int,
         num_quantiles: int,
         future_exogenous_dim: int = 0,
+        future_exogenous_mode: str = "query",
+        exogenous_adapter_hidden_dim: int = 16,
         channels: int = 40,
         kernel_size: int = 3,
         dilations: Sequence[int] = (1, 2, 4, 8, 16),
@@ -66,9 +68,17 @@ class TemporalConvForecastHead(nn.Module):
             raise ValueError("summary_mode must be 'last' or 'attention'")
         if future_exogenous_dim < 0:
             raise ValueError("future_exogenous_dim must be non-negative")
+        if future_exogenous_mode not in {"query", "post_attention_residual"}:
+            raise ValueError(
+                "future_exogenous_mode must be 'query' or "
+                "'post_attention_residual'"
+            )
+        if exogenous_adapter_hidden_dim <= 0:
+            raise ValueError("exogenous_adapter_hidden_dim must be positive")
 
         self.summary_mode = summary_mode
         self.future_exogenous_dim = future_exogenous_dim
+        self.future_exogenous_mode = future_exogenous_mode
         self.receptive_field = 1 + 2 * (kernel_size - 1) * sum(dilations)
         self.input_projection = nn.Conv1d(num_variables, channels, 1)
         self.temporal_blocks = nn.Sequential(
@@ -80,9 +90,20 @@ class TemporalConvForecastHead(nn.Module):
         self.calendar_projection = nn.Linear(calendar_dim, channels)
         self.exogenous_projection = (
             nn.Linear(future_exogenous_dim, channels, bias=False)
-            if future_exogenous_dim > 0
+            if future_exogenous_dim > 0 and future_exogenous_mode == "query"
             else None
         )
+        self.exogenous_adapter = None
+        if (
+            future_exogenous_dim > 0
+            and future_exogenous_mode == "post_attention_residual"
+        ):
+            self.exogenous_adapter = nn.Sequential(
+                nn.Linear(future_exogenous_dim, exogenous_adapter_hidden_dim),
+                nn.GELU(),
+                nn.Linear(exogenous_adapter_hidden_dim, channels, bias=False),
+            )
+            nn.init.zeros_(self.exogenous_adapter[-1].weight)
         if summary_mode == "attention":
             self.query_projection = nn.Linear(channels, channels, bias=False)
             self.key_projection = nn.Linear(channels, channels, bias=False)
@@ -103,8 +124,7 @@ class TemporalConvForecastHead(nn.Module):
         temporal = self.input_projection(temporal)
         temporal = self.temporal_blocks(temporal)
 
-        future_projection = self.calendar_projection(future_calendar)
-        if self.exogenous_projection is not None:
+        if self.future_exogenous_dim > 0:
             if future_exogenous is None or future_exogenous.shape != (
                 history_signal.shape[0],
                 future_calendar.shape[1],
@@ -114,6 +134,13 @@ class TemporalConvForecastHead(nn.Module):
                     "future_exogenous must have shape "
                     f"[B, {future_calendar.shape[1]}, {self.future_exogenous_dim}]"
                 )
+        elif future_exogenous is not None:
+            raise ValueError(
+                "future_exogenous was provided to a head without exogenous inputs"
+            )
+
+        future_projection = self.calendar_projection(future_calendar)
+        if self.exogenous_projection is not None:
             future_projection = future_projection + self.exogenous_projection(
                 future_exogenous
             )
@@ -138,6 +165,10 @@ class TemporalConvForecastHead(nn.Module):
                 torch.cat([history_context, future_context], dim=-1)
             )
         )
+        if self.exogenous_adapter is not None:
+            future_hidden = future_hidden + self.exogenous_adapter(
+                future_exogenous
+            )
         return (
             self.point_output(future_hidden),
             self.quantile_output(future_hidden),
@@ -155,6 +186,8 @@ class DualFieldLinearForecaster(nn.Module):
         forecast_horizon: int = 24,
         calendar_dim: int = 10,
         future_exogenous_dim: int = 0,
+        future_exogenous_mode: str = "query",
+        exogenous_adapter_hidden_dim: int = 16,
         quantiles: Sequence[float] = (0.05, 0.10, 0.50, 0.90, 0.95),
         num_frequencies: int = 16,
         hidden_dim: int = 64,
@@ -176,6 +209,7 @@ class DualFieldLinearForecaster(nn.Module):
         self.forecast_horizon = forecast_horizon
         self.calendar_dim = calendar_dim
         self.future_exogenous_dim = future_exogenous_dim
+        self.future_exogenous_mode = future_exogenous_mode
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
         self.forecast_head_type = forecast_head_type
@@ -237,7 +271,6 @@ class DualFieldLinearForecaster(nn.Module):
                     "num_variables": num_variables,
                     "calendar_dim": calendar_dim,
                     "num_quantiles": len(self.quantiles),
-                    "future_exogenous_dim": future_exogenous_dim,
                     "channels": tcn_channels,
                     "kernel_size": tcn_kernel_size,
                     "dilations": tuple(tcn_dilations),
@@ -248,10 +281,20 @@ class DualFieldLinearForecaster(nn.Module):
                     ),
                 }
                 self.ctf_forecast_head = TemporalConvForecastHead(
-                    **head_arguments
+                    **head_arguments,
+                    future_exogenous_dim=(
+                        future_exogenous_dim
+                        if future_exogenous_mode == "query"
+                        else 0
+                    ),
+                    future_exogenous_mode=future_exogenous_mode,
+                    exogenous_adapter_hidden_dim=exogenous_adapter_hidden_dim,
                 )
                 self.dgf_forecast_head = TemporalConvForecastHead(
-                    **head_arguments
+                    **head_arguments,
+                    future_exogenous_dim=future_exogenous_dim,
+                    future_exogenous_mode=future_exogenous_mode,
+                    exogenous_adapter_hidden_dim=exogenous_adapter_hidden_dim,
                 )
             else:
                 self.ctf_point_head = nn.Linear(
@@ -317,7 +360,13 @@ class DualFieldLinearForecaster(nn.Module):
         dgf_attention = None
         if self.forecast_head_type in {"tcn", "tcn_attention"}:
             ctf_point, ctf_quantile, ctf_attention = self.ctf_forecast_head(
-                ctf_signal, future_calendar, future_exogenous
+                ctf_signal,
+                future_calendar,
+                (
+                    future_exogenous
+                    if self.future_exogenous_mode == "query"
+                    else None
+                ),
             )
             dgf_point, dgf_quantile, dgf_attention = self.dgf_forecast_head(
                 event_signal, future_calendar, future_exogenous
