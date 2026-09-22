@@ -160,6 +160,37 @@ shows that grouped sampling removes within-epoch target duplication, but it does
 not establish that the sampling method harms accuracy. A compute-matched run needs
 multiple complete 24-hour rotations or a scheduler defined in rotation cycles.
 
+### Extended grouped-sampling run: 240 epochs, learning rate 0.001
+
+The extended run covers ten complete 24-hour rotations. It also raises the
+learning rate from 0.0003 to 0.001, so it measures the joint effect of a larger
+training budget and faster optimization rather than epochs alone.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_daily_grouped_sampling_extended.yaml`](../../configs/aemo_forecast_daily_grouped_sampling_extended.yaml) |
+| Epochs / rotations / learning rate | 240 / 10 / 0.001 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 69 / 151 / 182 |
+| Output directory | `outputs/forecasting/daily_grouped_sampling_extended/` |
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](daily_grouped_sampling_extended/nsw1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling_extended/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling_extended/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling_extended/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](daily_grouped_sampling_extended/qld1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling_extended/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling_extended/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling_extended/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](daily_grouped_sampling_extended/tas1.log) | [`metrics.json`](../../outputs/forecasting/daily_grouped_sampling_extended/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/daily_grouped_sampling_extended/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/daily_grouped_sampling_extended/TAS1/best_model.pt) |
+
+| Region | Best validation loss | Test MAE | Test RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 1.888758 | 81.0640 | 408.6400 | 48.44% | 84.3306 | 77.93% | 198.3038 |
+| QLD1 | 6.275600 | 81.1377 | 284.9892 | 49.55% | 105.5124 | 81.12% | 219.6974 |
+| TAS1 | 21.103945 | 39.1098 | 162.3975 | 46.34% | 58.3218 | 76.51% | 117.8816 |
+
+More rotations move checkpoint selection to substantially later epochs and lower
+validation loss, confirming that 30 grouped epochs were insufficient. Test MAE,
+however, worsens in all three regions relative to the 30-epoch run. The expanded
+budget plus higher learning rate therefore does not improve point forecasting and
+is retained as a negative hyperparameter result.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
