@@ -212,6 +212,23 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/additive_tcn_head/`.
 
+### Horizon-specific TCN history attention
+
+The attention TCN head retains all 72 temporal outputs instead of reducing them
+to the final TCN state. Each of the 24 future calendar embeddings becomes a
+query over the full historical key/value sequence, producing a distinct
+history summary for every forecast hour. Separate attention maps are exposed
+for the CTF and DGF branches.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_tcn_attention_head.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/additive_tcn_attention_head/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

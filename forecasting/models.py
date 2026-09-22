@@ -52,6 +52,7 @@ class TemporalConvForecastHead(nn.Module):
         channels: int = 40,
         kernel_size: int = 3,
         dilations: Sequence[int] = (1, 2, 4, 8, 16),
+        summary_mode: str = "last",
     ):
         super().__init__()
         if channels <= 0:
@@ -60,7 +61,10 @@ class TemporalConvForecastHead(nn.Module):
             raise ValueError("kernel_size must be greater than one")
         if not dilations or any(dilation <= 0 for dilation in dilations):
             raise ValueError("dilations must contain positive integers")
+        if summary_mode not in {"last", "attention"}:
+            raise ValueError("summary_mode must be 'last' or 'attention'")
 
+        self.summary_mode = summary_mode
         self.receptive_field = 1 + 2 * (kernel_size - 1) * sum(dilations)
         self.input_projection = nn.Conv1d(num_variables, channels, 1)
         self.temporal_blocks = nn.Sequential(
@@ -70,6 +74,11 @@ class TemporalConvForecastHead(nn.Module):
             ]
         )
         self.calendar_projection = nn.Linear(calendar_dim, channels)
+        if summary_mode == "attention":
+            self.query_projection = nn.Linear(channels, channels, bias=False)
+            self.key_projection = nn.Linear(channels, channels, bias=False)
+            self.value_projection = nn.Linear(channels, channels, bias=False)
+            self.attention_scale = channels ** -0.5
         self.future_fusion = nn.Linear(2 * channels, channels)
         self.activation = nn.GELU()
         self.point_output = nn.Linear(channels, 1)
@@ -79,18 +88,29 @@ class TemporalConvForecastHead(nn.Module):
         self,
         history_signal: torch.Tensor,
         future_calendar: torch.Tensor,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
         temporal = history_signal.transpose(1, 2)
         temporal = self.input_projection(temporal)
         temporal = self.temporal_blocks(temporal)
-        history_context = temporal[..., -1]
 
         calendar_context = self.activation(
             self.calendar_projection(future_calendar)
         )
-        history_context = history_context.unsqueeze(1).expand(
-            -1, future_calendar.shape[1], -1
-        )
+        attention_weights = None
+        if self.summary_mode == "attention":
+            temporal_sequence = temporal.transpose(1, 2)
+            query = self.query_projection(calendar_context)
+            key = self.key_projection(temporal_sequence)
+            value = self.value_projection(temporal_sequence)
+            attention_scores = torch.matmul(
+                query, key.transpose(1, 2)
+            ) * self.attention_scale
+            attention_weights = torch.softmax(attention_scores, dim=-1)
+            history_context = torch.matmul(attention_weights, value)
+        else:
+            history_context = temporal[..., -1].unsqueeze(1).expand(
+                -1, future_calendar.shape[1], -1
+            )
         future_hidden = self.activation(
             self.future_fusion(
                 torch.cat([history_context, calendar_context], dim=-1)
@@ -99,6 +119,7 @@ class TemporalConvForecastHead(nn.Module):
         return (
             self.point_output(future_hidden),
             self.quantile_output(future_hidden),
+            attention_weights,
         )
 
 
@@ -143,9 +164,12 @@ class DualFieldLinearForecaster(nn.Module):
                 "fusion_mode must be 'concatenate', 'trigonometric_gate', "
                 "or 'additive_trigonometric_gate'"
             )
-        if forecast_head_type not in {"linear", "tcn"}:
-            raise ValueError("forecast_head_type must be 'linear' or 'tcn'")
-        if fusion_mode == "concatenate" and forecast_head_type == "tcn":
+        if forecast_head_type not in {"linear", "tcn", "tcn_attention"}:
+            raise ValueError(
+                "forecast_head_type must be 'linear', 'tcn', "
+                "or 'tcn_attention'"
+            )
+        if fusion_mode == "concatenate" and forecast_head_type != "linear":
             raise ValueError(
                 "TCN heads require a gated fusion mode with separate fields"
             )
@@ -177,7 +201,7 @@ class DualFieldLinearForecaster(nn.Module):
                 input_length * num_variables
                 + forecast_horizon * calendar_dim
             )
-            if forecast_head_type == "tcn":
+            if forecast_head_type in {"tcn", "tcn_attention"}:
                 head_arguments = {
                     "num_variables": num_variables,
                     "calendar_dim": calendar_dim,
@@ -185,6 +209,11 @@ class DualFieldLinearForecaster(nn.Module):
                     "channels": tcn_channels,
                     "kernel_size": tcn_kernel_size,
                     "dilations": tuple(tcn_dilations),
+                    "summary_mode": (
+                        "attention"
+                        if forecast_head_type == "tcn_attention"
+                        else "last"
+                    ),
                 }
                 self.ctf_forecast_head = TemporalConvForecastHead(
                     **head_arguments
@@ -251,11 +280,13 @@ class DualFieldLinearForecaster(nn.Module):
             [ctf_flat, event_flat, calendar_flat], dim=1
         )
 
-        if self.forecast_head_type == "tcn":
-            ctf_point, ctf_quantile = self.ctf_forecast_head(
+        ctf_attention = None
+        dgf_attention = None
+        if self.forecast_head_type in {"tcn", "tcn_attention"}:
+            ctf_point, ctf_quantile, ctf_attention = self.ctf_forecast_head(
                 ctf_signal, future_calendar
             )
-            dgf_point, dgf_quantile = self.dgf_forecast_head(
+            dgf_point, dgf_quantile, dgf_attention = self.dgf_forecast_head(
                 event_signal, future_calendar
             )
         else:
@@ -291,7 +322,7 @@ class DualFieldLinearForecaster(nn.Module):
                 ctf_weight * ctf_quantile + dgf_weight * dgf_quantile
             )
 
-        return {
+        forecasts = {
             "point_forecast": point_forecast,
             "quantile_forecast": quantile_forecast,
             "ctf_expert_point": ctf_point,
@@ -302,6 +333,14 @@ class DualFieldLinearForecaster(nn.Module):
             "ctf_fusion_weight": ctf_weight,
             "dgf_fusion_weight": dgf_weight,
         }
+        if ctf_attention is not None:
+            forecasts.update(
+                {
+                    "ctf_history_attention": ctf_attention,
+                    "dgf_history_attention": dgf_attention,
+                }
+            )
+        return forecasts
 
     def _history_time(self, history_values: torch.Tensor) -> torch.Tensor:
         return torch.linspace(
