@@ -216,6 +216,54 @@ test DGF weights remain distributed around 45--57% instead of collapsing near
 epochs 1, 1, and 2, so the new parameterization still overfits quickly and does
 not consistently beat the original concatenation head.
 
+## Temporal convolutional forecast-head experiment
+
+This experiment preserves the complementary additive CTF/DGF fusion and
+replaces the flattened linear heads with separate temporal convolutional
+heads. Each head uses 40 channels and five causal residual blocks with kernel
+size 3 and dilations 1, 2, 4, 8, and 16. Two convolutions per block give a
+125-step receptive field, covering the full 72-hour history. The final temporal
+state is combined independently with each future hour's calendar vector before
+point and quantile decoding. The two TCN heads contain 104,892 parameters,
+compared with 110,880 for the additive linear heads and 117,280 for the minimal
+GELU heads.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_additive_tcn_head.yaml`](../../configs/aemo_forecast_additive_tcn_head.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 1 / 6 / 7 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/additive_tcn_head/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](additive_tcn_head/nsw1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_head/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_head/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_head/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](additive_tcn_head/qld1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_head/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_head/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_head/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](additive_tcn_head/tas1.log) | [`metrics.json`](../../outputs/forecasting/additive_tcn_head/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_tcn_head/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_tcn_head/TAS1/best_model.pt) |
+
+![TCN-head training and validation loss](additive_tcn_head/training_loss_curves.png)
+
+![TCN-head validation DGF gate](additive_tcn_head/dgf_gate_curves.png)
+
+### Test metrics and comparisons
+
+| Region | MAE | vs. GELU head | vs. additive linear head | RMSE | vs. GELU head | vs. additive linear head | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 65.8118 | -9.01% | -2.62% | 401.5297 | +0.11% | +0.30% | 33.98% |
+| QLD1 | 75.2342 | +16.01% | +26.31% | 286.0702 | +2.42% | +2.80% | 37.44% |
+| TAS1 | 41.1317 | +0.46% | +8.96% | 162.6147 | -0.19% | +0.53% | 48.30% |
+
+Negative comparison values are improvements. The TCN improves NSW1 MAE over
+both matched alternatives and slightly improves TAS1 RMSE over the GELU head,
+but substantially degrades QLD1 and does not improve consistently across
+regions. Training loss falls much faster than validation loss, showing that
+the TCN learns stronger temporal patterns but also widens the generalization
+gap. Retaining only the final TCN state as a single summary of all 72 hours is
+a likely information bottleneck and is recorded as part of this ablation.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
