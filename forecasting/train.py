@@ -48,6 +48,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         freq_cutoff=model_config["freq_cutoff"],
         num_atoms=model_config["num_atoms"],
         sigma_base=model_config["sigma_base"],
+        fusion_mode=model_config.get("fusion_mode", "concatenate"),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]
@@ -138,6 +139,9 @@ def evaluate(
     squared_error = 0.0
     target_count = 0
     interval_totals = {"80": [0.0, 0.0], "90": [0.0, 0.0]}
+    fusion_weight_sum = 0.0
+    fusion_weight_square_sum = 0.0
+    fusion_weight_count = 0
     price_mean = dataset.history_standardizer.mean[0]
     price_std = dataset.history_standardizer.std[0]
     quantiles = list(model.quantiles)
@@ -161,6 +165,11 @@ def evaluate(
             absolute_error += error.abs().sum().item()
             squared_error += error.square().sum().item()
             target_count += actual.numel()
+            if "dgf_fusion_weight" in outputs:
+                dgf_weight = outputs["dgf_fusion_weight"]
+                fusion_weight_sum += dgf_weight.sum().item()
+                fusion_weight_square_sum += dgf_weight.square().sum().item()
+                fusion_weight_count += dgf_weight.numel()
             for label, (lower_index, upper_index) in interval_indices.items():
                 lower = quantile[..., lower_index:lower_index + 1]
                 upper = quantile[..., upper_index:upper_index + 1]
@@ -174,6 +183,20 @@ def evaluate(
         "coverage_90": interval_totals["90"][0] / target_count,
         "mean_width_90_aud_per_mwh": interval_totals["90"][1] / target_count,
     }
+    if fusion_weight_count:
+        mean_dgf_weight = fusion_weight_sum / fusion_weight_count
+        variance = max(
+            fusion_weight_square_sum / fusion_weight_count
+            - mean_dgf_weight ** 2,
+            0.0,
+        )
+        metrics.update(
+            {
+                "mean_ctf_fusion_weight": 1.0 - mean_dgf_weight,
+                "mean_dgf_fusion_weight": mean_dgf_weight,
+                "std_dgf_fusion_weight": variance ** 0.5,
+            }
+        )
     return {"losses": average_losses(loss_sums, sample_count), "metrics": metrics}
 
 

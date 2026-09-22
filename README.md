@@ -161,6 +161,23 @@ These values are **paper-reported**, not reproduced by this repository. The auth
 
 Reference: Chen, H., Xu, Y., Wu, W., and Sun, H. *Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models*. Applied Energy (2026). [DOI: 10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
 
+### Trigonometric gated CTF/DGF fusion
+
+The optional trigonometric fusion mode first produces separate linear forecasts
+from CTF and DGF features. A horizon-specific gate then maps the combined CTF,
+DGF, and known-future calendar context to an angle in `[0, pi/2]`. The final
+weights are `cos(theta)^2` and `sin(theta)^2`, so they are non-negative and sum
+to one. The gate is initialized to an equal 50/50 mixture.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+The original configuration defaults to `concatenate`; gated outputs are isolated
+under `outputs/forecasting/trigonometric_gate/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

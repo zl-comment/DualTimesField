@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Sequence
 
 import torch
@@ -24,6 +25,7 @@ class DualFieldLinearForecaster(nn.Module):
         sigma_base: float = 0.05,
         sparsity_lambda: float = 0.001,
         smoothness_lambda: float = 0.001,
+        fusion_mode: str = "concatenate",
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -31,6 +33,11 @@ class DualFieldLinearForecaster(nn.Module):
         self.forecast_horizon = forecast_horizon
         self.calendar_dim = calendar_dim
         self.quantiles = tuple(quantiles)
+        self.fusion_mode = fusion_mode
+        if fusion_mode not in {"concatenate", "trigonometric_gate"}:
+            raise ValueError(
+                "fusion_mode must be 'concatenate' or 'trigonometric_gate'"
+            )
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -45,14 +52,106 @@ class DualFieldLinearForecaster(nn.Module):
             smoothness_lambda=smoothness_lambda,
         )
 
-        feature_dim = (
+        combined_feature_dim = (
             2 * input_length * num_variables
             + forecast_horizon * calendar_dim
         )
-        self.point_head = nn.Linear(feature_dim, forecast_horizon)
-        self.quantile_head = nn.Linear(
-            feature_dim, forecast_horizon * len(self.quantiles)
+        if fusion_mode == "concatenate":
+            self.point_head = nn.Linear(combined_feature_dim, forecast_horizon)
+            self.quantile_head = nn.Linear(
+                combined_feature_dim, forecast_horizon * len(self.quantiles)
+            )
+        else:
+            expert_feature_dim = (
+                input_length * num_variables
+                + forecast_horizon * calendar_dim
+            )
+            self.ctf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
+            self.dgf_point_head = nn.Linear(expert_feature_dim, forecast_horizon)
+            self.ctf_quantile_head = nn.Linear(
+                expert_feature_dim, forecast_horizon * len(self.quantiles)
+            )
+            self.dgf_quantile_head = nn.Linear(
+                expert_feature_dim, forecast_horizon * len(self.quantiles)
+            )
+            self.fusion_gate = nn.Linear(combined_feature_dim, forecast_horizon)
+            nn.init.zeros_(self.fusion_gate.weight)
+            nn.init.zeros_(self.fusion_gate.bias)
+
+    def _concatenated_forecast(
+        self,
+        ctf_signal: torch.Tensor,
+        event_signal: torch.Tensor,
+        future_calendar: torch.Tensor,
+    ) -> Dict[str, torch.Tensor]:
+        features = torch.cat(
+            [
+                ctf_signal.flatten(start_dim=1),
+                event_signal.flatten(start_dim=1),
+                future_calendar.flatten(start_dim=1),
+            ],
+            dim=1,
         )
+        point_forecast = self.point_head(features).unsqueeze(-1)
+        quantile_forecast = self.quantile_head(features).view(
+            ctf_signal.shape[0],
+            self.forecast_horizon,
+            len(self.quantiles),
+        )
+        return {
+            "point_forecast": point_forecast,
+            "quantile_forecast": torch.sort(
+                quantile_forecast, dim=-1
+            ).values,
+        }
+
+    def _trigonometric_gated_forecast(
+        self,
+        ctf_signal: torch.Tensor,
+        event_signal: torch.Tensor,
+        future_calendar: torch.Tensor,
+    ) -> Dict[str, torch.Tensor]:
+        ctf_flat = ctf_signal.flatten(start_dim=1)
+        event_flat = event_signal.flatten(start_dim=1)
+        calendar_flat = future_calendar.flatten(start_dim=1)
+        ctf_features = torch.cat([ctf_flat, calendar_flat], dim=1)
+        dgf_features = torch.cat([event_flat, calendar_flat], dim=1)
+        gate_features = torch.cat(
+            [ctf_flat, event_flat, calendar_flat], dim=1
+        )
+
+        ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
+        dgf_point = self.dgf_point_head(dgf_features).unsqueeze(-1)
+        ctf_quantile = self.ctf_quantile_head(ctf_features).view(
+            ctf_signal.shape[0], self.forecast_horizon, len(self.quantiles)
+        )
+        dgf_quantile = self.dgf_quantile_head(dgf_features).view(
+            ctf_signal.shape[0], self.forecast_horizon, len(self.quantiles)
+        )
+        ctf_quantile = torch.sort(ctf_quantile, dim=-1).values
+        dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
+
+        fusion_angle = 0.5 * math.pi * torch.sigmoid(
+            self.fusion_gate(gate_features)
+        )
+        ctf_weight = torch.cos(fusion_angle).square().unsqueeze(-1)
+        dgf_weight = torch.sin(fusion_angle).square().unsqueeze(-1)
+        point_forecast = ctf_weight * ctf_point + dgf_weight * dgf_point
+        quantile_forecast = (
+            ctf_weight * ctf_quantile + dgf_weight * dgf_quantile
+        )
+
+        return {
+            "point_forecast": point_forecast,
+            "quantile_forecast": quantile_forecast,
+            "ctf_expert_point": ctf_point,
+            "dgf_expert_point": dgf_point,
+            "ctf_expert_quantile": ctf_quantile,
+            "dgf_expert_quantile": dgf_quantile,
+            "fusion_angle": fusion_angle.unsqueeze(-1),
+            "ctf_fusion_weight": ctf_weight,
+            "dgf_fusion_weight": dgf_weight,
+        }
 
     def _history_time(self, history_values: torch.Tensor) -> torch.Tensor:
         return torch.linspace(
@@ -93,25 +192,17 @@ class DualFieldLinearForecaster(nn.Module):
             residual, history_time, sigma_addition
         )
 
-        features = torch.cat(
-            [
-                ctf_signal.flatten(start_dim=1),
-                event_signal.flatten(start_dim=1),
-                future_calendar.flatten(start_dim=1),
-            ],
-            dim=1,
-        )
-        point_forecast = self.point_head(features).unsqueeze(-1)
-        quantile_forecast = self.quantile_head(features).view(
-            history_values.shape[0],
-            self.forecast_horizon,
-            len(self.quantiles),
-        )
-        quantile_forecast = torch.sort(quantile_forecast, dim=-1).values
+        if self.fusion_mode == "concatenate":
+            forecasts = self._concatenated_forecast(
+                ctf_signal, event_signal, future_calendar
+            )
+        else:
+            forecasts = self._trigonometric_gated_forecast(
+                ctf_signal, event_signal, future_calendar
+            )
 
         return {
-            "point_forecast": point_forecast,
-            "quantile_forecast": quantile_forecast,
+            **forecasts,
             "ctf_signal": ctf_signal,
             "event_signal": event_signal,
             "event_amplitude": amplitude,
