@@ -49,6 +49,7 @@ class TemporalConvForecastHead(nn.Module):
         num_variables: int,
         calendar_dim: int,
         num_quantiles: int,
+        future_exogenous_dim: int = 0,
         channels: int = 40,
         kernel_size: int = 3,
         dilations: Sequence[int] = (1, 2, 4, 8, 16),
@@ -63,8 +64,11 @@ class TemporalConvForecastHead(nn.Module):
             raise ValueError("dilations must contain positive integers")
         if summary_mode not in {"last", "attention"}:
             raise ValueError("summary_mode must be 'last' or 'attention'")
+        if future_exogenous_dim < 0:
+            raise ValueError("future_exogenous_dim must be non-negative")
 
         self.summary_mode = summary_mode
+        self.future_exogenous_dim = future_exogenous_dim
         self.receptive_field = 1 + 2 * (kernel_size - 1) * sum(dilations)
         self.input_projection = nn.Conv1d(num_variables, channels, 1)
         self.temporal_blocks = nn.Sequential(
@@ -74,6 +78,11 @@ class TemporalConvForecastHead(nn.Module):
             ]
         )
         self.calendar_projection = nn.Linear(calendar_dim, channels)
+        self.exogenous_projection = (
+            nn.Linear(future_exogenous_dim, channels, bias=False)
+            if future_exogenous_dim > 0
+            else None
+        )
         if summary_mode == "attention":
             self.query_projection = nn.Linear(channels, channels, bias=False)
             self.key_projection = nn.Linear(channels, channels, bias=False)
@@ -88,18 +97,31 @@ class TemporalConvForecastHead(nn.Module):
         self,
         history_signal: torch.Tensor,
         future_calendar: torch.Tensor,
+        future_exogenous: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
         temporal = history_signal.transpose(1, 2)
         temporal = self.input_projection(temporal)
         temporal = self.temporal_blocks(temporal)
 
-        calendar_context = self.activation(
-            self.calendar_projection(future_calendar)
-        )
+        future_projection = self.calendar_projection(future_calendar)
+        if self.exogenous_projection is not None:
+            if future_exogenous is None or future_exogenous.shape != (
+                history_signal.shape[0],
+                future_calendar.shape[1],
+                self.future_exogenous_dim,
+            ):
+                raise ValueError(
+                    "future_exogenous must have shape "
+                    f"[B, {future_calendar.shape[1]}, {self.future_exogenous_dim}]"
+                )
+            future_projection = future_projection + self.exogenous_projection(
+                future_exogenous
+            )
+        future_context = self.activation(future_projection)
         attention_weights = None
         if self.summary_mode == "attention":
             temporal_sequence = temporal.transpose(1, 2)
-            query = self.query_projection(calendar_context)
+            query = self.query_projection(future_context)
             key = self.key_projection(temporal_sequence)
             value = self.value_projection(temporal_sequence)
             attention_scores = torch.matmul(
@@ -113,7 +135,7 @@ class TemporalConvForecastHead(nn.Module):
             )
         future_hidden = self.activation(
             self.future_fusion(
-                torch.cat([history_context, calendar_context], dim=-1)
+                torch.cat([history_context, future_context], dim=-1)
             )
         )
         return (
@@ -132,6 +154,7 @@ class DualFieldLinearForecaster(nn.Module):
         input_length: int = 72,
         forecast_horizon: int = 24,
         calendar_dim: int = 10,
+        future_exogenous_dim: int = 0,
         quantiles: Sequence[float] = (0.05, 0.10, 0.50, 0.90, 0.95),
         num_frequencies: int = 16,
         hidden_dim: int = 64,
@@ -152,6 +175,7 @@ class DualFieldLinearForecaster(nn.Module):
         self.input_length = input_length
         self.forecast_horizon = forecast_horizon
         self.calendar_dim = calendar_dim
+        self.future_exogenous_dim = future_exogenous_dim
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
         self.forecast_head_type = forecast_head_type
@@ -172,6 +196,13 @@ class DualFieldLinearForecaster(nn.Module):
         if fusion_mode == "concatenate" and forecast_head_type != "linear":
             raise ValueError(
                 "TCN heads require a gated fusion mode with separate fields"
+            )
+        if future_exogenous_dim > 0 and forecast_head_type not in {
+            "tcn",
+            "tcn_attention",
+        }:
+            raise ValueError(
+                "Future exogenous inputs require a TCN forecast head"
             )
 
         self.dual_field = DualTimesField(
@@ -206,6 +237,7 @@ class DualFieldLinearForecaster(nn.Module):
                     "num_variables": num_variables,
                     "calendar_dim": calendar_dim,
                     "num_quantiles": len(self.quantiles),
+                    "future_exogenous_dim": future_exogenous_dim,
                     "channels": tcn_channels,
                     "kernel_size": tcn_kernel_size,
                     "dilations": tuple(tcn_dilations),
@@ -272,6 +304,7 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_signal: torch.Tensor,
         event_signal: torch.Tensor,
         future_calendar: torch.Tensor,
+        future_exogenous: torch.Tensor | None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -284,10 +317,10 @@ class DualFieldLinearForecaster(nn.Module):
         dgf_attention = None
         if self.forecast_head_type in {"tcn", "tcn_attention"}:
             ctf_point, ctf_quantile, ctf_attention = self.ctf_forecast_head(
-                ctf_signal, future_calendar
+                ctf_signal, future_calendar, future_exogenous
             )
             dgf_point, dgf_quantile, dgf_attention = self.dgf_forecast_head(
-                event_signal, future_calendar
+                event_signal, future_calendar, future_exogenous
             )
         else:
             ctf_features = torch.cat([ctf_flat, calendar_flat], dim=1)
@@ -355,6 +388,7 @@ class DualFieldLinearForecaster(nn.Module):
         self,
         history_values: torch.Tensor,
         future_calendar: torch.Tensor,
+        future_exogenous: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         if history_values.shape[1:] != (self.input_length, self.num_variables):
             raise ValueError(
@@ -368,6 +402,16 @@ class DualFieldLinearForecaster(nn.Module):
                 "future_calendar must have shape "
                 f"[B, {self.forecast_horizon}, {self.calendar_dim}]"
             )
+        if self.future_exogenous_dim > 0:
+            expected = (
+                history_values.shape[0],
+                self.forecast_horizon,
+                self.future_exogenous_dim,
+            )
+            if future_exogenous is None or future_exogenous.shape != expected:
+                raise ValueError(f"future_exogenous must have shape {expected}")
+        elif future_exogenous is not None:
+            raise ValueError("future_exogenous was provided but the model has no exogenous inputs")
 
         history_time = self._history_time(history_values)
         ctf_signal = self.dual_field.ctf(history_values, history_time)
@@ -387,7 +431,7 @@ class DualFieldLinearForecaster(nn.Module):
             )
         else:
             forecasts = self._trigonometric_gated_forecast(
-                ctf_signal, event_signal, future_calendar
+                ctf_signal, event_signal, future_calendar, future_exogenous
             )
 
         return {

@@ -204,6 +204,73 @@ class AEMOForecastDataset(Dataset):
             frame[data_config["delivery_column"]]
         )
         self.origin_indices = _valid_origins(frame, config, split)
+        self.future_exogenous_feature_names: tuple[str, ...] = ()
+        self.future_exogenous_standardizer = None
+        self.future_exogenous_by_origin: dict[int, np.ndarray] = {}
+        exogenous_config = config.get("future_exogenous", {})
+        if exogenous_config.get("enabled", False):
+            self._load_future_exogenous(frame, config, region)
+
+    def _load_future_exogenous(
+        self,
+        frame: pd.DataFrame,
+        config: Mapping,
+        region: str,
+    ) -> None:
+        exogenous_config = config["future_exogenous"]
+        feature_name = exogenous_config["name"]
+        path = Path(config["project_root"]) / exogenous_config["region_files"][region]
+        with np.load(path) as archive:
+            origins = archive["forecast_origin_unix"].astype(np.int64)
+            raw_values = archive[feature_name].astype(np.float64)
+            source_runs = archive["source_run_unix"].astype(np.int64)
+            source_stpasa_runs = (
+                archive["source_stpasa_run_unix"].astype(np.int64)
+                if "source_stpasa_run_unix" in archive.files
+                else np.zeros_like(source_runs)
+            )
+            source_last_changed = archive["source_last_changed_unix"].astype(np.int64)
+        if raw_values.shape != (len(origins), self.output_hours):
+            raise ValueError(
+                f"Future exogenous values for {region} must have shape "
+                f"[N, {self.output_hours}], got {raw_values.shape}"
+            )
+        if len(np.unique(origins)) != len(origins):
+            raise ValueError(f"Duplicate future exogenous origins for {region}")
+        if np.isnan(raw_values).any():
+            raise ValueError(f"Missing future exogenous values for {region}")
+        if (
+            np.any(source_runs > origins)
+            or np.any(source_stpasa_runs > origins)
+            or np.any(source_last_changed > origins)
+        ):
+            raise ValueError(f"Future information leakage detected for {region}")
+
+        origin_to_row = {int(origin): index for index, origin in enumerate(origins)}
+        required_origins = self.delivery_unix_seconds[self.origin_indices]
+        missing = [int(origin) for origin in required_origins if int(origin) not in origin_to_row]
+        if missing:
+            first = pd.to_datetime(missing[0], unit="s", utc=True)
+            raise ValueError(
+                f"Missing {len(missing)} future exogenous origins for {region}/{self.split}; "
+                f"first missing origin is {first}"
+            )
+
+        train_origins = self.delivery_unix_seconds[
+            _valid_origins(frame, config, "train")
+        ]
+        train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
+        if not train_rows:
+            raise ValueError(f"No training future exogenous values for {region}")
+        self.future_exogenous_standardizer = _fit_standardizer(
+            raw_values[train_rows].reshape(-1, 1)
+        )
+        standardized = self.future_exogenous_standardizer.transform(raw_values[..., None])
+        self.future_exogenous_feature_names = (feature_name,)
+        self.future_exogenous_by_origin = {
+            int(origin): standardized[index]
+            for index, origin in enumerate(origins)
+        }
 
     def __len__(self) -> int:
         return len(self.origin_indices)
@@ -212,7 +279,7 @@ class AEMOForecastDataset(Dataset):
         forecast_start = int(self.origin_indices[index])
         history_start = forecast_start - self.input_hours
         forecast_end = forecast_start + self.output_hours
-        return {
+        sample = {
             "history_values": torch.from_numpy(
                 self.history_values[history_start:forecast_start].copy()
             ),
@@ -232,6 +299,12 @@ class AEMOForecastDataset(Dataset):
                 self.delivery_unix_seconds[forecast_start:forecast_end].copy()
             ),
         }
+        if self.future_exogenous_by_origin:
+            origin = int(self.delivery_unix_seconds[forecast_start])
+            sample["future_exogenous"] = torch.from_numpy(
+                self.future_exogenous_by_origin[origin].copy()
+            )
+        return sample
 
 
 def build_region_datasets(

@@ -229,6 +229,28 @@ python -m forecasting.train \
 Outputs are isolated under
 `outputs/forecasting/additive_tcn_attention_head/`.
 
+### Point-in-time AEMO supply-demand margin
+
+The maximum-spare-capacity experiment adds one known-future factor without
+changing the historical CTF/DGF decomposition or the additive fusion gate.
+For each hourly forecast origin, the builder selects only AEMO PASA runs that
+were already published. PD PASA supplies the available next-day intervals and
+ST PASA supplies the short tail where PD PASA stops at the market-day boundary.
+Each hourly value is the minimum of its two half-hour margins.
+
+```bash
+python -m forecasting.build_pdpasa_exogenous \
+  --start-year 2015 --end-year 2024
+
+python -m forecasting.train \
+  --config configs/aemo_forecast_max_spare.yaml \
+  --region NSW1
+```
+
+The future margin is projected into each horizon-specific attention query.
+Outputs are isolated under
+`outputs/forecasting/max_spare_future_context/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

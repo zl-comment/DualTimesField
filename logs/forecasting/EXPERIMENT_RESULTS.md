@@ -323,6 +323,62 @@ adjacent forecast hours have very similar distributions. Thus the QLD1 gain is
 mainly attributable to full-history weighted pooling rather than strongly
 horizon-specific historical selection.
 
+## Maximum-spare future-context experiment
+
+This experiment adds one point-in-time known-future AEMO factor,
+`MAXSPARECAPACITY`, to the horizon-specific TCN attention model. Each hourly
+forecast uses the latest PD PASA publication available at its origin, with the
+remaining market-day tail supplied by the latest already-published ST PASA
+run. Two half-hour intervals are aggregated by their minimum. The factor is
+standardized with training data only and projected into both the CTF and DGF
+future attention contexts. Historical inputs, target, split, loss weights,
+optimizer, epoch budget, and random seed remain unchanged.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_max_spare.yaml`](../../configs/aemo_forecast_max_spare.yaml) |
+| Future factor | AEMO `MAXSPARECAPACITY`, hourly minimum |
+| Vintage rule | Latest available PD PASA with an already-published ST PASA tail |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 1 / 1 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/max_spare_future_context/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`train.log`](../../outputs/forecasting/max_spare_future_context/NSW1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_future_context/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_future_context/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/max_spare_future_context/NSW1/best_model.pt) |
+| QLD1 | [`train.log`](../../outputs/forecasting/max_spare_future_context/QLD1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_future_context/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_future_context/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/max_spare_future_context/QLD1/best_model.pt) |
+| TAS1 | [`train.log`](../../outputs/forecasting/max_spare_future_context/TAS1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_future_context/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_future_context/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/max_spare_future_context/TAS1/best_model.pt) |
+
+### Validation metrics at the selected checkpoint
+
+| Region | MAE | RMSE | 80% coverage | 80% mean width | 90% coverage | 90% mean width |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 88.1851 | 198.1391 | 42.20% | 109.4059 | 63.50% | 165.0661 |
+| QLD1 | 175.8848 | 465.3082 | 56.13% | 180.2693 | 80.10% | 301.7551 |
+| TAS1 | 68.0684 | 276.7955 | 53.47% | 114.0317 | 76.21% | 192.4702 |
+
+### Test metrics and attention-baseline comparison
+
+| Region | MAE | MAE change | RMSE | RMSE change | 80% coverage | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 74.9394 | +5.69% | 395.0977 | -3.47% | 60.50% | 78.23% |
+| QLD1 | 75.4752 | +25.25% | 277.1987 | -1.13% | 44.79% | 80.08% |
+| TAS1 | 41.8536 | -0.28% | 163.3747 | -0.33% | 54.15% | 73.84% |
+
+Negative changes are improvements. `MAXSPARECAPACITY` reduces RMSE in every
+region and reduces the MAE of the highest-price one percent by 8.6%, 5.8%, and
+3.5% in NSW1, QLD1, and TAS1, respectively. It nevertheless increases ordinary
+hour errors enough to worsen overall MAE in NSW1 and QLD1. NSW1 and QLD1 select
+the first epoch while their training losses continue to fall, showing rapid
+overfitting. The one-dimensional exogenous projection is also initialized with
+substantially greater per-feature norm than a calendar column and directly
+changes both experts' attention queries. The follow-up experiment therefore
+keeps attention calendar-driven and introduces the factor only as a
+zero-initialized post-attention residual adapter in the DGF event branch.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |

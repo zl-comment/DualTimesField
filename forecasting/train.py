@@ -41,6 +41,11 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         input_length=protocol["input_hours"],
         forecast_horizon=protocol["output_hours"],
         calendar_dim=len(protocol["calendar_features"]),
+        future_exogenous_dim=(
+            config.get("future_exogenous", {}).get("dimension", 0)
+            if config.get("future_exogenous", {}).get("enabled", False)
+            else 0
+        ),
         quantiles=model_config["quantiles"],
         num_frequencies=model_config["num_frequencies"],
         hidden_dim=model_config["hidden_dim"],
@@ -96,10 +101,11 @@ def build_loaders(datasets: Mapping, training_config: Mapping) -> Dict[str, Data
     }
 
 
-def move_inputs(batch: Mapping, device: torch.device) -> tuple[torch.Tensor, ...]:
+def move_inputs(batch: Mapping, device: torch.device) -> tuple:
     return (
         batch["history_values"].to(device),
         batch["future_calendar"].to(device),
+        batch["future_exogenous"].to(device) if "future_exogenous" in batch else None,
         batch["target_price"].to(device),
     )
 
@@ -119,9 +125,9 @@ def train_epoch(
     loss_sums = {name: 0.0 for name in LOSS_NAMES}
     sample_count = 0
     for batch in loader:
-        history, calendar, target = move_inputs(batch, device)
+        history, calendar, exogenous, target = move_inputs(batch, device)
         optimizer.zero_grad(set_to_none=True)
-        losses = criterion(model(history, calendar), history, target)
+        losses = criterion(model(history, calendar, exogenous), history, target)
         losses["total"].backward()
         optimizer.step()
         batch_size = history.shape[0]
@@ -158,8 +164,8 @@ def evaluate(
     }
     with torch.no_grad():
         for batch in loader:
-            history, calendar, target = move_inputs(batch, device)
-            outputs = model(history, calendar)
+            history, calendar, exogenous, target = move_inputs(batch, device)
+            outputs = model(history, calendar, exogenous)
             losses = criterion(outputs, history, target)
             batch_size = history.shape[0]
             sample_count += batch_size
@@ -243,10 +249,22 @@ def save_checkpoint(
             "loss_config": config["loss"],
             "training_config": config["training"],
             "forecast_protocol": config["forecast_protocol"],
+            "future_exogenous_config": config.get("future_exogenous"),
             "history_feature_names": dataset.history_feature_names,
             "calendar_feature_names": dataset.calendar_feature_names,
             "history_mean": dataset.history_standardizer.mean.tolist(),
             "history_std": dataset.history_standardizer.std.tolist(),
+            "future_exogenous_feature_names": dataset.future_exogenous_feature_names,
+            "future_exogenous_mean": (
+                dataset.future_exogenous_standardizer.mean.tolist()
+                if dataset.future_exogenous_standardizer is not None
+                else None
+            ),
+            "future_exogenous_std": (
+                dataset.future_exogenous_standardizer.std.tolist()
+                if dataset.future_exogenous_standardizer is not None
+                else None
+            ),
         },
         path,
     )

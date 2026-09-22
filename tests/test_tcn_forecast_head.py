@@ -49,6 +49,29 @@ class TemporalConvForecastHeadTest(unittest.TestCase):
             torch.ones(4, 5),
         )
 
+    def test_future_exogenous_changes_queries_and_receives_gradients(self):
+        torch.manual_seed(31)
+        head = TemporalConvForecastHead(
+            num_variables=2,
+            calendar_dim=3,
+            future_exogenous_dim=1,
+            num_quantiles=5,
+            channels=8,
+            dilations=(1, 2),
+            summary_mode="attention",
+        )
+        history = torch.randn(4, 12, 2)
+        calendar = torch.randn(4, 5, 3)
+        exogenous = torch.randn(4, 5, 1, requires_grad=True)
+        point, _, attention = head(history, calendar, exogenous)
+
+        self.assertEqual(attention.shape, (4, 5, 12))
+        point.square().mean().backward()
+        self.assertGreater(exogenous.grad.abs().sum().item(), 0.0)
+        self.assertGreater(
+            head.exogenous_projection.weight.grad.abs().sum().item(), 0.0
+        )
+
     def test_tcn_heads_preserve_additive_fusion_and_gradients(self):
         torch.manual_seed(23)
         model = DualFieldLinearForecaster(
@@ -132,6 +155,35 @@ class TemporalConvForecastHeadTest(unittest.TestCase):
             self.assertGreater(
                 head.value_projection.weight.grad.abs().sum().item(), 0.0
             )
+
+    def test_attention_model_accepts_one_future_exogenous_factor(self):
+        torch.manual_seed(37)
+        model = DualFieldLinearForecaster(
+            num_variables=2,
+            input_length=8,
+            forecast_horizon=3,
+            calendar_dim=2,
+            future_exogenous_dim=1,
+            quantiles=(0.1, 0.5, 0.9),
+            num_frequencies=2,
+            hidden_dim=8,
+            num_layers=1,
+            freq_cutoff=2.0,
+            num_atoms=2,
+            fusion_mode="additive_trigonometric_gate",
+            forecast_head_type="tcn_attention",
+            tcn_channels=8,
+            tcn_dilations=(1, 2),
+        )
+        history = torch.randn(4, 8, 2)
+        calendar = torch.randn(4, 3, 2)
+        exogenous = torch.randn(4, 3, 1)
+        model.initialize_atoms(history)
+        outputs = model(history, calendar, exogenous)
+
+        self.assertEqual(outputs["point_forecast"].shape, (4, 3, 1))
+        self.assertEqual(outputs["quantile_forecast"].shape, (4, 3, 3))
+        self.assertEqual(outputs["ctf_history_attention"].shape, (4, 3, 8))
 
 
 if __name__ == "__main__":
