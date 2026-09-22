@@ -104,6 +104,60 @@ The machine exposes eight NVIDIA L40 GPUs with 46,068 MiB each. The exact physic
 | QLD1 | 2.728067 | 1.912101 | 0.086434 | 0.729157 | 0.068527 | 0.307171 |
 | TAS1 | 7.622208 | 5.533191 | 0.173170 | 1.914390 | 0.075824 | 1.381370 |
 
+## Fixed-origin day-ahead experiment
+
+This run uses one forecast origin per local day at 00:00. Each sample uses the
+previous 72 hours and predicts the following 24 hours. Forecast targets no longer
+overlap, while consecutive history windows still share 48 hours. All model,
+optimization, split, and seed settings match the static baseline.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_fixed_origin.yaml`](../../configs/aemo_forecast_fixed_origin.yaml) |
+| Train / validation / test windows | 2,554 / 365 / 731 per region |
+| Best epochs, NSW1 / QLD1 / TAS1 | 29 / 29 / 25 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/fixed_origin/` |
+
+### Fixed-origin artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](fixed_origin/nsw1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](fixed_origin/qld1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](fixed_origin/tas1.log) | [`metrics.json`](../../outputs/forecasting/fixed_origin/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/fixed_origin/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/fixed_origin/TAS1/best_model.pt) |
+
+### Fixed-origin validation metrics
+
+| Region | MAE | RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 63.0044 | 180.3609 | 59.60% | 113.6025 | 82.01% | 185.9416 |
+| QLD1 | 106.0874 | 423.7295 | 57.02% | 168.4893 | 84.46% | 309.3032 |
+| TAS1 | 61.2965 | 267.9858 | 39.12% | 64.8599 | 66.66% | 132.6441 |
+
+### Fixed-origin test metrics
+
+| Region | MAE | RMSE | 80% coverage | 80% width | 90% coverage | 90% width |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 64.0873 | 398.2751 | 62.64% | 87.5752 | 86.79% | 159.9493 |
+| QLD1 | 63.0140 | 274.0500 | 66.98% | 113.4497 | 93.61% | 223.9808 |
+| TAS1 | 36.6254 | 161.2316 | 43.15% | 48.3502 | 72.41% | 95.3907 |
+
+The original static checkpoints were also re-evaluated on these exact same
+fixed-origin validation and test datasets. This avoids comparing a daily subset
+against the baseline's all-hour rolling test set.
+
+| Region | Static-on-fixed MAE | Fixed-trained MAE change | Static-on-fixed RMSE | Fixed-trained RMSE change | 80% coverage change | 90% coverage change |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 60.9075 | +5.22% | 401.1438 | -0.72% | -0.89 pp | +1.69 pp |
+| QLD1 | 66.8799 | -5.78% | 281.2435 | -2.56% | -2.66 pp | +3.34 pp |
+| TAS1 | 36.5917 | +0.09% | 161.4042 | -0.11% | +3.45 pp | +2.54 pp |
+
+The fixed-origin protocol produces a clear point-forecast improvement only for
+QLD1. NSW1 trades worse MAE for slightly lower RMSE and sharper intervals, while
+TAS1 point accuracy is effectively unchanged. The result is retained as a
+protocol experiment rather than treated as a universal improvement.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
