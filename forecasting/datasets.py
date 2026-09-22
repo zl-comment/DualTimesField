@@ -204,6 +204,9 @@ class AEMOForecastDataset(Dataset):
             frame[data_config["delivery_column"]]
         )
         self.origin_indices = _valid_origins(frame, config, split)
+        delivery_hours = frame[data_config["delivery_column"]].dt.hour.to_numpy()
+        self.forecast_origin_hours = delivery_hours[self.origin_indices]
+        self.forecast_origin_unix_seconds = self.delivery_unix_seconds[self.origin_indices]
 
     def __len__(self) -> int:
         return len(self.origin_indices)

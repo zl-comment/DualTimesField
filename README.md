@@ -74,6 +74,32 @@ python -m interpolation.visualize
 
 > **Note:** On high-dimensional datasets (e.g. `traffic` with 862 variables), transformer baselines such as PatchTST may require a smaller `--batch_size` to fit in GPU memory.
 
+### AEMO Forecasting: Daily Grouped Sampling
+
+This experiment keeps every hourly forecast window (`stride_hours: 1`) but reduces
+overlapping training gradients. Epoch 1 trains on all 00:00 forecast origins,
+epoch 2 on all 01:00 origins, and so on through 23:00 before repeating. Selected
+origins in one epoch are exactly 24 hours apart, so their 24-hour targets do not
+overlap. Across 24 epochs, every hourly origin is used once. Validation and test
+loaders always retain all hourly windows, making their evaluation protocol
+identical to the static baseline.
+
+```bash
+python -m forecasting.train \
+    --config configs/aemo_forecast_daily_grouped_sampling.yaml \
+    --region NSW1
+```
+
+The sampler records `train_origin_hour` and `train_samples` in
+`training_history.csv`. Outputs are isolated under
+`outputs/forecasting/daily_grouped_sampling/`.
+
+One grouped epoch contains roughly one twenty-fourth of the baseline's training
+windows. A complete 24-epoch rotation corresponds to one pass over all hourly
+origins; the supplied 30-epoch configuration completes one full rotation plus six
+hours. Epoch counts and learning curves therefore must not be compared directly with
+the all-window baseline.
+
 ## Project Structure
 
 The layout below matches the repository code (excluding generated artifacts such as `outputs/`, checkpoints, and downloaded data under `data/`):

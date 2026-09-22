@@ -1,0 +1,83 @@
+data:
+  timezone: Australia/Brisbane
+  delivery_column: delivery_start_aest
+  available_column: available_at_aest
+  region_column: region
+  split_column: split
+  history_columns:
+    - rrp_aud_per_mwh
+    - total_demand_mw
+  target_column: rrp_aud_per_mwh
+  split_names:
+    - train
+    - validation
+    - test
+  split_boundaries:
+    train:
+      start: 2015-01-01 00:00:00
+      end_exclusive: 2022-01-01 00:00:00
+    validation:
+      start: 2022-01-01 00:00:00
+      end_exclusive: 2023-01-01 00:00:00
+    test:
+      start: 2023-01-01 00:00:00
+      end_exclusive: 2025-01-01 00:00:00
+  region_files:
+    NSW1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/nsw1_hourly.csv
+    QLD1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/qld1_hourly.csv
+    TAS1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/tas1_hourly.csv
+
+forecast_protocol:
+  input_hours: 72
+  output_hours: 24
+  stride_hours: 1
+  calendar_features:
+    - hour_sin
+    - hour_cos
+    - day_of_week_sin
+    - day_of_week_cos
+    - day_of_year_sin
+    - day_of_year_cos
+    - month_sin
+    - month_cos
+    - is_weekend
+    - year_standardized
+
+model:
+  num_variables: 2
+  num_frequencies: 16
+  hidden_dim: 64
+  num_layers: 3
+  freq_cutoff: 10
+  num_atoms: 16
+  sigma_base: 0.05
+  scale_warmup_ratio: 0.3
+  quantiles:
+    - 0.05
+    - 0.10
+    - 0.50
+    - 0.90
+    - 0.95
+
+loss:
+  point_weight: 1.0
+  quantile_weight: 1.0
+  decomposition_weight: 1.0
+  smoothness_weight: 0.001
+  sparsity_weight: 0.001
+  target_sparsity: 0.3
+  sparsity_excess_weight: 10.0
+
+training:
+  batch_size: 128
+  epochs: 30
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  seed: 2026
+  device: cuda
+  num_workers: 0
+  output_directory: outputs/forecasting/daily_grouped_sampling
+  train_sampling:
+    mode: daily_hour_rotation
+    start_hour: 0
+    shuffle_days: true

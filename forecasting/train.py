@@ -15,6 +15,7 @@ from torch.utils.data import DataLoader
 from .datasets import build_region_datasets, load_forecast_config
 from .losses import DualFieldForecastLoss
 from .models import DualFieldLinearForecaster
+from .samplers import build_train_sampler
 
 
 LOSS_NAMES = ("total", "point", "quantile", "decomposition", "smoothness", "sparsity")
@@ -66,11 +67,13 @@ def build_loss(config: Mapping) -> DualFieldForecastLoss:
 
 def build_loaders(datasets: Mapping, training_config: Mapping) -> Dict[str, DataLoader]:
     seed_generator = torch.Generator().manual_seed(training_config["seed"])
+    train_sampler = build_train_sampler(datasets["train"], training_config)
     return {
         "train": DataLoader(
             datasets["train"],
             batch_size=training_config["batch_size"],
-            shuffle=True,
+            shuffle=train_sampler is None,
+            sampler=train_sampler,
             num_workers=training_config["num_workers"],
             generator=seed_generator,
         ),
@@ -253,11 +256,21 @@ def run_training(config_path: Path | str, region: str) -> Path:
     best_validation_loss = float("inf")
     for epoch in range(training_config["epochs"]):
         model.set_epoch(epoch)
+        train_sampler = loaders["train"].sampler
+        sampler_details = {}
+        if hasattr(train_sampler, "set_epoch"):
+            train_sampler.set_epoch(epoch)
+        if hasattr(train_sampler, "current_hour"):
+            sampler_details = {
+                "train_origin_hour": train_sampler.current_hour,
+                "train_samples": len(train_sampler),
+            }
         train_losses = train_epoch(model, criterion, loaders["train"], optimizer, device)
         validation = evaluate(model, criterion, loaders["validation"], datasets["validation"], device)
         history.append(
             {
                 "epoch": epoch,
+                **sampler_details,
                 **{f"train_{key}": value for key, value in train_losses.items()},
                 **{
                     f"validation_{key}": value
@@ -277,7 +290,13 @@ def run_training(config_path: Path | str, region: str) -> Path:
             save_checkpoint(checkpoint_path, model, config, datasets["train"], region, epoch, validation_loss)
         print(
             f"epoch={epoch + 1}/{training_config['epochs']} "
-            f"train={train_losses['total']:.6f} "
+            + (
+                f"origin_hour={sampler_details['train_origin_hour']:02d} "
+                f"train_samples={sampler_details['train_samples']} "
+                if sampler_details
+                else ""
+            )
+            + f"train={train_losses['total']:.6f} "
             f"validation={validation_loss:.6f} "
             f"best_epoch={best_epoch + 1}"
         )
