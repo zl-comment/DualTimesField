@@ -150,6 +150,72 @@ retains a balanced and variable gate, but still loses point accuracy. The result
 shows that unconstrained trigonometric gating can collapse to one expert and is
 retained as a negative fusion ablation.
 
+## Complementary additive trigonometric-fusion experiment
+
+This experiment changes the competitive convex mixture into an additive
+residual form: `forecast = CTF forecast + sin(theta)^2 * DGF correction`.
+The CTF path therefore always has weight 1 and receives an unscaled gradient;
+the dynamic gate controls only the non-negative strength of the DGF event
+correction. All data, normalization, split, loss, optimizer, learning rate,
+epoch budget, and random seed settings remain unchanged.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_additive_trigonometric_gate.yaml`](../../configs/aemo_forecast_additive_trigonometric_gate.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 1 / 1 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/additive_trigonometric_gate/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](additive_trigonometric_gate/nsw1.log) | [`metrics.json`](../../outputs/forecasting/additive_trigonometric_gate/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_trigonometric_gate/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_trigonometric_gate/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](additive_trigonometric_gate/qld1.log) | [`metrics.json`](../../outputs/forecasting/additive_trigonometric_gate/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_trigonometric_gate/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_trigonometric_gate/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](additive_trigonometric_gate/tas1.log) | [`metrics.json`](../../outputs/forecasting/additive_trigonometric_gate/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_trigonometric_gate/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_trigonometric_gate/TAS1/best_model.pt) |
+
+![Additive fusion training and validation loss](additive_trigonometric_gate/training_loss_curves.png)
+
+![Additive fusion validation DGF gate](additive_trigonometric_gate/dgf_gate_curves.png)
+
+### Validation metrics at the selected checkpoint
+
+| Region | MAE | RMSE | 80% coverage | 90% coverage | Mean DGF correction weight | DGF weight std. |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 69.0112 | 187.8241 | 60.12% | 78.60% | 47.24% | 17.51% |
+| QLD1 | 95.9668 | 434.4366 | 62.20% | 85.61% | 51.87% | 20.30% |
+| TAS1 | 63.7030 | 273.8954 | 46.75% | 73.65% | 66.09% | 20.33% |
+
+### Test metrics and comparisons
+
+| Region | MAE | vs. static | vs. competitive gate | RMSE | vs. static | vs. competitive gate | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 67.5852 | +10.93% | -19.96% | 400.3284 | -0.07% | -10.13% | 45.43% |
+| QLD1 | 59.5623 | -9.23% | -13.55% | 278.2809 | -0.60% | -0.80% | 50.73% |
+| TAS1 | 37.7484 | +1.68% | -3.39% | 161.7574 | +0.04% | -0.64% | 56.51% |
+
+Negative comparison values are improvements. The additive design outperforms
+the competitive trigonometric gate on both point metrics in all three regions.
+Against the original concatenation baseline, it improves both point metrics on
+QLD1, slightly improves NSW1 RMSE but worsens NSW1 MAE, and is effectively tied
+on TAS1 RMSE while slightly worsening TAS1 MAE.
+
+### CTF backbone and DGF correction ablation
+
+| Region | CTF-only MAE | Fused MAE | CTF-only RMSE | Fused RMSE | Mean absolute DGF correction (AUD/MWh) |
+|---|---:|---:|---:|---:|---:|
+| NSW1 | 79.8787 | 67.5852 | 406.3610 | 400.3284 | 52.5739 |
+| QLD1 | 73.6634 | 59.5623 | 285.0789 | 278.2809 | 47.9608 |
+| TAS1 | 39.0819 | 37.7484 | 164.3688 | 161.7574 | 17.0854 |
+
+The DGF correction improves its paired CTF backbone in every region on both
+MAE and RMSE, which supports the intended complementary interpretation. The
+test DGF weights remain distributed around 45--57% instead of collapsing near
+100% as in competitive NSW1. However, the best validation checkpoints occur at
+epochs 1, 1, and 2, so the new parameterization still overfits quickly and does
+not consistently beat the original concatenation head.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
