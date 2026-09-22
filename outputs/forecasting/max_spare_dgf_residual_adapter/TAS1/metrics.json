@@ -1,0 +1,222 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/training_history.csv",
+    "mae_checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_mae_model.pt",
+    "rmse_checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_rmse_model.pt"
+  },
+  "best_epoch": 20,
+  "best_validation_loss": 21.600129601467497,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "region": "TAS1",
+  "seed": 2026,
+  "selection_results": {
+    "mae": {
+      "best_epoch": 20,
+      "checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_mae_model.pt",
+      "selection_value": 70.9302376290906,
+      "test": {
+        "losses": {
+          "decomposition": 1.8956491657447225,
+          "point": 5.671472413301346,
+          "quantile": 0.18264842900274741,
+          "smoothness": 0.07163643782140763,
+          "sparsity": 1.9677855842060834,
+          "total": 7.751809386155573
+        },
+        "metrics": {
+          "coverage_80": 0.4692083785172079,
+          "coverage_90": 0.702264425546487,
+          "mae_aud_per_mwh": 41.843161699264456,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5911510139423094,
+          "mean_width_80_aud_per_mwh": 59.438260954414226,
+          "mean_width_90_aud_per_mwh": 94.01829883752592,
+          "rmse_aud_per_mwh": 163.69385614591272,
+          "std_dgf_fusion_weight": 0.1618938348382882
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 5.01172753485704,
+          "point": 16.258683011614583,
+          "quantile": 0.32754547873023065,
+          "smoothness": 0.17965115566427864,
+          "sparsity": 1.9934302771870545,
+          "total": 21.600129601467497
+        },
+        "metrics": {
+          "coverage_80": 0.4259948113387509,
+          "coverage_90": 0.6758231276944794,
+          "mae_aud_per_mwh": 70.9302376290906,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.6756259248301345,
+          "mean_width_80_aud_per_mwh": 92.77276760591927,
+          "mean_width_90_aud_per_mwh": 148.17868958881766,
+          "rmse_aud_per_mwh": 277.15784054135537,
+          "std_dgf_fusion_weight": 0.20875345685551258
+        }
+      }
+    },
+    "rmse": {
+      "best_epoch": 20,
+      "checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_rmse_model.pt",
+      "selection_value": 277.15784054135537,
+      "test": {
+        "losses": {
+          "decomposition": 1.8956491657447225,
+          "point": 5.671472413301346,
+          "quantile": 0.18264842900274741,
+          "smoothness": 0.07163643782140763,
+          "sparsity": 1.9677855842060834,
+          "total": 7.751809386155573
+        },
+        "metrics": {
+          "coverage_80": 0.4692083785172079,
+          "coverage_90": 0.702264425546487,
+          "mae_aud_per_mwh": 41.843161699264456,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5911510139423094,
+          "mean_width_80_aud_per_mwh": 59.438260954414226,
+          "mean_width_90_aud_per_mwh": 94.01829883752592,
+          "rmse_aud_per_mwh": 163.69385614591272,
+          "std_dgf_fusion_weight": 0.1618938348382882
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 5.01172753485704,
+          "point": 16.258683011614583,
+          "quantile": 0.32754547873023065,
+          "smoothness": 0.17965115566427864,
+          "sparsity": 1.9934302771870545,
+          "total": 21.600129601467497
+        },
+        "metrics": {
+          "coverage_80": 0.4259948113387509,
+          "coverage_90": 0.6758231276944794,
+          "mae_aud_per_mwh": 70.9302376290906,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.6756259248301345,
+          "mean_width_80_aud_per_mwh": 92.77276760591927,
+          "mean_width_90_aud_per_mwh": 148.17868958881766,
+          "rmse_aud_per_mwh": 277.15784054135537,
+          "std_dgf_fusion_weight": 0.20875345685551258
+        }
+      }
+    },
+    "total": {
+      "best_epoch": 20,
+      "checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_model.pt",
+      "selection_value": 21.600129601467497,
+      "test": {
+        "losses": {
+          "decomposition": 1.8956491657447225,
+          "point": 5.671472413301346,
+          "quantile": 0.18264842900274741,
+          "smoothness": 0.07163643782140763,
+          "sparsity": 1.9677855842060834,
+          "total": 7.751809386155573
+        },
+        "metrics": {
+          "coverage_80": 0.4692083785172079,
+          "coverage_90": 0.702264425546487,
+          "mae_aud_per_mwh": 41.843161699264456,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5911510139423094,
+          "mean_width_80_aud_per_mwh": 59.438260954414226,
+          "mean_width_90_aud_per_mwh": 94.01829883752592,
+          "rmse_aud_per_mwh": 163.69385614591272,
+          "std_dgf_fusion_weight": 0.1618938348382882
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 5.01172753485704,
+          "point": 16.258683011614583,
+          "quantile": 0.32754547873023065,
+          "smoothness": 0.17965115566427864,
+          "sparsity": 1.9934302771870545,
+          "total": 21.600129601467497
+        },
+        "metrics": {
+          "coverage_80": 0.4259948113387509,
+          "coverage_90": 0.6758231276944794,
+          "mae_aud_per_mwh": 70.9302376290906,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.6756259248301345,
+          "mean_width_80_aud_per_mwh": 92.77276760591927,
+          "mean_width_90_aud_per_mwh": 148.17868958881766,
+          "rmse_aud_per_mwh": 277.15784054135537,
+          "std_dgf_fusion_weight": 0.20875345685551258
+        }
+      }
+    }
+  },
+  "test": {
+    "losses": {
+      "decomposition": 1.8956491657447225,
+      "point": 5.671472413301346,
+      "quantile": 0.18264842900274741,
+      "smoothness": 0.07163643782140763,
+      "sparsity": 1.9677855842060834,
+      "total": 7.751809386155573
+    },
+    "metrics": {
+      "coverage_80": 0.4692083785172079,
+      "coverage_90": 0.702264425546487,
+      "mae_aud_per_mwh": 41.843161699264456,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.5911510139423094,
+      "mean_width_80_aud_per_mwh": 59.438260954414226,
+      "mean_width_90_aud_per_mwh": 94.01829883752592,
+      "rmse_aud_per_mwh": 163.69385614591272,
+      "std_dgf_fusion_weight": 0.1618938348382882
+    }
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 5.01172753485704,
+      "point": 16.258683011614583,
+      "quantile": 0.32754547873023065,
+      "smoothness": 0.17965115566427864,
+      "sparsity": 1.9934302771870545,
+      "total": 21.600129601467497
+    },
+    "metrics": {
+      "coverage_80": 0.4259948113387509,
+      "coverage_90": 0.6758231276944794,
+      "mae_aud_per_mwh": 70.9302376290906,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.6756259248301345,
+      "mean_width_80_aud_per_mwh": 92.77276760591927,
+      "mean_width_90_aud_per_mwh": 148.17868958881766,
+      "rmse_aud_per_mwh": 277.15784054135537,
+      "std_dgf_fusion_weight": 0.20875345685551258
+    }
+  },
+  "warm_start": {
+    "adapter_only": true,
+    "base_best_epoch": 1,
+    "checkpoint": "/root/workspace/Code/DualTimesField-max-spare-dgf-adapter/outputs/forecasting/additive_tcn_attention_head/TAS1/best_model.pt",
+    "trainable_parameter_count": 672,
+    "trainable_parameter_names": [
+      "dgf_forecast_head.exogenous_adapter.0.weight",
+      "dgf_forecast_head.exogenous_adapter.0.bias",
+      "dgf_forecast_head.exogenous_adapter.2.weight"
+    ]
+  }
+}

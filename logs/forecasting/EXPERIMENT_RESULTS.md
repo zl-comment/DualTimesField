@@ -379,6 +379,95 @@ changes both experts' attention queries. The follow-up experiment therefore
 keeps attention calendar-driven and introduces the factor only as a
 zero-initialized post-attention residual adapter in the DGF event branch.
 
+## DGF-only maximum-spare residual-adapter experiment
+
+This is the recommended and best-controlled maximum-spare version. It starts
+from each region's selected TCN-attention checkpoint, keeps the calendar-only
+attention queries unchanged, freezes all existing parameters, and trains only
+a 672-parameter nonlinear adapter after DGF history attention. The adapter's
+final layer is zero-initialized, so its warm-start predictions reproduce the
+baseline to floating-point precision. Validation total loss, MAE, and RMSE are
+selected independently; the canonical `best_model.pt` uses validation total
+loss, while the other two selections remain available for metric-specific use.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_max_spare_dgf_adapter.yaml`](../../configs/aemo_forecast_max_spare_dgf_adapter.yaml) |
+| Initialization | Regional `additive_tcn_attention_head` best checkpoint |
+| Trainable parameters | 672, DGF exogenous adapter only |
+| Adapter | `1 -> 16 -> GELU -> 40`, zero-initialized final projection |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best total epochs, NSW1 / QLD1 / TAS1 | 2 / 30 / 21 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/max_spare_dgf_residual_adapter/` |
+| Status | Recommended maximum-spare implementation |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Total / MAE / RMSE checkpoints |
+|---|---|---|---|---|
+| NSW1 | [`train.log`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/training_history.csv) | [`total`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/best_model.pt) / [`MAE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/best_rmse_model.pt) |
+| QLD1 | [`train.log`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/training_history.csv) | [`total`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/best_model.pt) / [`MAE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/best_rmse_model.pt) |
+| TAS1 | [`train.log`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/train.log) | [`metrics.json`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/training_history.csv) | [`total`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_model.pt) / [`MAE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/max_spare_dgf_residual_adapter/TAS1/best_rmse_model.pt) |
+
+### Canonical total-loss-selected test results
+
+| Region | MAE | vs. TCN attention | RMSE | vs. TCN attention | 80% coverage | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 70.0587 | -1.19% | 406.7138 | -0.64% | 60.51% | 76.49% |
+| QLD1 | 63.2004 | +4.88% | 276.8303 | -1.26% | 51.52% | 77.81% |
+| TAS1 | 41.8432 | -0.31% | 163.6939 | -0.14% | 46.92% | 70.23% |
+
+Negative changes are improvements. NSW1 improves both point metrics, TAS1 is
+effectively tied with a small improvement, and QLD1 trades a 1.26% RMSE gain
+for a 4.88% MAE loss. QLD1's validation-MAE checkpoint remains the untouched
+warm start, proving that no trained adapter checkpoint improves its validation
+MAE. Compared with query injection, this residual design reduces MAE by 6.51%
+on NSW1 and 16.26% on QLD1 and removes the catastrophic ordinary-hour error.
+
+## All archived local versions
+
+The following table uses each run's canonical validation-selected checkpoint.
+Except where noted, every row uses the same rolling-hour test set with 17,521
+origins per region. Average MAE and RMSE are unweighted means across NSW1,
+QLD1, and TAS1. This is a comparison of completed local experiments, not a
+claim that later versions must dominate earlier ones.
+
+| Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | `main` static normalization | 17,521 | **54.556** | 280.748 | 56.4% | 81.1% |
+| 2 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 3 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 4 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 5 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 6 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 7 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 8 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 9 | Maximum-spare query injection V1 | 17,521 | 64.089 | **278.557** | 53.1% | 77.4% |
+| 10 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 11 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 12 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+
+The `main` static version remains the aggregate MAE leader. Maximum-spare V1
+has the lowest aggregate RMSE because it emphasizes extreme errors, but its
+ordinary-hour MAE is poor. The recommended residual-adapter version is the
+best scientific control for using the new factor: it starts exactly from the
+baseline, cannot lose the baseline MAE checkpoint, and isolates the factor to
+the DGF event branch. Its value is architectural stability rather than a new
+overall leaderboard record.
+
+Fixed-origin experiments evaluate only 731 daily origins per region and are
+therefore not ranked directly with the rolling-hour table:
+
+| Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
+|---|---:|---:|---:|---:|---:|
+| Fixed origin, 30 epochs | 731 | 54.576 | 277.852 | 57.6% | 84.3% |
+| Fixed origin, 100 epochs | 731 | 55.970 | 279.420 | 55.1% | 83.4% |
+
+Because the fixed-origin rows score a much smaller and differently sampled
+test set, their lower RMSE cannot be interpreted as a direct win over rolling
+hourly models.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
