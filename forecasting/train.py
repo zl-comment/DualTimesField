@@ -140,6 +140,7 @@ def evaluate(
     target_count = 0
     interval_totals = {"80": [0.0, 0.0], "90": [0.0, 0.0]}
     fusion_weight_sum = 0.0
+    ctf_fusion_weight_sum = 0.0
     fusion_weight_square_sum = 0.0
     fusion_weight_count = 0
     price_mean = dataset.history_standardizer.mean[0]
@@ -167,7 +168,9 @@ def evaluate(
             target_count += actual.numel()
             if "dgf_fusion_weight" in outputs:
                 dgf_weight = outputs["dgf_fusion_weight"]
+                ctf_weight = outputs["ctf_fusion_weight"]
                 fusion_weight_sum += dgf_weight.sum().item()
+                ctf_fusion_weight_sum += ctf_weight.sum().item()
                 fusion_weight_square_sum += dgf_weight.square().sum().item()
                 fusion_weight_count += dgf_weight.numel()
             for label, (lower_index, upper_index) in interval_indices.items():
@@ -192,7 +195,9 @@ def evaluate(
         )
         metrics.update(
             {
-                "mean_ctf_fusion_weight": 1.0 - mean_dgf_weight,
+                "mean_ctf_fusion_weight": (
+                    ctf_fusion_weight_sum / fusion_weight_count
+                ),
                 "mean_dgf_fusion_weight": mean_dgf_weight,
                 "std_dgf_fusion_weight": variance ** 0.5,
             }

@@ -178,6 +178,23 @@ python -m forecasting.train \
 The original configuration defaults to `concatenate`; gated outputs are isolated
 under `outputs/forecasting/trigonometric_gate/`.
 
+### Complementary additive CTF/DGF fusion
+
+The additive trigonometric mode treats the two fields as complementary rather
+than competing experts. CTF is always retained as the low-frequency backbone,
+while a non-negative horizon-specific gate scales the DGF event correction:
+`forecast = CTF forecast + sin(theta)^2 * DGF correction`. This prevents the
+gate from suppressing CTF and preserves direct gradient flow into the CTF head.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/additive_trigonometric_gate/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

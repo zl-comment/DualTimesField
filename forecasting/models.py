@@ -34,9 +34,14 @@ class DualFieldLinearForecaster(nn.Module):
         self.calendar_dim = calendar_dim
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
-        if fusion_mode not in {"concatenate", "trigonometric_gate"}:
+        if fusion_mode not in {
+            "concatenate",
+            "trigonometric_gate",
+            "additive_trigonometric_gate",
+        }:
             raise ValueError(
-                "fusion_mode must be 'concatenate' or 'trigonometric_gate'"
+                "fusion_mode must be 'concatenate', 'trigonometric_gate', "
+                "or 'additive_trigonometric_gate'"
             )
 
         self.dual_field = DualTimesField(
@@ -134,12 +139,17 @@ class DualFieldLinearForecaster(nn.Module):
         fusion_angle = 0.5 * math.pi * torch.sigmoid(
             self.fusion_gate(gate_features)
         )
-        ctf_weight = torch.cos(fusion_angle).square().unsqueeze(-1)
         dgf_weight = torch.sin(fusion_angle).square().unsqueeze(-1)
-        point_forecast = ctf_weight * ctf_point + dgf_weight * dgf_point
-        quantile_forecast = (
-            ctf_weight * ctf_quantile + dgf_weight * dgf_quantile
-        )
+        if self.fusion_mode == "additive_trigonometric_gate":
+            ctf_weight = torch.ones_like(dgf_weight)
+            point_forecast = ctf_point + dgf_weight * dgf_point
+            quantile_forecast = ctf_quantile + dgf_weight * dgf_quantile
+        else:
+            ctf_weight = torch.cos(fusion_angle).square().unsqueeze(-1)
+            point_forecast = ctf_weight * ctf_point + dgf_weight * dgf_point
+            quantile_forecast = (
+                ctf_weight * ctf_quantile + dgf_weight * dgf_quantile
+            )
 
         return {
             "point_forecast": point_forecast,
