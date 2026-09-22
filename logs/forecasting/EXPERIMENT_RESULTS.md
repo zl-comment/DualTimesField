@@ -216,6 +216,50 @@ test DGF weights remain distributed around 45--57% instead of collapsing near
 epochs 1, 1, and 2, so the new parameterization still overfits quickly and does
 not consistently beat the original concatenation head.
 
+## Minimal nonlinear forecast-head experiment
+
+This experiment preserves the complementary additive CTF/DGF fusion and
+replaces each direct forecast head with
+`Linear(input, 64) -> GELU -> Linear(64, output)`. All data, normalization,
+split, gate, loss, optimizer, learning rate, epoch budget, and random seed
+settings remain unchanged. The four forecast heads contain 117,280 parameters,
+compared with 110,880 in the linear-head version.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_additive_nonlinear_head.yaml`](../../configs/aemo_forecast_additive_nonlinear_head.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 1 / 1 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/additive_nonlinear_head/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](additive_nonlinear_head/nsw1.log) | [`metrics.json`](../../outputs/forecasting/additive_nonlinear_head/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_nonlinear_head/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_nonlinear_head/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](additive_nonlinear_head/qld1.log) | [`metrics.json`](../../outputs/forecasting/additive_nonlinear_head/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_nonlinear_head/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_nonlinear_head/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](additive_nonlinear_head/tas1.log) | [`metrics.json`](../../outputs/forecasting/additive_nonlinear_head/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/additive_nonlinear_head/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/additive_nonlinear_head/TAS1/best_model.pt) |
+
+![Nonlinear-head training and validation loss](additive_nonlinear_head/training_loss_curves.png)
+
+![Nonlinear-head validation DGF gate](additive_nonlinear_head/dgf_gate_curves.png)
+
+### Test metrics and comparisons
+
+| Region | MAE | vs. additive linear head | vs. static baseline | RMSE | vs. additive linear head | vs. static baseline | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 72.3262 | +7.02% | +18.71% | 401.0712 | +0.19% | +0.12% | 44.14% |
+| QLD1 | 64.8524 | +8.88% | -1.17% | 279.3159 | +0.37% | -0.23% | 46.55% |
+| TAS1 | 40.9428 | +8.46% | +10.28% | 162.9214 | +0.72% | +0.76% | 63.86% |
+
+Negative comparison values are improvements. The one-hidden-layer nonlinear
+head is worse than the matched additive linear head on MAE and RMSE in all
+three regions. Training loss falls faster while the selected validation epochs
+remain 1, 1, and 2, indicating that the extra nonlinearity increases fitting
+capacity without improving cross-year generalization. It is retained as a
+negative forecast-head ablation.
+
 ## External RE-Price reference
 
 | Region | Local MAE | RE-Price MAE | MAE reduction needed | Local RMSE | RE-Price RMSE | RMSE reduction needed | RE-Price CRPS |
