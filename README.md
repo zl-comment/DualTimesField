@@ -370,6 +370,16 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/gas_price_ctf/`.
 
+Any configuration can be retrained with another seed for variance checks;
+`--seed N` overrides `training.seed` and writes to
+`<output_directory>_seed<N>`:
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --region NSW1 --seed 2027
+```
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

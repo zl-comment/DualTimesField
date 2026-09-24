@@ -635,8 +635,13 @@ def validation_selection_values(
     return values
 
 
-def run_training(config_path: Path | str, region: str) -> Path:
+def run_training(
+    config_path: Path | str, region: str, seed: int | None = None
+) -> Path:
     config = load_forecast_config(config_path)
+    if seed is not None:
+        config["training"]["seed"] = seed
+        config["training"]["output_directory"] += f"_seed{seed}"
     training_config = config["training"]
     set_seed(training_config["seed"])
     device = resolve_device(training_config["device"])
@@ -960,8 +965,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Train the dual-field linear AEMO forecaster")
     parser.add_argument("--config", default="configs/aemo_forecast.yaml")
     parser.add_argument("--region", required=True, choices=("NSW1", "QLD1", "TAS1"))
+    parser.add_argument(
+        "--seed",
+        type=int,
+        help="Override the configured seed and write to <output_directory>_seed<N>",
+    )
     args = parser.parse_args()
-    output_dir = run_training(args.config, args.region)
+    output_dir = run_training(args.config, args.region, args.seed)
     print(f"results={output_dir}")
 
 

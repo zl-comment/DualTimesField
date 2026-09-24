@@ -1,0 +1,58 @@
+{
+  "best_epoch": 6,
+  "checkpoint": "outputs/forecasting/gas_price_ctf_seed2027/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_gas_price_ctf.yaml",
+  "region": "NSW1",
+  "test": {
+    "model": {
+      "ais_80": 364.92837669580706,
+      "ais_90": 601.75753567232,
+      "crps_quantile_approx": 37.61512583928793,
+      "mae": 50.978891751255794,
+      "piaw_80": 83.96271866532653,
+      "piaw_90": 123.67959998673305,
+      "picp_80": 0.7086543766527785,
+      "picp_90": 0.8579323858988261,
+      "rmse_global": 394.2933497589212,
+      "rmse_horizon_mean": 394.1554505136492,
+      "rmse_window_mean": 103.55811629720668,
+      "sde_global": 393.4815218811456,
+      "sde_window_mean": 96.33414474433961
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 547.2507486202474,
+      "ais_90": 818.39102744491,
+      "crps_quantile_approx": 55.19672682900122,
+      "mae": 55.43783710657797,
+      "piaw_80": 88.67156129694554,
+      "piaw_90": 128.83603566259862,
+      "picp_80": 0.5124947541108695,
+      "picp_90": 0.6528032123917439,
+      "rmse_global": 172.37035798644467,
+      "rmse_horizon_mean": 172.2789977410929,
+      "rmse_window_mean": 80.72254477908153,
+      "sde_global": 170.07778572052877,
+      "sde_window_mean": 69.15451983863383
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}

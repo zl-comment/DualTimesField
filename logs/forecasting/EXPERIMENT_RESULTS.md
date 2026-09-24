@@ -741,6 +741,37 @@ small. Mean RMSE improves from 276.51 to 275.57, mean 90% AIS from 467.12 to
 44.467 (+0.35%) with QLD1 better and TAS1 worse. The single run cannot
 separate differences of this size from seed variance.
 
+### Seed variance: residual-path trunk vs. gas-price context
+
+Both configurations were retrained with seeds 2027 and 2028 through
+`python -m forecasting.train --config <config> --region <region> --seed <N>`,
+which writes to `<output_directory>_seed<N>`. Together with the original seed
+2026, each cell below is the mean and sample standard deviation of the
+three-region average over three seeds.
+
+| Version | Test MAE | Test RMSE | Window RMSE | 90% AIS | CRPS~ | Validation MAE |
+|---|---:|---:|---:|---:|---:|---:|
+| Residual-path trunk | 44.69 ± 0.37 | 275.96 ± 1.04 | 82.81 ± 0.45 | 457.89 ± 8.04 | 30.70 ± 0.46 | 69.53 ± 2.81 |
+| Gas-price CTF context | **44.37 ± 0.15** | **275.43 ± 0.39** | **82.28 ± 0.26** | **452.92 ± 8.41** | **30.40 ± 0.44** | **67.38 ± 2.29** |
+
+| Paired difference, gas - trunk | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | +0.15 | -0.86 | -0.27 | -0.32 |
+| 90% AIS | -4.61 | -7.27 | -3.03 | -4.97 |
+| CRPS~ | -0.31 | -0.53 | -0.05 | -0.30 |
+| Validation MAE | -0.74 | -2.35 | -3.35 | -2.15 |
+
+Per-region test MAE over three seeds is 52.30 ± 0.69 -> 51.59 ± 0.60 (NSW1),
+45.36 ± 0.12 -> 45.02 ± 0.02 (QLD1), and 36.41 ± 0.73 -> 36.49 ± 0.28 (TAS1).
+The gas context improves 90% AIS, CRPS~, and validation MAE for every seed and
+test MAE for two of three seeds, and it roughly halves the seed-to-seed MAE
+spread. Seed 2026 happened to be the residual-path trunk's best seed (44.31
+against a 44.69 mean), which is why the single-seed comparison looked flat.
+A seed standard deviation near 0.4 MAE also means that earlier single-seed
+differences smaller than about 0.5 MAE should be treated as unresolved.
+Artifacts are under `logs/forecasting/seed_variance/` and
+`outputs/forecasting/{residual_skip_path,gas_price_ctf}_seed{2027,2028}/`.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -773,8 +804,10 @@ The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
 Learning the quantiles in price space keeps that point accuracy, and the
 reconstruction residual path adds the best MAE so far. The gas-price context
-has the best RMSE and interval scores and tracks the 2022 price level better,
-but its MAE is slightly higher on the calmer test years. The conformal calibration run reuses the asinh
+has the best RMSE and interval scores and tracks the 2022 price level better.
+Its single-seed MAE is slightly higher, but over three seeds it has the lower
+mean MAE (44.37 ± 0.15 vs. 44.69 ± 0.37) and replaces the residual path as
+the research trunk. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the
