@@ -1,0 +1,60 @@
+{
+  "best_epoch": 3,
+  "checkpoint": "outputs/forecasting/additive_tcn_attention_head/QLD1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_tcn_attention_head.yaml",
+  "evaluated_commit": "8fe917b",
+  "region": "QLD1",
+  "tag": "aemo-additive-tcn-attention-head-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 462.52828751711917,
+      "ais_90": 603.9999939850331,
+      "crps_quantile_approx": 49.32000456013137,
+      "mae": 60.26100285816974,
+      "piaw_80": 114.56460637919986,
+      "piaw_90": 180.69525181575628,
+      "picp_80": 0.5215170366988185,
+      "picp_90": 0.7701377394745353,
+      "rmse_global": 280.35731536004243,
+      "rmse_horizon_mean": 280.3551140226011,
+      "rmse_window_mean": 106.88306304972114,
+      "sde_global": 278.8421758231184,
+      "sde_window_mean": 97.23605908769318
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 59.166410072923206,
+      "rmse_global": 368.8152120115404,
+      "rmse_horizon_mean": 368.8152120111766,
+      "rmse_window_mean": 133.53931489368935,
+      "sde_global": 368.8156503836255,
+      "sde_window_mean": 127.34961114067652
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 671.3119296304976,
+      "ais_90": 984.3184076569149,
+      "crps_quantile_approx": 71.3987717809882,
+      "mae": 109.50145884578873,
+      "piaw_80": 238.62910281173293,
+      "piaw_90": 322.6863970140359,
+      "picp_80": 0.6940359009576132,
+      "picp_90": 0.835465071916371,
+      "rmse_global": 436.0353805987743,
+      "rmse_horizon_mean": 436.0291862881748,
+      "rmse_window_mean": 183.83364989408196,
+      "sde_global": 435.74032362608716,
+      "sde_window_mean": 162.39018713689578
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 98.65434672959829,
+      "rmse_global": 525.410745077394,
+      "rmse_horizon_mean": 525.410745077319,
+      "rmse_window_mean": 206.5114716166149,
+      "sde_global": 525.41199698352,
+      "sde_window_mean": 194.38825116682872
+    }
+  }
+}

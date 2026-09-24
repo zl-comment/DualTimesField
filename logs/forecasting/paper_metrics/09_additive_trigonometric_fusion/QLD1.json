@@ -1,0 +1,60 @@
+{
+  "best_epoch": 0,
+  "checkpoint": "outputs/forecasting/additive_trigonometric_gate/QLD1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_trigonometric_gate.yaml",
+  "evaluated_commit": "39676db",
+  "region": "QLD1",
+  "tag": "aemo-additive-trigonometric-fusion-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 350.965050354252,
+      "ais_90": 526.3330203373073,
+      "crps_quantile_approx": 36.529680066777914,
+      "mae": 59.56232723344675,
+      "piaw_80": 103.11476301769981,
+      "piaw_90": 218.04247975993974,
+      "picp_80": 0.6464861214162053,
+      "picp_90": 0.9237866940623632,
+      "rmse_global": 278.2808755738928,
+      "rmse_horizon_mean": 278.2724988259027,
+      "rmse_window_mean": 106.47328453956528,
+      "sde_global": 278.07990062963216,
+      "sde_window_mean": 100.7594741299641
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 59.166410072923206,
+      "rmse_global": 368.8152120115404,
+      "rmse_horizon_mean": 368.8152120111766,
+      "rmse_window_mean": 133.53931489368935,
+      "sde_global": 368.8156503836255,
+      "sde_window_mean": 127.34961114067652
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 671.2947754364628,
+      "ais_90": 959.7283464724762,
+      "crps_quantile_approx": 70.40241063167056,
+      "mae": 95.96685020425377,
+      "piaw_80": 161.0292319382603,
+      "piaw_90": 284.32470798958155,
+      "picp_80": 0.621995536225249,
+      "picp_90": 0.8561338750906108,
+      "rmse_global": 434.43661481244357,
+      "rmse_horizon_mean": 434.41022492641486,
+      "rmse_window_mean": 170.03315505146182,
+      "sde_global": 431.90923719006827,
+      "sde_window_mean": 156.7599504706112
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 98.65434672959829,
+      "rmse_global": 525.410745077394,
+      "rmse_horizon_mean": 525.410745077319,
+      "rmse_window_mean": 206.5114716166149,
+      "sde_global": 525.41199698352,
+      "sde_window_mean": 194.38825116682872
+    }
+  }
+}
