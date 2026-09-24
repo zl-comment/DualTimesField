@@ -1,0 +1,60 @@
+{
+  "best_epoch": 68,
+  "checkpoint": "outputs/forecasting/daily_grouped_sampling_extended/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_daily_grouped_sampling_extended.yaml",
+  "evaluated_commit": "0c52d73",
+  "region": "NSW1",
+  "tag": "aemo-daily-grouped-sampling-240epoch-lr1e-3",
+  "test": {
+    "model": {
+      "ais_80": 480.72122040747416,
+      "ais_90": 724.3533098451188,
+      "crps_quantile_approx": 47.174232258807514,
+      "mae": 81.064048382858,
+      "piaw_80": 84.3306195765097,
+      "piaw_90": 198.30384293854982,
+      "picp_80": 0.4844496128455377,
+      "picp_90": 0.7793267127066568,
+      "rmse_global": 408.63999183596684,
+      "rmse_horizon_mean": 408.6012538656558,
+      "rmse_window_mean": 138.83149945183655,
+      "sde_global": 408.6245661268206,
+      "sde_window_mean": 130.0334932080899
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 376.0097842153996,
+      "ais_90": 474.43367749380775,
+      "crps_quantile_approx": 38.91375317952668,
+      "mae": 67.37513724613721,
+      "piaw_80": 124.6271231975201,
+      "piaw_90": 226.4618604561141,
+      "picp_80": 0.5678055015070009,
+      "picp_90": 0.8282305139063751,
+      "rmse_global": 184.78786487358522,
+      "rmse_horizon_mean": 184.6012411469354,
+      "rmse_window_mean": 98.33516919728672,
+      "sde_global": 184.53564220951412,
+      "sde_window_mean": 89.12008705591781
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}

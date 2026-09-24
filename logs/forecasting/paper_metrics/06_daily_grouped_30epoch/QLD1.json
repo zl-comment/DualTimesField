@@ -1,0 +1,60 @@
+{
+  "best_epoch": 29,
+  "checkpoint": "outputs/forecasting/daily_grouped_sampling/QLD1/best_model.pt",
+  "config": "configs/aemo_forecast_daily_grouped_sampling.yaml",
+  "evaluated_commit": "c9725b9",
+  "region": "QLD1",
+  "tag": "aemo-daily-grouped-sampling-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 433.7084354196414,
+      "ais_90": 608.3894847543178,
+      "crps_quantile_approx": 43.576526029819775,
+      "mae": 75.95660903696374,
+      "piaw_80": 108.21965830821804,
+      "piaw_90": 237.64474796835623,
+      "picp_80": 0.5638115214124003,
+      "picp_90": 0.859276011643171,
+      "rmse_global": 286.06011101116724,
+      "rmse_horizon_mean": 285.958506798536,
+      "rmse_window_mean": 127.04994366485836,
+      "sde_global": 286.02935179902903,
+      "sde_window_mean": 120.02625193202081
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 59.166410072923206,
+      "rmse_global": 368.8152120115404,
+      "rmse_horizon_mean": 368.8152120111766,
+      "rmse_window_mean": 133.53931489368935,
+      "sde_global": 368.8156503836255,
+      "sde_window_mean": 127.34961114067652
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 744.7333672519518,
+      "ais_90": 1020.0985620215537,
+      "crps_quantile_approx": 73.4192958656952,
+      "mae": 110.09473182532282,
+      "piaw_80": 141.2803240827328,
+      "piaw_90": 292.5863987053188,
+      "picp_80": 0.5181412384113541,
+      "picp_90": 0.8244773186829957,
+      "rmse_global": 439.3766370799429,
+      "rmse_horizon_mean": 439.3559975899182,
+      "rmse_window_mean": 186.99701135062966,
+      "sde_global": 437.82111733681097,
+      "sde_window_mean": 173.80798049864208
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 98.65434672959829,
+      "rmse_global": 525.410745077394,
+      "rmse_horizon_mean": 525.410745077319,
+      "rmse_window_mean": 206.5114716166149,
+      "sde_global": 525.41199698352,
+      "sde_window_mean": 194.38825116682872
+    }
+  }
+}

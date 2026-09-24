@@ -1,0 +1,60 @@
+{
+  "best_epoch": 150,
+  "checkpoint": "outputs/forecasting/daily_grouped_sampling_extended/QLD1/best_model.pt",
+  "config": "configs/aemo_forecast_daily_grouped_sampling_extended.yaml",
+  "evaluated_commit": "0c52d73",
+  "region": "QLD1",
+  "tag": "aemo-daily-grouped-sampling-240epoch-lr1e-3",
+  "test": {
+    "model": {
+      "ais_80": 444.480374513835,
+      "ais_90": 599.9224718575805,
+      "crps_quantile_approx": 43.14048266623656,
+      "mae": 81.13768872123825,
+      "piaw_80": 105.51240976568504,
+      "piaw_90": 219.6973858357265,
+      "picp_80": 0.49554582120503016,
+      "picp_90": 0.8111884785875997,
+      "rmse_global": 284.98917609602654,
+      "rmse_horizon_mean": 284.831570730962,
+      "rmse_window_mean": 131.51757923182168,
+      "sde_global": 284.9208910712176,
+      "sde_window_mean": 122.62111772693764
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 59.166410072923206,
+      "rmse_global": 368.8152120115404,
+      "rmse_horizon_mean": 368.8152120111766,
+      "rmse_window_mean": 133.53931489368935,
+      "sde_global": 368.8156503836255,
+      "sde_window_mean": 127.34961114067652
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 671.2001024975835,
+      "ais_90": 979.4502477870493,
+      "crps_quantile_approx": 67.79040455247772,
+      "mae": 111.52018218029156,
+      "piaw_80": 212.7583470639622,
+      "piaw_90": 369.78838060043273,
+      "picp_80": 0.592957155392774,
+      "picp_90": 0.8307533096791423,
+      "rmse_global": 435.3527863298419,
+      "rmse_horizon_mean": 435.302395923751,
+      "rmse_window_mean": 187.26509340322684,
+      "sde_global": 435.211420873963,
+      "sde_window_mean": 174.2062272187778
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 98.65434672959829,
+      "rmse_global": 525.410745077394,
+      "rmse_horizon_mean": 525.410745077319,
+      "rmse_window_mean": 206.5114716166149,
+      "sde_global": 525.41199698352,
+      "sde_window_mean": 194.38825116682872
+    }
+  }
+}

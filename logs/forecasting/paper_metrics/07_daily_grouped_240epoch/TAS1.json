@@ -1,0 +1,60 @@
+{
+  "best_epoch": 181,
+  "checkpoint": "outputs/forecasting/daily_grouped_sampling_extended/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_daily_grouped_sampling_extended.yaml",
+  "evaluated_commit": "0c52d73",
+  "region": "TAS1",
+  "tag": "aemo-daily-grouped-sampling-240epoch-lr1e-3",
+  "test": {
+    "model": {
+      "ais_80": 243.32707438219418,
+      "ais_90": 301.11939871923073,
+      "crps_quantile_approx": 23.666306639334962,
+      "mae": 39.109813647423074,
+      "piaw_80": 58.32177513664431,
+      "piaw_90": 117.88156450132918,
+      "picp_80": 0.463363012004642,
+      "picp_90": 0.765122329395202,
+      "rmse_global": 162.3974763973046,
+      "rmse_horizon_mean": 162.39524301023098,
+      "rmse_window_mean": 55.55013114007663,
+      "sde_global": 162.3766185821495,
+      "sde_window_mean": 48.103377203726886
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 414.4804859560855,
+      "ais_90": 563.7533956084163,
+      "crps_quantile_approx": 40.41507466493936,
+      "mae": 62.61508263081402,
+      "piaw_80": 85.59086320888791,
+      "piaw_90": 170.05964706501746,
+      "picp_80": 0.46089905001716835,
+      "picp_90": 0.7362414635076876,
+      "rmse_global": 273.137637641314,
+      "rmse_horizon_mean": 273.1302940934668,
+      "rmse_window_mean": 93.41760053090617,
+      "sde_global": 272.8040121198226,
+      "sde_window_mean": 78.32162681880057
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}
