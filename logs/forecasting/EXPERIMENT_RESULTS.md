@@ -458,6 +458,64 @@ generalization bottleneck.
 | QLD1 | [`train.log`](../../outputs/forecasting/stable_from_scratch/QLD1/train.log) | [`metrics.json`](../../outputs/forecasting/stable_from_scratch/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/stable_from_scratch/QLD1/training_history.csv) | [`total`](../../outputs/forecasting/stable_from_scratch/QLD1/best_model.pt) / [`MAE`](../../outputs/forecasting/stable_from_scratch/QLD1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/stable_from_scratch/QLD1/best_rmse_model.pt) |
 | TAS1 | [`train.log`](../../outputs/forecasting/stable_from_scratch/TAS1/train.log) | [`metrics.json`](../../outputs/forecasting/stable_from_scratch/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/stable_from_scratch/TAS1/training_history.csv) | [`total`](../../outputs/forecasting/stable_from_scratch/TAS1/best_model.pt) / [`MAE`](../../outputs/forecasting/stable_from_scratch/TAS1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/stable_from_scratch/TAS1/best_rmse_model.pt) |
 
+## Asinh price-target experiment
+
+This experiment keeps the complementary additive trigonometric CTF/DGF model,
+data, split, loss weights, optimizer, learning rate, 30-epoch budget, and seed
+unchanged. The only change is a variance-stabilizing transform of the price
+channel, applied to both the historical input and the forecast target before
+standardization:
+`asinh((price - median) / (MAD / 0.6745))`. The median and MAD are fitted on
+the training split only (NSW1 58.03 / 30.34, QLD1 55.19 / 29.30, TAS1
+57.60 / 41.44 AUD/MWh). Point forecasts and quantiles are mapped back with the
+inverse transform before every metric, so all values remain in AUD/MWh.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml`](../../configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 16 / 4 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/asinh_additive_trigonometric_gate/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](asinh_additive_trigonometric_gate/nsw1.log) | [`metrics.json`](../../outputs/forecasting/asinh_additive_trigonometric_gate/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_additive_trigonometric_gate/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_additive_trigonometric_gate/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](asinh_additive_trigonometric_gate/qld1.log) | [`metrics.json`](../../outputs/forecasting/asinh_additive_trigonometric_gate/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_additive_trigonometric_gate/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_additive_trigonometric_gate/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](asinh_additive_trigonometric_gate/tas1.log) | [`metrics.json`](../../outputs/forecasting/asinh_additive_trigonometric_gate/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_additive_trigonometric_gate/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_additive_trigonometric_gate/TAS1/best_model.pt) |
+
+### Validation metrics at the selected checkpoint
+
+| Region | MAE | RMSE | 80% coverage | 90% coverage | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|
+| NSW1 | 65.7256 | 184.3621 | 57.50% | 81.28% | 28.46% |
+| QLD1 | 92.4641 | 432.2614 | 65.84% | 86.42% | 43.27% |
+| TAS1 | 59.2845 | 271.0506 | 49.51% | 72.93% | 52.98% |
+
+### Test metrics and comparisons
+
+| Region | MAE | vs. additive | vs. static | RMSE | vs. additive | vs. static | 80% coverage / width | 90% coverage / width | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 53.4716 | -20.88% | -12.23% | 396.3959 | -0.98% | -1.05% | 63.10% / 108.9388 | 84.16% / 238.2870 | 30.68% |
+| QLD1 | 48.4728 | -18.62% | -26.13% | 275.8854 | -0.86% | -1.46% | 74.23% / 155.0740 | 92.66% / 410.8170 | 38.86% |
+| TAS1 | 36.0219 | -4.57% | -2.97% | 160.5065 | -0.77% | -0.73% | 47.39% / 52.5858 | 73.57% / 97.9439 | 51.84% |
+
+Negative comparison values are improvements. The transform improves both
+point metrics in every region against both the additive model and the static
+baseline. Average test MAE falls from 54.965 to 45.989 (-16.33%) against the
+additive model and by 15.70% against the static baseline, and QLD1 now beats
+the 24-hour seasonal naive MAE of 59.17. The gain is concentrated in ordinary
+hours: global RMSE improves by less than 1.5% because spike hours remain
+unforecast.
+
+Two costs remain. First, the inverse `sinh` widens upper quantiles, so 90%
+interval width grows from 165.3 to 249.0 AUD/MWh on average and the 90% AIS
+worsens from 485.4 to 508.6 under the RE-Price metric definitions. Second, the
+mean DGF correction weight falls from 45-57% to 31-52%, confirming that
+compressing spikes also reduces the event field's share of the forecast.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -468,23 +526,25 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | `main` static normalization | 17,521 | **54.556** | 280.748 | 56.4% | 81.1% |
-| 2 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 3 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 4 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 5 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 6 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 7 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 8 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 9 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 10 | Maximum-spare query injection V1 | 17,521 | 64.089 | **278.557** | 53.1% | 77.4% |
-| 11 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 12 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 13 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | **Asinh price target, additive trigonometric fusion** | 17,521 | **45.989** | **277.596** | 61.6% | 83.5% |
+| 2 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 3 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 4 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 5 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 6 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 7 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 8 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 9 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 10 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 11 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 12 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 13 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 14 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
-The `main` static version remains the aggregate MAE leader. Maximum-spare V1
-has the lowest aggregate RMSE because it emphasizes extreme errors, but its
-ordinary-hour MAE is poor. The recommended residual-adapter version is the
+The asinh price-target version is the new leader on both aggregate MAE and
+aggregate RMSE, and it is the first dual-field version to beat the `main`
+static baseline. Maximum-spare V1 has the second-lowest aggregate RMSE because
+it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the
 baseline, cannot lose the baseline MAE checkpoint, and isolates the factor to
 the DGF event branch. Its value is architectural stability rather than a new

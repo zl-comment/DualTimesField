@@ -303,6 +303,25 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/stable_from_scratch/`.
 
+### Asinh price target
+
+This configuration keeps the additive trigonometric CTF/DGF fusion unchanged
+and applies a variance-stabilizing `asinh((price - median) / MAD)` transform to
+the price channel before standardization. The median and normalized MAD are
+fitted on the training split only. Forecasts and quantiles are mapped back to
+AUD/MWh with the inverse transform before any metric is computed.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/asinh_additive_trigonometric_gate/`.
+RE-Price style metrics for archived checkpoints can be recomputed with
+`python -m forecasting.evaluate_paper_metrics`; see
+[`logs/forecasting/PAPER_METRICS.md`](logs/forecasting/PAPER_METRICS.md).
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

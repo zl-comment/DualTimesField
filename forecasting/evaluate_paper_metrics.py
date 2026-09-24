@@ -15,6 +15,16 @@ REGIONS = ("NSW1", "QLD1", "TAS1")
 INTERVALS = {"80": (0.10, 0.90), "90": (0.05, 0.95)}
 
 
+def denormalize(values: torch.Tensor, batch: Mapping, dataset, device) -> torch.Tensor:
+    if "target_scale" in batch:
+        location = batch["target_location"].to(device).view(-1, 1, 1)
+        scale = batch["target_scale"].to(device).view(-1, 1, 1)
+        return values * scale + location
+    if hasattr(dataset, "denormalize_target"):
+        return dataset.denormalize_target(values)
+    return values * dataset.history_standardizer.std[0] + dataset.history_standardizer.mean[0]
+
+
 def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np.ndarray]:
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     points, quantiles, actuals = [], [], []
@@ -23,14 +33,8 @@ def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np
         for batch in loader:
             inputs = move_inputs(batch, device)
             outputs = model(*inputs[:-1])
-            if "target_scale" in batch:
-                location = batch["target_location"].to(device).view(-1, 1, 1)
-                scale = batch["target_scale"].to(device).view(-1, 1, 1)
-            else:
-                location = dataset.history_standardizer.mean[0]
-                scale = dataset.history_standardizer.std[0]
-            points.append((outputs["point_forecast"] * scale + location)[..., 0].cpu())
-            quantiles.append((outputs["quantile_forecast"] * scale + location).cpu())
+            points.append(denormalize(outputs["point_forecast"], batch, dataset, device)[..., 0].cpu())
+            quantiles.append(denormalize(outputs["quantile_forecast"], batch, dataset, device).cpu())
             actuals.append(batch["target_price_raw"][..., 0])
     point = torch.cat(points).double().numpy()
     actual = torch.cat(actuals).double().numpy()

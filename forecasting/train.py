@@ -4,6 +4,7 @@ import math
 import random
 import sys
 from contextlib import contextmanager, nullcontext
+from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, Mapping
 
@@ -217,8 +218,6 @@ def evaluate(
     ctf_fusion_weight_sum = 0.0
     fusion_weight_square_sum = 0.0
     fusion_weight_count = 0
-    price_mean = dataset.history_standardizer.mean[0]
-    price_std = dataset.history_standardizer.std[0]
     quantiles = list(model.quantiles)
     interval_indices = {
         "80": (quantiles.index(0.10), quantiles.index(0.90)),
@@ -234,8 +233,8 @@ def evaluate(
             for name in LOSS_NAMES:
                 loss_sums[name] += losses[name].item() * batch_size
             actual = batch["target_price_raw"].to(device)
-            point = outputs["point_forecast"] * price_std + price_mean
-            quantile = outputs["quantile_forecast"] * price_std + price_mean
+            point = dataset.denormalize_target(outputs["point_forecast"])
+            quantile = dataset.denormalize_target(outputs["quantile_forecast"])
             error = point - actual
             absolute_error += error.abs().sum().item()
             squared_error += error.square().sum().item()
@@ -322,6 +321,7 @@ def save_checkpoint(
             "future_exogenous_config": config.get("future_exogenous"),
             "history_feature_names": dataset.history_feature_names,
             "calendar_feature_names": dataset.calendar_feature_names,
+            "price_transform": asdict(dataset.price_transform),
             "history_mean": dataset.history_standardizer.mean.tolist(),
             "history_std": dataset.history_standardizer.std.tolist(),
             "future_exogenous_feature_names": dataset.future_exogenous_feature_names,

@@ -73,6 +73,10 @@ compared with caution.
 | 15_stable_from_scratch | QLD1 | 17521 | 64.84 | 279.33 | 110.79 | 91.81 | 64.18% | 152.35 | 668.36 | 49.00 |
 | 15_stable_from_scratch | TAS1 | 17521 | 43.08 | 166.63 | 58.98 | 45.43 | 67.00% | 95.68 | 335.78 | 25.54 |
 | 15_stable_from_scratch | **Mean** | - | 57.90 | 281.41 | 95.76 | 81.50 | 71.54% | 135.58 | 547.78 | 38.56 |
+| 16_asinh_additive_trigonometric_fusion | NSW1 | 17521 | 53.47 | 396.40 | 107.09 | 100.19 | 84.16% | 238.29 | 621.44 | 38.44 |
+| 16_asinh_additive_trigonometric_fusion | QLD1 | 17521 | 48.47 | 275.89 | 96.01 | 91.28 | 92.66% | 410.82 | 614.53 | 35.91 |
+| 16_asinh_additive_trigonometric_fusion | TAS1 | 17521 | 36.02 | 160.51 | 51.60 | 44.11 | 73.57% | 97.94 | 289.68 | 21.95 |
+| 16_asinh_additive_trigonometric_fusion | **Mean** | - | 45.99 | 277.60 | 84.90 | 78.53 | 83.46% | 249.02 | 508.55 | 32.10 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -91,6 +95,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Aggregation explains most of the RMSE gap | The static baseline's mean RMSE falls from 280.75 (global) to 92.42 (window). RE-Price reports 31.37 |
 | Aggregation does not explain the MAE gap | MAE is aggregation-invariant: 54.56 locally versus 22.76 for RE-Price |
 | The seasonal naive forecast is a strong floor | On the rolling windows it reaches mean MAE 57.17 and window RMSE 119.31; in QLD1 its MAE (59.17) is below the static baseline's (65.62) |
+| The asinh price target narrows the MAE gap | 16_asinh_additive_trigonometric_fusion lowers mean MAE to 45.99 and window RMSE to 84.90 and gives the lowest CRPS~ (32.10), but its 90% AIS (508.55) is worse than the static baseline's (486.34) because the inverse transform widens upper quantiles |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -111,3 +116,4 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 13_max_spare_query_injection | `aemo-max-spare-query-injection-30epoch` | `a9d6913` | `configs/aemo_forecast_max_spare.yaml` | `outputs/forecasting/max_spare_future_context` |
 | 14_max_spare_dgf_residual_adapter | `aemo-best-max-spare-dgf-residual-adapter-30epoch` | `ad9792a` | `configs/aemo_forecast_max_spare_dgf_adapter.yaml` | `outputs/forecasting/max_spare_dgf_residual_adapter` |
 | 15_stable_from_scratch | untagged | `9cbac10` | `configs/aemo_forecast_stable_from_scratch.yaml` | `outputs/forecasting/stable_from_scratch` |
+| 16_asinh_additive_trigonometric_fusion | untagged | `feature/asinh-target` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |

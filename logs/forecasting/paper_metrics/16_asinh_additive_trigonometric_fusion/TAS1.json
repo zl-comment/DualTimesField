@@ -1,0 +1,60 @@
+{
+  "best_epoch": 1,
+  "checkpoint": "outputs/forecasting/asinh_additive_trigonometric_gate/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml",
+  "evaluated_commit": "feature/asinh-target",
+  "region": "TAS1",
+  "tag": null,
+  "test": {
+    "model": {
+      "ais_80": 222.6351187451401,
+      "ais_90": 289.6768610951438,
+      "crps_quantile_approx": 21.95208997743173,
+      "mae": 36.02193766944814,
+      "piaw_80": 52.58580839544812,
+      "piaw_90": 97.94385297032221,
+      "picp_80": 0.47385993950117,
+      "picp_90": 0.7357195175313433,
+      "rmse_global": 160.50653532086224,
+      "rmse_horizon_mean": 160.50454680474766,
+      "rmse_window_mean": 51.597153804879454,
+      "sde_global": 160.22379043439537,
+      "sde_window_mean": 44.113439222363155
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 381.3299565094569,
+      "ais_90": 543.6327787826309,
+      "crps_quantile_approx": 37.96016745003891,
+      "mae": 59.284492538324926,
+      "piaw_80": 85.5009024058807,
+      "piaw_90": 157.69023071010866,
+      "picp_80": 0.49505932623707605,
+      "picp_90": 0.7292644309640991,
+      "rmse_global": 271.05056008777376,
+      "rmse_horizon_mean": 271.04475215972167,
+      "rmse_window_mean": 88.77984730253486,
+      "sde_global": 269.4061593367223,
+      "sde_window_mean": 72.72272002342388
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}

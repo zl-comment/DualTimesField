@@ -18,6 +18,37 @@ class Standardizer:
         return ((values - self.mean) / self.std).astype(np.float32)
 
 
+@dataclass(frozen=True)
+class PriceTransform:
+    kind: str = "identity"
+    location: float = 0.0
+    scale: float = 1.0
+
+    def forward(self, values: np.ndarray) -> np.ndarray:
+        if self.kind == "identity":
+            return values
+        return np.arcsinh((values - self.location) / self.scale)
+
+    def inverse(self, values):
+        if self.kind == "identity":
+            return values
+        sinh = torch.sinh if isinstance(values, torch.Tensor) else np.sinh
+        return sinh(values) * self.scale + self.location
+
+
+def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
+    if kind == "identity":
+        return PriceTransform()
+    if kind != "asinh":
+        raise ValueError(f"Unknown price transform: {kind}")
+    location = float(np.median(train_prices))
+    # Normalized median absolute deviation (Uniejewski et al., 2018).
+    scale = float(np.median(np.abs(train_prices - location)) / 0.6745)
+    if scale <= 0:
+        raise ValueError("Training prices must have a positive median absolute deviation")
+    return PriceTransform(kind=kind, location=location, scale=scale)
+
+
 def load_forecast_config(config_path: Path | str) -> dict:
     path = Path(config_path).resolve()
     config = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
@@ -187,15 +218,25 @@ class AEMOForecastDataset(Dataset):
         self.calendar_feature_names = tuple(protocol["calendar_features"])
         split_values = frame[data_config["split_column"]].to_numpy()
         train_mask = split_values == "train"
-        raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64)
+        raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64, copy=True)
+        self.target_index = self.history_feature_names.index(data_config["target_column"])
+        self.price_transform = _fit_price_transform(
+            data_config.get("price_transform", "identity"),
+            raw_history[train_mask, self.target_index],
+        )
+        raw_history[:, self.target_index] = self.price_transform.forward(
+            raw_history[:, self.target_index]
+        )
         self.history_standardizer = _fit_standardizer(raw_history[train_mask])
         self.history_values = self.history_standardizer.transform(raw_history)
-        target_index = self.history_feature_names.index(data_config["target_column"])
         raw_target = frame[data_config["target_column"]].to_numpy(dtype=np.float32)
         self.target_values_raw = raw_target
         self.target_values = (
-            (raw_target - self.history_standardizer.mean[target_index])
-            / self.history_standardizer.std[target_index]
+            (
+                self.price_transform.forward(raw_target.astype(np.float64))
+                - self.history_standardizer.mean[self.target_index]
+            )
+            / self.history_standardizer.std[self.target_index]
         ).astype(np.float32)
         self.calendar_values = _build_calendar_matrix(
             frame[data_config["delivery_column"]], train_mask, self.calendar_feature_names
@@ -271,6 +312,13 @@ class AEMOForecastDataset(Dataset):
             int(origin): standardized[index]
             for index, origin in enumerate(origins)
         }
+
+    def denormalize_target(self, values: torch.Tensor) -> torch.Tensor:
+        restored = (
+            values * self.history_standardizer.std[self.target_index]
+            + self.history_standardizer.mean[self.target_index]
+        )
+        return self.price_transform.inverse(restored)
 
     def __len__(self) -> int:
         return len(self.origin_indices)
