@@ -338,6 +338,21 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/asinh_price_space_quantiles/`.
 
+### Reconstruction residual path
+
+Setting `model.residual_path: true` feeds the remainder
+`history - CTF - DGF` to the CTF expert's linear heads, so history that
+neither field reconstructs still reaches the forecast. It requires a gated
+fusion mode with linear heads.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_residual_skip_path.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/residual_skip_path/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

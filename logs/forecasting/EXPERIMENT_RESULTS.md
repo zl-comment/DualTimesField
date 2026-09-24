@@ -608,6 +608,70 @@ TAS1 still under-covers both intervals and its AIS worsens slightly. The low
 validation coverage again reflects the 2022 volatility shift rather than the
 test behavior.
 
+## Reconstruction residual-path experiment
+
+The trunk model's forecast heads only read the reconstructed CTF and DGF
+fields. On the test split the discarded remainder
+`history - CTF - DGF` averages 0.47, 0.50, and 0.33 standardized units on the
+NSW1, QLD1, and TAS1 price channel, and the one-hour-ahead MAE is no better
+than last-value persistence (49.2 vs. 50.1, 44.7 vs. 48.2, and 30.7 vs. 22.1).
+This experiment adds that remainder, flattened over both input variables, to
+the CTF expert's point and quantile heads. The decomposition therefore becomes
+CTF + DGF + remainder at the forecast head. Everything else matches the
+price-space quantile trunk, including the asinh point target, loss weights,
+optimizer, 30-epoch budget, and seed. Parameters increase from 146,300 to
+167,036.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_residual_skip_path.yaml`](../../configs/aemo_forecast_residual_skip_path.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 2 / 4 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/residual_skip_path/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](residual_skip_path/nsw1.log) | [`metrics.json`](../../outputs/forecasting/residual_skip_path/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/residual_skip_path/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/residual_skip_path/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](residual_skip_path/qld1.log) | [`metrics.json`](../../outputs/forecasting/residual_skip_path/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/residual_skip_path/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/residual_skip_path/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](residual_skip_path/tas1.log) | [`metrics.json`](../../outputs/forecasting/residual_skip_path/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/residual_skip_path/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/residual_skip_path/TAS1/best_model.pt) |
+
+### Validation metrics at the selected checkpoint
+
+| Region | MAE | RMSE | 80% coverage | 90% coverage | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|
+| NSW1 | 63.4074 | 182.5430 | 42.17% | 60.18% | 48.78% |
+| QLD1 | 85.7597 | 422.3746 | 48.61% | 65.86% | 50.70% |
+| TAS1 | 57.0928 | 269.3322 | 35.59% | 59.07% | 51.87% |
+
+### Test metrics and trunk comparison
+
+| Region | MAE | MAE change | RMSE | RMSE change | 90% coverage / width | 90% AIS, trunk -> this run | CRPS~, trunk -> this run | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 52.1061 | -2.56% | 397.7381 | +0.54% | 83.39% / 115.8712 | 613.61 -> 616.57 | 38.68 -> 38.74 | 42.89% |
+| QLD1 | 45.2573 | -6.45% | 271.6738 | -1.48% | 90.62% / 157.1635 | 494.69 -> 479.59 | 33.16 -> 31.99 | 44.09% |
+| TAS1 | 35.5779 | -1.19% | 160.1102 | -0.22% | 73.36% / 88.5526 | 307.55 -> 305.21 | 23.14 -> 22.89 | 46.25% |
+
+### Horizon and hour-type diagnostics on the test split
+
+| Region | MAE h1, trunk -> this run | MAE h24, trunk -> this run | Persistence MAE h1 | Ordinary-hour MAE, trunk -> this run |
+|---|---:|---:|---:|---:|
+| NSW1 | 49.2 -> 45.1 | 55.6 -> 54.1 | 50.1 | 31.96 -> 30.30 |
+| QLD1 | 44.7 -> 36.2 | 49.2 -> 47.2 | 48.2 | 33.00 -> 30.37 |
+| TAS1 | 30.7 -> 26.5 | 37.9 -> 36.5 | 22.1 | 31.91 -> 31.53 |
+
+Negative changes are improvements. MAE improves in every region and the
+average falls from 45.955 to 44.314 (-3.57%). The gain is largest at the first
+horizons, as intended: one-hour-ahead MAE now beats persistence in NSW1 and
+QLD1, although TAS1 still trails it. Mean 90% width narrows from 127.65 to
+120.53 and mean 90% AIS improves from 471.95 to 467.12, while NSW1 AIS and
+RMSE are slightly worse. The NSW1 checkpoint is now selected at epoch 2
+instead of 16, so the extra path also makes early overfitting more visible.
+The DGF correction weight moves from 32-49% to 43-46%, so the event field is
+not displaced by the new path.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -618,26 +682,27 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | **Asinh price target with price-space quantiles** | 17,521 | **45.955** | **277.268** | 61.9% | 82.7% |
-| 2 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 3 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 4 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 5 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 6 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 7 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 8 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 9 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 10 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 11 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 12 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 13 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 14 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 15 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | **Reconstruction residual path** | 17,521 | **44.314** | **276.507** | 60.4% | 82.5% |
+| 2 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 3 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 4 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 5 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 6 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 7 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 8 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 9 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 10 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 11 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 12 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 13 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 14 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 15 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 16 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
-Learning the quantiles in price space keeps that point accuracy and gives the
-best interval scores. The conformal calibration run reuses the asinh
+Learning the quantiles in price space keeps that point accuracy, and the
+reconstruction residual path adds the best point and interval scores so far. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the

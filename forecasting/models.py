@@ -202,6 +202,7 @@ class DualFieldLinearForecaster(nn.Module):
         tcn_channels: int = 40,
         tcn_kernel_size: int = 3,
         tcn_dilations: Sequence[int] = (1, 2, 4, 8, 16),
+        residual_path: bool = False,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -213,6 +214,13 @@ class DualFieldLinearForecaster(nn.Module):
         self.quantiles = tuple(quantiles)
         self.fusion_mode = fusion_mode
         self.forecast_head_type = forecast_head_type
+        self.residual_path = residual_path
+        if residual_path and (
+            fusion_mode == "concatenate" or forecast_head_type != "linear"
+        ):
+            raise ValueError(
+                "The residual path requires a gated fusion mode with linear heads"
+            )
         if fusion_mode not in {
             "concatenate",
             "trigonometric_gate",
@@ -297,14 +305,19 @@ class DualFieldLinearForecaster(nn.Module):
                     exogenous_adapter_hidden_dim=exogenous_adapter_hidden_dim,
                 )
             else:
+                # The CTF head also reads the reconstruction remainder, so
+                # history not captured by either field still reaches the forecast.
+                ctf_feature_dim = expert_feature_dim + (
+                    input_length * num_variables if residual_path else 0
+                )
                 self.ctf_point_head = nn.Linear(
-                    expert_feature_dim, forecast_horizon
+                    ctf_feature_dim, forecast_horizon
                 )
                 self.dgf_point_head = nn.Linear(
                     expert_feature_dim, forecast_horizon
                 )
                 self.ctf_quantile_head = nn.Linear(
-                    expert_feature_dim,
+                    ctf_feature_dim,
                     forecast_horizon * len(self.quantiles),
                 )
                 self.dgf_quantile_head = nn.Linear(
@@ -348,6 +361,7 @@ class DualFieldLinearForecaster(nn.Module):
         event_signal: torch.Tensor,
         future_calendar: torch.Tensor,
         future_exogenous: torch.Tensor | None,
+        remainder: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -372,7 +386,10 @@ class DualFieldLinearForecaster(nn.Module):
                 event_signal, future_calendar, future_exogenous
             )
         else:
-            ctf_features = torch.cat([ctf_flat, calendar_flat], dim=1)
+            ctf_parts = [ctf_flat, calendar_flat]
+            if remainder is not None:
+                ctf_parts.insert(1, remainder.flatten(start_dim=1))
+            ctf_features = torch.cat(ctf_parts, dim=1)
             dgf_features = torch.cat([event_flat, calendar_flat], dim=1)
             ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
             dgf_point = self.dgf_point_head(dgf_features).unsqueeze(-1)
@@ -480,7 +497,15 @@ class DualFieldLinearForecaster(nn.Module):
             )
         else:
             forecasts = self._trigonometric_gated_forecast(
-                ctf_signal, event_signal, future_calendar, future_exogenous
+                ctf_signal,
+                event_signal,
+                future_calendar,
+                future_exogenous,
+                (
+                    history_values - ctf_signal - event_signal
+                    if self.residual_path
+                    else None
+                ),
             )
 
         return {

@@ -105,6 +105,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         tcn_dilations=model_config.get(
             "tcn_dilations", (1, 2, 4, 8, 16)
         ),
+        residual_path=model_config.get("residual_path", False),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]
