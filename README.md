@@ -288,6 +288,21 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/stable_dgf_finetuning/`.
 
+### Stable training from scratch
+
+To separate optimizer effects from checkpoint fine-tuning, the from-scratch
+configuration disables warm starts and trains all model parameters. It retains
+AdamW, blended Huber/MSE point loss, gradient clipping, EMA, a five-epoch
+linear warmup, cosine learning-rate decay, and validation-based early stopping.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_stable_from_scratch.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/stable_from_scratch/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

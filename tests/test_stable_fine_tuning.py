@@ -104,6 +104,33 @@ class StableFineTuningTest(unittest.TestCase):
         self.assertAlmostEqual(rates_10["decoder"], 1e-5)
         self.assertAlmostEqual(rates_60["temporal"], 1e-6)
 
+    def test_full_model_training_uses_warmup_and_cosine_schedule(self):
+        model = torch.nn.Linear(4, 2)
+        training = {
+            "epochs": 120,
+            "learning_rate": 3e-4,
+            "weight_decay": 1e-4,
+            "optimizer": {"betas": (0.9, 0.95), "eps": 1e-8},
+            "schedule": {"warmup_epochs": 5, "min_lr_ratio": 0.01},
+        }
+        optimizer, groups = build_optimizer(model, training)
+
+        stage_0, rates_0, count_0 = configure_fine_tuning_epoch(
+            optimizer, groups, training, 0
+        )
+        _, rates_4, _ = configure_fine_tuning_epoch(
+            optimizer, groups, training, 4
+        )
+        _, rates_119, _ = configure_fine_tuning_epoch(
+            optimizer, groups, training, 119
+        )
+
+        self.assertEqual(stage_0, "training")
+        self.assertEqual(count_0, sum(p.numel() for p in model.parameters()))
+        self.assertAlmostEqual(rates_0["default"], 6e-5)
+        self.assertAlmostEqual(rates_4["default"], 3e-4)
+        self.assertAlmostEqual(rates_119["default"], 3e-6)
+
     def test_composite_selection_is_relative_to_warm_start(self):
         validation = {
             "losses": {"total": 2.0},

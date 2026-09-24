@@ -425,6 +425,39 @@ warm start, proving that no trained adapter checkpoint improves its validation
 MAE. Compared with query injection, this residual design reduces MAE by 6.51%
 on NSW1 and 16.26% on QLD1 and removes the catastrophic ordinary-hour error.
 
+## Stable full-model training from scratch
+
+This run tests the stable optimizer recipe without loading a prior checkpoint.
+All 150,584 parameters are trained from their seeded initialization. The setup
+uses AdamW with betas 0.9/0.95, blended Huber/MSE point loss, gradient clipping
+at 1.0, EMA decay 0.999, five warmup epochs from `6e-5` to `3e-4`, and cosine
+decay toward `3e-6`. Early stopping monitors validation total loss with a
+minimum of 80 epochs and patience of 20. All regions stopped at epoch 99.
+
+Configuration: [`configs/aemo_forecast_stable_from_scratch.yaml`](../../configs/aemo_forecast_stable_from_scratch.yaml)
+
+| Region | Best total epoch | Validation MAE | Validation RMSE | Test MAE | Test RMSE | 80% coverage | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 6 | 85.1333 | 199.4683 | 65.7883 | 398.2677 | 72.86% | 83.44% |
+| QLD1 | 10 | 106.1321 | 430.6047 | 64.8411 | 279.3281 | 43.41% | 64.18% |
+| TAS1 | 10 | 76.1095 | 282.7228 | 43.0753 | 166.6315 | 46.82% | 67.00% |
+| Mean | - | 89.1249 | 304.2653 | 57.9016 | 281.4091 | 54.37% | 71.54% |
+
+Although optimization continued stably to epoch 99, the total-loss-selected
+checkpoints remained at epochs 6, 10, and 10. The run improves the residual
+adapter's average test MAE from 58.367 to 57.902 and RMSE from 282.413 to
+281.409, but does not surpass the static baseline's 54.556 average MAE. This
+confirms that longer stable optimization alone does not remove the validation
+generalization bottleneck.
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Total / MAE / RMSE checkpoints |
+|---|---|---|---|---|
+| NSW1 | [`train.log`](../../outputs/forecasting/stable_from_scratch/NSW1/train.log) | [`metrics.json`](../../outputs/forecasting/stable_from_scratch/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/stable_from_scratch/NSW1/training_history.csv) | [`total`](../../outputs/forecasting/stable_from_scratch/NSW1/best_model.pt) / [`MAE`](../../outputs/forecasting/stable_from_scratch/NSW1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/stable_from_scratch/NSW1/best_rmse_model.pt) |
+| QLD1 | [`train.log`](../../outputs/forecasting/stable_from_scratch/QLD1/train.log) | [`metrics.json`](../../outputs/forecasting/stable_from_scratch/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/stable_from_scratch/QLD1/training_history.csv) | [`total`](../../outputs/forecasting/stable_from_scratch/QLD1/best_model.pt) / [`MAE`](../../outputs/forecasting/stable_from_scratch/QLD1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/stable_from_scratch/QLD1/best_rmse_model.pt) |
+| TAS1 | [`train.log`](../../outputs/forecasting/stable_from_scratch/TAS1/train.log) | [`metrics.json`](../../outputs/forecasting/stable_from_scratch/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/stable_from_scratch/TAS1/training_history.csv) | [`total`](../../outputs/forecasting/stable_from_scratch/TAS1/best_model.pt) / [`MAE`](../../outputs/forecasting/stable_from_scratch/TAS1/best_mae_model.pt) / [`RMSE`](../../outputs/forecasting/stable_from_scratch/TAS1/best_rmse_model.pt) |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -439,14 +472,15 @@ claim that later versions must dominate earlier ones.
 | 2 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
 | 3 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
 | 4 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 5 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 6 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 7 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 8 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 9 | Maximum-spare query injection V1 | 17,521 | 64.089 | **278.557** | 53.1% | 77.4% |
-| 10 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 11 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 12 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 5 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 6 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 7 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 8 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 9 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 10 | Maximum-spare query injection V1 | 17,521 | 64.089 | **278.557** | 53.1% | 77.4% |
+| 11 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 12 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 13 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The `main` static version remains the aggregate MAE leader. Maximum-spare V1
 has the lowest aggregate RMSE because it emphasizes extreme errors, but its

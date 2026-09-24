@@ -526,9 +526,21 @@ def configure_fine_tuning_epoch(
     epoch: int,
 ) -> tuple[str, Dict[str, float], int]:
     if not group_metadata:
+        schedule = training_config.get("schedule")
+        learning_rate = float(training_config["learning_rate"])
+        if schedule is not None:
+            learning_rate = _scheduled_learning_rate(
+                epoch=epoch,
+                start_epoch=0,
+                total_epochs=int(training_config["epochs"]),
+                warmup_epochs=int(schedule.get("warmup_epochs", 0)),
+                max_lr=learning_rate,
+                min_lr_ratio=float(schedule.get("min_lr_ratio", 1.0)),
+            )
+            optimizer.param_groups[0]["lr"] = learning_rate
         return (
             "training",
-            {"default": optimizer.param_groups[0]["lr"]},
+            {"default": learning_rate},
             sum(
                 parameter.numel()
                 for group in optimizer.param_groups
