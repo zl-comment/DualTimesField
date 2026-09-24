@@ -516,6 +516,46 @@ worsens from 485.4 to 508.6 under the RE-Price metric definitions. Second, the
 mean DGF correction weight falls from 45-57% to 31-52%, confirming that
 compressing spikes also reduces the event field's share of the forecast.
 
+## Conformal interval-calibration experiment
+
+This post-hoc experiment reuses the asinh price-target checkpoints without
+retraining. Asymmetric conformalized quantile regression (Romano et al., 2019)
+is fitted separately for each region and each of the 24 horizons. The lower and
+upper offsets of the 80% and 90% intervals are estimated on the 2022
+validation split in the model's normalized asinh space and then mapped back to
+AUD/MWh. Point forecasts are unchanged, so MAE and RMSE are identical to the
+asinh run.
+
+| Item | Value |
+|---|---|
+| Base checkpoints | `outputs/forecasting/asinh_additive_trigonometric_gate/` |
+| Calibration | Validation split, per-horizon asymmetric CQR, finite-sample `(n + 1) / n` correction |
+| Calibration files | `outputs/forecasting/asinh_conformal_intervals/{NSW1,QLD1,TAS1}/interval_calibration.json` |
+| Results | [`paper_metrics/17_asinh_conformal_intervals/`](paper_metrics/17_asinh_conformal_intervals/) |
+
+### Test interval metrics before and after calibration
+
+| Region | 90% coverage | 90% mean width | 90% AIS | 80% coverage | 80% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 | 84.16% -> 89.05% | 238.29 -> 310.08 | 621.44 -> 644.82 | 63.10% -> 75.67% | 379.45 -> 392.61 | 38.44 -> 39.43 |
+| QLD1 | 92.66% -> 93.83% | 410.82 -> 450.67 | 614.53 -> 629.90 | 74.23% -> 82.51% | 338.76 -> 356.02 | 35.91 -> 36.91 |
+| TAS1 | 73.57% -> 93.64% | 97.94 -> 192.66 | 289.68 -> 290.43 | 47.39% -> 82.35% | 222.64 -> 194.94 | 21.95 -> 20.86 |
+| Mean | 83.46% -> 92.17% | 249.02 -> 317.80 | 508.55 -> 521.72 | 61.57% -> 80.18% | 313.61 -> 314.53 | 32.10 -> 32.40 |
+
+Calibration restores nominal coverage on average, but it widens every
+interval and worsens the mean 90% AIS. The 2022 validation year is far more
+volatile than the 2023-2024 test period, so validation residuals overstate the
+test uncertainty. Coverage alone is therefore not the bottleneck and this
+calibration is retained as a negative interval ablation.
+
+The asinh model's interval problem is concentrated in a heavy tail of very
+wide intervals rather than in typical widths. On the test split its median
+90% width is below the additive model's in NSW1 and TAS1 (112.2 vs. 132.4 and
+84.0 vs. 95.9 AUD/MWh), while the 99th-percentile width rises from 891.7 to
+2292.1 in NSW1 and from 741.9 to 3382.2 in QLD1. Pinball loss in asinh space
+does not penalize the price-space cost of tail-quantile errors, which the
+inverse `sinh` amplifies.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

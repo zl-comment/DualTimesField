@@ -321,6 +321,8 @@ Outputs are isolated under `outputs/forecasting/asinh_additive_trigonometric_gat
 RE-Price style metrics for archived checkpoints can be recomputed with
 `python -m forecasting.evaluate_paper_metrics`; see
 [`logs/forecasting/PAPER_METRICS.md`](logs/forecasting/PAPER_METRICS.md).
+Passing `--calibration-dir` additionally fits per-horizon asymmetric conformal
+interval offsets on the validation split and scores the calibrated intervals.
 
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 

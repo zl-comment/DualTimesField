@@ -28,6 +28,7 @@ def denormalize(values: torch.Tensor, batch: Mapping, dataset, device) -> torch.
 def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np.ndarray]:
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     points, quantiles, actuals = [], [], []
+    normalized_quantiles, normalized_actuals = [], []
     model.eval()
     with torch.no_grad():
         for batch in loader:
@@ -36,6 +37,8 @@ def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np
             points.append(denormalize(outputs["point_forecast"], batch, dataset, device)[..., 0].cpu())
             quantiles.append(denormalize(outputs["quantile_forecast"], batch, dataset, device).cpu())
             actuals.append(batch["target_price_raw"][..., 0])
+            normalized_quantiles.append(outputs["quantile_forecast"].cpu())
+            normalized_actuals.append(batch["target_price"][..., 0])
     point = torch.cat(points).double().numpy()
     actual = torch.cat(actuals).double().numpy()
     raw = np.asarray(dataset.target_values_raw, dtype=np.float64)
@@ -50,7 +53,35 @@ def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np
         "quantile": torch.cat(quantiles).double().numpy(),
         "actual": actual,
         "naive": naive,
+        "quantile_normalized": torch.cat(normalized_quantiles).double().numpy(),
+        "actual_normalized": torch.cat(normalized_actuals).double().numpy(),
     }
+
+
+def conformal_offsets(
+    quantile: np.ndarray, actual: np.ndarray, levels: list
+) -> Dict[str, Dict[str, list]]:
+    # Asymmetric conformalized quantile regression (Romano et al., 2019), per horizon.
+    offsets = {}
+    sample_count = actual.shape[0]
+    for label, (lower_level, upper_level) in INTERVALS.items():
+        tail = (1.0 - (upper_level - lower_level)) / 2.0
+        level = min(1.0, (1.0 - tail) * (sample_count + 1) / sample_count)
+        lower_scores = quantile[..., levels.index(lower_level)] - actual
+        upper_scores = actual - quantile[..., levels.index(upper_level)]
+        offsets[label] = {
+            "lower": np.quantile(lower_scores, level, axis=0, method="higher").tolist(),
+            "upper": np.quantile(upper_scores, level, axis=0, method="higher").tolist(),
+        }
+    return offsets
+
+
+def apply_offsets(quantile: np.ndarray, offsets: Mapping, levels: list) -> np.ndarray:
+    adjusted = quantile.copy()
+    for label, (lower_level, upper_level) in INTERVALS.items():
+        adjusted[..., levels.index(lower_level)] -= np.asarray(offsets[label]["lower"])
+        adjusted[..., levels.index(upper_level)] += np.asarray(offsets[label]["upper"])
+    return np.sort(adjusted, axis=-1)
 
 
 def point_metrics(prediction: np.ndarray, actual: np.ndarray) -> Dict[str, float]:
@@ -91,7 +122,12 @@ def probabilistic_metrics(
 
 
 def evaluate_checkpoint(
-    config_path: Path, region: str, checkpoint_path: Path, device_name: str, batch_size: int
+    config_path: Path,
+    region: str,
+    checkpoint_path: Path,
+    device_name: str,
+    batch_size: int,
+    calibration_path: Path | None = None,
 ) -> Dict:
     config = load_forecast_config(config_path)
     device = resolve_device(device_name)
@@ -107,16 +143,48 @@ def evaluate_checkpoint(
         "checkpoint": str(checkpoint_path),
         "best_epoch": int(checkpoint["best_epoch"]),
     }
-    for split in ("validation", "test"):
-        predictions = collect_predictions(model, datasets[split], device, batch_size)
-        results[split] = {
-            "origins": int(predictions["actual"].shape[0]),
-            "model": {
-                **point_metrics(predictions["point"], predictions["actual"]),
-                **probabilistic_metrics(predictions["quantile"], predictions["actual"], levels),
-            },
-            "seasonal_naive_24h": point_metrics(predictions["naive"], predictions["actual"]),
+    predictions = {
+        split: collect_predictions(model, datasets[split], device, batch_size)
+        for split in ("validation", "test")
+    }
+    offsets = None
+    if calibration_path is not None:
+        offsets = conformal_offsets(
+            predictions["validation"]["quantile_normalized"],
+            predictions["validation"]["actual_normalized"],
+            levels,
+        )
+        calibration_path.parent.mkdir(parents=True, exist_ok=True)
+        calibration_path.write_text(
+            json.dumps(
+                {
+                    "method": "asymmetric conformalized quantile regression per horizon",
+                    "calibration_split": "validation",
+                    "space": "normalized model output",
+                    "offsets": offsets,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        results["interval_calibration"] = str(calibration_path)
+    for split, split_predictions in predictions.items():
+        quantile = split_predictions["quantile"]
+        entry = {"origins": int(split_predictions["actual"].shape[0])}
+        if offsets is not None:
+            entry["model_uncalibrated"] = probabilistic_metrics(
+                quantile, split_predictions["actual"], levels
+            )
+            adjusted = apply_offsets(split_predictions["quantile_normalized"], offsets, levels)
+            quantile = datasets[split].denormalize_target(torch.from_numpy(adjusted)).numpy()
+        entry["model"] = {
+            **point_metrics(split_predictions["point"], split_predictions["actual"]),
+            **probabilistic_metrics(quantile, split_predictions["actual"], levels),
         }
+        entry["seasonal_naive_24h"] = point_metrics(
+            split_predictions["naive"], split_predictions["actual"]
+        )
+        results[split] = entry
     return results
 
 
@@ -186,6 +254,11 @@ def main() -> None:
     evaluate_parser.add_argument("--regions", nargs="+", default=list(REGIONS))
     evaluate_parser.add_argument("--device", default="cuda")
     evaluate_parser.add_argument("--batch-size", type=int, default=512)
+    evaluate_parser.add_argument(
+        "--calibration-dir",
+        type=Path,
+        help="Fit validation conformal interval offsets and save them under this directory",
+    )
     summary_parser = subparsers.add_parser("summarize")
     summary_parser.add_argument("--result-root", required=True, type=Path)
     args = parser.parse_args()
@@ -194,15 +267,26 @@ def main() -> None:
         return
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for region in args.regions:
+        calibration_path = (
+            args.calibration_dir / region / "interval_calibration.json"
+            if args.calibration_dir is not None
+            else None
+        )
         results = evaluate_checkpoint(
-            args.config, region, args.checkpoint_dir / region / "best_model.pt", args.device, args.batch_size
+            args.config,
+            region,
+            args.checkpoint_dir / region / "best_model.pt",
+            args.device,
+            args.batch_size,
+            calibration_path,
         )
         path = args.output_dir / f"{region}.json"
         path.write_text(json.dumps(results, indent=2, sort_keys=True), encoding="utf-8")
         test = results["test"]["model"]
         print(
             f"{region} test mae={test['mae']:.4f} rmse_global={test['rmse_global']:.4f} "
-            f"rmse_window={test['rmse_window_mean']:.4f} crps~={test['crps_quantile_approx']:.4f}"
+            f"rmse_window={test['rmse_window_mean']:.4f} picp90={test['picp_90']:.4f} "
+            f"piaw90={test['piaw_90']:.4f} ais90={test['ais_90']:.4f} crps~={test['crps_quantile_approx']:.4f}"
         )
 
 
