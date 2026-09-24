@@ -242,13 +242,24 @@ class DualFieldLinearForecaster(nn.Module):
             raise ValueError(
                 "TCN heads require a gated fusion mode with separate fields"
             )
-        if future_exogenous_dim > 0 and forecast_head_type not in {
+        if future_exogenous_mode == "dgf_linear":
+            if forecast_head_type != "linear" or fusion_mode == "concatenate":
+                raise ValueError(
+                    "dgf_linear future exogenous inputs require gated linear heads"
+                )
+        elif future_exogenous_dim > 0 and forecast_head_type not in {
             "tcn",
             "tcn_attention",
         }:
             raise ValueError(
                 "Future exogenous inputs require a TCN forecast head"
             )
+        # Forward-looking scarcity inputs reach only the DGF event expert and its gate.
+        dgf_exogenous_dim = (
+            forecast_horizon * future_exogenous_dim
+            if future_exogenous_mode == "dgf_linear"
+            else 0
+        )
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -319,17 +330,19 @@ class DualFieldLinearForecaster(nn.Module):
                     ctf_feature_dim, forecast_horizon
                 )
                 self.dgf_point_head = nn.Linear(
-                    expert_feature_dim, forecast_horizon
+                    expert_feature_dim + dgf_exogenous_dim, forecast_horizon
                 )
                 self.ctf_quantile_head = nn.Linear(
                     ctf_feature_dim,
                     forecast_horizon * len(self.quantiles),
                 )
                 self.dgf_quantile_head = nn.Linear(
-                    expert_feature_dim,
+                    expert_feature_dim + dgf_exogenous_dim,
                     forecast_horizon * len(self.quantiles),
                 )
-            self.fusion_gate = nn.Linear(combined_feature_dim, forecast_horizon)
+            self.fusion_gate = nn.Linear(
+                combined_feature_dim + dgf_exogenous_dim, forecast_horizon
+            )
             nn.init.zeros_(self.fusion_gate.weight)
             nn.init.zeros_(self.fusion_gate.bias)
 
@@ -372,8 +385,11 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
         calendar_flat = future_calendar.flatten(start_dim=1)
+        dgf_extra = []
+        if self.future_exogenous_mode == "dgf_linear":
+            dgf_extra = [future_exogenous.flatten(start_dim=1)]
         gate_features = torch.cat(
-            [ctf_flat, event_flat, calendar_flat], dim=1
+            [ctf_flat, event_flat, calendar_flat, *dgf_extra], dim=1
         )
 
         ctf_attention = None
@@ -398,7 +414,7 @@ class DualFieldLinearForecaster(nn.Module):
             if origin_context is not None:
                 ctf_parts.append(origin_context)
             ctf_features = torch.cat(ctf_parts, dim=1)
-            dgf_features = torch.cat([event_flat, calendar_flat], dim=1)
+            dgf_features = torch.cat([event_flat, calendar_flat, *dgf_extra], dim=1)
             ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
             dgf_point = self.dgf_point_head(dgf_features).unsqueeze(-1)
             ctf_quantile = self.ctf_quantile_head(ctf_features).view(

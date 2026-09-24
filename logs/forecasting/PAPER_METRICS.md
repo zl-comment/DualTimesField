@@ -93,6 +93,10 @@ compared with caution.
 | 20_gas_price_ctf | QLD1 | 17521 | 45.03 | 269.87 | 90.70 | 85.76 | 90.06% | 155.63 | 468.31 | 30.94 |
 | 20_gas_price_ctf | TAS1 | 17521 | 36.18 | 160.15 | 51.66 | 44.18 | 75.10% | 92.75 | 301.77 | 22.84 |
 | 20_gas_price_ctf | **Mean** | - | 44.47 | 275.57 | 82.48 | 75.73 | 82.59% | 120.91 | 462.52 | 30.89 |
+| 21_pdpasa_dgf | NSW1 | 17521 | 50.63 | 389.28 | 102.13 | 95.52 | 86.24% | 124.70 | 585.64 | 36.61 |
+| 21_pdpasa_dgf | QLD1 | 17521 | 44.79 | 267.96 | 89.58 | 83.79 | 89.06% | 142.35 | 455.71 | 30.43 |
+| 21_pdpasa_dgf | TAS1 | 17521 | 36.78 | 160.34 | 52.29 | 44.83 | 80.54% | 105.09 | 270.47 | 21.46 |
+| 21_pdpasa_dgf | **Mean** | - | 44.06 | 272.53 | 81.33 | 74.71 | 85.28% | 124.05 | 437.27 | 29.50 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -102,7 +106,7 @@ Seasonal naive (price 24 hours earlier) on the same test windows:
 | rolling hourly | QLD1 | 17521 | 59.17 | 368.82 | 133.54 | 127.35 |
 | rolling hourly | TAS1 | 17521 | 39.83 | 222.81 | 67.37 | 61.29 |
 
-Fixed-origin experiments score 731 daily origins per region and are not directly comparable with rolling-hour rows. 17_asinh_conformal_intervals reuses the 16 checkpoints; only its intervals differ.
+Fixed-origin experiments score 731 daily origins per region and are not directly comparable with rolling-hour rows. 17_asinh_conformal_intervals reuses the 16 checkpoints; only its intervals differ. Seed-variance runs are summarized in `EXPERIMENT_RESULTS.md` and stored under `seed_variance/paper_metrics/`.
 
 ## Findings
 
@@ -115,7 +119,8 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Validation conformal calibration does not repair AIS | 17_asinh_conformal_intervals restores mean 90% coverage to 92.17% but widens intervals to 317.80 and raises 90% AIS to 521.72, because the 2022 validation year is more volatile than the test years |
 | Price-space quantiles repair the intervals | 18_asinh_price_space_quantiles keeps mean MAE at 45.95, halves the 90% width to 127.65, and lowers 90% AIS to 471.95 |
 | The reconstruction residual path helps short horizons | 19_residual_skip_path lowers mean MAE to 44.31, window RMSE to 82.44, 90% AIS to 467.12, and CRPS~ to 31.20, mostly through one-hour-ahead errors |
-| Gas prices track the crisis level | 20_gas_price_ctf gives the best 90% AIS (462.52) and CRPS~ (30.89) and reduces the 2022 crisis-month under-forecast, while test MAE is flat at 44.47 |
+| Gas prices track the crisis level | 20_gas_price_ctf improves 90% AIS and CRPS~ and reduces the 2022 crisis-month under-forecast; over three seeds its test MAE is 44.37 ± 0.15 |
+| PD PASA scarcity sharpens the DGF event expert | 21_pdpasa_dgf lowers mean MAE to 44.06, window RMSE to 81.33, 90% AIS to 437.27, and CRPS~ to 29.50; over three seeds it improves every metric for every seed |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -141,3 +146,4 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 18_asinh_price_space_quantiles | untagged | `feature/price-space-quantiles` | `configs/aemo_forecast_asinh_price_space_quantiles.yaml` | `outputs/forecasting/asinh_price_space_quantiles` |
 | 19_residual_skip_path | untagged | `feature/residual-skip-path` | `configs/aemo_forecast_residual_skip_path.yaml` | `outputs/forecasting/residual_skip_path` |
 | 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |
+| 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |

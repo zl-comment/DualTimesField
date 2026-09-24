@@ -370,6 +370,22 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/gas_price_ctf/`.
 
+### PD PASA scarcity for the DGF expert
+
+Setting `model.future_exogenous_mode: dgf_linear` with a `future_exogenous`
+block feeds the point-in-time 24-hour PD PASA `MAXSPARECAPACITY` trajectory
+to the DGF point and quantile heads and to the fusion gate. The CTF expert
+does not see it. The `.npz` inputs are built by
+`python -m forecasting.build_pdpasa_exogenous`.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_pdpasa_dgf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/pdpasa_dgf/`.
+
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to
 `<output_directory>_seed<N>`:

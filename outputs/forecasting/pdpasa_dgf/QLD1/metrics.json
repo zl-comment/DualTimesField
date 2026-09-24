@@ -1,0 +1,221 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/training_history.csv",
+    "mae_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_mae_model.pt",
+    "rmse_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_rmse_model.pt"
+  },
+  "best_epoch": 12,
+  "best_validation_loss": 1.1161936289374255,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "primary_selection": "total",
+  "region": "QLD1",
+  "seed": 2026,
+  "selection_results": {
+    "mae": {
+      "best_epoch": 3,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_mae_model.pt",
+      "selection_value": 83.97235520749877,
+      "test": {
+        "losses": {
+          "decomposition": 0.32976568967510483,
+          "point": 0.569427807590582,
+          "quantile": 0.07905665538691813,
+          "smoothness": 0.08759445656544065,
+          "sparsity": 0.27109019025147324,
+          "total": 0.9786088349312845
+        },
+        "metrics": {
+          "coverage_80": 0.6779555010178262,
+          "coverage_90": 0.8712830317904229,
+          "mae_aud_per_mwh": 44.935342107699924,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.3826893847697588,
+          "mean_width_80_aud_per_mwh": 81.42809313347792,
+          "mean_width_90_aud_per_mwh": 135.2113547819997,
+          "rmse_aud_per_mwh": 269.5255981736918,
+          "std_dgf_fusion_weight": 0.3102592478905762
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.2593711976520909,
+          "point": 0.6593905933371013,
+          "quantile": 0.19763103753918435,
+          "smoothness": 0.06459247407786863,
+          "sparsity": 0.27006560559606774,
+          "total": 1.1167274911970981
+        },
+        "metrics": {
+          "coverage_80": 0.4907290832093396,
+          "coverage_90": 0.6860287665483957,
+          "mae_aud_per_mwh": 83.97235520749877,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5134223605288348,
+          "mean_width_80_aud_per_mwh": 96.544750154098,
+          "mean_width_90_aud_per_mwh": 156.29076502947237,
+          "rmse_aud_per_mwh": 414.59118173508426,
+          "std_dgf_fusion_weight": 0.29985545356922905
+        }
+      }
+    },
+    "rmse": {
+      "best_epoch": 17,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_rmse_model.pt",
+      "selection_value": 412.9216216880496,
+      "test": {
+        "losses": {
+          "decomposition": 0.3329562962337564,
+          "point": 0.5642848843431698,
+          "quantile": 0.07539035733960364,
+          "smoothness": 0.09005621941413082,
+          "sparsity": 0.09688400013364754,
+          "total": 0.9728184859574803
+        },
+        "metrics": {
+          "coverage_80": 0.7475410459829157,
+          "coverage_90": 0.904395677567871,
+          "mae_aud_per_mwh": 45.188453979852156,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.39563522613196195,
+          "mean_width_80_aud_per_mwh": 97.9873042601854,
+          "mean_width_90_aud_per_mwh": 156.32365380293646,
+          "rmse_aud_per_mwh": 266.0799438137908,
+          "std_dgf_fusion_weight": 0.3145039301719204
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.2605900667932687,
+          "point": 0.6717088670612978,
+          "quantile": 0.1876126140935089,
+          "smoothness": 0.06593062399306777,
+          "sparsity": 0.09724199226880982,
+          "total": 1.120074721875092
+        },
+        "metrics": {
+          "coverage_80": 0.5537417496470948,
+          "coverage_90": 0.7309908053870512,
+          "mae_aud_per_mwh": 85.80414386306977,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.539015210619468,
+          "mean_width_80_aud_per_mwh": 115.67984681407616,
+          "mean_width_90_aud_per_mwh": 178.3591382643499,
+          "rmse_aud_per_mwh": 412.9216216880496,
+          "std_dgf_fusion_weight": 0.3003621866012253
+        }
+      }
+    },
+    "total": {
+      "best_epoch": 12,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/QLD1/best_model.pt",
+      "selection_value": 1.1161936289374255,
+      "test": {
+        "losses": {
+          "decomposition": 0.3309866482145635,
+          "point": 0.5647823211741388,
+          "quantile": 0.07515832719515703,
+          "smoothness": 0.08610166662867147,
+          "sparsity": 0.12345430710322712,
+          "total": 0.9711368494018573
+        },
+        "metrics": {
+          "coverage_80": 0.7284663166105435,
+          "coverage_90": 0.8906264863116641,
+          "mae_aud_per_mwh": 44.78596276915618,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.37782379374498554,
+          "mean_width_80_aud_per_mwh": 90.96970372903706,
+          "mean_width_90_aud_per_mwh": 142.34507846536536,
+          "rmse_aud_per_mwh": 267.9551450044031,
+          "std_dgf_fusion_weight": 0.3142581810441147
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.2590726653464233,
+          "point": 0.6663751842822255,
+          "quantile": 0.19055781139154018,
+          "smoothness": 0.06297449519094755,
+          "sparsity": 0.12499148276010612,
+          "total": 1.1161936289374255
+        },
+        "metrics": {
+          "coverage_80": 0.5293960550913739,
+          "coverage_90": 0.7081139597878753,
+          "mae_aud_per_mwh": 84.74358853056385,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5372132318103824,
+          "mean_width_80_aud_per_mwh": 105.76828207265079,
+          "mean_width_90_aud_per_mwh": 164.18522563880623,
+          "rmse_aud_per_mwh": 414.085064524714,
+          "std_dgf_fusion_weight": 0.30729911147915806
+        }
+      }
+    }
+  },
+  "test": {
+    "losses": {
+      "decomposition": 0.3309866482145635,
+      "point": 0.5647823211741388,
+      "quantile": 0.07515832719515703,
+      "smoothness": 0.08610166662867147,
+      "sparsity": 0.12345430710322712,
+      "total": 0.9711368494018573
+    },
+    "metrics": {
+      "coverage_80": 0.7284663166105435,
+      "coverage_90": 0.8906264863116641,
+      "mae_aud_per_mwh": 44.78596276915618,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.37782379374498554,
+      "mean_width_80_aud_per_mwh": 90.96970372903706,
+      "mean_width_90_aud_per_mwh": 142.34507846536536,
+      "rmse_aud_per_mwh": 267.9551450044031,
+      "std_dgf_fusion_weight": 0.3142581810441147
+    }
+  },
+  "training_summary": {
+    "completed_epochs": 30,
+    "early_stopping_monitor": "total",
+    "ema_decay": null,
+    "fine_tuning_groups": [],
+    "gradient_clip_norm": null,
+    "stopped_early": false
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 0.2590726653464233,
+      "point": 0.6663751842822255,
+      "quantile": 0.19055781139154018,
+      "smoothness": 0.06297449519094755,
+      "sparsity": 0.12499148276010612,
+      "total": 1.1161936289374255
+    },
+    "metrics": {
+      "coverage_80": 0.5293960550913739,
+      "coverage_90": 0.7081139597878753,
+      "mae_aud_per_mwh": 84.74358853056385,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.5372132318103824,
+      "mean_width_80_aud_per_mwh": 105.76828207265079,
+      "mean_width_90_aud_per_mwh": 164.18522563880623,
+      "rmse_aud_per_mwh": 414.085064524714,
+      "std_dgf_fusion_weight": 0.30729911147915806
+    }
+  },
+  "warm_start": null
+}
