@@ -89,6 +89,10 @@ compared with caution.
 | 19_residual_skip_path | QLD1 | 17521 | 45.26 | 271.67 | 90.95 | 85.86 | 90.62% | 157.16 | 479.59 | 31.99 |
 | 19_residual_skip_path | TAS1 | 17521 | 35.58 | 160.11 | 51.09 | 43.78 | 73.36% | 88.55 | 305.21 | 22.89 |
 | 19_residual_skip_path | **Mean** | - | 44.31 | 276.51 | 82.44 | 75.71 | 82.45% | 120.53 | 467.12 | 31.20 |
+| 20_gas_price_ctf | NSW1 | 17521 | 52.18 | 396.70 | 105.09 | 97.24 | 82.62% | 114.36 | 617.47 | 38.90 |
+| 20_gas_price_ctf | QLD1 | 17521 | 45.03 | 269.87 | 90.70 | 85.76 | 90.06% | 155.63 | 468.31 | 30.94 |
+| 20_gas_price_ctf | TAS1 | 17521 | 36.18 | 160.15 | 51.66 | 44.18 | 75.10% | 92.75 | 301.77 | 22.84 |
+| 20_gas_price_ctf | **Mean** | - | 44.47 | 275.57 | 82.48 | 75.73 | 82.59% | 120.91 | 462.52 | 30.89 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -111,6 +115,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Validation conformal calibration does not repair AIS | 17_asinh_conformal_intervals restores mean 90% coverage to 92.17% but widens intervals to 317.80 and raises 90% AIS to 521.72, because the 2022 validation year is more volatile than the test years |
 | Price-space quantiles repair the intervals | 18_asinh_price_space_quantiles keeps mean MAE at 45.95, halves the 90% width to 127.65, and lowers 90% AIS to 471.95 |
 | The reconstruction residual path helps short horizons | 19_residual_skip_path lowers mean MAE to 44.31, window RMSE to 82.44, 90% AIS to 467.12, and CRPS~ to 31.20, mostly through one-hour-ahead errors |
+| Gas prices track the crisis level | 20_gas_price_ctf gives the best 90% AIS (462.52) and CRPS~ (30.89) and reduces the 2022 crisis-month under-forecast, while test MAE is flat at 44.47 |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -135,3 +140,4 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 17_asinh_conformal_intervals | untagged | `feature/conformal-intervals` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |
 | 18_asinh_price_space_quantiles | untagged | `feature/price-space-quantiles` | `configs/aemo_forecast_asinh_price_space_quantiles.yaml` | `outputs/forecasting/asinh_price_space_quantiles` |
 | 19_residual_skip_path | untagged | `feature/residual-skip-path` | `configs/aemo_forecast_residual_skip_path.yaml` | `outputs/forecasting/residual_skip_path` |
+| 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |

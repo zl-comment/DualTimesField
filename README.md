@@ -353,6 +353,23 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/residual_skip_path/`.
 
+### Gas-price CTF context
+
+The `origin_context` block adds one scalar per forecast origin to the CTF
+expert's linear heads: the log mean Victorian DWGM gas price over the seven
+gas days completed before the origin. The source is AEMO's
+`dwgm-prices-and-demand.xlsx`, sheet `Prices`, converted once to
+`data/aemo_exogenous/raw_gas/dwgm_prices.csv` with the columns `Gas_Date`,
+`Hour`, and `Price`.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/gas_price_ctf/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

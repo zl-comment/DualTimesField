@@ -672,6 +672,75 @@ instead of 16, so the extra path also makes early overfitting more visible.
 The DGF correction weight moves from 32-49% to 43-46%, so the event field is
 not displaced by the new path.
 
+## Gas-price CTF context experiment
+
+The 2022 validation year is mainly a level shift rather than a spike year:
+median prices rose from 50 to 135 (NSW1), 47 to 140 (QLD1), and 30 to 105
+(TAS1) AUD/MWh, while hours above 300 AUD/MWh explain only 12-23% of the 2022
+mean. Fuel cost is a slow, publicly observable driver of that level. This
+experiment feeds one gas-price scalar per forecast origin to the CTF expert's
+linear heads, on top of the reconstruction residual-path trunk. Everything
+else is unchanged. Parameters increase from 167,036 to 167,180.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_gas_price_ctf.yaml`](../../configs/aemo_forecast_gas_price_ctf.yaml) |
+| Source | AEMO Declared Wholesale Gas Market (Victoria) `dwgm-prices-and-demand.xlsx`, sheet `Prices`, 2007-02-01 to 2026-08-31, five schedule prices per gas day; SHA-256 `31d87a9e...52ad8` |
+| Feature | Log of the mean daily DWGM price over the 7 gas days that ended before the forecast origin, standardized on training origins |
+| Leakage rule | A gas day D runs from 06:00 D to 06:00 D + 1 AEST; the NEM timestamps are also AEST, and only completed gas days are used |
+| Regions | The same east-coast gas signal is used for NSW1, QLD1, and TAS1 |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 3 / 13 / 5 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/gas_price_ctf/` |
+
+The yearly mean of the feature tracks NSW1's median electricity price with a
+correlation of 0.949 over 2015-2024 (gas 8.3 AUD/GJ in 2021 and 20.0 in 2022).
+Training-period gas prices are far lower than in 2022, so the linear head
+extrapolates by up to about 4.6 standard deviations during the crisis.
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](gas_price_ctf/nsw1.log) | [`metrics.json`](../../outputs/forecasting/gas_price_ctf/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/gas_price_ctf/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/gas_price_ctf/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](gas_price_ctf/qld1.log) | [`metrics.json`](../../outputs/forecasting/gas_price_ctf/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/gas_price_ctf/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/gas_price_ctf/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](gas_price_ctf/tas1.log) | [`metrics.json`](../../outputs/forecasting/gas_price_ctf/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/gas_price_ctf/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/gas_price_ctf/TAS1/best_model.pt) |
+
+### Validation metrics, residual-path trunk -> this run
+
+| Region | MAE | RMSE | 90% coverage |
+|---|---:|---:|---:|
+| NSW1 | 63.4074 -> 61.3412 | 182.5430 -> 179.8364 | 59.98% |
+| QLD1 | 85.7597 -> 85.0190 | 422.3746 -> 420.7616 | 70.66% |
+| TAS1 | 57.0928 -> 57.6648 | 269.3322 -> 269.1254 | 60.00% |
+
+### Test metrics and trunk comparison
+
+| Region | MAE | MAE change | RMSE | RMSE change | 90% coverage / width | 90% AIS, trunk -> this run | CRPS~, trunk -> this run |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 52.1837 | +0.15% | 396.7044 | -0.26% | 82.62% / 114.3629 | 616.57 -> 617.47 | 38.74 -> 38.90 |
+| QLD1 | 45.0320 | -0.50% | 269.8738 | -0.66% | 90.06% / 155.6315 | 479.59 -> 468.31 | 31.99 -> 30.94 |
+| TAS1 | 36.1842 | +1.70% | 160.1457 | +0.02% | 75.10% / 92.7504 | 305.21 -> 301.77 | 22.89 -> 22.84 |
+
+### Crisis-month level tracking on the 2022 validation split
+
+Median one-hour-ahead forecast error by month, residual-path trunk -> this run:
+
+| Region | April | May | June | July |
+|---|---:|---:|---:|---:|
+| NSW1 | -28 -> -12 | -65 -> -19 | -89 -> -28 | -82 -> -21 |
+| QLD1 | -13 -> -14 | -52 -> -37 | -60 -> -37 | -56 -> -25 |
+
+The gas context does what it was designed for: during the April-July 2022
+crisis it removes most of the level under-forecast that the 72-hour price
+history alone leaves, and validation MAE falls from 68.75 to 68.01 on average.
+The 2023-2024 test period has no comparable fuel shock, so the test effect is
+small. Mean RMSE improves from 276.51 to 275.57, mean 90% AIS from 467.12 to
+462.52, and CRPS~ from 31.20 to 30.89, while mean MAE moves from 44.314 to
+44.467 (+0.35%) with QLD1 better and TAS1 worse. The single run cannot
+separate differences of this size from seed variance.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -682,27 +751,30 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | **Reconstruction residual path** | 17,521 | **44.314** | **276.507** | 60.4% | 82.5% |
-| 2 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 3 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 4 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 5 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 6 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 7 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 8 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 9 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 10 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 11 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 12 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 13 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 14 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 15 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 16 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | **Reconstruction residual path** | 17,521 | **44.314** | 276.507 | 60.4% | 82.5% |
+| 2 | Gas-price CTF context | 17,521 | 44.467 | **275.575** | 61.2% | 82.6% |
+| 3 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 4 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 5 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 6 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 7 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 8 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 9 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 10 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 11 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 12 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 13 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 14 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 15 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 16 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 17 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
 Learning the quantiles in price space keeps that point accuracy, and the
-reconstruction residual path adds the best point and interval scores so far. The conformal calibration run reuses the asinh
+reconstruction residual path adds the best MAE so far. The gas-price context
+has the best RMSE and interval scores and tracks the 2022 price level better,
+but its MAE is slightly higher on the calmer test years. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the

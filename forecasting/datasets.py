@@ -199,6 +199,30 @@ def _valid_origins(
     return starts[targets_in_split & history_is_available]
 
 
+def _trailing_gas_price(
+    delivery: pd.Series, config: Mapping
+) -> np.ndarray:
+    context_config = config["origin_context"]
+    prices = pd.read_csv(Path(config["project_root"]) / context_config["path"])
+    daily = prices.groupby("Gas_Date")["Price"].mean()
+    daily.index = pd.to_datetime(daily.index)
+    window = int(context_config["window_days"])
+    # A gas day D runs from 06:00 on D to 06:00 on D + 1 (AEST); only gas days
+    # that ended before the delivery hour are used.
+    current_gas_day = (
+        delivery.dt.tz_localize(None) - pd.Timedelta(hours=6)
+    ).dt.normalize()
+    trailing = daily.rolling(window).mean().shift(1)
+    expected_days = pd.date_range(current_gas_day.min() - pd.Timedelta(days=window), current_gas_day.max())
+    missing = expected_days.difference(daily.index)
+    if len(missing):
+        raise ValueError(f"Missing {len(missing)} gas days, first {missing[0].date()}")
+    values = trailing.reindex(current_gas_day).to_numpy(dtype=np.float64)
+    if np.isnan(values).any() or np.any(values <= 0):
+        raise ValueError("Trailing gas prices must be available and positive")
+    return np.log(values)
+
+
 def _to_unix_seconds(timestamps: pd.Series) -> np.ndarray:
     utc_naive = timestamps.dt.tz_convert("UTC").dt.tz_localize(None)
     return utc_naive.to_numpy(dtype="datetime64[s]").astype(np.int64)
@@ -253,6 +277,12 @@ class AEMOForecastDataset(Dataset):
         self.calendar_values = _build_calendar_matrix(
             frame[data_config["delivery_column"]], train_mask, self.calendar_feature_names
         )
+        self.origin_context_values = None
+        self.origin_context_standardizer = None
+        if config.get("origin_context", {}).get("enabled", False):
+            raw_context = _trailing_gas_price(frame[data_config["delivery_column"]], config)
+            self.origin_context_standardizer = _fit_standardizer(raw_context[train_mask])
+            self.origin_context_values = self.origin_context_standardizer.transform(raw_context)
         self.delivery_unix_seconds = _to_unix_seconds(
             frame[data_config["delivery_column"]]
         )
@@ -364,6 +394,10 @@ class AEMOForecastDataset(Dataset):
                 self.delivery_unix_seconds[forecast_start:forecast_end].copy()
             ),
         }
+        if self.origin_context_values is not None:
+            sample["origin_context"] = torch.tensor(
+                [self.origin_context_values[forecast_start]], dtype=torch.float32
+            )
         if self.quantile_target_values is not None:
             sample["target_quantile"] = torch.from_numpy(
                 self.quantile_target_values[forecast_start:forecast_end, None].copy()

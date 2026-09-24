@@ -106,6 +106,9 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             "tcn_dilations", (1, 2, 4, 8, 16)
         ),
         residual_path=model_config.get("residual_path", False),
+        origin_context_dim=(
+            1 if config.get("origin_context", {}).get("enabled", False) else 0
+        ),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]
@@ -152,6 +155,7 @@ def move_inputs(batch: Mapping, device: torch.device) -> tuple:
         batch["history_values"].to(device),
         batch["future_calendar"].to(device),
         batch["future_exogenous"].to(device) if "future_exogenous" in batch else None,
+        batch["origin_context"].to(device) if "origin_context" in batch else None,
         batch["target_price"].to(device),
     )
 
@@ -180,10 +184,11 @@ def train_epoch(
     gradient_norm_sum = 0.0
     sample_count = 0
     for batch in loader:
-        history, calendar, exogenous, target = move_inputs(batch, device)
+        *inputs, target = move_inputs(batch, device)
+        history = inputs[0]
         optimizer.zero_grad(set_to_none=True)
         losses = criterion(
-            model(history, calendar, exogenous),
+            model(*inputs),
             history,
             target,
             quantile_target(batch, device),
@@ -237,8 +242,9 @@ def evaluate(
     }
     with torch.no_grad():
         for batch in loader:
-            history, calendar, exogenous, target = move_inputs(batch, device)
-            outputs = model(history, calendar, exogenous)
+            *inputs, target = move_inputs(batch, device)
+            history = inputs[0]
+            outputs = model(*inputs)
             losses = criterion(
                 outputs, history, target, quantile_target(batch, device)
             )
@@ -336,6 +342,17 @@ def save_checkpoint(
             "history_feature_names": dataset.history_feature_names,
             "calendar_feature_names": dataset.calendar_feature_names,
             "price_transform": asdict(dataset.price_transform),
+            "origin_context_config": config.get("origin_context"),
+            "origin_context_mean": (
+                float(dataset.origin_context_standardizer.mean)
+                if dataset.origin_context_standardizer is not None
+                else None
+            ),
+            "origin_context_std": (
+                float(dataset.origin_context_standardizer.std)
+                if dataset.origin_context_standardizer is not None
+                else None
+            ),
             "quantile_target_mean": (
                 float(dataset.quantile_standardizer.mean)
                 if dataset.quantile_standardizer is not None
