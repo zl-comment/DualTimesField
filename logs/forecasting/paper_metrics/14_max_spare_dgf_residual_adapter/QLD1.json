@@ -1,0 +1,60 @@
+{
+  "best_epoch": 29,
+  "checkpoint": "outputs/forecasting/max_spare_dgf_residual_adapter/QLD1/best_model.pt",
+  "config": "configs/aemo_forecast_max_spare_dgf_adapter.yaml",
+  "evaluated_commit": "ad9792a",
+  "region": "QLD1",
+  "tag": "aemo-best-max-spare-dgf-residual-adapter-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 461.2938450735051,
+      "ais_90": 588.5101205342693,
+      "crps_quantile_approx": 49.03196874769263,
+      "mae": 63.20015399284907,
+      "piaw_80": 115.4785747882327,
+      "piaw_90": 186.42608429510486,
+      "picp_80": 0.5152531248216426,
+      "picp_90": 0.7781067480927649,
+      "rmse_global": 276.8299257578689,
+      "rmse_horizon_mean": 276.82553074825984,
+      "rmse_window_mean": 109.36721797995175,
+      "sde_global": 274.6771684086217,
+      "sde_window_mean": 98.15487746658387
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 59.166410072923206,
+      "rmse_global": 368.8152120115404,
+      "rmse_horizon_mean": 368.8152120111766,
+      "rmse_window_mean": 133.53931489368935,
+      "sde_global": 368.8156503836255,
+      "sde_window_mean": 127.34961114067652
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 671.8171653299524,
+      "ais_90": 981.27379158011,
+      "crps_quantile_approx": 70.92376006697631,
+      "mae": 121.37721621713398,
+      "piaw_80": 252.96962177983124,
+      "piaw_90": 348.25246355337214,
+      "picp_80": 0.7038647895921559,
+      "picp_90": 0.8456516348098126,
+      "rmse_global": 434.4647139321945,
+      "rmse_horizon_mean": 434.4540278147333,
+      "rmse_window_mean": 196.77838818950775,
+      "sde_global": 434.45621046280144,
+      "sde_window_mean": 169.33202297249525
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 98.65434672959829,
+      "rmse_global": 525.410745077394,
+      "rmse_horizon_mean": 525.410745077319,
+      "rmse_window_mean": 206.5114716166149,
+      "sde_global": 525.41199698352,
+      "sde_window_mean": 194.38825116682872
+    }
+  }
+}
