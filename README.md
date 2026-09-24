@@ -324,6 +324,20 @@ RE-Price style metrics for archived checkpoints can be recomputed with
 Passing `--calibration-dir` additionally fits per-horizon asymmetric conformal
 interval offsets on the validation split and scores the calibrated intervals.
 
+### Price-space quantiles
+
+Setting `data.quantile_target: price` keeps the asinh target for the point
+head but trains the quantile head's pinball loss against the raw price,
+standardized with training statistics. No parameters are added.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_asinh_price_space_quantiles.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/asinh_price_space_quantiles/`.
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

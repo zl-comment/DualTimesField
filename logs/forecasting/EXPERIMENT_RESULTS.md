@@ -556,6 +556,58 @@ wide intervals rather than in typical widths. On the test split its median
 does not penalize the price-space cost of tail-quantile errors, which the
 inverse `sinh` amplifies.
 
+## Price-space quantile experiment
+
+This experiment keeps the asinh price-target model, inputs, point target,
+architecture, parameter count, optimizer, 30-epoch budget, and seed unchanged.
+Only the quantile head's pinball-loss target changes: instead of the
+standardized asinh price, it is the raw price standardized with the training
+mean and standard deviation. Quantiles are therefore learned and
+denormalized in price space, where AIS and CRPS are scored, while the point
+head still benefits from the asinh target.
+
+| Item | Value |
+|---|---|
+| Configuration | [`configs/aemo_forecast_asinh_price_space_quantiles.yaml`](../../configs/aemo_forecast_asinh_price_space_quantiles.yaml) |
+| Epochs / learning rate | 30 / 0.0003 |
+| Best epochs, NSW1 / QLD1 / TAS1 | 16 / 4 / 2 |
+| GPU mapping | NSW1 / QLD1 / TAS1 on physical GPUs 5 / 6 / 7 |
+| Output directory | `outputs/forecasting/asinh_price_space_quantiles/` |
+
+### Artifacts
+
+| Region | Console log | Metrics | Training history | Best checkpoint |
+|---|---|---|---|---|
+| NSW1 | [`nsw1.log`](asinh_price_space_quantiles/nsw1.log) | [`metrics.json`](../../outputs/forecasting/asinh_price_space_quantiles/NSW1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_price_space_quantiles/NSW1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_price_space_quantiles/NSW1/best_model.pt) |
+| QLD1 | [`qld1.log`](asinh_price_space_quantiles/qld1.log) | [`metrics.json`](../../outputs/forecasting/asinh_price_space_quantiles/QLD1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_price_space_quantiles/QLD1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_price_space_quantiles/QLD1/best_model.pt) |
+| TAS1 | [`tas1.log`](asinh_price_space_quantiles/tas1.log) | [`metrics.json`](../../outputs/forecasting/asinh_price_space_quantiles/TAS1/metrics.json) | [`training_history.csv`](../../outputs/forecasting/asinh_price_space_quantiles/TAS1/training_history.csv) | [`best_model.pt`](../../outputs/forecasting/asinh_price_space_quantiles/TAS1/best_model.pt) |
+
+### Validation metrics at the selected checkpoint
+
+| Region | MAE | RMSE | 80% coverage | 90% coverage | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|
+| NSW1 | 63.5551 | 183.1007 | 45.16% | 61.64% | 28.89% |
+| QLD1 | 91.4597 | 431.9146 | 46.91% | 64.92% | 41.59% |
+| TAS1 | 58.7115 | 270.6377 | 36.66% | 59.57% | 54.45% |
+
+### Test metrics and asinh-target comparison
+
+| Region | MAE | RMSE | 80% coverage / width | 90% coverage / width | 90% AIS, asinh -> this run | CRPS~, asinh -> this run | Mean DGF correction weight |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| NSW1 | 53.4777 | 395.5884 | 66.07% / 80.1144 | 84.05% / 126.4861 | 621.44 -> 613.61 | 38.44 -> 38.68 | 31.70% |
+| QLD1 | 48.3792 | 275.7535 | 74.39% / 101.3219 | 90.71% / 165.5996 | 614.53 -> 494.69 | 35.91 -> 33.16 | 39.06% |
+| TAS1 | 36.0075 | 160.4607 | 45.22% / 47.4670 | 73.22% / 90.8656 | 289.68 -> 307.55 | 21.95 -> 23.14 | 48.98% |
+
+Point accuracy is preserved: average MAE moves from 45.989 to 45.955 and
+global RMSE from 277.596 to 277.268. The intervals change substantially. The
+average 90% width falls from 249.02 to 127.65 AUD/MWh at nearly the same
+coverage (83.46% to 82.66%), and the mean 90% AIS falls from 508.55 to 471.95,
+below the static baseline's 486.34. Mean 80% AIS falls from 313.61 to 311.88
+and CRPS~ from 32.10 to 31.66, both the best local values. QLD1 benefits most;
+TAS1 still under-covers both intervals and its AIS worsens slightly. The low
+validation coverage again reflects the 2022 volatility shift rather than the
+test behavior.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -566,24 +618,27 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | **Asinh price target, additive trigonometric fusion** | 17,521 | **45.989** | **277.596** | 61.6% | 83.5% |
-| 2 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 3 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 4 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 5 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 6 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 7 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 8 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 9 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 10 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 11 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 12 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 13 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 14 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | **Asinh price target with price-space quantiles** | 17,521 | **45.955** | **277.268** | 61.9% | 82.7% |
+| 2 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 3 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 4 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 5 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 6 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 7 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 8 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 9 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 10 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 11 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 12 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 13 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 14 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 15 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
-The asinh price-target version is the new leader on both aggregate MAE and
-aggregate RMSE, and it is the first dual-field version to beat the `main`
-static baseline. Maximum-spare V1 has the second-lowest aggregate RMSE because
+The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
+and are the first dual-field versions to beat the `main` static baseline.
+Learning the quantiles in price space keeps that point accuracy and gives the
+best interval scores. The conformal calibration run reuses the asinh
+checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the
 baseline, cannot lose the baseline MAE checkpoint, and isolates the factor to

@@ -155,6 +155,12 @@ def move_inputs(batch: Mapping, device: torch.device) -> tuple:
     )
 
 
+def quantile_target(batch: Mapping, device: torch.device) -> torch.Tensor | None:
+    if "target_quantile" not in batch:
+        return None
+    return batch["target_quantile"].to(device)
+
+
 def average_losses(loss_sums: Mapping[str, float], sample_count: int) -> Dict[str, float]:
     return {name: loss_sums[name] / sample_count for name in LOSS_NAMES}
 
@@ -175,7 +181,12 @@ def train_epoch(
     for batch in loader:
         history, calendar, exogenous, target = move_inputs(batch, device)
         optimizer.zero_grad(set_to_none=True)
-        losses = criterion(model(history, calendar, exogenous), history, target)
+        losses = criterion(
+            model(history, calendar, exogenous),
+            history,
+            target,
+            quantile_target(batch, device),
+        )
         losses["total"].backward()
         if gradient_clip_norm is not None:
             gradient_norm = torch.nn.utils.clip_grad_norm_(
@@ -227,14 +238,16 @@ def evaluate(
         for batch in loader:
             history, calendar, exogenous, target = move_inputs(batch, device)
             outputs = model(history, calendar, exogenous)
-            losses = criterion(outputs, history, target)
+            losses = criterion(
+                outputs, history, target, quantile_target(batch, device)
+            )
             batch_size = history.shape[0]
             sample_count += batch_size
             for name in LOSS_NAMES:
                 loss_sums[name] += losses[name].item() * batch_size
             actual = batch["target_price_raw"].to(device)
             point = dataset.denormalize_target(outputs["point_forecast"])
-            quantile = dataset.denormalize_target(outputs["quantile_forecast"])
+            quantile = dataset.denormalize_quantiles(outputs["quantile_forecast"])
             error = point - actual
             absolute_error += error.abs().sum().item()
             squared_error += error.square().sum().item()
@@ -322,6 +335,16 @@ def save_checkpoint(
             "history_feature_names": dataset.history_feature_names,
             "calendar_feature_names": dataset.calendar_feature_names,
             "price_transform": asdict(dataset.price_transform),
+            "quantile_target_mean": (
+                float(dataset.quantile_standardizer.mean)
+                if dataset.quantile_standardizer is not None
+                else None
+            ),
+            "quantile_target_std": (
+                float(dataset.quantile_standardizer.std)
+                if dataset.quantile_standardizer is not None
+                else None
+            ),
             "history_mean": dataset.history_standardizer.mean.tolist(),
             "history_std": dataset.history_standardizer.std.tolist(),
             "future_exogenous_feature_names": dataset.future_exogenous_feature_names,

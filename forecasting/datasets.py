@@ -238,6 +238,18 @@ class AEMOForecastDataset(Dataset):
             )
             / self.history_standardizer.std[self.target_index]
         ).astype(np.float32)
+        quantile_target = data_config.get("quantile_target", "transformed")
+        if quantile_target not in {"transformed", "price"}:
+            raise ValueError(f"Unknown quantile target: {quantile_target}")
+        self.quantile_standardizer = None
+        self.quantile_target_values = None
+        if quantile_target == "price":
+            self.quantile_standardizer = _fit_standardizer(
+                raw_target[train_mask].astype(np.float64)
+            )
+            self.quantile_target_values = self.quantile_standardizer.transform(
+                raw_target.astype(np.float64)
+            )
         self.calendar_values = _build_calendar_matrix(
             frame[data_config["delivery_column"]], train_mask, self.calendar_feature_names
         )
@@ -320,6 +332,11 @@ class AEMOForecastDataset(Dataset):
         )
         return self.price_transform.inverse(restored)
 
+    def denormalize_quantiles(self, values: torch.Tensor) -> torch.Tensor:
+        if self.quantile_standardizer is None:
+            return self.denormalize_target(values)
+        return values * self.quantile_standardizer.std + self.quantile_standardizer.mean
+
     def __len__(self) -> int:
         return len(self.origin_indices)
 
@@ -347,6 +364,10 @@ class AEMOForecastDataset(Dataset):
                 self.delivery_unix_seconds[forecast_start:forecast_end].copy()
             ),
         }
+        if self.quantile_target_values is not None:
+            sample["target_quantile"] = torch.from_numpy(
+                self.quantile_target_values[forecast_start:forecast_end, None].copy()
+            )
         if self.future_exogenous_by_origin:
             origin = int(self.delivery_unix_seconds[forecast_start])
             sample["future_exogenous"] = torch.from_numpy(

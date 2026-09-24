@@ -81,6 +81,10 @@ compared with caution.
 | 17_asinh_conformal_intervals | QLD1 | 17521 | 48.47 | 275.89 | 96.01 | 91.28 | 93.83% | 450.67 | 629.90 | 36.91 |
 | 17_asinh_conformal_intervals | TAS1 | 17521 | 36.02 | 160.51 | 51.60 | 44.11 | 93.64% | 192.66 | 290.43 | 20.86 |
 | 17_asinh_conformal_intervals | **Mean** | - | 45.99 | 277.60 | 84.90 | 78.53 | 92.17% | 317.80 | 521.72 | 32.40 |
+| 18_asinh_price_space_quantiles | NSW1 | 17521 | 53.48 | 395.59 | 107.14 | 100.32 | 84.05% | 126.49 | 613.61 | 38.68 |
+| 18_asinh_price_space_quantiles | QLD1 | 17521 | 48.38 | 275.75 | 95.91 | 91.20 | 90.71% | 165.60 | 494.69 | 33.16 |
+| 18_asinh_price_space_quantiles | TAS1 | 17521 | 36.01 | 160.46 | 51.56 | 44.12 | 73.22% | 90.87 | 307.55 | 23.14 |
+| 18_asinh_price_space_quantiles | **Mean** | - | 45.95 | 277.27 | 84.87 | 78.55 | 82.66% | 127.65 | 471.95 | 31.66 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -99,8 +103,9 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Aggregation explains most of the RMSE gap | The static baseline's mean RMSE falls from 280.75 (global) to 92.42 (window). RE-Price reports 31.37 |
 | Aggregation does not explain the MAE gap | MAE is aggregation-invariant: 54.56 locally versus 22.76 for RE-Price |
 | The seasonal naive forecast is a strong floor | On the rolling windows it reaches mean MAE 57.17 and window RMSE 119.31; in QLD1 its MAE (59.17) is below the static baseline's (65.62) |
-| The asinh price target narrows the MAE gap | 16_asinh_additive_trigonometric_fusion lowers mean MAE to 45.99 and window RMSE to 84.90 and gives the lowest CRPS~ (32.10), but its 90% AIS (508.55) is worse than the static baseline's (486.34) because the inverse transform widens upper quantiles |
+| The asinh price target narrows the MAE gap | 16_asinh_additive_trigonometric_fusion lowers mean MAE to 45.99 and window RMSE to 84.90, but its 90% AIS (508.55) is worse than the static baseline's (486.34) because the inverse transform widens upper quantiles |
 | Validation conformal calibration does not repair AIS | 17_asinh_conformal_intervals restores mean 90% coverage to 92.17% but widens intervals to 317.80 and raises 90% AIS to 521.72, because the 2022 validation year is more volatile than the test years |
+| Price-space quantiles repair the intervals | 18_asinh_price_space_quantiles keeps mean MAE at 45.95, halves the 90% width to 127.65, and gives the best local 90% AIS (471.95) and CRPS~ (31.66) |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -123,3 +128,4 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 15_stable_from_scratch | untagged | `9cbac10` | `configs/aemo_forecast_stable_from_scratch.yaml` | `outputs/forecasting/stable_from_scratch` |
 | 16_asinh_additive_trigonometric_fusion | untagged | `feature/asinh-target` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |
 | 17_asinh_conformal_intervals | untagged | `feature/conformal-intervals` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |
+| 18_asinh_price_space_quantiles | untagged | `feature/price-space-quantiles` | `configs/aemo_forecast_asinh_price_space_quantiles.yaml` | `outputs/forecasting/asinh_price_space_quantiles` |

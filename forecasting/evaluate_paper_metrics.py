@@ -35,10 +35,14 @@ def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np
             inputs = move_inputs(batch, device)
             outputs = model(*inputs[:-1])
             points.append(denormalize(outputs["point_forecast"], batch, dataset, device)[..., 0].cpu())
-            quantiles.append(denormalize(outputs["quantile_forecast"], batch, dataset, device).cpu())
+            if hasattr(dataset, "denormalize_quantiles"):
+                quantile = dataset.denormalize_quantiles(outputs["quantile_forecast"])
+            else:
+                quantile = denormalize(outputs["quantile_forecast"], batch, dataset, device)
+            quantiles.append(quantile.cpu())
             actuals.append(batch["target_price_raw"][..., 0])
             normalized_quantiles.append(outputs["quantile_forecast"].cpu())
-            normalized_actuals.append(batch["target_price"][..., 0])
+            normalized_actuals.append(batch.get("target_quantile", batch["target_price"])[..., 0])
     point = torch.cat(points).double().numpy()
     actual = torch.cat(actuals).double().numpy()
     raw = np.asarray(dataset.target_values_raw, dtype=np.float64)
@@ -176,7 +180,7 @@ def evaluate_checkpoint(
                 quantile, split_predictions["actual"], levels
             )
             adjusted = apply_offsets(split_predictions["quantile_normalized"], offsets, levels)
-            quantile = datasets[split].denormalize_target(torch.from_numpy(adjusted)).numpy()
+            quantile = datasets[split].denormalize_quantiles(torch.from_numpy(adjusted)).numpy()
         entry["model"] = {
             **point_metrics(split_predictions["point"], split_predictions["actual"]),
             **probabilistic_metrics(quantile, split_predictions["actual"], levels),

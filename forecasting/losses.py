@@ -51,7 +51,7 @@ class DualFieldForecastLoss(nn.Module):
         self.huber_delta = float(huber_delta)
         self.mse_fraction = float(mse_fraction)
 
-    def forward(self, outputs, history_values, target_price):
+    def forward(self, outputs, history_values, target_price, quantile_target=None):
         point_forecast = outputs["point_forecast"]
         quantile_forecast = outputs["quantile_forecast"]
         ctf_signal = outputs["ctf_signal"]
@@ -77,7 +77,9 @@ class DualFieldForecastLoss(nn.Module):
                 + (1.0 - self.mse_fraction) * huber_loss
             )
 
-        quantile_error = target_price - quantile_forecast
+        if quantile_target is None:
+            quantile_target = target_price
+        quantile_error = quantile_target - quantile_forecast
         quantiles = self.quantiles.to(
             device=quantile_forecast.device,
             dtype=quantile_forecast.dtype,
