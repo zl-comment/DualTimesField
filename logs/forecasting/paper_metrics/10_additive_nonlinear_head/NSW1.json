@@ -1,0 +1,60 @@
+{
+  "best_epoch": 0,
+  "checkpoint": "outputs/forecasting/additive_nonlinear_head/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_nonlinear_head.yaml",
+  "evaluated_commit": "3b6981a",
+  "region": "NSW1",
+  "tag": "aemo-additive-nonlinear-head-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 421.6906370880499,
+      "ais_90": 658.077569154419,
+      "crps_quantile_approx": 44.47079736865637,
+      "mae": 72.32615551831266,
+      "piaw_80": 110.49579222067177,
+      "piaw_90": 190.45611637370683,
+      "picp_80": 0.6609616079751917,
+      "picp_90": 0.8788477636360177,
+      "rmse_global": 401.0712089205519,
+      "rmse_horizon_mean": 401.06619679456054,
+      "rmse_window_mean": 127.05594237517492,
+      "sde_global": 400.8763452600946,
+      "sde_window_mean": 117.7938944628949
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 466.79074457175705,
+      "ais_90": 605.385308199927,
+      "crps_quantile_approx": 51.03387887685046,
+      "mae": 75.93136955431667,
+      "piaw_80": 143.37630022313903,
+      "piaw_90": 218.64155489702281,
+      "picp_80": 0.5972349395292053,
+      "picp_90": 0.7901739727595284,
+      "rmse_global": 191.57784346402948,
+      "rmse_horizon_mean": 191.4442779816923,
+      "rmse_window_mean": 104.77311847378479,
+      "sde_global": 188.0945040991271,
+      "sde_window_mean": 89.13899438089823
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}

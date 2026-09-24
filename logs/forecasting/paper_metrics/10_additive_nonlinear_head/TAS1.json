@@ -1,0 +1,60 @@
+{
+  "best_epoch": 1,
+  "checkpoint": "outputs/forecasting/additive_nonlinear_head/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_nonlinear_head.yaml",
+  "evaluated_commit": "3b6981a",
+  "region": "TAS1",
+  "tag": "aemo-additive-nonlinear-head-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 238.2377419372155,
+      "ais_90": 290.0019070577689,
+      "crps_quantile_approx": 23.298713581624902,
+      "mae": 40.94279688849882,
+      "piaw_80": 59.51920163025221,
+      "piaw_90": 110.34262417460577,
+      "picp_80": 0.47613102372391225,
+      "picp_90": 0.7549488233167818,
+      "rmse_global": 162.92137346115783,
+      "rmse_horizon_mean": 162.91772992714752,
+      "rmse_window_mean": 57.14095325024626,
+      "sde_global": 161.57510162519267,
+      "sde_window_mean": 46.69453134716208
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 434.01087781364174,
+      "ais_90": 549.6513313179848,
+      "crps_quantile_approx": 41.86296257199239,
+      "mae": 67.21553630454302,
+      "piaw_80": 84.28574854762464,
+      "piaw_90": 178.17139151371865,
+      "picp_80": 0.41886517111136545,
+      "picp_90": 0.7407386211895769,
+      "rmse_global": 275.74006302599906,
+      "rmse_horizon_mean": 275.73026717617273,
+      "rmse_window_mean": 97.47637167402125,
+      "sde_global": 273.56176944833607,
+      "sde_window_mean": 78.053476279932
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}
