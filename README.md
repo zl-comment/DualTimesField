@@ -407,7 +407,8 @@ python -m forecasting.build_pdpasa_exogenous merge \
 A `ctf_exogenous` block feeds listed features to the CTF point and quantile
 heads only. Besides the stored fields, `net_load_mw` (`demand50_mw -
 uigf_mw`) and `demand_spread_mw` (`demand10_mw - demand90_mw`) are derived on
-load.
+load. Setting `clip_to_train_quantiles: [low, high]` in the block clips each
+standardized feature to those quantiles of its training values.
 
 ```bash
 python -m forecasting.train \

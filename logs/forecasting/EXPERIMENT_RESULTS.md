@@ -950,6 +950,49 @@ negative-price errors worsen there while spike-hour errors fall. Diagnostics
 are stored in
 [`hour_type_diagnostics.json`](pdpasa_netload_ctf/hour_type_diagnostics.json).
 
+## Clipped net-load CTF input (mixed result)
+
+In the net-load trunk, the linear CTF head extrapolates far below the
+training range of net load when semi-scheduled solar is high, and QLD1 midday
+forecasts fall well below the price. This experiment clips the standardized
+net load to the central 99% of its training values
+(`ctf_exogenous.clip_to_train_quantiles: [0.005, 0.995]`); the bounds are
+computed on training origins only. Nothing else changes. On the test split,
+14.8% (NSW1), 14.2% (QLD1), and 2.7% (TAS1) of net-load values are raised to
+the lower bound, and 0.3%, 1.1%, and 1.0% are lowered to the upper bound.
+Configuration:
+[`configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml`](../../configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml);
+outputs `outputs/forecasting/pdpasa_netload_clip_ctf{,_seed2027,_seed2028}/`;
+best epochs NSW1 / QLD1 / TAS1 are 15 / 7 / 4, 3 / 3 / 3, and 21 / 12 / 13 for
+seeds 2026 / 2027 / 2028.
+
+| Version | Test MAE | Test RMSE | Window RMSE | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| Net-load CTF trunk | 42.58 ± 0.37 | **272.46 ± 0.51** | 80.15 ± 0.42 | **432.42 ± 0.54** | **28.81 ± 0.06** |
+| Clipped net load | **42.44 ± 0.49** | 273.04 ± 0.89 | **79.80 ± 0.41** | 434.02 ± 4.00 | 29.16 ± 0.23 |
+
+| Paired difference, clipped - trunk | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | -0.47 | -0.31 | +0.37 | -0.14 |
+| Window RMSE | -0.81 | -0.45 | +0.22 | -0.35 |
+| Test RMSE | +0.31 | +1.02 | +0.42 | +0.59 |
+| CRPS~ | +0.54 | +0.37 | +0.16 | +0.35 |
+
+Three-seed per-region test MAE moves from 48.49 to 49.32 (NSW1), 44.46 to
+43.24 (QLD1), and 34.80 to 34.78 (TAS1). The MAE change is inside seed noise
+and changes sign across seeds, while RMSE and CRPS~ worsen for every seed.
+
+| Midday non-spike hours, `UIGF` z at least 8 | Mean price | Trunk bias | Clipped bias |
+|---|---:|---:|---:|
+| NSW1 | 19.7 | -10.9 | +15.4 |
+| QLD1 | -11.3 | -27.7 | +13.6 |
+
+Clipping over-corrects. Without it the linear head goes too low; with it the
+forecast is held at the training edge and goes too high, and the price lies
+in between. QLD1, whose unclipped bias was larger, gains; NSW1 loses. The
+net-load trunk is kept. The size of both biases suggests a soft saturation
+between the linear and clipped responses rather than a hard bound.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -960,25 +1003,26 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | **PD PASA net-load CTF** | 17,521 | **42.970** | **272.096** | 70.0% | 88.2% |
-| 2 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
-| 3 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
-| 4 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
-| 5 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 6 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 7 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 8 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 9 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 10 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 11 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 12 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 13 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 14 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 15 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 16 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 17 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 18 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 19 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | Clipped PD PASA net-load CTF input | 17,521 | **42.497** | 272.409 | 65.6% | 85.6% |
+| 2 | **PD PASA net-load CTF** | 17,521 | 42.970 | **272.096** | 70.0% | 88.2% |
+| 3 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
+| 4 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
+| 5 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
+| 6 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 7 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 8 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 9 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 10 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 11 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 12 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 13 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 14 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 15 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 16 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 17 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 18 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 19 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 20 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
@@ -989,8 +1033,10 @@ Its single-seed MAE is slightly higher, but over three seeds it has the lower
 mean MAE (44.37 ± 0.15 vs. 44.69 ± 0.37) and replaces the residual path as
 the research trunk. The PD PASA scarcity DGF version improves on it for every
 seed (three-seed MAE 43.82 ± 0.27). The PD PASA net-load CTF version
-improves on it again for every seed (three-seed MAE 42.58 ± 0.37) and leads
-this table on seed-2026 MAE and RMSE. The conformal calibration run reuses the asinh
+improves on it again for every seed (three-seed MAE 42.58 ± 0.37) and has the
+lowest seed-2026 RMSE. The clipped net-load run has the lowest seed-2026 MAE,
+but over three seeds its MAE gain (-0.14) is inside seed noise and its RMSE
+and CRPS~ are worse, so the unclipped net-load version remains the trunk. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the

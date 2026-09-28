@@ -382,6 +382,16 @@ class AEMOForecastDataset(Dataset):
             raw_values[train_rows].reshape(-1, len(feature_names))
         )
         standardized = standardizer.transform(raw_values)
+        clip_quantiles = exogenous_config.get("clip_to_train_quantiles")
+        if clip_quantiles is not None:
+            # Hold values outside the training support at its edge instead of
+            # letting a linear head extrapolate beyond it.
+            lower, upper = np.quantile(
+                standardized[train_rows].reshape(-1, len(feature_names)),
+                [float(clip_quantiles[0]), float(clip_quantiles[1])],
+                axis=0,
+            )
+            standardized = np.clip(standardized, lower, upper).astype(np.float32)
         by_origin = {
             int(origin): standardized[index]
             for index, origin in enumerate(origins)
