@@ -386,6 +386,37 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/pdpasa_dgf/`.
 
+### PD PASA net load for the CTF expert
+
+The builder writes one `<region>_pdpasa.npz` per region with the hourly
+point-in-time PD PASA fields `max_spare_capacity_mw` (hourly minimum) and
+`demand10_mw`, `demand50_mw`, `demand90_mw`, `uigf_mw`, and
+`available_capacity_mw` (hourly means). Each field is filled from the newest
+run that had already published it. Years can be built in parallel and then
+joined:
+
+```bash
+python -m forecasting.build_pdpasa_exogenous build \
+  --start-year 2024 --end-year 2024 \
+  --output-dir data/aemo_exogenous/yearly_pdpasa/2024
+python -m forecasting.build_pdpasa_exogenous merge \
+  --shard-root data/aemo_exogenous/yearly_pdpasa \
+  --start-year 2015 --end-year 2024
+```
+
+A `ctf_exogenous` block feeds listed features to the CTF point and quantile
+heads only. Besides the stored fields, `net_load_mw` (`demand50_mw -
+uigf_mw`) and `demand_spread_mw` (`demand10_mw - demand90_mw`) are derived on
+load.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_pdpasa_netload_ctf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/pdpasa_netload_ctf/`.
+
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to
 `<output_directory>_seed<N>`:

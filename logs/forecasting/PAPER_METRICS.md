@@ -14,7 +14,7 @@ AUD/MWh.
 | Data | AEMO hourly prices, 2015-2024, NSW/QLD/TAS | Same |
 | Split | Chronological 70/10/20 | 2015-2021 / 2022 / 2023-2024; 70/10/20 of the same series starts the test split at 2022-12-31 23:00 |
 | Window | 72 hours in, 24 hours out | Same |
-| Inputs | Price, load forecast, temperature proxy, more than 2,000 WattClarity articles | Price, demand, calendar |
+| Inputs | Price, load forecast, temperature proxy, more than 2,000 WattClarity articles | Price, demand, calendar; experiments 20-22 add the DWGM gas price and point-in-time AEMO PD PASA forecasts (spare capacity, demand, semi-scheduled renewables) |
 | Price preprocessing | None stated | None |
 
 ## Metric definitions
@@ -97,6 +97,10 @@ compared with caution.
 | 21_pdpasa_dgf | QLD1 | 17521 | 44.79 | 267.96 | 89.58 | 83.79 | 89.06% | 142.35 | 455.71 | 30.43 |
 | 21_pdpasa_dgf | TAS1 | 17521 | 36.78 | 160.34 | 52.29 | 44.83 | 80.54% | 105.09 | 270.47 | 21.46 |
 | 21_pdpasa_dgf | **Mean** | - | 44.06 | 272.53 | 81.33 | 74.71 | 85.28% | 124.05 | 437.27 | 29.50 |
+| 22_pdpasa_netload_ctf | NSW1 | 17521 | 48.46 | 389.38 | 100.04 | 93.28 | 88.49% | 129.88 | 573.10 | 35.67 |
+| 22_pdpasa_netload_ctf | QLD1 | 17521 | 45.26 | 267.02 | 91.17 | 84.63 | 92.05% | 168.46 | 461.48 | 30.27 |
+| 22_pdpasa_netload_ctf | TAS1 | 17521 | 35.19 | 159.90 | 50.68 | 43.93 | 84.16% | 112.35 | 261.62 | 20.48 |
+| 22_pdpasa_netload_ctf | **Mean** | - | 42.97 | 272.10 | 80.63 | 73.95 | 88.23% | 136.90 | 432.06 | 28.81 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -121,6 +125,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | The reconstruction residual path helps short horizons | 19_residual_skip_path lowers mean MAE to 44.31, window RMSE to 82.44, 90% AIS to 467.12, and CRPS~ to 31.20, mostly through one-hour-ahead errors |
 | Gas prices track the crisis level | 20_gas_price_ctf improves 90% AIS and CRPS~ and reduces the 2022 crisis-month under-forecast; over three seeds its test MAE is 44.37 ± 0.15 |
 | PD PASA scarcity sharpens the DGF event expert | 21_pdpasa_dgf lowers mean MAE to 44.06, window RMSE to 81.33, 90% AIS to 437.27, and CRPS~ to 29.50; over three seeds it improves every metric for every seed |
+| The PD PASA net-load forecast lifts the CTF level | 22_pdpasa_netload_ctf lowers mean MAE to 42.97, window RMSE to 80.63, 90% AIS to 432.06, and CRPS~ to 28.81; over three seeds test MAE falls by 1.10-1.32 for every seed, through ordinary-hour errors in NSW1 and TAS1 |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -147,3 +152,4 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 19_residual_skip_path | untagged | `feature/residual-skip-path` | `configs/aemo_forecast_residual_skip_path.yaml` | `outputs/forecasting/residual_skip_path` |
 | 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |
 | 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |
+| 22_pdpasa_netload_ctf | untagged | `feature/pdpasa-netload` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
