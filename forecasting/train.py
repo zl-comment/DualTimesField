@@ -109,6 +109,11 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         origin_context_dim=(
             1 if config.get("origin_context", {}).get("enabled", False) else 0
         ),
+        ctf_exogenous_dim=(
+            len(config["ctf_exogenous"]["features"])
+            if config.get("ctf_exogenous", {}).get("enabled", False)
+            else 0
+        ),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]
@@ -156,6 +161,7 @@ def move_inputs(batch: Mapping, device: torch.device) -> tuple:
         batch["future_calendar"].to(device),
         batch["future_exogenous"].to(device) if "future_exogenous" in batch else None,
         batch["origin_context"].to(device) if "origin_context" in batch else None,
+        batch["ctf_exogenous"].to(device) if "ctf_exogenous" in batch else None,
         batch["target_price"].to(device),
     )
 
@@ -374,6 +380,18 @@ def save_checkpoint(
             "future_exogenous_std": (
                 dataset.future_exogenous_standardizer.std.tolist()
                 if dataset.future_exogenous_standardizer is not None
+                else None
+            ),
+            "ctf_exogenous_config": config.get("ctf_exogenous"),
+            "ctf_exogenous_feature_names": dataset.ctf_exogenous_feature_names,
+            "ctf_exogenous_mean": (
+                dataset.ctf_exogenous_standardizer.mean.tolist()
+                if dataset.ctf_exogenous_standardizer is not None
+                else None
+            ),
+            "ctf_exogenous_std": (
+                dataset.ctf_exogenous_standardizer.std.tolist()
+                if dataset.ctf_exogenous_standardizer is not None
                 else None
             ),
         },

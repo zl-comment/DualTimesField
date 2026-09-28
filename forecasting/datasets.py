@@ -133,6 +133,23 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     return frame
 
 
+# Forecast features derived from the PD PASA regional arrays.
+_DERIVED_FORECAST_FEATURES = {
+    # Demand left for scheduled plant after semi-scheduled wind and solar.
+    "net_load_mw": lambda archive: archive["demand50_mw"] - archive["uigf_mw"],
+    # Width of the 10%-90% probability-of-exceedance demand band.
+    "demand_spread_mw": lambda archive: archive["demand10_mw"] - archive["demand90_mw"],
+}
+
+
+def _forecast_feature(archive, name: str) -> np.ndarray:
+    if name in archive.files:
+        return archive[name].astype(np.float64)
+    if name in _DERIVED_FORECAST_FEATURES:
+        return _DERIVED_FORECAST_FEATURES[name](archive).astype(np.float64)
+    raise KeyError(f"Unknown forecast feature {name!r}; archive has {archive.files}")
+
+
 def _fit_standardizer(values: np.ndarray) -> Standardizer:
     mean = values.mean(axis=0, dtype=np.float64)
     std = values.std(axis=0, dtype=np.float64)
@@ -290,22 +307,38 @@ class AEMOForecastDataset(Dataset):
         self.future_exogenous_feature_names: tuple[str, ...] = ()
         self.future_exogenous_standardizer = None
         self.future_exogenous_by_origin: dict[int, np.ndarray] = {}
-        exogenous_config = config.get("future_exogenous", {})
-        if exogenous_config.get("enabled", False):
-            self._load_future_exogenous(frame, config, region)
+        if config.get("future_exogenous", {}).get("enabled", False):
+            (
+                self.future_exogenous_feature_names,
+                self.future_exogenous_standardizer,
+                self.future_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "future_exogenous")
+        # Forecast inputs for the CTF head (e.g. PD PASA net load).
+        self.ctf_exogenous_feature_names: tuple[str, ...] = ()
+        self.ctf_exogenous_standardizer = None
+        self.ctf_exogenous_by_origin: dict[int, np.ndarray] = {}
+        if config.get("ctf_exogenous", {}).get("enabled", False):
+            (
+                self.ctf_exogenous_feature_names,
+                self.ctf_exogenous_standardizer,
+                self.ctf_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "ctf_exogenous")
 
-    def _load_future_exogenous(
+    def _load_forecast_exogenous(
         self,
         frame: pd.DataFrame,
         config: Mapping,
         region: str,
-    ) -> None:
-        exogenous_config = config["future_exogenous"]
-        feature_name = exogenous_config["name"]
+        block: str,
+    ) -> tuple[tuple[str, ...], Standardizer, dict[int, np.ndarray]]:
+        exogenous_config = config[block]
+        feature_names = tuple(exogenous_config.get("features", [exogenous_config.get("name")]))
         path = Path(config["project_root"]) / exogenous_config["region_files"][region]
         with np.load(path) as archive:
             origins = archive["forecast_origin_unix"].astype(np.int64)
-            raw_values = archive[feature_name].astype(np.float64)
+            raw_values = np.stack(
+                [_forecast_feature(archive, name) for name in feature_names], axis=-1
+            )
             source_runs = archive["source_run_unix"].astype(np.int64)
             source_stpasa_runs = (
                 archive["source_stpasa_run_unix"].astype(np.int64)
@@ -313,10 +346,10 @@ class AEMOForecastDataset(Dataset):
                 else np.zeros_like(source_runs)
             )
             source_last_changed = archive["source_last_changed_unix"].astype(np.int64)
-        if raw_values.shape != (len(origins), self.output_hours):
+        if raw_values.shape != (len(origins), self.output_hours, len(feature_names)):
             raise ValueError(
-                f"Future exogenous values for {region} must have shape "
-                f"[N, {self.output_hours}], got {raw_values.shape}"
+                f"{block} values for {region} must have shape "
+                f"[N, {self.output_hours}, {len(feature_names)}], got {raw_values.shape}"
             )
         if len(np.unique(origins)) != len(origins):
             raise ValueError(f"Duplicate future exogenous origins for {region}")
@@ -345,15 +378,15 @@ class AEMOForecastDataset(Dataset):
         train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
         if not train_rows:
             raise ValueError(f"No training future exogenous values for {region}")
-        self.future_exogenous_standardizer = _fit_standardizer(
-            raw_values[train_rows].reshape(-1, 1)
+        standardizer = _fit_standardizer(
+            raw_values[train_rows].reshape(-1, len(feature_names))
         )
-        standardized = self.future_exogenous_standardizer.transform(raw_values[..., None])
-        self.future_exogenous_feature_names = (feature_name,)
-        self.future_exogenous_by_origin = {
+        standardized = standardizer.transform(raw_values)
+        by_origin = {
             int(origin): standardized[index]
             for index, origin in enumerate(origins)
         }
+        return feature_names, standardizer, by_origin
 
     def denormalize_target(self, values: torch.Tensor) -> torch.Tensor:
         restored = (
@@ -402,10 +435,14 @@ class AEMOForecastDataset(Dataset):
             sample["target_quantile"] = torch.from_numpy(
                 self.quantile_target_values[forecast_start:forecast_end, None].copy()
             )
+        origin = int(self.delivery_unix_seconds[forecast_start])
         if self.future_exogenous_by_origin:
-            origin = int(self.delivery_unix_seconds[forecast_start])
             sample["future_exogenous"] = torch.from_numpy(
                 self.future_exogenous_by_origin[origin].copy()
+            )
+        if self.ctf_exogenous_by_origin:
+            sample["ctf_exogenous"] = torch.from_numpy(
+                self.ctf_exogenous_by_origin[origin].copy()
             )
         return sample
 

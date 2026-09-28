@@ -1,9 +1,11 @@
-"""Build point-in-time AEMO PD PASA maximum-spare-capacity features.
+"""Build point-in-time AEMO PD PASA regional forecast features.
 
 The generated arrays are keyed by the hourly forecast origin.  Values use the
 latest available OUTAGE_LRC PD PASA run, with its short end-of-market-day tail
-filled from the latest already-published ST PASA run.  The two half-hour values
-within an hour are reduced with ``min`` so scarcity is not averaged away.
+filled from the latest already-published ST PASA run.  Each field is filled
+independently from the newest run that published it.  Maximum spare capacity
+reduces the two half-hours within an hour with ``min`` so scarcity is not
+averaged away; the demand, renewable and capacity forecasts use ``mean``.
 """
 
 from __future__ import annotations
@@ -28,6 +30,16 @@ AEST = timezone(timedelta(hours=10))
 ARCHIVE_ROOT = "https://www.nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM"
 REGIONS = ("NSW1", "QLD1", "TAS1")
 TIME_FORMAT = "%Y/%m/%d %H:%M:%S"
+# (output array, REGIONSOLUTION column, hourly reduction)
+FIELDS = (
+    ("max_spare_capacity_mw", "MAXSPARECAPACITY", "min"),
+    ("demand10_mw", "DEMAND10", "mean"),
+    ("demand50_mw", "DEMAND50", "mean"),
+    ("demand90_mw", "DEMAND90", "mean"),
+    ("uigf_mw", "UIGF", "mean"),
+    ("available_capacity_mw", "AGGREGATECAPACITYAVAILABLE", "mean"),
+)
+FIELD_COLUMNS = tuple(column for _, column, _ in FIELDS)
 
 
 def _month_directory(year: int, month: int) -> str:
@@ -103,6 +115,15 @@ def _unix_seconds(value: datetime) -> int:
     return int(value.timestamp())
 
 
+def _field_values(row: list[str], columns: dict[str, int]) -> np.ndarray | None:
+    texts = [row[columns[column]] for column in FIELD_COLUMNS]
+    if not any(texts):
+        return None
+    return np.asarray(
+        [float(text) if text else np.nan for text in texts], dtype=np.float32
+    )
+
+
 def _read_month(
     archive_path: Path,
     runs: dict[str, dict[int, dict[str, object]]],
@@ -127,9 +148,9 @@ def _read_month(
                         "RUN_DATETIME",
                         "INTERVAL_DATETIME",
                         "REGIONID",
-                        "MAXSPARECAPACITY",
                         "LASTCHANGED",
                         "RUNTYPE",
+                        *FIELD_COLUMNS,
                     }
                     missing = required - set(columns)
                     if missing:
@@ -151,18 +172,18 @@ def _read_month(
                 if last_changed > run_time:
                     rejected_late += 1
                     continue
-                value_text = row[columns["MAXSPARECAPACITY"]]
-                if not value_text:
+                row_values = _field_values(row, columns)
+                if row_values is None:
                     continue
                 run_unix = _unix_seconds(run_time)
                 record = runs[region].setdefault(
                     run_unix,
                     {
-                        "half_hour": np.full(48, np.nan, dtype=np.float32),
+                        "half_hour": np.full((48, len(FIELDS)), np.nan, dtype=np.float32),
                         "last_changed": 0,
                     },
                 )
-                record["half_hour"][half_hour_index] = float(value_text)
+                record["half_hour"][half_hour_index] = row_values
                 record["last_changed"] = max(
                     int(record["last_changed"]), _unix_seconds(last_changed)
                 )
@@ -193,9 +214,9 @@ def _read_stpasa_month(
                         "RUN_DATETIME",
                         "INTERVAL_DATETIME",
                         "REGIONID",
-                        "MAXSPARECAPACITY",
                         "LASTCHANGED",
                         "RUNTYPE",
+                        *FIELD_COLUMNS,
                     }
                     missing = required - set(columns)
                     if missing:
@@ -212,8 +233,8 @@ def _read_stpasa_month(
                 interval_time = _parse_time(row[columns["INTERVAL_DATETIME"]])
                 if not timedelta(0) < interval_time - run_time <= timedelta(hours=48):
                     continue
-                value_text = row[columns["MAXSPARECAPACITY"]]
-                if not value_text:
+                row_values = _field_values(row, columns)
+                if row_values is None:
                     continue
                 last_changed = _parse_time(row[columns["LASTCHANGED"]])
                 run_unix = _unix_seconds(run_time)
@@ -221,12 +242,29 @@ def _read_stpasa_month(
                     run_unix,
                     {"values": {}, "last_changed": 0},
                 )
-                record["values"][_unix_seconds(interval_time)] = float(value_text)
+                record["values"][_unix_seconds(interval_time)] = row_values
                 record["last_changed"] = max(
                     int(record["last_changed"]), _unix_seconds(last_changed)
                 )
                 accepted += 1
     return accepted
+
+
+def _fill_missing(target: np.ndarray, source: np.ndarray) -> bool:
+    fill = np.isnan(target) & np.isfinite(source)
+    if not fill.any():
+        return False
+    target[fill] = source[fill]
+    return True
+
+
+def _hourly(half_hour: np.ndarray) -> np.ndarray:
+    first, second = half_hour[0::2], half_hour[1::2]
+    hourly = (first + second) / 2
+    for index, (_, _, reduction) in enumerate(FIELDS):
+        if reduction == "min":
+            hourly[:, index] = np.minimum(first[:, index], second[:, index])
+    return hourly
 
 
 def _write_region(
@@ -268,7 +306,7 @@ def _write_region(
             incomplete += 1
             continue
         _, pdpasa_run, record = available_pdpasa[pdpasa_index]
-        half_hour = np.full(48, np.nan, dtype=np.float32)
+        half_hour = np.full((48, len(FIELDS)), np.nan, dtype=np.float32)
         used_pdpasa_run = 0
         used_pdpasa_last_changed = 0
         for index in range(48):
@@ -280,23 +318,23 @@ def _write_region(
                 if candidate_changed < origin - 24 * 3600:
                     break
                 source_index = int((interval - candidate_run) // 1800) - 1
-                if (
-                    0 <= source_index < 48
-                    and np.isfinite(candidate_record["half_hour"][source_index])
+                if not 0 <= source_index < 48:
+                    continue
+                if _fill_missing(
+                    half_hour[index], candidate_record["half_hour"][source_index]
                 ):
-                    half_hour[index] = candidate_record["half_hour"][source_index]
                     used_pdpasa_run = max(used_pdpasa_run, candidate_run)
                     used_pdpasa_last_changed = max(
                         used_pdpasa_last_changed, candidate_changed
                     )
+                if np.isfinite(half_hour[index]).all():
                     break
         stpasa_index = bisect_right(stpasa_availability, origin) - 1
-        stpasa_record = None
         stpasa_run = 0
         used_stpasa_last_changed = 0
         used_stpasa = False
         if stpasa_index >= 0:
-            for index in np.flatnonzero(np.isnan(half_hour)):
+            for index in np.flatnonzero(np.isnan(half_hour).any(axis=1)):
                 interval = origin + (int(index) + 1) * 1800
                 for candidate in range(stpasa_index, -1, -1):
                     candidate_changed, candidate_run, candidate_record = (
@@ -304,21 +342,24 @@ def _write_region(
                     )
                     if candidate_changed < origin - 24 * 3600:
                         break
-                    if interval in candidate_record["values"]:
-                        half_hour[index] = candidate_record["values"][interval]
+                    if interval not in candidate_record["values"]:
+                        continue
+                    if _fill_missing(
+                        half_hour[index], candidate_record["values"][interval]
+                    ):
                         stpasa_run = max(stpasa_run, candidate_run)
-                        stpasa_record = candidate_record
                         used_stpasa_last_changed = max(
                             used_stpasa_last_changed, candidate_changed
                         )
-                        stpasa_filled_values += 1
                         used_stpasa = True
+                    if np.isfinite(half_hour[index]).all():
+                        stpasa_filled_values += 1
                         break
         if np.isnan(half_hour).any():
             incomplete += 1
             continue
         origins.append(origin)
-        values.append(np.minimum(half_hour[0::2], half_hour[1::2]))
+        values.append(_hourly(half_hour))
         source_pdpasa_run.append(used_pdpasa_run)
         source_last_changed.append(
             max(
@@ -330,10 +371,11 @@ def _write_region(
     if not origins:
         raise RuntimeError(f"No complete hourly origins were produced for {region}")
     output.parent.mkdir(parents=True, exist_ok=True)
+    stacked = np.asarray(values, dtype=np.float32)
     np.savez_compressed(
         output,
         forecast_origin_unix=np.asarray(origins, dtype=np.int64),
-        max_spare_capacity_mw=np.asarray(values, dtype=np.float32),
+        **{name: stacked[..., index] for index, (name, _, _) in enumerate(FIELDS)},
         source_run_unix=np.asarray(source_pdpasa_run, dtype=np.int64),
         source_stpasa_run_unix=np.asarray(source_stpasa_run, dtype=np.int64),
         source_last_changed_unix=np.asarray(source_last_changed, dtype=np.int64),
@@ -389,19 +431,56 @@ def build_dataset(start_year: int, end_year: int, output_dir: Path, cache_dir: P
             region,
             runs[region],
             stpasa_runs[region],
-            output_dir / f"{region.lower()}_max_spare.npz",
+            output_dir / f"{region.lower()}_pdpasa.npz",
         )
         print(f"summary={summary}", flush=True)
 
 
+def merge_yearly(shard_root: Path, start_year: int, end_year: int, output_dir: Path) -> None:
+    """Join yearly shards built with ``build`` into one file per region."""
+    end = _unix_seconds(datetime(end_year + 1, 1, 1, tzinfo=AEST))
+    for region in REGIONS:
+        name = f"{region.lower()}_pdpasa.npz"
+        parts = []
+        for year in range(start_year, end_year + 1):
+            with np.load(shard_root / str(year) / name) as archive:
+                parts.append({key: archive[key] for key in archive.files})
+        merged = {
+            key: np.concatenate([part[key] for part in parts]) for key in parts[0]
+        }
+        origins = merged["forecast_origin_unix"]
+        if np.any(np.diff(origins) <= 0):
+            raise RuntimeError(f"Yearly shards for {region} overlap or are out of order")
+        keep = origins < end
+        output_dir.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            output_dir / name, **{key: value[keep] for key, value in merged.items()}
+        )
+        print(
+            f"merged region={region} origins={int(keep.sum())} "
+            f"dropped_after_end={int((~keep).sum())}",
+            flush=True,
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("command", nargs="?", choices=("build", "merge"), default="build")
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2024)
     parser.add_argument("--output-dir", type=Path, default=Path("data/aemo_exogenous"))
     parser.add_argument("--cache-dir", type=Path, default=Path("data/aemo_exogenous/raw"))
+    parser.add_argument(
+        "--shard-root",
+        type=Path,
+        default=Path("data/aemo_exogenous/yearly_pdpasa"),
+        help="Directory of <year>/ shards joined by the merge command.",
+    )
     args = parser.parse_args()
-    build_dataset(args.start_year, args.end_year, args.output_dir, args.cache_dir)
+    if args.command == "merge":
+        merge_yearly(args.shard_root, args.start_year, args.end_year, args.output_dir)
+    else:
+        build_dataset(args.start_year, args.end_year, args.output_dir, args.cache_dir)
 
 
 if __name__ == "__main__":

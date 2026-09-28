@@ -204,6 +204,7 @@ class DualFieldLinearForecaster(nn.Module):
         tcn_dilations: Sequence[int] = (1, 2, 4, 8, 16),
         residual_path: bool = False,
         origin_context_dim: int = 0,
+        ctf_exogenous_dim: int = 0,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -217,12 +218,13 @@ class DualFieldLinearForecaster(nn.Module):
         self.forecast_head_type = forecast_head_type
         self.residual_path = residual_path
         self.origin_context_dim = origin_context_dim
-        if (residual_path or origin_context_dim > 0) and (
+        self.ctf_exogenous_dim = ctf_exogenous_dim
+        if (residual_path or origin_context_dim > 0 or ctf_exogenous_dim > 0) and (
             fusion_mode == "concatenate" or forecast_head_type != "linear"
         ):
             raise ValueError(
-                "The residual path and origin context require a gated fusion "
-                "mode with linear heads"
+                "The residual path, origin context and CTF exogenous inputs "
+                "require a gated fusion mode with linear heads"
             )
         if fusion_mode not in {
             "concatenate",
@@ -325,6 +327,7 @@ class DualFieldLinearForecaster(nn.Module):
                     expert_feature_dim
                     + (input_length * num_variables if residual_path else 0)
                     + origin_context_dim
+                    + forecast_horizon * ctf_exogenous_dim
                 )
                 self.ctf_point_head = nn.Linear(
                     ctf_feature_dim, forecast_horizon
@@ -381,6 +384,7 @@ class DualFieldLinearForecaster(nn.Module):
         future_exogenous: torch.Tensor | None,
         remainder: torch.Tensor | None = None,
         origin_context: torch.Tensor | None = None,
+        ctf_exogenous: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -413,6 +417,8 @@ class DualFieldLinearForecaster(nn.Module):
                 ctf_parts.insert(1, remainder.flatten(start_dim=1))
             if origin_context is not None:
                 ctf_parts.append(origin_context)
+            if ctf_exogenous is not None:
+                ctf_parts.append(ctf_exogenous.flatten(start_dim=1))
             ctf_features = torch.cat(ctf_parts, dim=1)
             dgf_features = torch.cat([event_flat, calendar_flat, *dgf_extra], dim=1)
             ctf_point = self.ctf_point_head(ctf_features).unsqueeze(-1)
@@ -480,6 +486,7 @@ class DualFieldLinearForecaster(nn.Module):
         future_calendar: torch.Tensor,
         future_exogenous: torch.Tensor | None = None,
         origin_context: torch.Tensor | None = None,
+        ctf_exogenous: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         if history_values.shape[1:] != (self.input_length, self.num_variables):
             raise ValueError(
@@ -509,6 +516,16 @@ class DualFieldLinearForecaster(nn.Module):
                 raise ValueError(f"origin_context must have shape {expected}")
         elif origin_context is not None:
             raise ValueError("origin_context was provided but the model has no origin context")
+        if self.ctf_exogenous_dim > 0:
+            expected = (
+                history_values.shape[0],
+                self.forecast_horizon,
+                self.ctf_exogenous_dim,
+            )
+            if ctf_exogenous is None or ctf_exogenous.shape != expected:
+                raise ValueError(f"ctf_exogenous must have shape {expected}")
+        elif ctf_exogenous is not None:
+            raise ValueError("ctf_exogenous was provided but the model has no CTF exogenous inputs")
 
         history_time = self._history_time(history_values)
         ctf_signal = self.dual_field.ctf(history_values, history_time)
@@ -538,6 +555,7 @@ class DualFieldLinearForecaster(nn.Module):
                     else None
                 ),
                 origin_context,
+                ctf_exogenous,
             )
 
         return {
