@@ -950,6 +950,43 @@ negative-price errors worsen there while spike-hour errors fall. Diagnostics
 are stored in
 [`hour_type_diagnostics.json`](pdpasa_netload_ctf/hour_type_diagnostics.json).
 
+## Separate demand and renewable CTF inputs (negative result)
+
+This experiment tests whether QLD1's midday regression under the net-load
+trunk comes from forcing demand and renewables to share one weight. It feeds
+PD PASA `DEMAND50` and `UIGF` to the CTF heads as two separate standardized
+features instead of their difference. Everything else matches the net-load
+trunk. Configuration:
+[`configs/aemo_forecast_pdpasa_demand_uigf_ctf.yaml`](../../configs/aemo_forecast_pdpasa_demand_uigf_ctf.yaml);
+outputs `outputs/forecasting/pdpasa_demand_uigf_ctf{,_seed2027,_seed2028}/`;
+best epochs NSW1 / QLD1 / TAS1 are 13 / 12 / 4, 3 / 6 / 3, and 1 / 8 / 13 for
+seeds 2026 / 2027 / 2028.
+
+| Version | Test MAE | Test RMSE | Window RMSE | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| Net-load CTF trunk | **42.58 ± 0.37** | **272.46 ± 0.51** | **80.15 ± 0.42** | **432.42 ± 0.54** | **28.81 ± 0.06** |
+| Separate `DEMAND50` and `UIGF` | 43.94 ± 0.52 | 273.03 ± 0.87 | 82.03 ± 0.66 | 432.54 ± 4.21 | 28.89 ± 0.19 |
+
+| Paired difference, separate - trunk | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | +1.20 | +1.11 | +1.76 | +1.36 |
+| Window RMSE | +1.73 | +1.44 | +2.49 | +1.89 |
+
+Three-seed per-region test MAE moves from 48.49 to 51.00 (NSW1), 44.46 to
+46.12 (QLD1), and 34.80 to 34.70 (TAS1). Splitting makes QLD1 worse, not
+better, and hurts NSW1 more.
+
+The cause is extrapolation in `UIGF`. On the test split, 29.9% (NSW1) and
+31.8% (QLD1) of standardized `UIGF` values lie outside the central 99% of the
+training values, reaching 20 and 16 training standard deviations (TAS1:
+5.4%). Grouping QLD1 midday non-spike hours by that z-score, the net-load
+trunk's mean bias is -13, -9, +0, and -28 AUD/MWh for z below 1, 1-4, 4-8, and
+at least 8, against +9 for the scarcity trunk in the last group, where the
+mean price is -11. NSW1 shows the same sign flip in that group (bias -11).
+A linear head keeps lowering the price as renewable output grows, while the
+real price flattens near the floor. Giving `UIGF` its own weight lets it
+extrapolate further. The net-load trunk is kept.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -962,23 +999,24 @@ claim that later versions must dominate earlier ones.
 |---:|---|---:|---:|---:|---:|---:|
 | 1 | **PD PASA net-load CTF** | 17,521 | **42.970** | **272.096** | 70.0% | 88.2% |
 | 2 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
-| 3 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
-| 4 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
-| 5 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 6 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 7 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 8 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 9 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 10 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 11 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 12 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 13 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 14 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 15 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 16 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 17 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 18 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 19 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 3 | Separate PD PASA demand and renewable CTF inputs | 17,521 | 44.171 | 272.156 | 65.4% | 87.3% |
+| 4 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
+| 5 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
+| 6 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 7 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 8 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 9 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 10 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 11 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 12 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 13 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 14 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 15 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 16 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 17 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 18 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 19 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 20 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.

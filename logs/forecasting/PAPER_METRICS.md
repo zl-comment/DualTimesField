@@ -101,6 +101,10 @@ compared with caution.
 | 22_pdpasa_netload_ctf | QLD1 | 17521 | 45.26 | 267.02 | 91.17 | 84.63 | 92.05% | 168.46 | 461.48 | 30.27 |
 | 22_pdpasa_netload_ctf | TAS1 | 17521 | 35.19 | 159.90 | 50.68 | 43.93 | 84.16% | 112.35 | 261.62 | 20.48 |
 | 22_pdpasa_netload_ctf | **Mean** | - | 42.97 | 272.10 | 80.63 | 73.95 | 88.23% | 136.90 | 432.06 | 28.81 |
+| 23_pdpasa_demand_uigf_ctf | NSW1 | 17521 | 51.03 | 388.28 | 103.85 | 97.22 | 89.44% | 135.32 | 565.89 | 35.15 |
+| 23_pdpasa_demand_uigf_ctf | QLD1 | 17521 | 46.98 | 268.74 | 93.30 | 85.02 | 93.72% | 193.59 | 458.93 | 30.21 |
+| 23_pdpasa_demand_uigf_ctf | TAS1 | 17521 | 34.51 | 159.44 | 49.91 | 43.56 | 78.85% | 97.73 | 273.04 | 21.24 |
+| 23_pdpasa_demand_uigf_ctf | **Mean** | - | 44.17 | 272.16 | 82.35 | 75.27 | 87.34% | 142.22 | 432.62 | 28.87 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -126,6 +130,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Gas prices track the crisis level | 20_gas_price_ctf improves 90% AIS and CRPS~ and reduces the 2022 crisis-month under-forecast; over three seeds its test MAE is 44.37 ± 0.15 |
 | PD PASA scarcity sharpens the DGF event expert | 21_pdpasa_dgf lowers mean MAE to 44.06, window RMSE to 81.33, 90% AIS to 437.27, and CRPS~ to 29.50; over three seeds it improves every metric for every seed |
 | The PD PASA net-load forecast lifts the CTF level | 22_pdpasa_netload_ctf lowers mean MAE to 42.97, window RMSE to 80.63, 90% AIS to 432.06, and CRPS~ to 28.81; over three seeds test MAE falls by 1.10-1.32 for every seed, through ordinary-hour errors in NSW1 and TAS1 |
+| Separate demand and renewable inputs extrapolate worse | 23_pdpasa_demand_uigf_ctf raises mean MAE to 44.17; over three seeds test MAE rises by 1.11-1.76 for every seed versus the net-load version, because test-period `UIGF` lies far outside its training range |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -152,4 +157,5 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 19_residual_skip_path | untagged | `feature/residual-skip-path` | `configs/aemo_forecast_residual_skip_path.yaml` | `outputs/forecasting/residual_skip_path` |
 | 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |
 | 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |
-| 22_pdpasa_netload_ctf | untagged | `feature/pdpasa-netload` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
+| 22_pdpasa_netload_ctf | `aemo-pdpasa-netload-ctf-30epoch` | `062ddb7` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
+| 23_pdpasa_demand_uigf_ctf | untagged | `feature/pdpasa-demand-uigf-split` | `configs/aemo_forecast_pdpasa_demand_uigf_ctf.yaml` | `outputs/forecasting/pdpasa_demand_uigf_ctf` |
