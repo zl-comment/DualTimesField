@@ -987,6 +987,26 @@ A linear head keeps lowering the price as renewable output grows, while the
 real price flattens near the floor. Giving `UIGF` its own weight lets it
 extrapolate further. The net-load trunk is kept.
 
+### Model-independent check with gradient-boosted trees
+
+The same inputs were given to one scikit-learn `HistGradientBoostingRegressor`
+per horizon (absolute-error loss, learning rate 0.05, 63 leaves, up to 500
+iterations, iteration count chosen on the 2022 validation split, seed 2026).
+Features are the 72-hour price and demand history, the gas-price context,
+and the horizon's calendar and spare-capacity values; the net-load row adds
+the horizon's net load and the full 24-hour net-load profile.
+
+| GBDT inputs | NSW1 | QLD1 | TAS1 | Mean test MAE |
+|---|---:|---:|---:|---:|
+| Scarcity-trunk inputs | 50.75 | 44.06 | 34.69 | 43.17 |
+| Plus PD PASA net load | 49.94 | 42.58 | 33.84 | 42.12 |
+
+Net load lowers the tree model's MAE by 1.05, close to the dual-field gain
+of 1.24, so the gain comes from the information rather than the architecture.
+Unlike the linear head, the trees also improve QLD1 (44.06 to 42.58). Trees
+hold their last value outside the training range instead of extrapolating,
+which supports the extrapolation explanation above.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
