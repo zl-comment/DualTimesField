@@ -1041,6 +1041,53 @@ trunk. A per-horizon gradient-boosted-tree model with the same unsaturated
 inputs reaches 42.12 (recorded on `feature/pdpasa-demand-uigf-split`), so the
 dual-field model now leads it by 0.26 MAE.
 
+## Demand-uncertainty DGF experiment (probabilistic-only gain)
+
+This experiment adds AEMO's demand-forecast uncertainty to the DGF expert on
+top of the soft-saturated net-load trunk. The 24-hour PD PASA band
+`DEMAND10 - DEMAND90` (10% minus 90% probability-of-exceedance demand) is
+standardized on training origins and concatenated with maximum spare capacity
+as a second `future_exogenous` feature, so it reaches the DGF point and
+quantile heads and the fusion gate. The CTF expert is unchanged. `DEMAND50`
+explains only 49-58% of the band's variance, and 0.7-3.9% of test values lie
+outside the central 99% of training values, so no saturation is applied.
+Parameters increase from 174,668 to 178,700. Configuration:
+[`configs/aemo_forecast_pdpasa_demand_spread_dgf.yaml`](../../configs/aemo_forecast_pdpasa_demand_spread_dgf.yaml);
+outputs `outputs/forecasting/pdpasa_demand_spread_dgf{,_seed2027,_seed2028}/`;
+best epochs NSW1 / QLD1 / TAS1 are 2 / 17 / 4, 3 / 3 / 29, and 14 / 12 / 14 for
+seeds 2026 / 2027 / 2028.
+
+| Version | Test MAE | Test RMSE | Window RMSE | Window SDE | 90% AIS | CRPS~ | Validation MAE |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Soft-saturated net-load trunk | **41.86 ± 0.24** | **272.47 ± 0.53** | **79.11 ± 0.20** | **72.92 ± 0.11** | 433.53 ± 1.85 | 28.95 ± 0.13 | **65.01 ± 0.58** |
+| Plus demand uncertainty in DGF | 41.93 ± 0.21 | 272.76 ± 1.10 | 79.23 ± 0.25 | 73.23 ± 0.19 | **428.48 ± 2.78** | **28.66 ± 0.24** | 66.31 ± 2.02 |
+
+| Paired difference, uncertainty - trunk | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | +0.20 | +0.19 | -0.20 | +0.06 |
+| Window SDE | +0.46 | +0.33 | +0.12 | +0.30 |
+| 90% AIS | -4.31 | -2.30 | -8.55 | -5.05 |
+| CRPS~ | -0.25 | -0.15 | -0.46 | -0.28 |
+
+Three-seed per-region test MAE moves from 48.53 to 48.65 (NSW1), 42.51 to
+42.36 (QLD1), and 34.55 to 34.76 (TAS1).
+
+| Three-seed mean, trunk -> this run | NSW1 | QLD1 | TAS1 |
+|---|---:|---:|---:|
+| Spike-hour CRPS~ (price above 300) | 1203.8 -> 1211.1 | 788.2 -> 776.1 | 842.8 -> 831.8 |
+| Ordinary-hour CRPS~ | 14.84 -> 14.97 | 15.68 -> 15.49 | 17.10 -> 16.46 |
+| CRPS~ in the top-10% uncertainty hours | 96.0 -> 96.3 | 100.8 -> 101.0 | 46.0 -> 43.5 |
+| Ordinary-hour 90% coverage | 89.9% -> 88.1% | 92.5% -> 91.9% | 79.7% -> 83.7% |
+
+Point accuracy is unchanged within seed noise, and window SDE and validation
+MAE are slightly worse. The probabilistic scores improve for every seed, but
+mostly through TAS1 intervals and QLD1 spike quantiles, while NSW1 is
+slightly worse on every score. Only TAS1 improves most in the hours with the
+widest demand band, so the gain is not clearly caused by the uncertainty
+signal itself. The trunk is left unchanged; this run is kept as a candidate
+for probabilistic reporting. Diagnostics are in
+[`diagnostics.json`](pdpasa_demand_spread_dgf/diagnostics.json).
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -1052,26 +1099,27 @@ claim that later versions must dominate earlier ones.
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
 | 1 | **Soft-saturated PD PASA net-load CTF input** | 17,521 | **41.963** | **272.031** | 66.4% | 86.4% |
-| 2 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
-| 3 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
-| 4 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
-| 5 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
-| 6 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
-| 7 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 8 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 9 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 10 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 11 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 12 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 13 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 14 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 15 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 16 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 17 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 18 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 19 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 20 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 21 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 2 | Demand-uncertainty DGF input | 17,521 | 42.163 | 272.827 | 62.7% | 86.3% |
+| 3 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
+| 4 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
+| 5 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
+| 6 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
+| 7 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
+| 8 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 9 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 10 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 11 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 12 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 13 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 14 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 15 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 16 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 17 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 18 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 19 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 20 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 21 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 22 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
