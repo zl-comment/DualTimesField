@@ -105,6 +105,10 @@ compared with caution.
 | 24_pdpasa_netload_clip_ctf | QLD1 | 17521 | 43.73 | 268.37 | 88.62 | 83.43 | 90.72% | 160.35 | 462.50 | 30.63 |
 | 24_pdpasa_netload_clip_ctf | TAS1 | 17521 | 34.55 | 159.57 | 49.96 | 43.53 | 78.40% | 96.01 | 274.04 | 21.26 |
 | 24_pdpasa_netload_clip_ctf | **Mean** | - | 42.50 | 272.41 | 79.82 | 73.78 | 85.63% | 128.55 | 437.82 | 29.35 |
+| 25_pdpasa_netload_softclip_ctf | NSW1 | 17521 | 48.39 | 389.56 | 99.80 | 93.19 | 88.87% | 131.91 | 572.15 | 35.74 |
+| 25_pdpasa_netload_softclip_ctf | QLD1 | 17521 | 43.06 | 267.03 | 87.98 | 82.33 | 91.25% | 161.13 | 459.08 | 30.28 |
+| 25_pdpasa_netload_softclip_ctf | TAS1 | 17521 | 34.44 | 159.50 | 49.83 | 43.44 | 78.99% | 97.48 | 274.14 | 21.28 |
+| 25_pdpasa_netload_softclip_ctf | **Mean** | - | 41.96 | 272.03 | 79.20 | 72.99 | 86.37% | 130.17 | 435.13 | 29.10 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -131,6 +135,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | PD PASA scarcity sharpens the DGF event expert | 21_pdpasa_dgf lowers mean MAE to 44.06, window RMSE to 81.33, 90% AIS to 437.27, and CRPS~ to 29.50; over three seeds it improves every metric for every seed |
 | The PD PASA net-load forecast lifts the CTF level | 22_pdpasa_netload_ctf lowers mean MAE to 42.97, window RMSE to 80.63, 90% AIS to 432.06, and CRPS~ to 28.81; over three seeds test MAE falls by 1.10-1.32 for every seed, through ordinary-hour errors in NSW1 and TAS1 |
 | Clipping net load trades NSW1 for QLD1 | 24_pdpasa_netload_clip_ctf holds net load inside its training range; QLD1 three-seed MAE falls by 1.22 but NSW1 rises by 0.83, and over three seeds the mean MAE change (-0.14) is inside seed noise |
+| Soft saturation keeps the QLD1 gain without the NSW1 loss | 25_pdpasa_netload_softclip_ctf compresses net load beyond its training range with `log1p`; mean MAE falls to 41.96 and window RMSE to 79.20, and over three seeds test MAE falls by 0.50-1.01 for every seed |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -158,4 +163,5 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |
 | 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |
 | 22_pdpasa_netload_ctf | `aemo-pdpasa-netload-ctf-30epoch` | `062ddb7` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
-| 24_pdpasa_netload_clip_ctf | untagged | `feature/pdpasa-netload-clip` | `configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_clip_ctf` |
+| 24_pdpasa_netload_clip_ctf | untagged | `224099c` | `configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_clip_ctf` |
+| 25_pdpasa_netload_softclip_ctf | untagged | `feature/pdpasa-netload-softclip` | `configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_softclip_ctf` |

@@ -391,7 +391,18 @@ class AEMOForecastDataset(Dataset):
                 [float(clip_quantiles[0]), float(clip_quantiles[1])],
                 axis=0,
             )
-            standardized = np.clip(standardized, lower, upper).astype(np.float32)
+            if exogenous_config.get("out_of_range", "clip") == "log":
+                # Soft saturation: keep the training range linear and compress
+                # the excess beyond each bound with log1p.
+                below = np.maximum(lower - standardized, 0.0)
+                above = np.maximum(standardized - upper, 0.0)
+                standardized = (
+                    np.clip(standardized, lower, upper)
+                    - np.log1p(below)
+                    + np.log1p(above)
+                ).astype(np.float32)
+            else:
+                standardized = np.clip(standardized, lower, upper).astype(np.float32)
         by_origin = {
             int(origin): standardized[index]
             for index, origin in enumerate(origins)

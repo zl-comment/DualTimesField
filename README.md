@@ -408,7 +408,10 @@ A `ctf_exogenous` block feeds listed features to the CTF point and quantile
 heads only. Besides the stored fields, `net_load_mw` (`demand50_mw -
 uigf_mw`) and `demand_spread_mw` (`demand10_mw - demand90_mw`) are derived on
 load. Setting `clip_to_train_quantiles: [low, high]` in the block clips each
-standardized feature to those quantiles of its training values.
+standardized feature to those quantiles of its training values. Adding
+`out_of_range: log` keeps values inside the bounds unchanged and compresses
+the excess beyond each bound with `log1p` instead of clipping it
+(`configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml`).
 
 ```bash
 python -m forecasting.train \
