@@ -1171,6 +1171,89 @@ describe the observed 72 hours, which the linear heads can read directly. To
 make the dual field matter for forecasting, it must be extended into the
 forecast horizon rather than only reconstruct the history.
 
+## Future event field, stage A
+
+Stage A of [`PLAN_FUTURE_EVENT_FIELD.md`](PLAN_FUTURE_EVENT_FIELD.md) adds a
+future event field beside the unchanged forecast of the scarcity trunk
+(`model.event_field: true`). For each forecast hour it outputs a
+three-component Gaussian mixture of the target-space price. The level
+component's mean is the fused point forecast, detached, so the forecast path
+receives no gradient from the event field. A scarcity-driven spike component
+reads spare capacity, shortfalls, calendar, and an event state. A
+surplus-driven trough component reads net load, calendar, and the event
+state. The loss adds the mixture negative log-likelihood (weight 0.2) and a
+cross-entropy anchoring the spike probability to `price > 300` and the trough
+probability to `price < 0` (weight 0.1). Three event-state sources are
+compared: the DGF (price-channel atom amplitudes and gates plus the last 24
+hours of the event signal), the raw last 24 hours of history, and none. The
+event field adds 606, 542, and 94 parameters. Configurations:
+`configs/aemo_forecast_event_field_a_{dgf,raw,none}.yaml`; outputs
+`outputs/forecasting/event_field_a_{dgf,raw,none}{,_seed2027,_seed2028}/`;
+scorer [`forecasting/event_metrics.py`](../../forecasting/event_metrics.py).
+
+Checkpoints are still selected on validation total loss, which is reached
+early (for example epoch 4 for QLD1 seed 2026), so the event heads are scored
+after only a few epochs of training.
+
+### Standard metrics, three-seed mean
+
+| Version | Test MAE | Window RMSE | Window SDE | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| Scarcity trunk | 41.88 ± 0.22 | 79.21 | 72.97 | 412.60 | 28.43 |
+| Event field, DGF state | 41.81 ± 0.26 | 79.06 | 73.04 | 413.14 | 28.47 |
+| Event field, raw-history state | 42.10 ± 0.06 | 79.44 | 73.19 | 415.89 | 28.49 |
+| Event field, no state | 42.20 ± 0.07 | 79.60 | 73.08 | 418.45 | 28.68 |
+
+The forecast path is unchanged by design, but the event losses still shape
+the shared DGF and move checkpoint selection. With the DGF state the scores
+match the trunk; the other two sources are slightly worse.
+
+### Event forecasts on the test split (seed-mean probabilities)
+
+PR-AUC, with the event rate in brackets. Persistence and logistic regression
+are fitted on the training split; the logistic regression reads the same
+hour-level drivers plus last-24-hour event indicators and extremes.
+
+| Region, event | Persistence | Logistic regression | No state | Raw state | DGF state |
+|---|---:|---:|---:|---:|---:|
+| NSW1 spike (1.75%) | 0.041 | **0.303** | 0.243 | 0.181 | 0.238 |
+| NSW1 trough (6.19%) | 0.103 | **0.641** | 0.568 | 0.546 | 0.533 |
+| QLD1 spike (1.85%) | 0.042 | **0.234** | 0.203 | 0.200 | 0.213 |
+| QLD1 trough (13.21%) | 0.179 | **0.844** | 0.831 | 0.691 | 0.828 |
+| TAS1 spike (0.50%) | 0.036 | **0.096** | 0.020 | 0.008 | 0.013 |
+| TAS1 trough (7.37%) | 0.165 | 0.411 | 0.401 | **0.423** | 0.393 |
+
+| Brier score | Persistence | Logistic regression | No state | Raw state | DGF state |
+|---|---:|---:|---:|---:|---:|
+| NSW1 spike | 0.01700 | **0.01444** | 0.01560 | 0.01567 | 0.01520 |
+| NSW1 trough | 0.05697 | 0.06993 | 0.05745 | 0.04267 | **0.03989** |
+| QLD1 spike | 0.01780 | 0.01668 | 0.01625 | 0.01666 | **0.01618** |
+| QLD1 trough | 0.11502 | 0.05806 | 0.06800 | 0.08813 | **0.05655** |
+| TAS1 spike | 0.00479 | **0.00468** | 0.00492 | 0.00516 | 0.00501 |
+| TAS1 trough | 0.06370 | 0.05469 | 0.06138 | **0.05430** | 0.05737 |
+
+Full scores, including ROC-AUC and calibration error, are in
+[`event_field_a/event_metrics.json`](event_field_a/event_metrics.json).
+
+Against the stage-A criteria:
+
+- The event field is far better than persistence everywhere, and trains
+  stably without mixture collapse.
+- It does not beat the logistic regression on PR-AUC. It has the best Brier
+  score in four of six cases, mainly because the logistic regression
+  over-predicts troughs (mean probability 0.139 against a 0.062 rate in
+  NSW1).
+- The DGF state is not clearly better than the raw-history state or no state
+  on event metrics. It is the only state that keeps the forecast scores at
+  the trunk's level.
+- TAS1 spikes (0.5% of hours) are not learned by any event-field variant.
+
+The main suspected cause is under-training of the event heads: checkpoints
+are chosen at the epoch of lowest total validation loss, often epoch 3-7,
+while a logistic regression is fitted to convergence. The logistic
+regression also sees the last-day price extremes directly, which the event
+state only sees through a learned projection.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

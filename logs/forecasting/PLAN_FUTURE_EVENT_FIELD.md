@@ -1,8 +1,9 @@
 # Plan: extending the DGF into a future event field
 
-Status: design, not yet implemented. Branch: `feature/future-event-field`,
-from `feature/ablation-no-reconstruction` (`ba37ad3`, trunk `b3fd5a9` plus
-the ablation).
+Status: stage A run; results in `EXPERIMENT_RESULTS.md` ("Future event
+field, stage A"). Branch: `feature/future-event-field`, from
+`feature/ablation-no-reconstruction` (`ba37ad3`, trunk `b3fd5a9` plus the
+ablation).
 
 ## Why
 

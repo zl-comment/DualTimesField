@@ -20,7 +20,10 @@ from .losses import DualFieldForecastLoss
 from .models import DualFieldLinearForecaster
 
 
-LOSS_NAMES = ("total", "point", "quantile", "decomposition", "smoothness", "sparsity")
+LOSS_NAMES = (
+    "total", "point", "quantile", "decomposition", "smoothness", "sparsity",
+    "event_nll", "event_anchor",
+)
 
 
 class ExponentialMovingAverage:
@@ -116,6 +119,9 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         ),
         quantile_gate=model_config.get("quantile_gate", False),
         head_input=model_config.get("head_input", "fields"),
+        event_field=model_config.get("event_field", False),
+        event_state_source=model_config.get("event_state_source", "dgf"),
+        event_detach_level=model_config.get("event_detach_level", True),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
@@ -207,6 +213,7 @@ def train_epoch(
             history,
             target,
             quantile_target(batch, device),
+            batch["target_price_raw"].to(device),
         )
         losses["total"].backward()
         if gradient_clip_norm is not None:
@@ -261,7 +268,8 @@ def evaluate(
             history = inputs[0]
             outputs = model(*inputs)
             losses = criterion(
-                outputs, history, target, quantile_target(batch, device)
+                outputs, history, target, quantile_target(batch, device),
+                batch["target_price_raw"].to(device),
             )
             batch_size = history.shape[0]
             sample_count += batch_size

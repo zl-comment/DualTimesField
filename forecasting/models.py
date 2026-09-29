@@ -176,6 +176,118 @@ class TemporalConvForecastHead(nn.Module):
         )
 
 
+class FutureEventField(nn.Module):
+    """Two-sided event process over the forecast horizon.
+
+    For each forecast hour the target-space price follows a three-component
+    Gaussian mixture: the continuous level, a scarcity-driven spike above it,
+    and a surplus-driven trough below it.  Spike and trough probabilities and
+    shapes come from the hour's forecast drivers and a compact state of
+    recent events.  The event state is built from the DGF (atom amplitudes,
+    gates, and the last day of the event signal), from the raw last day of
+    history, or omitted, so the value of the DGF can be tested directly.
+    """
+
+    def __init__(
+        self,
+        input_length: int,
+        num_variables: int,
+        num_atoms: int,
+        calendar_dim: int,
+        spare_dim: int,
+        shortfall_dim: int,
+        trough_dim: int,
+        state_source: str = "dgf",
+        state_dim: int = 8,
+        state_hours: int = 24,
+        spike_rate: float = 0.005,
+        trough_rate: float = 0.015,
+    ):
+        super().__init__()
+        if state_source not in {"dgf", "raw", "none"}:
+            raise ValueError("event state_source must be 'dgf', 'raw', or 'none'")
+        self.state_source = state_source
+        self.state_hours = min(state_hours, input_length)
+        if state_source == "dgf":
+            state_input = 2 * num_atoms + self.state_hours
+        elif state_source == "raw":
+            state_input = self.state_hours * num_variables
+        else:
+            state_input = 0
+        self.state_dim = state_dim if state_input > 0 else 0
+        self.state = nn.Linear(state_input, state_dim) if state_input > 0 else None
+        self.spike_head = nn.Linear(shortfall_dim + spare_dim + calendar_dim + self.state_dim, 3)
+        self.trough_head = nn.Linear(trough_dim + calendar_dim + self.state_dim, 3)
+        self.level_scale_head = nn.Linear(
+            spare_dim + trough_dim + calendar_dim + self.state_dim, 1
+        )
+
+        def inverse_softplus(value: float) -> float:
+            return math.log(math.expm1(value))
+
+        with torch.no_grad():
+            # logit, shift, scale; biases start at plausible event rates and sizes.
+            self.spike_head.bias.copy_(torch.tensor(
+                [math.log(spike_rate), inverse_softplus(3.0), inverse_softplus(1.0)]
+            ))
+            self.trough_head.bias.copy_(torch.tensor(
+                [math.log(trough_rate), inverse_softplus(1.5), inverse_softplus(0.3)]
+            ))
+            self.level_scale_head.bias.fill_(inverse_softplus(0.4))
+
+    def forward(
+        self,
+        level_mean: torch.Tensor,
+        future_calendar: torch.Tensor,
+        spare: torch.Tensor,
+        shortfall: torch.Tensor,
+        net_load: torch.Tensor,
+        history_values: torch.Tensor,
+        event_signal: torch.Tensor,
+        amplitude: torch.Tensor,
+        gate: torch.Tensor,
+    ) -> Dict[str, torch.Tensor]:
+        horizon = future_calendar.shape[1]
+        state_parts = []
+        if self.state_source == "dgf":
+            state_input = torch.cat(
+                [amplitude[..., 0], gate, event_signal[:, -self.state_hours:, 0]], dim=1
+            )
+        elif self.state_source == "raw":
+            state_input = history_values[:, -self.state_hours:].flatten(start_dim=1)
+        if self.state is not None:
+            state = self.state(state_input)
+            state_parts = [state.unsqueeze(1).expand(-1, horizon, -1)]
+        spike = self.spike_head(torch.cat([shortfall, spare, future_calendar, *state_parts], dim=-1))
+        trough = self.trough_head(torch.cat([net_load, future_calendar, *state_parts], dim=-1))
+        level_scale = nn.functional.softplus(
+            self.level_scale_head(torch.cat([spare, net_load, future_calendar, *state_parts], dim=-1))
+        ) + 0.05
+        logits = torch.stack(
+            [torch.zeros_like(spike[..., 0]), spike[..., 0], trough[..., 0]], dim=-1
+        )
+        spike_shift = nn.functional.softplus(spike[..., 1]) + 0.1
+        trough_shift = nn.functional.softplus(trough[..., 1]) + 0.1
+        level = level_mean[..., 0]
+        means = torch.stack([level, level + spike_shift, level - trough_shift], dim=-1)
+        scales = torch.stack(
+            [
+                level_scale[..., 0],
+                nn.functional.softplus(spike[..., 2]) + 0.05,
+                nn.functional.softplus(trough[..., 2]) + 0.05,
+            ],
+            dim=-1,
+        )
+        log_weights = torch.log_softmax(logits, dim=-1)
+        return {
+            "mixture_log_weights": log_weights,
+            "mixture_means": means,
+            "mixture_scales": scales,
+            "event_probability_spike": log_weights[..., 1].exp(),
+            "event_probability_trough": log_weights[..., 2].exp(),
+        }
+
+
 class DualFieldLinearForecaster(nn.Module):
     """Forecast from constrained CTF and DGF features."""
 
@@ -208,6 +320,9 @@ class DualFieldLinearForecaster(nn.Module):
         quantile_gate: bool = False,
         quantile_exogenous_dim: int = 0,
         head_input: str = "fields",
+        event_field: bool = False,
+        event_state_source: str = "dgf",
+        event_detach_level: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -230,6 +345,24 @@ class DualFieldLinearForecaster(nn.Module):
         # place of the CTF and DGF fields (and a zero remainder), keeping the
         # heads, routing, gate, parameters, and losses unchanged.
         self.head_input = head_input
+        self.event_field = None
+        self.event_detach_level = event_detach_level
+        if event_field:
+            if not (future_exogenous_dim > 0 and quantile_exogenous_dim > 0 and ctf_exogenous_dim == 1):
+                raise ValueError(
+                    "event_field needs spare capacity (future_exogenous), shortfalls "
+                    "(quantile_exogenous), and one net-load CTF exogenous feature"
+                )
+            self.event_field = FutureEventField(
+                input_length=input_length,
+                num_variables=num_variables,
+                num_atoms=num_atoms,
+                calendar_dim=calendar_dim,
+                spare_dim=future_exogenous_dim,
+                shortfall_dim=quantile_exogenous_dim,
+                trough_dim=ctf_exogenous_dim,
+                state_source=event_state_source,
+            )
         if quantile_exogenous_dim > 0 and (
             fusion_mode == "concatenate" or forecast_head_type != "linear"
         ):
@@ -621,6 +754,24 @@ class DualFieldLinearForecaster(nn.Module):
                 origin_context,
                 ctf_exogenous,
                 quantile_exogenous,
+            )
+
+        if self.event_field is not None:
+            level_mean = forecasts["point_forecast"]
+            if self.event_detach_level:
+                level_mean = level_mean.detach()
+            forecasts.update(
+                self.event_field(
+                    level_mean,
+                    future_calendar,
+                    future_exogenous,
+                    quantile_exogenous,
+                    ctf_exogenous,
+                    history_values,
+                    event_signal,
+                    amplitude,
+                    gate,
+                )
             )
 
         return {
