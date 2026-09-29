@@ -329,6 +329,16 @@ class AEMOForecastDataset(Dataset):
                 self.ctf_exogenous_standardizer,
                 self.ctf_exogenous_by_origin,
             ) = self._load_forecast_exogenous(frame, config, region, "ctf_exogenous")
+        # Forecast inputs for the DGF quantile head only (e.g. scarcity shortfalls).
+        self.quantile_exogenous_feature_names: tuple[str, ...] = ()
+        self.quantile_exogenous_standardizer = None
+        self.quantile_exogenous_by_origin: dict[int, np.ndarray] = {}
+        if config.get("quantile_exogenous", {}).get("enabled", False):
+            (
+                self.quantile_exogenous_feature_names,
+                self.quantile_exogenous_standardizer,
+                self.quantile_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "quantile_exogenous")
 
     def _load_forecast_exogenous(
         self,
@@ -384,6 +394,23 @@ class AEMOForecastDataset(Dataset):
         train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
         if not train_rows:
             raise ValueError(f"No training future exogenous values for {region}")
+        shortfall_quantiles = exogenous_config.get("shortfall_below_train_quantiles")
+        if shortfall_quantiles is not None:
+            # Replace each feature with its shortfall below several training
+            # quantiles, max(knot - value, 0): a piecewise-linear, convex
+            # response that a linear head can use to rise faster as the
+            # value gets scarcer.
+            knots = np.quantile(
+                raw_values[train_rows].reshape(-1, len(feature_names)),
+                [float(q) for q in shortfall_quantiles],
+                axis=0,
+            )
+            raw_values = np.concatenate(
+                [np.maximum(knot - raw_values, 0.0) for knot in knots], axis=-1
+            )
+            feature_names = tuple(
+                f"{name}_shortfall_q{q}" for q in shortfall_quantiles for name in feature_names
+            )
         standardizer = _fit_standardizer(
             raw_values[train_rows].reshape(-1, len(feature_names))
         )
@@ -470,6 +497,10 @@ class AEMOForecastDataset(Dataset):
         if self.ctf_exogenous_by_origin:
             sample["ctf_exogenous"] = torch.from_numpy(
                 self.ctf_exogenous_by_origin[origin].copy()
+            )
+        if self.quantile_exogenous_by_origin:
+            sample["quantile_exogenous"] = torch.from_numpy(
+                self.quantile_exogenous_by_origin[origin].copy()
             )
         return sample
 

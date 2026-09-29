@@ -113,6 +113,10 @@ compared with caution.
 | 27_quantile_gate | QLD1 | 17521 | 42.92 | 266.92 | 87.78 | 82.18 | 91.10% | 165.61 | 454.73 | 30.13 |
 | 27_quantile_gate | TAS1 | 17521 | 34.50 | 159.56 | 49.90 | 43.46 | 77.81% | 93.32 | 274.24 | 21.01 |
 | 27_quantile_gate | **Mean** | - | 41.94 | 271.98 | 79.16 | 72.94 | 85.79% | 131.18 | 432.75 | 28.96 |
+| 28_scarcity_quantile_inputs | NSW1 | 17521 | 48.43 | 389.79 | 99.92 | 93.27 | 87.81% | 157.63 | 527.34 | 34.54 |
+| 28_scarcity_quantile_inputs | QLD1 | 17521 | 42.75 | 268.02 | 87.95 | 82.39 | 89.23% | 175.13 | 433.69 | 29.75 |
+| 28_scarcity_quantile_inputs | TAS1 | 17521 | 34.50 | 159.56 | 49.90 | 43.46 | 77.59% | 93.01 | 274.90 | 21.11 |
+| 28_scarcity_quantile_inputs | **Mean** | - | 41.89 | 272.46 | 79.26 | 73.04 | 84.88% | 141.92 | 411.97 | 28.47 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -143,6 +147,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | RE-Price's error ratios imply spike treatment | Its RMSE/MAE ratios (1.45, 1.44, 1.20) are reached only when prices are capped near 650 AUD/MWh; with spike windows removed the trunk scores 24.83 (NSW1) and 25.62 (QLD1) against 23.48 and 25.85, while TAS1 stays unexplained. See [`PROTOCOL_ALIGNMENT.md`](PROTOCOL_ALIGNMENT.md) |
 | Same-data baselines trail on points but not on intervals | Re-implemented XGBoost, GRU, and DeepAR (three seeds, no news) reach mean MAE 43.15, 45.65, and 47.86 against the trunk's 41.86; XGBoost's CRPS~ (27.69) is below the trunk's (28.95). See [`BASELINES.md`](BASELINES.md) |
 | A quantile-specific gate helps intervals slightly | 27_quantile_gate lowers three-seed CRPS~ by 0.12 and 90% AIS by 1.98 for every seed with unchanged point forecasts; XGBoost's CRPS~ (27.69) is still lower |
+| Scarcity shortfalls sharpen the upper tail | 28_scarcity_quantile_inputs feeds spare-capacity shortfalls below training quantiles to the DGF quantile head; three-seed 90% AIS falls by 18.95 and CRPS~ by 0.40 for every seed, mean AIS (412.60) drops below XGBoost's (414.32), and NSW1 CRPS~ (34.71) beats XGBoost (35.32) |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -172,4 +177,5 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 22_pdpasa_netload_ctf | `aemo-pdpasa-netload-ctf-30epoch` | `062ddb7` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
 | 24_pdpasa_netload_clip_ctf | untagged | `224099c` | `configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_clip_ctf` |
 | 25_pdpasa_netload_softclip_ctf | `aemo-pdpasa-netload-softclip-ctf-30epoch` | `bfd5f55` | `configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_softclip_ctf` |
-| 27_quantile_gate | untagged | `feature/probabilistic-quantiles` | `configs/aemo_forecast_quantile_gate.yaml` | `outputs/forecasting/quantile_gate` |
+| 27_quantile_gate | untagged | `da4abfe` | `configs/aemo_forecast_quantile_gate.yaml` | `outputs/forecasting/quantile_gate` |
+| 28_scarcity_quantile_inputs | untagged | `feature/scarcity-quantile-inputs` | `configs/aemo_forecast_scarcity_quantile_inputs.yaml` | `outputs/forecasting/scarcity_quantile_inputs` |

@@ -206,6 +206,7 @@ class DualFieldLinearForecaster(nn.Module):
         origin_context_dim: int = 0,
         ctf_exogenous_dim: int = 0,
         quantile_gate: bool = False,
+        quantile_exogenous_dim: int = 0,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -221,6 +222,11 @@ class DualFieldLinearForecaster(nn.Module):
         self.origin_context_dim = origin_context_dim
         self.ctf_exogenous_dim = ctf_exogenous_dim
         self.quantile_gate = quantile_gate
+        self.quantile_exogenous_dim = quantile_exogenous_dim
+        if quantile_exogenous_dim > 0 and (
+            fusion_mode == "concatenate" or forecast_head_type != "linear"
+        ):
+            raise ValueError("quantile exogenous inputs require gated linear heads")
         if quantile_gate and fusion_mode == "concatenate":
             raise ValueError("quantile_gate requires a gated fusion mode")
         if (residual_path or origin_context_dim > 0 or ctf_exogenous_dim > 0) and (
@@ -344,7 +350,9 @@ class DualFieldLinearForecaster(nn.Module):
                     forecast_horizon * len(self.quantiles),
                 )
                 self.dgf_quantile_head = nn.Linear(
-                    expert_feature_dim + dgf_exogenous_dim,
+                    expert_feature_dim
+                    + dgf_exogenous_dim
+                    + forecast_horizon * quantile_exogenous_dim,
                     forecast_horizon * len(self.quantiles),
                 )
             self.fusion_gate = nn.Linear(
@@ -399,6 +407,7 @@ class DualFieldLinearForecaster(nn.Module):
         remainder: torch.Tensor | None = None,
         origin_context: torch.Tensor | None = None,
         ctf_exogenous: torch.Tensor | None = None,
+        quantile_exogenous: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -442,7 +451,12 @@ class DualFieldLinearForecaster(nn.Module):
                 self.forecast_horizon,
                 len(self.quantiles),
             )
-            dgf_quantile = self.dgf_quantile_head(dgf_features).view(
+            dgf_quantile_features = dgf_features
+            if quantile_exogenous is not None:
+                dgf_quantile_features = torch.cat(
+                    [dgf_features, quantile_exogenous.flatten(start_dim=1)], dim=1
+                )
+            dgf_quantile = self.dgf_quantile_head(dgf_quantile_features).view(
                 ctf_signal.shape[0],
                 self.forecast_horizon,
                 len(self.quantiles),
@@ -514,6 +528,7 @@ class DualFieldLinearForecaster(nn.Module):
         future_exogenous: torch.Tensor | None = None,
         origin_context: torch.Tensor | None = None,
         ctf_exogenous: torch.Tensor | None = None,
+        quantile_exogenous: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         if history_values.shape[1:] != (self.input_length, self.num_variables):
             raise ValueError(
@@ -553,6 +568,16 @@ class DualFieldLinearForecaster(nn.Module):
                 raise ValueError(f"ctf_exogenous must have shape {expected}")
         elif ctf_exogenous is not None:
             raise ValueError("ctf_exogenous was provided but the model has no CTF exogenous inputs")
+        if self.quantile_exogenous_dim > 0:
+            expected = (
+                history_values.shape[0],
+                self.forecast_horizon,
+                self.quantile_exogenous_dim,
+            )
+            if quantile_exogenous is None or quantile_exogenous.shape != expected:
+                raise ValueError(f"quantile_exogenous must have shape {expected}")
+        elif quantile_exogenous is not None:
+            raise ValueError("quantile_exogenous was provided but the model has no quantile exogenous inputs")
 
         history_time = self._history_time(history_values)
         ctf_signal = self.dual_field.ctf(history_values, history_time)
@@ -583,6 +608,7 @@ class DualFieldLinearForecaster(nn.Module):
                 ),
                 origin_context,
                 ctf_exogenous,
+                quantile_exogenous,
             )
 
         return {

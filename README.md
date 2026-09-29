@@ -438,7 +438,11 @@ column at `c` before training and scoring
 Setting `model.quantile_gate: true` gives each quantile level and horizon
 its own affine rescaling of the fusion-gate logit, so the tail quantiles can
 weight the DGF event field differently from the point forecast
-(`configs/aemo_forecast_quantile_gate.yaml`).
+(`configs/aemo_forecast_quantile_gate.yaml`). A `quantile_exogenous` block
+feeds forecast features to the DGF quantile head only; with
+`shortfall_below_train_quantiles: [q, ...]` each feature is replaced by its
+shortfalls `max(knot - value, 0)` below those training quantiles
+(`configs/aemo_forecast_scarcity_quantile_inputs.yaml`).
 
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to

@@ -115,6 +115,12 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             else 0
         ),
         quantile_gate=model_config.get("quantile_gate", False),
+        quantile_exogenous_dim=(
+            len(config["quantile_exogenous"]["features"])
+            * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
+            if config.get("quantile_exogenous", {}).get("enabled", False)
+            else 0
+        ),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]
@@ -163,6 +169,7 @@ def move_inputs(batch: Mapping, device: torch.device) -> tuple:
         batch["future_exogenous"].to(device) if "future_exogenous" in batch else None,
         batch["origin_context"].to(device) if "origin_context" in batch else None,
         batch["ctf_exogenous"].to(device) if "ctf_exogenous" in batch else None,
+        batch["quantile_exogenous"].to(device) if "quantile_exogenous" in batch else None,
         batch["target_price"].to(device),
     )
 
@@ -383,6 +390,8 @@ def save_checkpoint(
                 if dataset.future_exogenous_standardizer is not None
                 else None
             ),
+            "quantile_exogenous_config": config.get("quantile_exogenous"),
+            "quantile_exogenous_feature_names": dataset.quantile_exogenous_feature_names,
             "ctf_exogenous_config": config.get("ctf_exogenous"),
             "ctf_exogenous_feature_names": dataset.ctf_exogenous_feature_names,
             "ctf_exogenous_mean": (

@@ -1083,6 +1083,52 @@ faster than the point forecast as the gate opens, as intended. The gain is
 consistent across seeds but closes only about a tenth of the CRPS~ gap to
 XGBoost.
 
+## Scarcity shortfalls for the DGF quantile head
+
+The quantile-specific gate left NSW1 and QLD1 upper quantiles too low in
+spike hours. A linear head reading spare capacity can only move a quantile in
+proportion to the spare margin, while spike risk rises sharply as the margin
+nears zero. This experiment adds, for the DGF quantile head only, the
+shortfall of PD PASA maximum spare capacity below its training 1%, 5%, and
+10% quantiles, `max(knot - spare, 0)` for each of the 24 horizons
+(`quantile_exogenous` with `shortfall_below_train_quantiles`). The three
+hinges give a convex, piecewise-linear response with knots fixed by the
+training data. The point path and the fusion gate do not see these inputs.
+On the test split, spare capacity lies below the training 10% knot in 16.5%
+(NSW1), 18.7% (QLD1), and 3.5% (TAS1) of hours. Parameters increase by 8,640
+to 183,548. It builds on the quantile-specific gate. Configuration:
+[`configs/aemo_forecast_scarcity_quantile_inputs.yaml`](../../configs/aemo_forecast_scarcity_quantile_inputs.yaml);
+outputs `outputs/forecasting/scarcity_quantile_inputs{,_seed2027,_seed2028}/`;
+best epochs NSW1 / QLD1 / TAS1 are 15 / 4 / 4, 3 / 3 / 3, and 21 / 6 / 10 for
+seeds 2026 / 2027 / 2028.
+
+| Version | Test MAE | Window RMSE | 90% coverage / width | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| Quantile-specific gate | 41.86 ± 0.23 | **79.10 ± 0.17** | 86.1% / 129.0 | 431.55 ± 1.44 | 28.83 ± 0.12 |
+| Plus scarcity shortfalls | 41.88 ± 0.22 | 79.22 ± 0.12 | 85.4% / 144.5 | **412.60 ± 3.96** | **28.43 ± 0.21** |
+| Re-implemented XGBoost | 43.15 ± 0.07 | 81.65 | 84.5% / 164.2 | 414.32 | **27.69** |
+
+| Paired difference, shortfalls - gate | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | -0.04 | +0.04 | +0.05 | +0.01 |
+| Window RMSE | +0.10 | +0.17 | +0.08 | +0.12 |
+| 90% AIS | -20.78 | -13.12 | -22.96 | -18.95 |
+| CRPS~ | -0.50 | -0.18 | -0.53 | -0.40 |
+
+| Three-seed mean | NSW1 | QLD1 | TAS1 |
+|---|---:|---:|---:|
+| CRPS~, gate -> shortfalls (XGBoost) | 35.65 -> **34.71** (35.32) | 29.89 -> 29.61 (**28.79**) | 20.96 -> 20.97 (**18.94**) |
+| 90% AIS, gate -> shortfalls (XGBoost) | 570.5 -> **533.2** (563.1) | 450.4 -> **430.5** (431.2) | 273.8 -> 274.1 (**248.7**) |
+| Spike-hour 0.95-quantile pinball, gate -> shortfalls (XGBoost) | 1069 -> **905** (945) | 669 -> 546 (**463**) | 768 -> 766 (**681**) |
+
+The shortfalls lower 90% AIS and CRPS~ for every seed at an unchanged MAE.
+Mean 90% AIS is now below XGBoost's. In NSW1 both CRPS~ and AIS beat XGBoost,
+and in QLD1 AIS matches it. The gain is concentrated where scarcity occurs:
+spike-hour upper-quantile losses fall in NSW1 and QLD1, while TAS1, which is
+rarely short of capacity in the test years, is unchanged. The remaining
+CRPS~ gap to XGBoost (0.74) is now mostly TAS1 ordinary-hour calibration
+(ordinary-hour contribution 16.79 vs 15.10) and QLD1 spike hours.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -1093,28 +1139,29 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | Quantile-specific fusion gate | 17,521 | **41.937** | **271.976** | 66.8% | 85.8% |
-| 2 | **Soft-saturated PD PASA net-load CTF input** | 17,521 | 41.963 | 272.031 | 66.4% | 86.4% |
-| 3 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
-| 4 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
-| 5 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
-| 6 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
-| 7 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
-| 8 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 9 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 10 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 11 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 12 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 13 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 14 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 15 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 16 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 17 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 18 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 19 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 20 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 21 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 22 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | Scarcity shortfalls for the DGF quantile head | 17,521 | **41.894** | 272.456 | 65.0% | 84.9% |
+| 2 | Quantile-specific fusion gate | 17,521 | 41.937 | **271.976** | 66.8% | 85.8% |
+| 3 | **Soft-saturated PD PASA net-load CTF input** | 17,521 | 41.963 | 272.031 | 66.4% | 86.4% |
+| 4 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
+| 5 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
+| 6 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
+| 7 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
+| 8 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
+| 9 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 10 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 11 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 12 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 13 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 14 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 15 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 16 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 17 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 18 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 19 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 20 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 21 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 22 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 23 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
@@ -1128,8 +1175,9 @@ seed (three-seed MAE 43.82 ± 0.27). The PD PASA net-load CTF version
 improves on it again for every seed (three-seed MAE 42.58 ± 0.37). Hard
 clipping of net load is a mixed result, while soft saturation improves MAE
 for every seed (three-seed MAE 41.86 ± 0.24). The quantile-specific gate
-leaves the point path unchanged, so its seed-2026 lead in this table (0.03
-MAE) is not a point-accuracy gain; its effect is on the intervals. The conformal calibration run reuses the asinh
+and the scarcity shortfalls leave the point path unchanged, so their
+seed-2026 leads in this table (0.03-0.07 MAE) are not point-accuracy gains;
+their effect is on the intervals. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the
