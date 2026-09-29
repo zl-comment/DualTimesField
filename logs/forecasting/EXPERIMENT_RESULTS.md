@@ -1129,6 +1129,48 @@ rarely short of capacity in the test years, is unchanged. The remaining
 CRPS~ gap to XGBoost (0.74) is now mostly TAS1 ordinary-hour calibration
 (ordinary-hour contribution 16.79 vs 15.10) and QLD1 spike hours.
 
+## Ablation: expert heads without the reconstruction fields
+
+This ablation asks whether the CTF/DGF decomposition itself helps the
+forecast. On the current trunk (scarcity shortfalls), both expert heads read
+the raw 72-hour history in place of the CTF and DGF fields, and the
+reconstruction remainder is set to zero (`model.head_input: raw_history`).
+The two heads still receive their field-specific inputs (gas price and net
+load for CTF; spare capacity and shortfalls for DGF). The routing, fusion
+and quantile gates, parameter count (183,548), and losses are unchanged. The
+dual field is still trained by the decomposition loss but no longer reaches
+the forecast. Configuration:
+[`configs/aemo_forecast_ablation_raw_history.yaml`](../../configs/aemo_forecast_ablation_raw_history.yaml);
+outputs `outputs/forecasting/ablation_raw_history{,_seed2027,_seed2028}/`;
+best epochs NSW1 / QLD1 / TAS1 are 23 / 29 / 4, 6 / 25 / 2, and 28 / 29 / 13
+for seeds 2026 / 2027 / 2028, later than the trunk's in NSW1 and QLD1.
+
+| Version | Test MAE | Window RMSE | Window SDE | Test RMSE | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|---:|
+| Trunk, heads read CTF and DGF fields | 41.88 ± 0.22 | 79.22 ± 0.12 | **72.97 ± 0.06** | 272.97 ± 0.68 | 412.60 ± 3.96 | 28.43 ± 0.21 |
+| Heads read raw history | 41.90 ± 0.11 | 79.31 ± 0.12 | 73.25 ± 0.06 | **270.68 ± 0.41** | **408.81 ± 4.91** | 28.40 ± 0.26 |
+
+| Paired difference, raw history - fields | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Test MAE | -0.08 | +0.22 | -0.07 | +0.02 |
+| Window SDE | +0.16 | +0.31 | +0.36 | +0.28 |
+| Test RMSE | -1.63 | -3.52 | -1.71 | -2.29 |
+| 90% AIS | -2.83 | -3.30 | -5.26 | -3.80 |
+| CRPS~ | -0.02 | +0.02 | -0.09 | -0.03 |
+
+Three-seed per-region test MAE moves from 48.55 to 48.61 (NSW1), 42.57 to
+42.36 (QLD1), and 34.51 to 34.73 (TAS1).
+
+Removing the reconstruction fields leaves MAE and CRPS~ unchanged within
+seed noise. The fields give a slightly smoother within-day error (window SDE
+lower for every seed), while raw history gives slightly better global RMSE
+and 90% AIS for every seed. The gains of the trunk therefore come from the
+field-specific inputs, gates, and quantile design, not from the
+decomposition of the past window. As transplanted, the CTF and DGF only
+describe the observed 72 hours, which the linear heads can read directly. To
+make the dual field matter for forecasting, it must be extended into the
+forecast horizon rather than only reconstruct the history.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

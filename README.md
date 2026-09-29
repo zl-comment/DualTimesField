@@ -442,7 +442,10 @@ weight the DGF event field differently from the point forecast
 feeds forecast features to the DGF quantile head only; with
 `shortfall_below_train_quantiles: [q, ...]` each feature is replaced by its
 shortfalls `max(knot - value, 0)` below those training quantiles
-(`configs/aemo_forecast_scarcity_quantile_inputs.yaml`).
+(`configs/aemo_forecast_scarcity_quantile_inputs.yaml`). For ablations,
+`model.head_input: raw_history` feeds the raw history to both expert heads
+instead of the CTF and DGF fields
+(`configs/aemo_forecast_ablation_raw_history.yaml`).
 
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to

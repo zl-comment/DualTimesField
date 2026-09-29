@@ -115,6 +115,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             else 0
         ),
         quantile_gate=model_config.get("quantile_gate", False),
+        head_input=model_config.get("head_input", "fields"),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])

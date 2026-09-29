@@ -207,6 +207,7 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_exogenous_dim: int = 0,
         quantile_gate: bool = False,
         quantile_exogenous_dim: int = 0,
+        head_input: str = "fields",
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -223,6 +224,12 @@ class DualFieldLinearForecaster(nn.Module):
         self.ctf_exogenous_dim = ctf_exogenous_dim
         self.quantile_gate = quantile_gate
         self.quantile_exogenous_dim = quantile_exogenous_dim
+        if head_input not in {"fields", "raw_history"}:
+            raise ValueError("head_input must be 'fields' or 'raw_history'")
+        # Ablation: "raw_history" feeds the raw history to both expert heads in
+        # place of the CTF and DGF fields (and a zero remainder), keeping the
+        # heads, routing, gate, parameters, and losses unchanged.
+        self.head_input = head_input
         if quantile_exogenous_dim > 0 and (
             fusion_mode == "concatenate" or forecast_head_type != "linear"
         ):
@@ -596,16 +603,21 @@ class DualFieldLinearForecaster(nn.Module):
                 ctf_signal, event_signal, future_calendar
             )
         else:
+            remainder = (
+                history_values - ctf_signal - event_signal
+                if self.residual_path
+                else None
+            )
+            ctf_input, event_input = ctf_signal, event_signal
+            if self.head_input == "raw_history":
+                ctf_input, event_input = history_values, history_values
+                remainder = torch.zeros_like(history_values) if self.residual_path else None
             forecasts = self._trigonometric_gated_forecast(
-                ctf_signal,
-                event_signal,
+                ctf_input,
+                event_input,
                 future_calendar,
                 future_exogenous,
-                (
-                    history_values - ctf_signal - event_signal
-                    if self.residual_path
-                    else None
-                ),
+                remainder,
                 origin_context,
                 ctf_exogenous,
                 quantile_exogenous,
