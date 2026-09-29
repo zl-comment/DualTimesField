@@ -137,6 +137,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Clipping net load trades NSW1 for QLD1 | 24_pdpasa_netload_clip_ctf holds net load inside its training range; QLD1 three-seed MAE falls by 1.22 but NSW1 rises by 0.83, and over three seeds the mean MAE change (-0.14) is inside seed noise |
 | Soft saturation keeps the QLD1 gain without the NSW1 loss | 25_pdpasa_netload_softclip_ctf compresses net load beyond its training range with `log1p`; mean MAE falls to 41.96 and window RMSE to 79.20, and over three seeds test MAE falls by 0.50-1.01 for every seed |
 | RE-Price's error ratios imply spike treatment | Its RMSE/MAE ratios (1.45, 1.44, 1.20) are reached only when prices are capped near 650 AUD/MWh; with spike windows removed the trunk scores 24.83 (NSW1) and 25.62 (QLD1) against 23.48 and 25.85, while TAS1 stays unexplained. See [`PROTOCOL_ALIGNMENT.md`](PROTOCOL_ALIGNMENT.md) |
+| Same-data baselines trail on points but not on intervals | Re-implemented XGBoost, GRU, and DeepAR (three seeds, no news) reach mean MAE 43.15, 45.65, and 47.86 against the trunk's 41.86; XGBoost's CRPS~ (27.69) is below the trunk's (28.95). See [`BASELINES.md`](BASELINES.md) |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction

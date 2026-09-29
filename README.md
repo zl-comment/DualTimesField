@@ -427,7 +427,10 @@ Outputs are isolated under `outputs/forecasting/pdpasa_netload_ctf/`.
 the same splits and inputs as a configuration.
 `forecasting/protocol_alignment.py` caches the trunk's forecasts over seeds
 and scores them with the baselines under raw, capped, and
-spike-window-removed prices. Setting `data.price_cap: <c>` clips the price
+spike-window-removed prices. `forecasting/baselines.py` re-implements
+RE-Price's XGBoost, GRU, and DeepAR baselines on the same inputs, and
+`forecasting/summarize_baselines.py` tabulates them against the trunk
+(`logs/forecasting/BASELINES.md`). Setting `data.price_cap: <c>` clips the price
 column at `c` before training and scoring
 (`configs/aemo_forecast_capped650_trunk.yaml`). The results and commands are in
 `logs/forecasting/PROTOCOL_ALIGNMENT.md`.

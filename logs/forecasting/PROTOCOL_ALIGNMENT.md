@@ -143,6 +143,14 @@ directly comparable.
 | Training on capped prices narrows but does not close the point gap | Trained and scored with a 650 AUD/MWh cap, the trunk reaches 30.05 (NSW1), 30.69 (QLD1), and 31.94 (TAS1) MAE against 23.48, 25.85, and 18.96; its CRPS~ (17.69, 18.12, 17.76) is close to RE-Price's 17.36 in NSW1 and below its 20.58 in QLD1 |
 | The dual-field trunk leads the same-data baselines in NSW1 and QLD1 | It has the lowest MAE under raw and capped scoring in NSW1 and QLD1. In TAS1 the trunk-input GBDT is ahead by 0.7-1.1 MAE under every treatment |
 
+## Re-implemented baselines
+
+XGBoost, GRU, and DeepAR were re-run on the same data, inputs, and both price
+treatments, with three seeds each; see [`BASELINES.md`](BASELINES.md). The
+dual-field trunk has the best mean MAE under both treatments (41.86 raw,
+30.89 capped, against 43.15 and 31.61 for XGBoost), but XGBoost has better
+mean CRPS~ and 90% AIS.
+
 ## Recommended reporting
 
 1. Report the headline comparison on raw RRP against baselines run on the same
