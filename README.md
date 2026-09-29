@@ -435,6 +435,11 @@ column at `c` before training and scoring
 (`configs/aemo_forecast_capped650_trunk.yaml`). The results and commands are in
 `logs/forecasting/PROTOCOL_ALIGNMENT.md`.
 
+Setting `model.quantile_gate: true` gives each quantile level and horizon
+its own affine rescaling of the fusion-gate logit, so the tail quantiles can
+weight the DGF event field differently from the point forecast
+(`configs/aemo_forecast_quantile_gate.yaml`).
+
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to
 `<output_directory>_seed<N>`:

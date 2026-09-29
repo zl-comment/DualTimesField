@@ -109,6 +109,10 @@ compared with caution.
 | 25_pdpasa_netload_softclip_ctf | QLD1 | 17521 | 43.06 | 267.03 | 87.98 | 82.33 | 91.25% | 161.13 | 459.08 | 30.28 |
 | 25_pdpasa_netload_softclip_ctf | TAS1 | 17521 | 34.44 | 159.50 | 49.83 | 43.44 | 78.99% | 97.48 | 274.14 | 21.28 |
 | 25_pdpasa_netload_softclip_ctf | **Mean** | - | 41.96 | 272.03 | 79.20 | 72.99 | 86.37% | 130.17 | 435.13 | 29.10 |
+| 27_quantile_gate | NSW1 | 17521 | 48.39 | 389.44 | 99.78 | 93.19 | 88.46% | 134.61 | 569.29 | 35.74 |
+| 27_quantile_gate | QLD1 | 17521 | 42.92 | 266.92 | 87.78 | 82.18 | 91.10% | 165.61 | 454.73 | 30.13 |
+| 27_quantile_gate | TAS1 | 17521 | 34.50 | 159.56 | 49.90 | 43.46 | 77.81% | 93.32 | 274.24 | 21.01 |
+| 27_quantile_gate | **Mean** | - | 41.94 | 271.98 | 79.16 | 72.94 | 85.79% | 131.18 | 432.75 | 28.96 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -138,6 +142,7 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Soft saturation keeps the QLD1 gain without the NSW1 loss | 25_pdpasa_netload_softclip_ctf compresses net load beyond its training range with `log1p`; mean MAE falls to 41.96 and window RMSE to 79.20, and over three seeds test MAE falls by 0.50-1.01 for every seed |
 | RE-Price's error ratios imply spike treatment | Its RMSE/MAE ratios (1.45, 1.44, 1.20) are reached only when prices are capped near 650 AUD/MWh; with spike windows removed the trunk scores 24.83 (NSW1) and 25.62 (QLD1) against 23.48 and 25.85, while TAS1 stays unexplained. See [`PROTOCOL_ALIGNMENT.md`](PROTOCOL_ALIGNMENT.md) |
 | Same-data baselines trail on points but not on intervals | Re-implemented XGBoost, GRU, and DeepAR (three seeds, no news) reach mean MAE 43.15, 45.65, and 47.86 against the trunk's 41.86; XGBoost's CRPS~ (27.69) is below the trunk's (28.95). See [`BASELINES.md`](BASELINES.md) |
+| A quantile-specific gate helps intervals slightly | 27_quantile_gate lowers three-seed CRPS~ by 0.12 and 90% AIS by 1.98 for every seed with unchanged point forecasts; XGBoost's CRPS~ (27.69) is still lower |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -166,4 +171,5 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |
 | 22_pdpasa_netload_ctf | `aemo-pdpasa-netload-ctf-30epoch` | `062ddb7` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
 | 24_pdpasa_netload_clip_ctf | untagged | `224099c` | `configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_clip_ctf` |
-| 25_pdpasa_netload_softclip_ctf | untagged | `feature/pdpasa-netload-softclip` | `configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_softclip_ctf` |
+| 25_pdpasa_netload_softclip_ctf | `aemo-pdpasa-netload-softclip-ctf-30epoch` | `bfd5f55` | `configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_softclip_ctf` |
+| 27_quantile_gate | untagged | `feature/probabilistic-quantiles` | `configs/aemo_forecast_quantile_gate.yaml` | `outputs/forecasting/quantile_gate` |

@@ -114,6 +114,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             if config.get("ctf_exogenous", {}).get("enabled", False)
             else 0
         ),
+        quantile_gate=model_config.get("quantile_gate", False),
     )
     scale_scheduler = model.dual_field.scale_scheduler
     scale_scheduler.total_epochs = config["training"]["epochs"]

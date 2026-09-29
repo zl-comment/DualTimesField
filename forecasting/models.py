@@ -205,6 +205,7 @@ class DualFieldLinearForecaster(nn.Module):
         residual_path: bool = False,
         origin_context_dim: int = 0,
         ctf_exogenous_dim: int = 0,
+        quantile_gate: bool = False,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -219,6 +220,9 @@ class DualFieldLinearForecaster(nn.Module):
         self.residual_path = residual_path
         self.origin_context_dim = origin_context_dim
         self.ctf_exogenous_dim = ctf_exogenous_dim
+        self.quantile_gate = quantile_gate
+        if quantile_gate and fusion_mode == "concatenate":
+            raise ValueError("quantile_gate requires a gated fusion mode")
         if (residual_path or origin_context_dim > 0 or ctf_exogenous_dim > 0) and (
             fusion_mode == "concatenate" or forecast_head_type != "linear"
         ):
@@ -348,6 +352,16 @@ class DualFieldLinearForecaster(nn.Module):
             )
             nn.init.zeros_(self.fusion_gate.weight)
             nn.init.zeros_(self.fusion_gate.bias)
+            if quantile_gate:
+                # Each quantile level and horizon rescales and shifts the shared
+                # gate logit, so tail quantiles can lean on the event field more
+                # than the point forecast does.  Starts equal to the shared gate.
+                self.quantile_gate_scale = nn.Parameter(
+                    torch.ones(forecast_horizon, len(self.quantiles))
+                )
+                self.quantile_gate_bias = nn.Parameter(
+                    torch.zeros(forecast_horizon, len(self.quantiles))
+                )
 
     def _concatenated_forecast(
         self,
@@ -436,20 +450,32 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_quantile = torch.sort(ctf_quantile, dim=-1).values
         dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
 
-        fusion_angle = 0.5 * math.pi * torch.sigmoid(
-            self.fusion_gate(gate_features)
-        )
+        gate_logit = self.fusion_gate(gate_features)
+        fusion_angle = 0.5 * math.pi * torch.sigmoid(gate_logit)
         dgf_weight = torch.sin(fusion_angle).square().unsqueeze(-1)
+        if self.quantile_gate:
+            quantile_angle = 0.5 * math.pi * torch.sigmoid(
+                gate_logit.unsqueeze(-1) * self.quantile_gate_scale
+                + self.quantile_gate_bias
+            )
+            dgf_quantile_weight = torch.sin(quantile_angle).square()
+        else:
+            quantile_angle = fusion_angle.unsqueeze(-1)
+            dgf_quantile_weight = dgf_weight
         if self.fusion_mode == "additive_trigonometric_gate":
             ctf_weight = torch.ones_like(dgf_weight)
             point_forecast = ctf_point + dgf_weight * dgf_point
-            quantile_forecast = ctf_quantile + dgf_weight * dgf_quantile
+            quantile_forecast = ctf_quantile + dgf_quantile_weight * dgf_quantile
         else:
             ctf_weight = torch.cos(fusion_angle).square().unsqueeze(-1)
             point_forecast = ctf_weight * ctf_point + dgf_weight * dgf_point
             quantile_forecast = (
-                ctf_weight * ctf_quantile + dgf_weight * dgf_quantile
+                torch.cos(quantile_angle).square() * ctf_quantile
+                + dgf_quantile_weight * dgf_quantile
             )
+        if self.quantile_gate:
+            # Different weights per level can cross; keep quantiles ordered.
+            quantile_forecast = torch.sort(quantile_forecast, dim=-1).values
 
         forecasts = {
             "point_forecast": point_forecast,
@@ -461,6 +487,7 @@ class DualFieldLinearForecaster(nn.Module):
             "fusion_angle": fusion_angle.unsqueeze(-1),
             "ctf_fusion_weight": ctf_weight,
             "dgf_fusion_weight": dgf_weight,
+            "dgf_quantile_fusion_weight": dgf_quantile_weight,
         }
         if ctf_attention is not None:
             forecasts.update(
