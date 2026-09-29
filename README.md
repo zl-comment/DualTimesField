@@ -421,6 +421,15 @@ python -m forecasting.train \
 
 Outputs are isolated under `outputs/forecasting/pdpasa_netload_ctf/`.
 
+### Same-data baselines and the RE-Price comparison
+
+`forecasting/gbdt_baseline.py` fits one gradient-boosted tree per horizon on
+the same splits and inputs as a configuration.
+`forecasting/protocol_alignment.py` caches the trunk's forecasts over seeds
+and scores them with the baselines under raw, capped, and
+spike-window-removed prices. The results and commands are in
+`logs/forecasting/PROTOCOL_ALIGNMENT.md`.
+
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to
 `<output_directory>_seed<N>`:
