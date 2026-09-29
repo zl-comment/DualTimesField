@@ -90,6 +90,48 @@ calendar" uses only price and demand history and calendar features.
 | RE-Price, as reported | 18.96 / 22.81 | | | | |
 | RE-Price's XGBoost, as reported | 37.56 / 40.33 | | | | |
 
+## Training on capped prices
+
+If RE-Price capped prices before training, the fair counterpart is a model
+trained and scored on the same capped series. The trunk configuration was
+retrained with `data.price_cap: 650`, which clips RRP at 650 AUD/MWh before
+it is used as history or target
+([`configs/aemo_forecast_capped650_trunk.yaml`](../../configs/aemo_forecast_capped650_trunk.yaml);
+outputs `outputs/forecasting/capped650_trunk{,_seed2027,_seed2028}/`; best
+epochs NSW1 / QLD1 / TAS1 are 4 / 12 / 17, 6 / 6 / 23, and 5 / 14 / 10 for seeds
+2026 / 2027 / 2028). Negative prices are kept. The asinh transform's median
+and MAD, the test origins, and all other inputs are unchanged. The GBDT with
+trunk inputs was refitted on the same capped series.
+
+| MAE / window RMSE, prices capped at 650 | NSW1 | QLD1 | TAS1 |
+|---|---:|---:|---:|
+| Trunk trained on raw prices, scored capped | 30.51 ± 0.30 / 43.74 | 31.04 ± 0.47 / 44.57 | **31.59 ± 0.51** / **38.67** |
+| Trunk trained on capped prices | **30.05 ± 0.32** / **43.05** | **30.69 ± 0.11** / **43.69** | 31.94 ± 0.25 / 39.07 |
+| GBDT, trunk inputs, trained on capped prices | 32.01 / 45.66 | 30.79 / 44.09 | 30.88 / 38.16 |
+| Seasonal naive, capped | 39.63 / 57.86 | 37.75 / 55.08 | 33.92 / 45.48 |
+| RE-Price, as reported | 23.48 / 34.15 | 25.85 / 37.15 | 18.96 / 22.81 |
+
+The GBDT row has one seed; it is best in TAS1 (30.88 / 38.16). The capped-trained trunk's window RMSE / MAE is 1.43, 1.42, and 1.22,
+against RE-Price's 1.45, 1.44, and 1.20.
+
+| Capped-trained trunk, three-seed mean | NSW1 | QLD1 | TAS1 |
+|---|---:|---:|---:|
+| CRPS~ | 17.69 | 18.12 | 17.76 |
+| RE-Price CRPS, as reported | 17.36 | 20.58 | 13.13 |
+| 80% coverage / width / AIS | 70.9% / 78.0 / 168.5 | 81.4% / 108.7 / 168.8 | 57.5% / 59.9 / 176.0 |
+| 90% coverage / width / AIS | 88.7% / 125.5 / 213.9 | 94.9% / 183.7 / 230.0 | 82.1% / 106.3 / 208.6 |
+| RE-Price coverage / width / AIS, as reported | 84.6% / 81.9 / 125.9 | 81.3% / 97.5 / 152.7 | 90.2% / 80.4 / 89.4 |
+
+Training on capped prices lowers MAE by 0.46 (NSW1) and 0.35 (QLD1) relative
+to scoring the raw-trained trunk with the same cap, and raises it by 0.35 in
+TAS1. The point gap to RE-Price remains 6.6 (NSW1), 4.8 (QLD1), and 13.0
+(TAS1) MAE. On the capped series, the trunk's CRPS~ is within 0.33 of
+RE-Price in NSW1 and 2.46 lower in QLD1, while TAS1 stays 4.6 higher. Two
+caveats apply: CRPS~ here is twice the mean pinball loss over five quantiles
+rather than an integral over a full density, and RE-Price does not state the
+nominal level of its reported interval, so the interval rows are not
+directly comparable.
+
 ## Findings
 
 | Finding | Evidence |
@@ -98,6 +140,7 @@ calendar" uses only price and demand history and calendar features.
 | Spike treatment explains most of the NSW1 and QLD1 gap | With spike windows removed, the trunk scores 24.83 / 33.41 (NSW1) and 25.62 / 34.66 (QLD1) against RE-Price's 23.48 / 34.15 and 25.85 / 37.15; this subset keeps 81.5% and 76.4% of windows |
 | The TAS1 gap is not explained | TAS1 has few spikes, and no treatment brings any local forecast below 28.3 MAE, against 18.96 reported. RE-Price's TAS1 XGBoost ratio (1.07) is below every local ratio (at least 1.18) |
 | RE-Price's baselines are weak on this data | Under every treatment, both local GBDT baselines beat RE-Price's reported XGBoost. At the ratio-matched caps, the history-and-calendar GBDT scores 34.03 (NSW1) and 33.38 (QLD1) against 38.63 and 44.70 |
+| Training on capped prices narrows but does not close the point gap | Trained and scored with a 650 AUD/MWh cap, the trunk reaches 30.05 (NSW1), 30.69 (QLD1), and 31.94 (TAS1) MAE against 23.48, 25.85, and 18.96; its CRPS~ (17.69, 18.12, 17.76) is close to RE-Price's 17.36 in NSW1 and below its 20.58 in QLD1 |
 | The dual-field trunk leads the same-data baselines in NSW1 and QLD1 | It has the lowest MAE under raw and capped scoring in NSW1 and QLD1. In TAS1 the trunk-input GBDT is ahead by 0.7-1.1 MAE under every treatment |
 
 ## Recommended reporting
@@ -125,6 +168,11 @@ python -m forecasting.gbdt_baseline \
 python -m forecasting.gbdt_baseline \
   --config configs/aemo_forecast_asinh_price_space_quantiles.yaml \
   --region NSW1 --output outputs/forecasting/gbdt_baseline/history_calendar/NSW1.npz
+python -m forecasting.train --config configs/aemo_forecast_capped650_trunk.yaml --region NSW1
+python -m forecasting.protocol_alignment collect \
+  --config configs/aemo_forecast_capped650_trunk.yaml \
+  --checkpoint-root outputs/forecasting/capped650_trunk \
+  --output-dir outputs/forecasting/protocol_alignment/capped650_trunk
 python -m forecasting.protocol_alignment report \
   --model outputs/forecasting/protocol_alignment/trunk \
   --baseline gbdt_trunk_inputs=outputs/forecasting/gbdt_baseline/trunk_inputs \
@@ -135,5 +183,7 @@ python -m forecasting.protocol_alignment report \
 Repeat the GBDT commands for QLD1 and TAS1. Each GBDT run took about six
 minutes with `OMP_NUM_THREADS=20`. The report is stored in
 [`protocol_alignment/report.json`](protocol_alignment/report.json), and the
+capped-training metrics and logs are in
+[`protocol_alignment/capped650_trunk/`](protocol_alignment/capped650_trunk/). The
 GBDT summaries are copied to
 [`protocol_alignment/gbdt/`](protocol_alignment/gbdt/).

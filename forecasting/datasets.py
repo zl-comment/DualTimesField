@@ -130,6 +130,12 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
         raise ValueError(f"Missing values found in model columns for {region}")
     _validate_hourly_timeline(frame, config)
     _validate_splits(frame, config)
+    price_cap = data_config.get("price_cap")
+    if price_cap is not None:
+        # Clip the price column before it is used as history or target, so
+        # training and scoring both see the capped series.
+        target_column = data_config["target_column"]
+        frame[target_column] = frame[target_column].clip(upper=float(price_cap))
     return frame
 
 
