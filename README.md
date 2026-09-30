@@ -446,6 +446,12 @@ shortfalls `max(knot - value, 0)` below those training quantiles
 `model.head_input: raw_history` feeds the raw history to both expert heads
 instead of the CTF and DGF fields
 (`configs/aemo_forecast_ablation_raw_history.yaml`).
+`model.dgf_type: detected` replaces the Gabor DGF with events detected
+explicitly in the price channel, as the largest departures from the window
+median with non-maximum suppression, so the CTF fits only what remains
+(`configs/aemo_forecast_detected_dgf.yaml`); `adaptive` locates atoms by
+attention, and `model.event_echo` echoes events 24 and 48 hours into the
+horizon.
 
 Setting `training.device_batches: true` builds each split's samples once and
 serves batches from tensors on the training device, in the same order as the

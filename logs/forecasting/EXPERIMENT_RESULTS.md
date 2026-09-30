@@ -1351,6 +1351,72 @@ placement. The lag-24 spike echo has no skill for future spikes (ROC-AUC
 atoms fit one broad bump; nothing forces them onto separate events. The small
 interval gains of the echo variants therefore do not come from event timing.
 
+## Detected-event DGF
+
+The adaptive DGF's collapse pointed to a deeper problem. On the scarcity
+trunk's test split, the CTF absorbs most of each spike and the Gabor DGF is
+effectively off:
+
+| At past spike hours (target space) | Price | CTF | DGF event field | Event-field std |
+|---|---:|---:|---:|---:|
+| Trunk, NSW1 | 4.14 | 3.09 | -0.12 | 0.054 |
+| Trunk, QLD1 | 3.76 | 2.51 | -0.00 | 0.052 |
+| Trunk, TAS1 | 3.48 | 2.63 | -0.14 | 0.071 |
+
+The transplanted dual field is thus a single field: the CTF describes
+everything and the DGF heads read almost nothing but their exogenous inputs,
+which explains the raw-history ablation. Consistently, echoes of events
+detected in the CTF residual carry no skill for future events (ROC-AUC
+0.35-0.68), while echoes of events detected in the price relative to its
+window median do (spike ROC-AUC 0.70, 0.69, 0.60; trough 0.82, 0.86, 0.47 in
+NSW1, QLD1, TAS1).
+
+`DetectedEventField` (`model.dgf_type: detected`) therefore separates events
+explicitly. In the price channel it takes the 8 largest absolute departures
+from the window median, with non-maximum suppression keeping detected events
+at least 3 hours apart. Positions are data, not parameters, so they cannot
+collapse. Each departure is soft-thresholded by a learned level and rendered
+as a Gaussian bump of learned width. Because the event field is fixed by the
+data, the decomposition loss (CTF plus events equals history) makes the CTF
+fit only what remains, and the two fields separate. Everything else matches
+the scarcity trunk. The echo variants add the 24- and 48-hour echo of the
+detected events, unmodulated or modulated by each hour's drivers.
+Configurations:
+`configs/aemo_forecast_{detected_dgf,detected_dgf_echo_raw,detected_dgf_echo}.yaml`;
+best epochs of `detected_dgf` NSW1 / QLD1 / TAS1 are 15 / 17 / 6, 19 / 19 / 29,
+and 21 / 23 / 22 for seeds 2026 / 2027 / 2028; logs and metrics in
+[`detected_dgf/`](detected_dgf/).
+
+| Three-seed mean | Test MAE | Window RMSE | Window SDE | 90% AIS | CRPS~ | NSW1 / QLD1 / TAS1 MAE |
+|---|---:|---:|---:|---:|---:|---|
+| Scarcity trunk (Gabor DGF) | 41.88 ± 0.22 | 79.21 | 72.97 | 412.60 | 28.43 | 48.55 / 42.57 / 34.51 |
+| Raw-history ablation | 41.90 ± 0.11 | 79.31 | 73.25 | 408.81 | 28.40 | 48.61 / **42.36** / 34.73 |
+| **Detected-event DGF** | **41.54 ± 0.06** | **78.80** | **72.94** | **403.48** | 28.15 | **48.31** / 42.53 / **33.79** |
+| Detected DGF + echo | 42.21 ± 0.11 | 79.93 | 74.10 | 410.38 | 28.22 | 48.73 / 43.79 / 34.10 |
+| Detected DGF + modulated echo | 42.17 ± 0.16 | 79.86 | 74.01 | 407.81 | **28.05** | 48.48 / 44.14 / 33.88 |
+
+| Paired MAE difference, detected DGF | Seed 2026 | Seed 2027 | Seed 2028 | Mean |
+|---|---:|---:|---:|---:|
+| Minus trunk | -0.38 | -0.03 | -0.58 | -0.33 |
+| Minus raw-history ablation | -0.30 | -0.25 | -0.51 | -0.35 |
+
+| Detected-event DGF, test split | NSW1 | QLD1 | TAS1 |
+|---|---:|---:|---:|
+| At past spike hours: price / CTF / event field | 4.14 / 2.18 / 1.36 | 3.76 / 1.95 / 1.25 | 3.48 / 1.91 / 0.96 |
+| Event-field std | 0.577 | 0.611 | 0.364 |
+| Mean DGF weight, windows followed by a spike vs others | 0.56 vs 0.44 | 0.45 vs 0.38 | 0.37 vs 0.35 |
+| Learned threshold / bump width (hours) | 0.59 / 0.61 | 0.61 / 0.55 | 0.72 / 0.81 |
+
+The detected-event DGF is the first structural change that beats both the
+trunk and the raw-history ablation on every seed: MAE falls by 0.33 and 0.35
+on average, window RMSE to 78.80, and 90% AIS to 403.48. Its seed spread
+(0.06) is the smallest so far. TAS1, the region where the trunk trailed
+XGBoost, improves most (34.51 to 33.79). The event field now carries a
+large share of each past spike, the CTF absorbs less, and the fusion gate
+opens wider before spikes. The echoes do not help: they raise MAE, above
+all in QLD1 (42.53 to 43.8-44.1), although the modulated echo gives the
+lowest CRPS~.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

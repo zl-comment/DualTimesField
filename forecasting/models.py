@@ -258,6 +258,69 @@ class AdaptiveEventField(nn.Module):
         return torch.stack(parts, dim=-1)
 
 
+class DetectedEventField(nn.Module):
+    """DGF built from explicitly detected price events.
+
+    Events are found in the price channel relative to a robust baseline (the
+    window median): the ``num_events`` largest absolute departures, with
+    non-maximum suppression so that detected events are at least
+    ``min_separation`` hours apart.  Positions are data, not parameters.
+    Each event keeps its departure, soft-thresholded by a learned level so
+    small departures vanish, and becomes a Gaussian bump of learned width.
+    Because the event field is fixed by the data, the decomposition loss
+    makes the CTF fit only what is left, so the two fields separate.
+    """
+
+    def __init__(self, num_variables: int, num_events: int = 8, min_separation: int = 3):
+        super().__init__()
+        self.num_variables = num_variables
+        self.num_events = num_events
+        self.min_separation = min_separation
+        self.raw_width = nn.Parameter(torch.tensor(math.log(math.expm1(1.0))))
+        self.raw_threshold = nn.Parameter(torch.tensor(math.log(math.expm1(0.5))))
+        self.raw_echo_width = nn.Parameter(torch.tensor(math.log(math.expm1(1.0))))
+        self.last_centres = None
+        self.last_widths = None
+        self.last_amplitudes = None
+
+    def detect(self, price: torch.Tensor):
+        departure = price - price.median(dim=1, keepdim=True).values
+        remaining = departure.abs()
+        steps = price.shape[1]
+        index = torch.arange(steps, device=price.device)
+        positions, values = [], []
+        for _ in range(self.num_events):
+            position = remaining.argmax(dim=1)
+            positions.append(position)
+            values.append(departure.gather(1, position.unsqueeze(1))[:, 0])
+            near = (index.unsqueeze(0) - position.unsqueeze(1)).abs() < self.min_separation
+            remaining = remaining.masked_fill(near, 0.0)
+        return torch.stack(positions, dim=1), torch.stack(values, dim=1)
+
+    def extract_events(self, x: torch.Tensor, t: torch.Tensor, sigma_addition: float = 0.0):
+        batch, steps, variables = x.shape
+        positions, values = self.detect(x[..., 0])
+        threshold = nn.functional.softplus(self.raw_threshold)
+        amplitude_price = torch.sign(values) * torch.relu(values.abs() - threshold)
+        width = nn.functional.softplus(self.raw_width) + 0.25
+        index = torch.arange(steps, device=x.device, dtype=x.dtype)
+        centres = positions.to(x.dtype)
+        bumps = torch.exp(-((index.view(1, 1, -1) - centres.unsqueeze(-1)) ** 2) / (2 * width ** 2))
+        amplitude = torch.zeros(batch, self.num_events, variables, device=x.device, dtype=x.dtype)
+        amplitude[..., 0] = amplitude_price
+        event_signal = torch.einsum("bkt,bkd->btd", bumps, amplitude)
+        gate = (amplitude_price != 0).to(x.dtype)
+        self.last_centres = centres
+        self.last_widths = torch.full_like(centres, 1.0) * (nn.functional.softplus(self.raw_echo_width) + 0.25)
+        self.last_amplitudes = amplitude
+        return event_signal, amplitude, gate
+
+    def initialize_from_residual(self, residual, t):
+        return None
+
+    echo = AdaptiveEventField.echo
+
+
 class FutureEventField(nn.Module):
     """Two-sided event process over the forecast horizon.
 
@@ -509,10 +572,10 @@ class DualFieldLinearForecaster(nn.Module):
             if future_exogenous_mode == "dgf_linear"
             else 0
         )
-        if dgf_type not in {"gabor", "adaptive"}:
-            raise ValueError("dgf_type must be 'gabor' or 'adaptive'")
-        if event_echo and dgf_type != "adaptive":
-            raise ValueError("event_echo needs the adaptive DGF")
+        if dgf_type not in {"gabor", "adaptive", "detected"}:
+            raise ValueError("dgf_type must be 'gabor', 'adaptive', or 'detected'")
+        if event_echo and dgf_type == "gabor":
+            raise ValueError("event_echo needs an adaptive or detected DGF")
         self.dgf_type = dgf_type
         self.event_echo = event_echo
         self.echo_modulation = echo_modulation
@@ -620,6 +683,8 @@ class DualFieldLinearForecaster(nn.Module):
                 )
         if dgf_type == "adaptive":
             self.dual_field.dgf = AdaptiveEventField(num_variables, num_atoms)
+        elif dgf_type == "detected":
+            self.dual_field.dgf = DetectedEventField(num_variables)
         self.echo_modulator = None
         if event_echo and echo_modulation:
             # Per forecast hour, spike and trough echo strengths from the hour's
@@ -847,8 +912,11 @@ class DualFieldLinearForecaster(nn.Module):
             self.dual_field.current_epoch
         )
         sigma_addition = eta * self.dual_field.scale_scheduler.sigma_base
+        # The detected DGF finds events in the history itself; the CTF then
+        # fits what is left through the decomposition loss.
+        event_source = history_values if self.dgf_type == "detected" else residual
         event_signal, amplitude, gate = self.dual_field.dgf.extract_events(
-            residual, history_time, sigma_addition
+            event_source, history_time, sigma_addition
         )
         echo_features = None
         if self.event_echo:
