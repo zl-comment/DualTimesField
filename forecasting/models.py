@@ -537,7 +537,8 @@ class DualFieldLinearForecaster(nn.Module):
             self.event_field = FutureEventField(
                 input_length=input_length,
                 num_variables=num_variables,
-                num_atoms=num_atoms,
+                # The detected DGF exposes one amplitude and gate per detected event.
+                num_atoms=detected_events if dgf_type == "detected" else num_atoms,
                 calendar_dim=calendar_dim,
                 spare_dim=future_exogenous_dim,
                 shortfall_dim=quantile_exogenous_dim,

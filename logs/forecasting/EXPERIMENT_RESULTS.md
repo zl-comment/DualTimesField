@@ -1491,6 +1491,34 @@ significantly different from the Gabor trunk, the raw-history ablation, and
 GBDT in QLD1 on raw prices, and it ties XGBoost and GBDT in TAS1 under both
 treatments. Test outputs: [`significance/`](significance/).
 
+## Future event field on the detected-event trunk
+
+Stage A' was repeated on the detected-event DGF trunk, whose event field is
+active, to test whether a working DGF event state helps forecast future
+events. The event field is sized to the detector's 8 events. Everything else
+matches stage A': the trunk is frozen, 40 epochs, selection on validation
+event loss, and last-day extremes. Configurations:
+`configs/aemo_forecast_event_field_det_{dgf,raw,none}.yaml`; results in
+[`event_field_det/`](event_field_det/).
+
+| PR-AUC | Logistic regression | Detected trunk, no state | Raw state | DGF state | Gabor trunk (stage A'), DGF state |
+|---|---:|---:|---:|---:|---:|
+| NSW1 spike | **0.303** | 0.168 | 0.163 | 0.173 | 0.189 |
+| NSW1 trough | **0.641** | 0.531 | 0.511 | 0.237 | 0.449 |
+| QLD1 spike | **0.234** | 0.189 | 0.190 | 0.166 | 0.201 |
+| QLD1 trough | 0.844 | **0.845** | 0.818 | 0.756 | 0.833 |
+| TAS1 spike | **0.096** | 0.041 | 0.036 | 0.018 | 0.012 |
+| TAS1 trough | 0.411 | 0.387 | **0.416** | 0.390 | 0.411 |
+
+The outcome does not change. Validation event loss is again lowest at epoch
+1-2 in NSW1 and QLD1, and the mixture event field stays below the logistic
+regression on spikes. With detected events, the DGF state is now clearly
+worse than no state, most of all for NSW1 troughs. The detected event
+magnitudes carry the 2015-2021 regime, and the event heads overfit them. The
+DGF's contribution is therefore the separation of events from the level,
+which improves the point forecast, not a state for a separate event
+classifier. The future event field is not pursued further.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
