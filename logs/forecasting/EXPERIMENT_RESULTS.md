@@ -1417,6 +1417,38 @@ opens wider before spikes. The echoes do not help: they raise MAE, above
 all in QLD1 (42.53 to 43.8-44.1), although the modulated echo gives the
 lowest CRPS~.
 
+## Step 3 pre-check: calendar-anchored CTF extrapolation
+
+Step 3 of the structural plan extends the CTF into the forecast horizon. A
+fixed smooth continuation of the history is a linear function of it, which
+the linear heads can already read, so any gain has to come from what they
+cannot form. Two candidate feature groups were tested before building
+anything ([`forecasting/ctf_extrapolation_precheck.py`](../../forecasting/ctf_extrapolation_precheck.py)).
+The first is a per-sample, recency-weighted ridge fit of the de-evented
+history (price minus detected events) on a clock-anchored harmonic basis,
+extrapolated over the 24 forecast hours. The second is net load times daily
+harmonics of the clock hour. The heads' weights are indexed by horizon, not
+by clock hour, so they cannot learn hour-of-day sensitivity to net load. A
+ridge regression of the detected-event DGF's (seed 2026) target-space
+residuals on each group, with the model's own forecast as a covariate,
+corrects the test forecasts:
+
+| Test MAE | Model | + trend | + net load x hour | + both |
+|---|---:|---:|---:|---:|
+| NSW1, fitted on training residuals | 48.35 | 48.30 | 48.30 | 48.31 |
+| QLD1, fitted on training residuals | 42.55 | 42.78 | 42.83 | 42.86 |
+| TAS1, fitted on training residuals | 33.64 | 33.45 | 33.61 | 33.46 |
+| NSW1, fitted on 2022 validation residuals | 48.35 | 49.34 | 50.02 | 49.77 |
+| QLD1, fitted on 2022 validation residuals | 42.55 | 42.96 | 44.61 | 44.68 |
+| TAS1, fitted on 2022 validation residuals | 33.64 | **33.00** | 33.20 | **33.00** |
+
+Neither group gives a consistent gain. Only TAS1, whose hydro-dominated
+prices follow a stable daily shape, improves (by up to 0.64 MAE), while NSW1
+and QLD1 worsen when the correction is learned on 2022. With events
+separated, the level and daily shape are already well described; the
+remaining error is mostly in spike hours. Step 3 in this form is therefore
+not pursued further.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
