@@ -202,6 +202,7 @@ class FutureEventField(nn.Module):
         state_hours: int = 24,
         spike_rate: float = 0.005,
         trough_rate: float = 0.015,
+        recent_extremes: bool = False,
     ):
         super().__init__()
         if state_source not in {"dgf", "raw", "none"}:
@@ -216,10 +217,13 @@ class FutureEventField(nn.Module):
             state_input = 0
         self.state_dim = state_dim if state_input > 0 else 0
         self.state = nn.Linear(state_input, state_dim) if state_input > 0 else None
-        self.spike_head = nn.Linear(shortfall_dim + spare_dim + calendar_dim + self.state_dim, 3)
-        self.trough_head = nn.Linear(trough_dim + calendar_dim + self.state_dim, 3)
+        # Maximum, minimum, and mean price of the last state_hours, read directly.
+        self.recent_extremes = recent_extremes
+        extra = self.state_dim + (3 if recent_extremes else 0)
+        self.spike_head = nn.Linear(shortfall_dim + spare_dim + calendar_dim + extra, 3)
+        self.trough_head = nn.Linear(trough_dim + calendar_dim + extra, 3)
         self.level_scale_head = nn.Linear(
-            spare_dim + trough_dim + calendar_dim + self.state_dim, 1
+            spare_dim + trough_dim + calendar_dim + extra, 1
         )
 
         def inverse_softplus(value: float) -> float:
@@ -258,6 +262,12 @@ class FutureEventField(nn.Module):
         if self.state is not None:
             state = self.state(state_input)
             state_parts = [state.unsqueeze(1).expand(-1, horizon, -1)]
+        if self.recent_extremes:
+            recent = history_values[:, -self.state_hours:, 0]
+            extremes = torch.stack(
+                [recent.max(dim=1).values, recent.min(dim=1).values, recent.mean(dim=1)], dim=-1
+            )
+            state_parts.append(extremes.unsqueeze(1).expand(-1, horizon, -1))
         spike = self.spike_head(torch.cat([shortfall, spare, future_calendar, *state_parts], dim=-1))
         trough = self.trough_head(torch.cat([net_load, future_calendar, *state_parts], dim=-1))
         level_scale = nn.functional.softplus(
@@ -323,6 +333,7 @@ class DualFieldLinearForecaster(nn.Module):
         event_field: bool = False,
         event_state_source: str = "dgf",
         event_detach_level: bool = True,
+        event_recent_extremes: bool = False,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -362,6 +373,7 @@ class DualFieldLinearForecaster(nn.Module):
                 shortfall_dim=quantile_exogenous_dim,
                 trough_dim=ctf_exogenous_dim,
                 state_source=event_state_source,
+                recent_extremes=event_recent_extremes,
             )
         if quantile_exogenous_dim > 0 and (
             fusion_mode == "concatenate" or forecast_head_type != "linear"

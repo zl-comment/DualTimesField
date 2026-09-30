@@ -1254,6 +1254,59 @@ while a logistic regression is fitted to convergence. The logistic
 regression also sees the last-day price extremes directly, which the event
 state only sees through a learned projection.
 
+## Future event field, stage A'
+
+Stage A' tests whether stage A's event field was simply under-trained. The
+event field is trained alone on the frozen scarcity trunk of the same region
+and seed ([`forecasting/train_event_field.py`](../../forecasting/train_event_field.py)).
+Every other parameter is frozen, so point and quantile forecasts are
+bit-identical to the trunk's (checked on TAS1). The field trains for 40
+epochs at learning rate 0.001, and the epoch with the lowest validation event
+loss is kept. All three variants also read the maximum, minimum, and mean
+target-space price of the last 24 hours (`model.event_recent_extremes`), so
+the state sources now differ only beyond those extremes. Configurations:
+`configs/aemo_forecast_event_field_a2_{dgf,raw,none}.yaml`; outputs
+`outputs/forecasting/event_field_a2_{dgf,raw,none}{,_seed2027,_seed2028}/`;
+logs and per-run summaries in [`event_field_a2/`](event_field_a2/).
+
+| PR-AUC (event rate) | Persistence | Logistic regression | Stage A, DGF | A', no state | A', raw state | A', DGF state |
+|---|---:|---:|---:|---:|---:|---:|
+| NSW1 spike (1.75%) | 0.041 | **0.303** | 0.238 | 0.137 | 0.154 | 0.189 |
+| NSW1 trough (6.19%) | 0.103 | **0.641** | 0.533 | 0.553 | 0.539 | 0.449 |
+| QLD1 spike (1.85%) | 0.042 | **0.234** | 0.213 | 0.190 | 0.195 | 0.201 |
+| QLD1 trough (13.21%) | 0.179 | 0.844 | 0.828 | **0.847** | 0.830 | 0.833 |
+| TAS1 spike (0.50%) | 0.036 | **0.096** | 0.013 | 0.040 | 0.029 | 0.012 |
+| TAS1 trough (7.37%) | 0.165 | **0.411** | 0.393 | 0.375 | 0.407 | **0.411** |
+
+| Brier score | Logistic regression | A', no state | A', raw state | A', DGF state |
+|---|---:|---:|---:|---:|
+| NSW1 spike | **0.01444** | 0.01621 | 0.01593 | 0.01562 |
+| NSW1 trough | 0.06993 | **0.04090** | 0.04484 | 0.05524 |
+| QLD1 spike | 0.01668 | 0.01631 | **0.01628** | **0.01628** |
+| QLD1 trough | 0.05806 | 0.05545 | 0.05824 | **0.05298** |
+| TAS1 spike | **0.00468** | 0.00497 | 0.00499 | 0.00506 |
+| TAS1 trough | 0.05469 | 0.05919 | **0.05349** | 0.05514 |
+
+Longer, separate training does not help. Validation event loss is lowest at
+epoch 1-4 in NSW1 and QLD1 and then rises steadily; for NSW1 with the DGF
+state it goes 0.311 at epoch 1, 0.365 at epoch 10, and 0.385 at epoch 40. The
+better the event heads fit 2015-2021, the worse they do on 2022. Spike
+PR-AUC falls below stage A in NSW1, and the logistic regression, fitted on
+the training split without validation-based stopping, stays ahead on spikes
+in every region. Troughs are close: the event field matches or beats the
+logistic regression's PR-AUC in QLD1 and TAS1 and has lower Brier scores in
+NSW1 and QLD1. No event-state source is consistently best, so the DGF state
+still shows no advantage over raw history or no state.
+
+The stage-A shortfall is therefore not under-training. Event rates and their
+drivers shift between the training years and 2022-2024 (spike hours rise
+from 0.25% to 1.75% in NSW1, troughs from 0.37% to 6.19%), and the
+mixture-likelihood objective fits the training regime's event shapes rather
+than a transferable event classifier. By the decision rule in the plan, the
+mixture event field is not yet a better event forecaster than a logistic
+regression on the same drivers, and the DGF, with atom positions fixed across
+samples, does not supply a useful event state.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

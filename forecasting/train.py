@@ -122,6 +122,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         event_field=model_config.get("event_field", False),
         event_state_source=model_config.get("event_state_source", "dgf"),
         event_detach_level=model_config.get("event_detach_level", True),
+        event_recent_extremes=model_config.get("event_recent_extremes", False),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
