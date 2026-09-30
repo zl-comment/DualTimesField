@@ -1,0 +1,60 @@
+{
+  "best_epoch": 1,
+  "checkpoint": "outputs/forecasting/additive_trigonometric_gate/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_trigonometric_gate.yaml",
+  "evaluated_commit": "39676db",
+  "region": "TAS1",
+  "tag": "aemo-additive-trigonometric-fusion-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 224.75385398178364,
+      "ais_90": 279.2332217222827,
+      "crps_quantile_approx": 22.137859166904416,
+      "mae": 37.74841752811271,
+      "piaw_80": 59.30694246709414,
+      "piaw_90": 110.82537688543664,
+      "picp_80": 0.5008442250252079,
+      "picp_90": 0.7855549531038943,
+      "rmse_global": 161.75737717825993,
+      "rmse_horizon_mean": 161.7545986480877,
+      "rmse_window_mean": 53.78191798461103,
+      "sde_global": 161.55616851648392,
+      "sde_window_mean": 46.2736135251831
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 414.7908770084723,
+      "ais_90": 558.4048344909768,
+      "crps_quantile_approx": 40.55305876585406,
+      "mae": 63.70296467142851,
+      "piaw_80": 81.32109198741804,
+      "piaw_90": 156.70092309917072,
+      "picp_80": 0.467518408301858,
+      "picp_90": 0.7365323719049254,
+      "rmse_global": 273.8953593191468,
+      "rmse_horizon_mean": 273.88665459346294,
+      "rmse_window_mean": 93.73097464498255,
+      "sde_global": 272.88204919155544,
+      "sde_window_mean": 77.01734406356475
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}

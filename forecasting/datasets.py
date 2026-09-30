@@ -18,6 +18,37 @@ class Standardizer:
         return ((values - self.mean) / self.std).astype(np.float32)
 
 
+@dataclass(frozen=True)
+class PriceTransform:
+    kind: str = "identity"
+    location: float = 0.0
+    scale: float = 1.0
+
+    def forward(self, values: np.ndarray) -> np.ndarray:
+        if self.kind == "identity":
+            return values
+        return np.arcsinh((values - self.location) / self.scale)
+
+    def inverse(self, values):
+        if self.kind == "identity":
+            return values
+        sinh = torch.sinh if isinstance(values, torch.Tensor) else np.sinh
+        return sinh(values) * self.scale + self.location
+
+
+def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
+    if kind == "identity":
+        return PriceTransform()
+    if kind != "asinh":
+        raise ValueError(f"Unknown price transform: {kind}")
+    location = float(np.median(train_prices))
+    # Normalized median absolute deviation (Uniejewski et al., 2018).
+    scale = float(np.median(np.abs(train_prices - location)) / 0.6745)
+    if scale <= 0:
+        raise ValueError("Training prices must have a positive median absolute deviation")
+    return PriceTransform(kind=kind, location=location, scale=scale)
+
+
 def load_forecast_config(config_path: Path | str) -> dict:
     path = Path(config_path).resolve()
     config = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
@@ -99,7 +130,30 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
         raise ValueError(f"Missing values found in model columns for {region}")
     _validate_hourly_timeline(frame, config)
     _validate_splits(frame, config)
+    price_cap = data_config.get("price_cap")
+    if price_cap is not None:
+        # Clip the price column before it is used as history or target, so
+        # training and scoring both see the capped series.
+        target_column = data_config["target_column"]
+        frame[target_column] = frame[target_column].clip(upper=float(price_cap))
     return frame
+
+
+# Forecast features derived from the PD PASA regional arrays.
+_DERIVED_FORECAST_FEATURES = {
+    # Demand left for scheduled plant after semi-scheduled wind and solar.
+    "net_load_mw": lambda archive: archive["demand50_mw"] - archive["uigf_mw"],
+    # Width of the 10%-90% probability-of-exceedance demand band.
+    "demand_spread_mw": lambda archive: archive["demand10_mw"] - archive["demand90_mw"],
+}
+
+
+def _forecast_feature(archive, name: str) -> np.ndarray:
+    if name in archive.files:
+        return archive[name].astype(np.float64)
+    if name in _DERIVED_FORECAST_FEATURES:
+        return _DERIVED_FORECAST_FEATURES[name](archive).astype(np.float64)
+    raise KeyError(f"Unknown forecast feature {name!r}; archive has {archive.files}")
 
 
 def _fit_standardizer(values: np.ndarray) -> Standardizer:
@@ -168,6 +222,30 @@ def _valid_origins(
     return starts[targets_in_split & history_is_available]
 
 
+def _trailing_gas_price(
+    delivery: pd.Series, config: Mapping
+) -> np.ndarray:
+    context_config = config["origin_context"]
+    prices = pd.read_csv(Path(config["project_root"]) / context_config["path"])
+    daily = prices.groupby("Gas_Date")["Price"].mean()
+    daily.index = pd.to_datetime(daily.index)
+    window = int(context_config["window_days"])
+    # A gas day D runs from 06:00 on D to 06:00 on D + 1 (AEST); only gas days
+    # that ended before the delivery hour are used.
+    current_gas_day = (
+        delivery.dt.tz_localize(None) - pd.Timedelta(hours=6)
+    ).dt.normalize()
+    trailing = daily.rolling(window).mean().shift(1)
+    expected_days = pd.date_range(current_gas_day.min() - pd.Timedelta(days=window), current_gas_day.max())
+    missing = expected_days.difference(daily.index)
+    if len(missing):
+        raise ValueError(f"Missing {len(missing)} gas days, first {missing[0].date()}")
+    values = trailing.reindex(current_gas_day).to_numpy(dtype=np.float64)
+    if np.isnan(values).any() or np.any(values <= 0):
+        raise ValueError("Trailing gas prices must be available and positive")
+    return np.log(values)
+
+
 def _to_unix_seconds(timestamps: pd.Series) -> np.ndarray:
     utc_naive = timestamps.dt.tz_convert("UTC").dt.tz_localize(None)
     return utc_naive.to_numpy(dtype="datetime64[s]").astype(np.int64)
@@ -187,23 +265,194 @@ class AEMOForecastDataset(Dataset):
         self.calendar_feature_names = tuple(protocol["calendar_features"])
         split_values = frame[data_config["split_column"]].to_numpy()
         train_mask = split_values == "train"
-        raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64)
+        raw_history = frame[list(self.history_feature_names)].to_numpy(dtype=np.float64, copy=True)
+        self.target_index = self.history_feature_names.index(data_config["target_column"])
+        self.price_transform = _fit_price_transform(
+            data_config.get("price_transform", "identity"),
+            raw_history[train_mask, self.target_index],
+        )
+        raw_history[:, self.target_index] = self.price_transform.forward(
+            raw_history[:, self.target_index]
+        )
         self.history_standardizer = _fit_standardizer(raw_history[train_mask])
         self.history_values = self.history_standardizer.transform(raw_history)
-        target_index = self.history_feature_names.index(data_config["target_column"])
         raw_target = frame[data_config["target_column"]].to_numpy(dtype=np.float32)
         self.target_values_raw = raw_target
         self.target_values = (
-            (raw_target - self.history_standardizer.mean[target_index])
-            / self.history_standardizer.std[target_index]
+            (
+                self.price_transform.forward(raw_target.astype(np.float64))
+                - self.history_standardizer.mean[self.target_index]
+            )
+            / self.history_standardizer.std[self.target_index]
         ).astype(np.float32)
+        quantile_target = data_config.get("quantile_target", "transformed")
+        if quantile_target not in {"transformed", "price"}:
+            raise ValueError(f"Unknown quantile target: {quantile_target}")
+        self.quantile_standardizer = None
+        self.quantile_target_values = None
+        if quantile_target == "price":
+            self.quantile_standardizer = _fit_standardizer(
+                raw_target[train_mask].astype(np.float64)
+            )
+            self.quantile_target_values = self.quantile_standardizer.transform(
+                raw_target.astype(np.float64)
+            )
         self.calendar_values = _build_calendar_matrix(
             frame[data_config["delivery_column"]], train_mask, self.calendar_feature_names
         )
+        self.origin_context_values = None
+        self.origin_context_standardizer = None
+        if config.get("origin_context", {}).get("enabled", False):
+            raw_context = _trailing_gas_price(frame[data_config["delivery_column"]], config)
+            self.origin_context_standardizer = _fit_standardizer(raw_context[train_mask])
+            self.origin_context_values = self.origin_context_standardizer.transform(raw_context)
         self.delivery_unix_seconds = _to_unix_seconds(
             frame[data_config["delivery_column"]]
         )
         self.origin_indices = _valid_origins(frame, config, split)
+        self.future_exogenous_feature_names: tuple[str, ...] = ()
+        self.future_exogenous_standardizer = None
+        self.future_exogenous_by_origin: dict[int, np.ndarray] = {}
+        if config.get("future_exogenous", {}).get("enabled", False):
+            (
+                self.future_exogenous_feature_names,
+                self.future_exogenous_standardizer,
+                self.future_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "future_exogenous")
+        # Forecast inputs for the CTF head (e.g. PD PASA net load).
+        self.ctf_exogenous_feature_names: tuple[str, ...] = ()
+        self.ctf_exogenous_standardizer = None
+        self.ctf_exogenous_by_origin: dict[int, np.ndarray] = {}
+        if config.get("ctf_exogenous", {}).get("enabled", False):
+            (
+                self.ctf_exogenous_feature_names,
+                self.ctf_exogenous_standardizer,
+                self.ctf_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "ctf_exogenous")
+        # Forecast inputs for the DGF quantile head only (e.g. scarcity shortfalls).
+        self.quantile_exogenous_feature_names: tuple[str, ...] = ()
+        self.quantile_exogenous_standardizer = None
+        self.quantile_exogenous_by_origin: dict[int, np.ndarray] = {}
+        if config.get("quantile_exogenous", {}).get("enabled", False):
+            (
+                self.quantile_exogenous_feature_names,
+                self.quantile_exogenous_standardizer,
+                self.quantile_exogenous_by_origin,
+            ) = self._load_forecast_exogenous(frame, config, region, "quantile_exogenous")
+
+    def _load_forecast_exogenous(
+        self,
+        frame: pd.DataFrame,
+        config: Mapping,
+        region: str,
+        block: str,
+    ) -> tuple[tuple[str, ...], Standardizer, dict[int, np.ndarray]]:
+        exogenous_config = config[block]
+        feature_names = tuple(exogenous_config.get("features", [exogenous_config.get("name")]))
+        path = Path(config["project_root"]) / exogenous_config["region_files"][region]
+        with np.load(path) as archive:
+            origins = archive["forecast_origin_unix"].astype(np.int64)
+            raw_values = np.stack(
+                [_forecast_feature(archive, name) for name in feature_names], axis=-1
+            )
+            source_runs = archive["source_run_unix"].astype(np.int64)
+            source_stpasa_runs = (
+                archive["source_stpasa_run_unix"].astype(np.int64)
+                if "source_stpasa_run_unix" in archive.files
+                else np.zeros_like(source_runs)
+            )
+            source_last_changed = archive["source_last_changed_unix"].astype(np.int64)
+        if raw_values.shape != (len(origins), self.output_hours, len(feature_names)):
+            raise ValueError(
+                f"{block} values for {region} must have shape "
+                f"[N, {self.output_hours}, {len(feature_names)}], got {raw_values.shape}"
+            )
+        if len(np.unique(origins)) != len(origins):
+            raise ValueError(f"Duplicate future exogenous origins for {region}")
+        if np.isnan(raw_values).any():
+            raise ValueError(f"Missing future exogenous values for {region}")
+        if (
+            np.any(source_runs > origins)
+            or np.any(source_stpasa_runs > origins)
+            or np.any(source_last_changed > origins)
+        ):
+            raise ValueError(f"Future information leakage detected for {region}")
+
+        origin_to_row = {int(origin): index for index, origin in enumerate(origins)}
+        required_origins = self.delivery_unix_seconds[self.origin_indices]
+        missing = [int(origin) for origin in required_origins if int(origin) not in origin_to_row]
+        if missing:
+            first = pd.to_datetime(missing[0], unit="s", utc=True)
+            raise ValueError(
+                f"Missing {len(missing)} future exogenous origins for {region}/{self.split}; "
+                f"first missing origin is {first}"
+            )
+
+        train_origins = self.delivery_unix_seconds[
+            _valid_origins(frame, config, "train")
+        ]
+        train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
+        if not train_rows:
+            raise ValueError(f"No training future exogenous values for {region}")
+        shortfall_quantiles = exogenous_config.get("shortfall_below_train_quantiles")
+        if shortfall_quantiles is not None:
+            # Replace each feature with its shortfall below several training
+            # quantiles, max(knot - value, 0): a piecewise-linear, convex
+            # response that a linear head can use to rise faster as the
+            # value gets scarcer.
+            knots = np.quantile(
+                raw_values[train_rows].reshape(-1, len(feature_names)),
+                [float(q) for q in shortfall_quantiles],
+                axis=0,
+            )
+            raw_values = np.concatenate(
+                [np.maximum(knot - raw_values, 0.0) for knot in knots], axis=-1
+            )
+            feature_names = tuple(
+                f"{name}_shortfall_q{q}" for q in shortfall_quantiles for name in feature_names
+            )
+        standardizer = _fit_standardizer(
+            raw_values[train_rows].reshape(-1, len(feature_names))
+        )
+        standardized = standardizer.transform(raw_values)
+        clip_quantiles = exogenous_config.get("clip_to_train_quantiles")
+        if clip_quantiles is not None:
+            # Hold values outside the training support at its edge instead of
+            # letting a linear head extrapolate beyond it.
+            lower, upper = np.quantile(
+                standardized[train_rows].reshape(-1, len(feature_names)),
+                [float(clip_quantiles[0]), float(clip_quantiles[1])],
+                axis=0,
+            )
+            if exogenous_config.get("out_of_range", "clip") == "log":
+                # Soft saturation: keep the training range linear and compress
+                # the excess beyond each bound with log1p.
+                below = np.maximum(lower - standardized, 0.0)
+                above = np.maximum(standardized - upper, 0.0)
+                standardized = (
+                    np.clip(standardized, lower, upper)
+                    - np.log1p(below)
+                    + np.log1p(above)
+                ).astype(np.float32)
+            else:
+                standardized = np.clip(standardized, lower, upper).astype(np.float32)
+        by_origin = {
+            int(origin): standardized[index]
+            for index, origin in enumerate(origins)
+        }
+        return feature_names, standardizer, by_origin
+
+    def denormalize_target(self, values: torch.Tensor) -> torch.Tensor:
+        restored = (
+            values * self.history_standardizer.std[self.target_index]
+            + self.history_standardizer.mean[self.target_index]
+        )
+        return self.price_transform.inverse(restored)
+
+    def denormalize_quantiles(self, values: torch.Tensor) -> torch.Tensor:
+        if self.quantile_standardizer is None:
+            return self.denormalize_target(values)
+        return values * self.quantile_standardizer.std + self.quantile_standardizer.mean
 
     def __len__(self) -> int:
         return len(self.origin_indices)
@@ -212,7 +461,7 @@ class AEMOForecastDataset(Dataset):
         forecast_start = int(self.origin_indices[index])
         history_start = forecast_start - self.input_hours
         forecast_end = forecast_start + self.output_hours
-        return {
+        sample = {
             "history_values": torch.from_numpy(
                 self.history_values[history_start:forecast_start].copy()
             ),
@@ -232,6 +481,28 @@ class AEMOForecastDataset(Dataset):
                 self.delivery_unix_seconds[forecast_start:forecast_end].copy()
             ),
         }
+        if self.origin_context_values is not None:
+            sample["origin_context"] = torch.tensor(
+                [self.origin_context_values[forecast_start]], dtype=torch.float32
+            )
+        if self.quantile_target_values is not None:
+            sample["target_quantile"] = torch.from_numpy(
+                self.quantile_target_values[forecast_start:forecast_end, None].copy()
+            )
+        origin = int(self.delivery_unix_seconds[forecast_start])
+        if self.future_exogenous_by_origin:
+            sample["future_exogenous"] = torch.from_numpy(
+                self.future_exogenous_by_origin[origin].copy()
+            )
+        if self.ctf_exogenous_by_origin:
+            sample["ctf_exogenous"] = torch.from_numpy(
+                self.ctf_exogenous_by_origin[origin].copy()
+            )
+        if self.quantile_exogenous_by_origin:
+            sample["quantile_exogenous"] = torch.from_numpy(
+                self.quantile_exogenous_by_origin[origin].copy()
+            )
+        return sample
 
 
 def build_region_datasets(

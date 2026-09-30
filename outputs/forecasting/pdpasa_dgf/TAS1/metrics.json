@@ -1,0 +1,221 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/training_history.csv",
+    "mae_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_mae_model.pt",
+    "rmse_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_rmse_model.pt"
+  },
+  "best_epoch": 20,
+  "best_validation_loss": 1.335932161454766,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "primary_selection": "total",
+  "region": "TAS1",
+  "seed": 2026,
+  "selection_results": {
+    "mae": {
+      "best_epoch": 1,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_mae_model.pt",
+      "selection_value": 55.42518641162704,
+      "test": {
+        "losses": {
+          "decomposition": 0.1783761703318626,
+          "point": 0.6567525842181489,
+          "quantile": 0.1616546810115556,
+          "smoothness": 0.02382417987205229,
+          "sparsity": 1.1868009932284336,
+          "total": 0.9979940650533999
+        },
+        "metrics": {
+          "coverage_80": 0.4647090158476495,
+          "coverage_90": 0.7402616859768278,
+          "mae_aud_per_mwh": 35.20127621407882,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5004496923028303,
+          "mean_width_80_aud_per_mwh": 47.02998559466735,
+          "mean_width_90_aud_per_mwh": 89.47167145704915,
+          "rmse_aud_per_mwh": 159.8159195681506,
+          "std_dgf_fusion_weight": 0.16913138362875202
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.20233229740889597,
+          "point": 0.8117483642143721,
+          "quantile": 0.3447883671148119,
+          "smoothness": 0.025956646374154856,
+          "sparsity": 1.1948409514117735,
+          "total": 1.3600898243250665
+        },
+        "metrics": {
+          "coverage_80": 0.3581606958910381,
+          "coverage_90": 0.609686772729007,
+          "mae_aud_per_mwh": 55.42518641162704,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.5399238385874378,
+          "mean_width_80_aud_per_mwh": 53.858708887579404,
+          "mean_width_90_aud_per_mwh": 102.99409859827458,
+          "rmse_aud_per_mwh": 268.0877493959867,
+          "std_dgf_fusion_weight": 0.17727217819464985
+        }
+      }
+    },
+    "rmse": {
+      "best_epoch": 17,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_rmse_model.pt",
+      "selection_value": 267.76790051487416,
+      "test": {
+        "losses": {
+          "decomposition": 0.1774121829397391,
+          "point": 0.6870929070187448,
+          "quantile": 0.157995816254907,
+          "smoothness": 0.023958685443083397,
+          "sparsity": 0.1256615868269135,
+          "total": 1.022650524467837
+        },
+        "metrics": {
+          "coverage_80": 0.5373932233700511,
+          "coverage_90": 0.7987201072998117,
+          "mae_aud_per_mwh": 36.09958878958345,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.44497602806877284,
+          "mean_width_80_aud_per_mwh": 57.05669454095562,
+          "mean_width_90_aud_per_mwh": 103.46195848463987,
+          "rmse_aud_per_mwh": 160.028934918196,
+          "std_dgf_fusion_weight": 0.1831500347589011
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.2005105735600861,
+          "point": 0.8131835832023588,
+          "quantile": 0.32842675488601225,
+          "smoothness": 0.026830056123243625,
+          "sparsity": 0.12462808966425173,
+          "total": 1.3422723803794996
+        },
+        "metrics": {
+          "coverage_80": 0.4176681545915837,
+          "coverage_90": 0.6655030330777154,
+          "mae_aud_per_mwh": 55.94557168809285,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.43772270811276753,
+          "mean_width_80_aud_per_mwh": 65.64076220161024,
+          "mean_width_90_aud_per_mwh": 119.04503752301038,
+          "rmse_aud_per_mwh": 267.76790051487416,
+          "std_dgf_fusion_weight": 0.18570673445604843
+        }
+      }
+    },
+    "total": {
+      "best_epoch": 20,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/pdpasa_dgf/TAS1/best_model.pt",
+      "selection_value": 1.335932161454766,
+      "test": {
+        "losses": {
+          "decomposition": 0.17757815184774045,
+          "point": 0.7038438260286517,
+          "quantile": 0.15612731520702058,
+          "smoothness": 0.02388623211962108,
+          "sparsity": 0.11133027042191933,
+          "total": 1.0376845118281137
+        },
+        "metrics": {
+          "coverage_80": 0.5394336320225254,
+          "coverage_90": 0.8054096988375854,
+          "mae_aud_per_mwh": 36.77624780880503,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.43236812085495546,
+          "mean_width_80_aud_per_mwh": 58.517067261102156,
+          "mean_width_90_aud_per_mwh": 105.09390119505403,
+          "rmse_aud_per_mwh": 160.3372251332457,
+          "std_dgf_fusion_weight": 0.1937100806525481
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.20120285247687386,
+          "point": 0.8249050489556152,
+          "quantile": 0.3096877201441648,
+          "smoothness": 0.026901437985064086,
+          "sparsity": 0.10963358539400186,
+          "total": 1.335932161454766
+        },
+        "metrics": {
+          "coverage_80": 0.44395005913547747,
+          "coverage_90": 0.7015232154438976,
+          "mae_aud_per_mwh": 57.620756884186264,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.45007733209717754,
+          "mean_width_80_aud_per_mwh": 71.00655803205238,
+          "mean_width_90_aud_per_mwh": 126.6073102135673,
+          "rmse_aud_per_mwh": 268.6265714250825,
+          "std_dgf_fusion_weight": 0.19392264863463124
+        }
+      }
+    }
+  },
+  "test": {
+    "losses": {
+      "decomposition": 0.17757815184774045,
+      "point": 0.7038438260286517,
+      "quantile": 0.15612731520702058,
+      "smoothness": 0.02388623211962108,
+      "sparsity": 0.11133027042191933,
+      "total": 1.0376845118281137
+    },
+    "metrics": {
+      "coverage_80": 0.5394336320225254,
+      "coverage_90": 0.8054096988375854,
+      "mae_aud_per_mwh": 36.77624780880503,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.43236812085495546,
+      "mean_width_80_aud_per_mwh": 58.517067261102156,
+      "mean_width_90_aud_per_mwh": 105.09390119505403,
+      "rmse_aud_per_mwh": 160.3372251332457,
+      "std_dgf_fusion_weight": 0.1937100806525481
+    }
+  },
+  "training_summary": {
+    "completed_epochs": 30,
+    "early_stopping_monitor": "total",
+    "ema_decay": null,
+    "fine_tuning_groups": [],
+    "gradient_clip_norm": null,
+    "stopped_early": false
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 0.20120285247687386,
+      "point": 0.8249050489556152,
+      "quantile": 0.3096877201441648,
+      "smoothness": 0.026901437985064086,
+      "sparsity": 0.10963358539400186,
+      "total": 1.335932161454766
+    },
+    "metrics": {
+      "coverage_80": 0.44395005913547747,
+      "coverage_90": 0.7015232154438976,
+      "mae_aud_per_mwh": 57.620756884186264,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.45007733209717754,
+      "mean_width_80_aud_per_mwh": 71.00655803205238,
+      "mean_width_90_aud_per_mwh": 126.6073102135673,
+      "rmse_aud_per_mwh": 268.6265714250825,
+      "std_dgf_fusion_weight": 0.19392264863463124
+    }
+  },
+  "warm_start": null
+}

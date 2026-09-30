@@ -1,0 +1,60 @@
+{
+  "best_epoch": 6,
+  "checkpoint": "outputs/forecasting/additive_tcn_attention_head/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_tcn_attention_head.yaml",
+  "evaluated_commit": "8fe917b",
+  "region": "NSW1",
+  "tag": "aemo-additive-tcn-attention-head-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 450.1287250857826,
+      "ais_90": 721.22591727042,
+      "crps_quantile_approx": 46.48513919831932,
+      "mae": 70.90755261510746,
+      "piaw_80": 109.00349479373604,
+      "piaw_90": 162.66819926411168,
+      "picp_80": 0.5804796149382646,
+      "picp_90": 0.7403258946407169,
+      "rmse_global": 409.31994978111766,
+      "rmse_horizon_mean": 409.3187880533826,
+      "rmse_window_mean": 125.67236658383807,
+      "sde_global": 407.2388127461276,
+      "sde_window_mean": 107.44391236434397
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 438.49925061153243,
+      "ais_90": 570.4231632455227,
+      "crps_quantile_approx": 50.325669077490275,
+      "mae": 81.44789814973595,
+      "piaw_80": 151.70971075955734,
+      "piaw_90": 207.7930954268822,
+      "picp_80": 0.584010529930182,
+      "picp_90": 0.7288686047842509,
+      "rmse_global": 199.34503577634513,
+      "rmse_horizon_mean": 199.33780536928884,
+      "rmse_window_mean": 107.39577397020801,
+      "sde_global": 191.8643845144652,
+      "sde_window_mean": 75.38277198622335
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}

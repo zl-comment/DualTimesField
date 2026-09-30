@@ -1,0 +1,14 @@
+% Figure: model structure. Needs graphicx.
+\providecommand{\materialsdir}{.}
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{\materialsdir/figures/architecture.pdf}
+  \caption{Detected-event dual-field forecaster. Events detected in the
+    72-hour history, as the largest departures from the window median after
+    non-maximum suppression, form the discrete event field (DGF); the
+    continuous trend field (CTF) fits the remainder under the decomposition
+    loss. Field-specific linear heads read field-matched AEMO forecasts (gas
+    price and net load for the CTF, spare capacity and shortfalls for the DGF)
+    and are fused by a trigonometric gate with per-quantile variants.}
+  \label{fig:architecture}
+\end{figure*}

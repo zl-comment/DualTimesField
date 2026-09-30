@@ -1,0 +1,60 @@
+{
+  "best_epoch": 1,
+  "checkpoint": "outputs/forecasting/additive_tcn_attention_head/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_tcn_attention_head.yaml",
+  "evaluated_commit": "8fe917b",
+  "region": "TAS1",
+  "tag": "aemo-additive-tcn-attention-head-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 256.2613747108693,
+      "ais_90": 323.21213866590927,
+      "crps_quantile_approx": 25.360369263936157,
+      "mae": 41.97166132383981,
+      "piaw_80": 60.21657172426537,
+      "piaw_90": 93.36411540163499,
+      "picp_80": 0.47440452409489564,
+      "picp_90": 0.6958102657763066,
+      "rmse_global": 163.92182193066657,
+      "rmse_horizon_mean": 163.92095762966235,
+      "rmse_window_mean": 57.84906913852312,
+      "sde_global": 161.90770958390047,
+      "sde_window_mean": 44.96775996238667
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 453.2967941695216,
+      "ais_90": 602.0299053687318,
+      "crps_quantile_approx": 45.34844456331825,
+      "mae": 71.19491157186654,
+      "piaw_80": 92.81625788014709,
+      "piaw_90": 146.3596991928898,
+      "picp_80": 0.4295906298882149,
+      "picp_90": 0.6678493762160925,
+      "rmse_global": 277.44873641312,
+      "rmse_horizon_mean": 277.43975283961436,
+      "rmse_window_mean": 100.65467496787335,
+      "sde_global": 273.74321053724583,
+      "sde_window_mean": 75.66760814447495
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}

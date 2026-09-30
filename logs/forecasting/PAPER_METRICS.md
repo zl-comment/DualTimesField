@@ -14,7 +14,7 @@ AUD/MWh.
 | Data | AEMO hourly prices, 2015-2024, NSW/QLD/TAS | Same |
 | Split | Chronological 70/10/20 | 2015-2021 / 2022 / 2023-2024; 70/10/20 of the same series starts the test split at 2022-12-31 23:00 |
 | Window | 72 hours in, 24 hours out | Same |
-| Inputs | Price, load forecast, temperature proxy, more than 2,000 WattClarity articles | Price, demand, calendar |
+| Inputs | Price, load forecast, temperature proxy, more than 2,000 WattClarity articles | Price, demand, calendar; experiments 20-22 add the DWGM gas price and point-in-time AEMO PD PASA forecasts (spare capacity, demand, semi-scheduled renewables) |
 | Price preprocessing | None stated | None |
 
 ## Metric definitions
@@ -49,6 +49,82 @@ compared with caution.
 | 01_static_normalization_baseline | QLD1 | 17521 | 65.62 | 279.97 | 110.15 | 97.17 | 90.61% | 208.95 | 511.18 | 35.00 |
 | 01_static_normalization_baseline | TAS1 | 17521 | 37.13 | 161.69 | 53.03 | 45.28 | 68.66% | 92.27 | 312.51 | 23.81 |
 | 01_static_normalization_baseline | **Mean** | - | 54.56 | 280.75 | 92.42 | 82.54 | 81.08% | 158.42 | 486.34 | 33.43 |
+| 09_additive_trigonometric_fusion | NSW1 | 17521 | 67.59 | 400.33 | 121.64 | 111.94 | 84.22% | 167.17 | 650.65 | 41.44 |
+| 09_additive_trigonometric_fusion | QLD1 | 17521 | 59.56 | 278.28 | 106.47 | 100.76 | 92.38% | 218.04 | 526.33 | 36.53 |
+| 09_additive_trigonometric_fusion | TAS1 | 17521 | 37.75 | 161.76 | 53.78 | 46.27 | 78.56% | 110.83 | 279.23 | 22.14 |
+| 09_additive_trigonometric_fusion | **Mean** | - | 54.97 | 280.12 | 93.96 | 86.32 | 85.05% | 165.34 | 485.41 | 33.37 |
+| 11_additive_tcn_head | NSW1 | 17521 | 65.81 | 401.53 | 119.28 | 109.22 | 68.33% | 108.66 | 730.95 | 45.90 |
+| 11_additive_tcn_head | QLD1 | 17521 | 75.24 | 286.07 | 123.85 | 106.81 | 90.09% | 245.44 | 541.74 | 39.05 |
+| 11_additive_tcn_head | TAS1 | 17521 | 41.13 | 162.62 | 57.20 | 46.15 | 65.23% | 89.08 | 331.72 | 24.36 |
+| 11_additive_tcn_head | **Mean** | - | 60.73 | 283.41 | 100.11 | 87.39 | 74.55% | 147.73 | 534.80 | 36.43 |
+| 12_additive_tcn_attention_head | NSW1 | 17521 | 70.91 | 409.32 | 125.67 | 107.44 | 74.03% | 162.67 | 721.23 | 46.49 |
+| 12_additive_tcn_attention_head | QLD1 | 17521 | 60.26 | 280.36 | 106.88 | 97.24 | 77.01% | 180.70 | 604.00 | 49.32 |
+| 12_additive_tcn_attention_head | TAS1 | 17521 | 41.97 | 163.92 | 57.85 | 44.97 | 69.58% | 93.36 | 323.21 | 25.36 |
+| 12_additive_tcn_attention_head | **Mean** | - | 57.71 | 284.53 | 96.80 | 83.22 | 73.54% | 145.58 | 549.48 | 40.39 |
+| 13_max_spare_query_injection | NSW1 | 17521 | 74.94 | 395.10 | 127.21 | 112.84 | 78.23% | 141.74 | 647.83 | 42.29 |
+| 13_max_spare_query_injection | QLD1 | 17521 | 75.48 | 277.20 | 120.55 | 98.82 | 80.08% | 156.09 | 560.84 | 43.26 |
+| 13_max_spare_query_injection | TAS1 | 17521 | 41.85 | 163.37 | 57.73 | 45.72 | 73.84% | 108.11 | 294.22 | 23.56 |
+| 13_max_spare_query_injection | **Mean** | - | 64.09 | 278.56 | 101.83 | 85.79 | 77.38% | 135.31 | 500.96 | 36.37 |
+| 14_max_spare_dgf_residual_adapter | NSW1 | 17521 | 70.06 | 406.72 | 124.26 | 106.93 | 76.49% | 169.17 | 696.72 | 45.43 |
+| 14_max_spare_dgf_residual_adapter | QLD1 | 17521 | 63.20 | 276.83 | 109.37 | 98.15 | 77.81% | 186.43 | 588.51 | 49.03 |
+| 14_max_spare_dgf_residual_adapter | TAS1 | 17521 | 41.84 | 163.69 | 57.66 | 44.93 | 70.23% | 94.02 | 316.19 | 25.11 |
+| 14_max_spare_dgf_residual_adapter | **Mean** | - | 58.37 | 282.41 | 97.09 | 83.34 | 74.84% | 149.87 | 533.81 | 39.86 |
+| 15_stable_from_scratch | NSW1 | 17521 | 65.79 | 398.27 | 117.51 | 107.27 | 83.44% | 158.72 | 639.21 | 41.14 |
+| 15_stable_from_scratch | QLD1 | 17521 | 64.84 | 279.33 | 110.79 | 91.81 | 64.18% | 152.35 | 668.36 | 49.00 |
+| 15_stable_from_scratch | TAS1 | 17521 | 43.08 | 166.63 | 58.98 | 45.43 | 67.00% | 95.68 | 335.78 | 25.54 |
+| 15_stable_from_scratch | **Mean** | - | 57.90 | 281.41 | 95.76 | 81.50 | 71.54% | 135.58 | 547.78 | 38.56 |
+| 16_asinh_additive_trigonometric_fusion | NSW1 | 17521 | 53.47 | 396.40 | 107.09 | 100.19 | 84.16% | 238.29 | 621.44 | 38.44 |
+| 16_asinh_additive_trigonometric_fusion | QLD1 | 17521 | 48.47 | 275.89 | 96.01 | 91.28 | 92.66% | 410.82 | 614.53 | 35.91 |
+| 16_asinh_additive_trigonometric_fusion | TAS1 | 17521 | 36.02 | 160.51 | 51.60 | 44.11 | 73.57% | 97.94 | 289.68 | 21.95 |
+| 16_asinh_additive_trigonometric_fusion | **Mean** | - | 45.99 | 277.60 | 84.90 | 78.53 | 83.46% | 249.02 | 508.55 | 32.10 |
+| 17_asinh_conformal_intervals | NSW1 | 17521 | 53.47 | 396.40 | 107.09 | 100.19 | 89.05% | 310.08 | 644.82 | 39.43 |
+| 17_asinh_conformal_intervals | QLD1 | 17521 | 48.47 | 275.89 | 96.01 | 91.28 | 93.83% | 450.67 | 629.90 | 36.91 |
+| 17_asinh_conformal_intervals | TAS1 | 17521 | 36.02 | 160.51 | 51.60 | 44.11 | 93.64% | 192.66 | 290.43 | 20.86 |
+| 17_asinh_conformal_intervals | **Mean** | - | 45.99 | 277.60 | 84.90 | 78.53 | 92.17% | 317.80 | 521.72 | 32.40 |
+| 18_asinh_price_space_quantiles | NSW1 | 17521 | 53.48 | 395.59 | 107.14 | 100.32 | 84.05% | 126.49 | 613.61 | 38.68 |
+| 18_asinh_price_space_quantiles | QLD1 | 17521 | 48.38 | 275.75 | 95.91 | 91.20 | 90.71% | 165.60 | 494.69 | 33.16 |
+| 18_asinh_price_space_quantiles | TAS1 | 17521 | 36.01 | 160.46 | 51.56 | 44.12 | 73.22% | 90.87 | 307.55 | 23.14 |
+| 18_asinh_price_space_quantiles | **Mean** | - | 45.95 | 277.27 | 84.87 | 78.55 | 82.66% | 127.65 | 471.95 | 31.66 |
+| 19_residual_skip_path | NSW1 | 17521 | 52.11 | 397.74 | 105.29 | 97.51 | 83.39% | 115.87 | 616.57 | 38.74 |
+| 19_residual_skip_path | QLD1 | 17521 | 45.26 | 271.67 | 90.95 | 85.86 | 90.62% | 157.16 | 479.59 | 31.99 |
+| 19_residual_skip_path | TAS1 | 17521 | 35.58 | 160.11 | 51.09 | 43.78 | 73.36% | 88.55 | 305.21 | 22.89 |
+| 19_residual_skip_path | **Mean** | - | 44.31 | 276.51 | 82.44 | 75.71 | 82.45% | 120.53 | 467.12 | 31.20 |
+| 20_gas_price_ctf | NSW1 | 17521 | 52.18 | 396.70 | 105.09 | 97.24 | 82.62% | 114.36 | 617.47 | 38.90 |
+| 20_gas_price_ctf | QLD1 | 17521 | 45.03 | 269.87 | 90.70 | 85.76 | 90.06% | 155.63 | 468.31 | 30.94 |
+| 20_gas_price_ctf | TAS1 | 17521 | 36.18 | 160.15 | 51.66 | 44.18 | 75.10% | 92.75 | 301.77 | 22.84 |
+| 20_gas_price_ctf | **Mean** | - | 44.47 | 275.57 | 82.48 | 75.73 | 82.59% | 120.91 | 462.52 | 30.89 |
+| 21_pdpasa_dgf | NSW1 | 17521 | 50.63 | 389.28 | 102.13 | 95.52 | 86.24% | 124.70 | 585.64 | 36.61 |
+| 21_pdpasa_dgf | QLD1 | 17521 | 44.79 | 267.96 | 89.58 | 83.79 | 89.06% | 142.35 | 455.71 | 30.43 |
+| 21_pdpasa_dgf | TAS1 | 17521 | 36.78 | 160.34 | 52.29 | 44.83 | 80.54% | 105.09 | 270.47 | 21.46 |
+| 21_pdpasa_dgf | **Mean** | - | 44.06 | 272.53 | 81.33 | 74.71 | 85.28% | 124.05 | 437.27 | 29.50 |
+| 22_pdpasa_netload_ctf | NSW1 | 17521 | 48.46 | 389.38 | 100.04 | 93.28 | 88.49% | 129.88 | 573.10 | 35.67 |
+| 22_pdpasa_netload_ctf | QLD1 | 17521 | 45.26 | 267.02 | 91.17 | 84.63 | 92.05% | 168.46 | 461.48 | 30.27 |
+| 22_pdpasa_netload_ctf | TAS1 | 17521 | 35.19 | 159.90 | 50.68 | 43.93 | 84.16% | 112.35 | 261.62 | 20.48 |
+| 22_pdpasa_netload_ctf | **Mean** | - | 42.97 | 272.10 | 80.63 | 73.95 | 88.23% | 136.90 | 432.06 | 28.81 |
+| 24_pdpasa_netload_clip_ctf | NSW1 | 17521 | 49.22 | 389.29 | 100.87 | 94.39 | 87.77% | 129.30 | 576.93 | 36.14 |
+| 24_pdpasa_netload_clip_ctf | QLD1 | 17521 | 43.73 | 268.37 | 88.62 | 83.43 | 90.72% | 160.35 | 462.50 | 30.63 |
+| 24_pdpasa_netload_clip_ctf | TAS1 | 17521 | 34.55 | 159.57 | 49.96 | 43.53 | 78.40% | 96.01 | 274.04 | 21.26 |
+| 24_pdpasa_netload_clip_ctf | **Mean** | - | 42.50 | 272.41 | 79.82 | 73.78 | 85.63% | 128.55 | 437.82 | 29.35 |
+| 25_pdpasa_netload_softclip_ctf | NSW1 | 17521 | 48.39 | 389.56 | 99.80 | 93.19 | 88.87% | 131.91 | 572.15 | 35.74 |
+| 25_pdpasa_netload_softclip_ctf | QLD1 | 17521 | 43.06 | 267.03 | 87.98 | 82.33 | 91.25% | 161.13 | 459.08 | 30.28 |
+| 25_pdpasa_netload_softclip_ctf | TAS1 | 17521 | 34.44 | 159.50 | 49.83 | 43.44 | 78.99% | 97.48 | 274.14 | 21.28 |
+| 25_pdpasa_netload_softclip_ctf | **Mean** | - | 41.96 | 272.03 | 79.20 | 72.99 | 86.37% | 130.17 | 435.13 | 29.10 |
+| 27_quantile_gate | NSW1 | 17521 | 48.39 | 389.44 | 99.78 | 93.19 | 88.46% | 134.61 | 569.29 | 35.74 |
+| 27_quantile_gate | QLD1 | 17521 | 42.92 | 266.92 | 87.78 | 82.18 | 91.10% | 165.61 | 454.73 | 30.13 |
+| 27_quantile_gate | TAS1 | 17521 | 34.50 | 159.56 | 49.90 | 43.46 | 77.81% | 93.32 | 274.24 | 21.01 |
+| 27_quantile_gate | **Mean** | - | 41.94 | 271.98 | 79.16 | 72.94 | 85.79% | 131.18 | 432.75 | 28.96 |
+| 28_scarcity_quantile_inputs | NSW1 | 17521 | 48.43 | 389.79 | 99.92 | 93.27 | 87.81% | 157.63 | 527.34 | 34.54 |
+| 28_scarcity_quantile_inputs | QLD1 | 17521 | 42.75 | 268.02 | 87.95 | 82.39 | 89.23% | 175.13 | 433.69 | 29.75 |
+| 28_scarcity_quantile_inputs | TAS1 | 17521 | 34.50 | 159.56 | 49.90 | 43.46 | 77.59% | 93.01 | 274.90 | 21.11 |
+| 28_scarcity_quantile_inputs | **Mean** | - | 41.89 | 272.46 | 79.26 | 73.04 | 84.88% | 141.92 | 411.97 | 28.47 |
+| 29_ablation_raw_history | NSW1 | 17521 | 48.43 | 387.49 | 100.26 | 93.88 | 87.61% | 150.58 | 529.53 | 34.50 |
+| 29_ablation_raw_history | QLD1 | 17521 | 42.41 | 265.41 | 87.39 | 82.24 | 92.15% | 195.88 | 415.74 | 29.05 |
+| 29_ablation_raw_history | TAS1 | 17521 | 34.61 | 159.59 | 49.98 | 43.48 | 76.13% | 92.66 | 282.16 | 21.79 |
+| 29_ablation_raw_history | **Mean** | - | 41.81 | 270.83 | 79.21 | 73.20 | 85.30% | 146.37 | 409.14 | 28.45 |
+| 30_detected_dgf | NSW1 | 17521 | 48.35 | 387.72 | 99.97 | 93.88 | 87.39% | 154.86 | 524.73 | 34.59 |
+| 30_detected_dgf | QLD1 | 17521 | 42.55 | 266.24 | 87.12 | 81.94 | 86.42% | 163.44 | 427.76 | 29.92 |
+| 30_detected_dgf | TAS1 | 17521 | 33.64 | 159.21 | 49.26 | 43.12 | 75.40% | 89.12 | 281.67 | 21.12 |
+| 30_detected_dgf | **Mean** | - | 41.51 | 271.05 | 78.78 | 72.98 | 83.07% | 135.81 | 411.39 | 28.54 |
 
 Seasonal naive (price 24 hours earlier) on the same test windows:
 
@@ -58,7 +134,7 @@ Seasonal naive (price 24 hours earlier) on the same test windows:
 | rolling hourly | QLD1 | 17521 | 59.17 | 368.82 | 133.54 | 127.35 |
 | rolling hourly | TAS1 | 17521 | 39.83 | 222.81 | 67.37 | 61.29 |
 
-Fixed-origin experiments score 731 daily origins per region and are not directly comparable with rolling-hour rows.
+Fixed-origin experiments score 731 daily origins per region and are not directly comparable with rolling-hour rows. 17_asinh_conformal_intervals reuses the 16 checkpoints; only its intervals differ. Seed-variance runs are summarized in `EXPERIMENT_RESULTS.md` and stored under `seed_variance/paper_metrics/`.
 
 ## Findings
 
@@ -67,6 +143,21 @@ Fixed-origin experiments score 731 daily origins per region and are not directly
 | Aggregation explains most of the RMSE gap | The static baseline's mean RMSE falls from 280.75 (global) to 92.42 (window). RE-Price reports 31.37 |
 | Aggregation does not explain the MAE gap | MAE is aggregation-invariant: 54.56 locally versus 22.76 for RE-Price |
 | The seasonal naive forecast is a strong floor | On the rolling windows it reaches mean MAE 57.17 and window RMSE 119.31; in QLD1 its MAE (59.17) is below the static baseline's (65.62) |
+| The asinh price target narrows the MAE gap | 16_asinh_additive_trigonometric_fusion lowers mean MAE to 45.99 and window RMSE to 84.90, but its 90% AIS (508.55) is worse than the static baseline's (486.34) because the inverse transform widens upper quantiles |
+| Validation conformal calibration does not repair AIS | 17_asinh_conformal_intervals restores mean 90% coverage to 92.17% but widens intervals to 317.80 and raises 90% AIS to 521.72, because the 2022 validation year is more volatile than the test years |
+| Price-space quantiles repair the intervals | 18_asinh_price_space_quantiles keeps mean MAE at 45.95, halves the 90% width to 127.65, and lowers 90% AIS to 471.95 |
+| The reconstruction residual path helps short horizons | 19_residual_skip_path lowers mean MAE to 44.31, window RMSE to 82.44, 90% AIS to 467.12, and CRPS~ to 31.20, mostly through one-hour-ahead errors |
+| Gas prices track the crisis level | 20_gas_price_ctf improves 90% AIS and CRPS~ and reduces the 2022 crisis-month under-forecast; over three seeds its test MAE is 44.37 ± 0.15 |
+| PD PASA scarcity sharpens the DGF event expert | 21_pdpasa_dgf lowers mean MAE to 44.06, window RMSE to 81.33, 90% AIS to 437.27, and CRPS~ to 29.50; over three seeds it improves every metric for every seed |
+| The PD PASA net-load forecast lifts the CTF level | 22_pdpasa_netload_ctf lowers mean MAE to 42.97, window RMSE to 80.63, 90% AIS to 432.06, and CRPS~ to 28.81; over three seeds test MAE falls by 1.10-1.32 for every seed, through ordinary-hour errors in NSW1 and TAS1 |
+| Clipping net load trades NSW1 for QLD1 | 24_pdpasa_netload_clip_ctf holds net load inside its training range; QLD1 three-seed MAE falls by 1.22 but NSW1 rises by 0.83, and over three seeds the mean MAE change (-0.14) is inside seed noise |
+| Soft saturation keeps the QLD1 gain without the NSW1 loss | 25_pdpasa_netload_softclip_ctf compresses net load beyond its training range with `log1p`; mean MAE falls to 41.96 and window RMSE to 79.20, and over three seeds test MAE falls by 0.50-1.01 for every seed |
+| RE-Price's error ratios imply spike treatment | Its RMSE/MAE ratios (1.45, 1.44, 1.20) are reached only when prices are capped near 650 AUD/MWh; with spike windows removed the trunk scores 24.83 (NSW1) and 25.62 (QLD1) against 23.48 and 25.85, while TAS1 stays unexplained. See [`PROTOCOL_ALIGNMENT.md`](PROTOCOL_ALIGNMENT.md) |
+| Same-data baselines trail on points but not on intervals | Re-implemented XGBoost, GRU, and DeepAR (three seeds, no news) reach mean MAE 43.15, 45.65, and 47.86 against the trunk's 41.86; XGBoost's CRPS~ (27.69) is below the trunk's (28.95). See [`BASELINES.md`](BASELINES.md) |
+| A quantile-specific gate helps intervals slightly | 27_quantile_gate lowers three-seed CRPS~ by 0.12 and 90% AIS by 1.98 for every seed with unchanged point forecasts; XGBoost's CRPS~ (27.69) is still lower |
+| Scarcity shortfalls sharpen the upper tail | 28_scarcity_quantile_inputs feeds spare-capacity shortfalls below training quantiles to the DGF quantile head; three-seed 90% AIS falls by 18.95 and CRPS~ by 0.40 for every seed, mean AIS (412.60) drops below XGBoost's (414.32), and NSW1 CRPS~ (34.71) beats XGBoost (35.32) |
+| The transplanted reconstruction fields do not drive the forecast | 29_ablation_raw_history feeds raw history to both expert heads instead of the CTF and DGF fields; three-seed MAE (41.90 vs 41.88) and CRPS~ (28.40 vs 28.43) are unchanged |
+| Detected events make the dual field work | 30_detected_dgf separates sparse price events from the CTF; three-seed MAE 41.54 ± 0.06 beats the Gabor trunk and the raw-history ablation for every seed, and a Diebold-Mariano test pooled over regions favours it over every comparator (p <= 0.002) |
 | RE-Price's MAE is hard to reach on raw prices | In the NSW1 test period, hours above 300 AUD/MWh alone add at least 20.7 to the MAE of any forecast that stays at or below 300 in those hours, versus RE-Price's reported 23.48 overall. The reported values imply either strong spike prediction or data processing not described in the paper |
 
 ## Reproduction
@@ -81,3 +172,22 @@ python -m forecasting.evaluate_paper_metrics summarize --result-root logs/foreca
 | Experiment | Tag | Evaluated commit | Config | Checkpoints |
 |---|---|---|---|---|
 | 01_static_normalization_baseline | `aemo-static-normalization-baseline` | `1bda1f1` | `configs/aemo_forecast.yaml` | `outputs/forecasting/static_train` |
+| 09_additive_trigonometric_fusion | `aemo-additive-trigonometric-fusion-30epoch` | `39676db` | `configs/aemo_forecast_additive_trigonometric_gate.yaml` | `outputs/forecasting/additive_trigonometric_gate` |
+| 11_additive_tcn_head | `aemo-additive-tcn-head-30epoch` | `556bbfc` | `configs/aemo_forecast_additive_tcn_head.yaml` | `outputs/forecasting/additive_tcn_head` |
+| 12_additive_tcn_attention_head | `aemo-additive-tcn-attention-head-30epoch` | `8fe917b` | `configs/aemo_forecast_additive_tcn_attention_head.yaml` | `outputs/forecasting/additive_tcn_attention_head` |
+| 13_max_spare_query_injection | `aemo-max-spare-query-injection-30epoch` | `a9d6913` | `configs/aemo_forecast_max_spare.yaml` | `outputs/forecasting/max_spare_future_context` |
+| 14_max_spare_dgf_residual_adapter | `aemo-best-max-spare-dgf-residual-adapter-30epoch` | `ad9792a` | `configs/aemo_forecast_max_spare_dgf_adapter.yaml` | `outputs/forecasting/max_spare_dgf_residual_adapter` |
+| 15_stable_from_scratch | untagged | `9cbac10` | `configs/aemo_forecast_stable_from_scratch.yaml` | `outputs/forecasting/stable_from_scratch` |
+| 16_asinh_additive_trigonometric_fusion | untagged | `feature/asinh-target` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |
+| 17_asinh_conformal_intervals | untagged | `feature/conformal-intervals` | `configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml` | `outputs/forecasting/asinh_additive_trigonometric_gate` |
+| 18_asinh_price_space_quantiles | untagged | `feature/price-space-quantiles` | `configs/aemo_forecast_asinh_price_space_quantiles.yaml` | `outputs/forecasting/asinh_price_space_quantiles` |
+| 19_residual_skip_path | untagged | `feature/residual-skip-path` | `configs/aemo_forecast_residual_skip_path.yaml` | `outputs/forecasting/residual_skip_path` |
+| 20_gas_price_ctf | untagged | `feature/gas-price-ctf` | `configs/aemo_forecast_gas_price_ctf.yaml` | `outputs/forecasting/gas_price_ctf` |
+| 21_pdpasa_dgf | untagged | `feature/pdpasa-dgf` | `configs/aemo_forecast_pdpasa_dgf.yaml` | `outputs/forecasting/pdpasa_dgf` |
+| 22_pdpasa_netload_ctf | `aemo-pdpasa-netload-ctf-30epoch` | `062ddb7` | `configs/aemo_forecast_pdpasa_netload_ctf.yaml` | `outputs/forecasting/pdpasa_netload_ctf` |
+| 24_pdpasa_netload_clip_ctf | untagged | `224099c` | `configs/aemo_forecast_pdpasa_netload_clip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_clip_ctf` |
+| 25_pdpasa_netload_softclip_ctf | `aemo-pdpasa-netload-softclip-ctf-30epoch` | `bfd5f55` | `configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml` | `outputs/forecasting/pdpasa_netload_softclip_ctf` |
+| 27_quantile_gate | untagged | `da4abfe` | `configs/aemo_forecast_quantile_gate.yaml` | `outputs/forecasting/quantile_gate` |
+| 28_scarcity_quantile_inputs | `aemo-scarcity-quantile-inputs-30epoch` | `b3fd5a9` | `configs/aemo_forecast_scarcity_quantile_inputs.yaml` | `outputs/forecasting/scarcity_quantile_inputs` |
+| 29_ablation_raw_history | untagged | `ba37ad3` | `configs/aemo_forecast_ablation_raw_history.yaml` | `outputs/forecasting/ablation_raw_history` |
+| 30_detected_dgf | `aemo-detected-event-dgf-30epoch` | `e2cd5f8` | `configs/aemo_forecast_detected_dgf.yaml` | `outputs/forecasting/detected_dgf` |

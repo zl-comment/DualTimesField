@@ -1,0 +1,31 @@
+% Preview of the paper components in an ICML-like two-column layout.
+% Build from paper/: pdflatex preview.tex
+\documentclass[10pt,twocolumn]{article}
+\usepackage[letterpaper,textwidth=6.75in,textheight=9in,columnsep=0.25in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{caption}
+\captionsetup{font=small,skip=6pt}
+\newcommand{\materialsdir}{.}
+
+\begin{document}
+\input{components/fig_architecture}
+\section{Components}
+Figure~\ref{fig:architecture} shows the model, Figure~\ref{fig:field-separation}
+the field separation, Figure~\ref{fig:ablation-ladder} the development ladder,
+and Figure~\ref{fig:comparison} the same-data comparison. Tables
+\ref{tab:main}, \ref{tab:significance}, \ref{tab:ablations},
+\ref{tab:field-separation}, and \ref{tab:re-price} give the numbers.
+
+
+\input{components/fig_field_separation}
+\input{components/tab_main}
+\input{components/tab_significance}
+\input{components/tab_field_separation}
+\clearpage
+\input{components/fig_ablation_ladder}
+\input{components/tab_ablations}
+\input{components/fig_comparison}
+\input{components/tab_re_price}
+\end{document}

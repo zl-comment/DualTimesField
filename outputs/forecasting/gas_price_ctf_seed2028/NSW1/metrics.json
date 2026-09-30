@@ -1,0 +1,221 @@
+{
+  "artifacts": {
+    "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_model.pt",
+    "history": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/training_history.csv",
+    "mae_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_mae_model.pt",
+    "rmse_checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_rmse_model.pt"
+  },
+  "best_epoch": 14,
+  "best_validation_loss": 1.031549110038201,
+  "dataset_sizes": {
+    "test": 17521,
+    "train": 61273,
+    "validation": 8737
+  },
+  "environment": {
+    "cuda_runtime": "12.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "python": "3.11.0",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.17.1",
+    "torch": "2.5.1+cu124"
+  },
+  "primary_selection": "total",
+  "region": "NSW1",
+  "seed": 2028,
+  "selection_results": {
+    "mae": {
+      "best_epoch": 1,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_mae_model.pt",
+      "selection_value": 61.38693426736985,
+      "test": {
+        "losses": {
+          "decomposition": 0.3069875155423073,
+          "point": 0.7903173088136107,
+          "quantile": 0.11798056833151337,
+          "smoothness": 0.056063931730673824,
+          "sparsity": 0.4420345865879339,
+          "total": 1.2157834882122776
+        },
+        "metrics": {
+          "coverage_80": 0.6188407244639765,
+          "coverage_90": 0.8372881114091661,
+          "mae_aud_per_mwh": 52.26076992579143,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.40292493458301115,
+          "mean_width_80_aud_per_mwh": 68.19241967302926,
+          "mean_width_90_aud_per_mwh": 119.09055168024561,
+          "rmse_aud_per_mwh": 397.6637375537,
+          "std_dgf_fusion_weight": 0.24828372792107026
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.19136873615358382,
+          "point": 0.6803407717163154,
+          "quantile": 0.18459391499361813,
+          "smoothness": 0.03983750023502936,
+          "sparsity": 0.4454924869219444,
+          "total": 1.0567887450869082
+        },
+        "metrics": {
+          "coverage_80": 0.43899507840219754,
+          "coverage_90": 0.617960970584869,
+          "mae_aud_per_mwh": 61.38693426736985,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.47117126058501574,
+          "mean_width_80_aud_per_mwh": 71.42080108303766,
+          "mean_width_90_aud_per_mwh": 123.17354284252079,
+          "rmse_aud_per_mwh": 180.46861583040018,
+          "std_dgf_fusion_weight": 0.2513978657800306
+        }
+      }
+    },
+    "rmse": {
+      "best_epoch": 8,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_rmse_model.pt",
+      "selection_value": 180.38482406858384,
+      "test": {
+        "losses": {
+          "decomposition": 0.3081373963865418,
+          "point": 0.7701812772560076,
+          "quantile": 0.11447339872553478,
+          "smoothness": 0.054194972004532424,
+          "sparsity": 0.19251700127603094,
+          "total": 1.1930387729202583
+        },
+        "metrics": {
+          "coverage_80": 0.6874346022867797,
+          "coverage_90": 0.8436162319502312,
+          "mae_aud_per_mwh": 51.747868006680676,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.37736088821854996,
+          "mean_width_80_aud_per_mwh": 82.13256395153198,
+          "mean_width_90_aud_per_mwh": 120.07095655600185,
+          "rmse_aud_per_mwh": 394.4676531894597,
+          "std_dgf_fusion_weight": 0.25311913900806293
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.1946568199869041,
+          "point": 0.6890725140319449,
+          "quantile": 0.15219418865767007,
+          "smoothness": 0.039143727551448584,
+          "sparsity": 0.19457449931239895,
+          "total": 1.0361572413309714
+        },
+        "metrics": {
+          "coverage_80": 0.5394109343405441,
+          "coverage_90": 0.6888281637480447,
+          "mae_aud_per_mwh": 62.11981055168125,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.454266406439083,
+          "mean_width_80_aud_per_mwh": 102.62717210733923,
+          "mean_width_90_aud_per_mwh": 143.02170889011293,
+          "rmse_aud_per_mwh": 180.38482406858384,
+          "std_dgf_fusion_weight": 0.2744474838893917
+        }
+      }
+    },
+    "total": {
+      "best_epoch": 14,
+      "checkpoint": "/root/workspace/Code/DualTimesField/outputs/forecasting/gas_price_ctf_seed2028/NSW1/best_model.pt",
+      "selection_value": 1.031549110038201,
+      "test": {
+        "losses": {
+          "decomposition": 0.30815552797507195,
+          "point": 0.7694112150699443,
+          "quantile": 0.11363250596275389,
+          "smoothness": 0.056140865560985236,
+          "sparsity": 0.131163938392087,
+          "total": 1.1913865650362174
+        },
+        "metrics": {
+          "coverage_80": 0.682904324334608,
+          "coverage_90": 0.8419824781690542,
+          "mae_aud_per_mwh": 51.610993992848464,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.3493595731822427,
+          "mean_width_80_aud_per_mwh": 81.23080582690652,
+          "mean_width_90_aud_per_mwh": 120.37862630319806,
+          "rmse_aud_per_mwh": 394.65956924283597,
+          "std_dgf_fusion_weight": 0.25297590798999936
+        }
+      },
+      "validation": {
+        "losses": {
+          "decomposition": 0.19626296321082554,
+          "point": 0.6891804464460716,
+          "quantile": 0.14593645432192004,
+          "smoothness": 0.04009243086896282,
+          "sparsity": 0.12915411853839404,
+          "total": 1.031549110038201
+        },
+        "metrics": {
+          "coverage_80": 0.5416905116172599,
+          "coverage_90": 0.7022147190111022,
+          "mae_aud_per_mwh": 62.16645260700571,
+          "mean_ctf_fusion_weight": 1.0,
+          "mean_dgf_fusion_weight": 0.4361012331346341,
+          "mean_width_80_aud_per_mwh": 100.47205103534776,
+          "mean_width_90_aud_per_mwh": 142.8209263211891,
+          "rmse_aud_per_mwh": 181.07122614488497,
+          "std_dgf_fusion_weight": 0.27438791048519123
+        }
+      }
+    }
+  },
+  "test": {
+    "losses": {
+      "decomposition": 0.30815552797507195,
+      "point": 0.7694112150699443,
+      "quantile": 0.11363250596275389,
+      "smoothness": 0.056140865560985236,
+      "sparsity": 0.131163938392087,
+      "total": 1.1913865650362174
+    },
+    "metrics": {
+      "coverage_80": 0.682904324334608,
+      "coverage_90": 0.8419824781690542,
+      "mae_aud_per_mwh": 51.610993992848464,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.3493595731822427,
+      "mean_width_80_aud_per_mwh": 81.23080582690652,
+      "mean_width_90_aud_per_mwh": 120.37862630319806,
+      "rmse_aud_per_mwh": 394.65956924283597,
+      "std_dgf_fusion_weight": 0.25297590798999936
+    }
+  },
+  "training_summary": {
+    "completed_epochs": 30,
+    "early_stopping_monitor": "total",
+    "ema_decay": null,
+    "fine_tuning_groups": [],
+    "gradient_clip_norm": null,
+    "stopped_early": false
+  },
+  "validation": {
+    "losses": {
+      "decomposition": 0.19626296321082554,
+      "point": 0.6891804464460716,
+      "quantile": 0.14593645432192004,
+      "smoothness": 0.04009243086896282,
+      "sparsity": 0.12915411853839404,
+      "total": 1.031549110038201
+    },
+    "metrics": {
+      "coverage_80": 0.5416905116172599,
+      "coverage_90": 0.7022147190111022,
+      "mae_aud_per_mwh": 62.16645260700571,
+      "mean_ctf_fusion_weight": 1.0,
+      "mean_dgf_fusion_weight": 0.4361012331346341,
+      "mean_width_80_aud_per_mwh": 100.47205103534776,
+      "mean_width_90_aud_per_mwh": 142.8209263211891,
+      "rmse_aud_per_mwh": 181.07122614488497,
+      "std_dgf_fusion_weight": 0.27438791048519123
+    }
+  },
+  "warm_start": null
+}

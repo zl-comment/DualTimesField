@@ -1,0 +1,60 @@
+{
+  "best_epoch": 1,
+  "checkpoint": "outputs/forecasting/max_spare_dgf_residual_adapter/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_max_spare_dgf_adapter.yaml",
+  "evaluated_commit": "ad9792a",
+  "region": "NSW1",
+  "tag": "aemo-best-max-spare-dgf-residual-adapter-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 437.7238401336784,
+      "ais_90": 696.7194118579004,
+      "crps_quantile_approx": 45.428528475933355,
+      "mae": 70.06118739082676,
+      "piaw_80": 113.68209917695047,
+      "piaw_90": 169.16806518105528,
+      "picp_80": 0.6051309856743337,
+      "picp_90": 0.7648607385423206,
+      "rmse_global": 406.71765182430653,
+      "rmse_horizon_mean": 406.71577329963975,
+      "rmse_window_mean": 124.26072295423617,
+      "sde_global": 404.91006014823137,
+      "sde_window_mean": 106.93155973824636
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 432.97937269624305,
+      "ais_90": 559.8200267449972,
+      "crps_quantile_approx": 49.86836027721407,
+      "mae": 81.20712577169196,
+      "piaw_80": 154.15346438714366,
+      "piaw_90": 211.4050908088866,
+      "picp_80": 0.5950745870054557,
+      "picp_90": 0.7428703597726145,
+      "rmse_global": 198.6925402847485,
+      "rmse_horizon_mean": 198.6848851840074,
+      "rmse_window_mean": 107.03330612776845,
+      "sde_global": 191.4998838237397,
+      "sde_window_mean": 75.59777128578881
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}

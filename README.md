@@ -161,6 +161,317 @@ These values are **paper-reported**, not reproduced by this repository. The auth
 
 Reference: Chen, H., Xu, Y., Wu, W., and Sun, H. *Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models*. Applied Energy (2026). [DOI: 10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
 
+### Trigonometric gated CTF/DGF fusion
+
+The optional trigonometric fusion mode first produces separate linear forecasts
+from CTF and DGF features. A horizon-specific gate then maps the combined CTF,
+DGF, and known-future calendar context to an angle in `[0, pi/2]`. The final
+weights are `cos(theta)^2` and `sin(theta)^2`, so they are non-negative and sum
+to one. The gate is initialized to an equal 50/50 mixture.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+The original configuration defaults to `concatenate`; gated outputs are isolated
+under `outputs/forecasting/trigonometric_gate/`.
+
+### Complementary additive CTF/DGF fusion
+
+The additive trigonometric mode treats the two fields as complementary rather
+than competing experts. CTF is always retained as the low-frequency backbone,
+while a non-negative horizon-specific gate scales the DGF event correction:
+`forecast = CTF forecast + sin(theta)^2 * DGF correction`. This prevents the
+gate from suppressing CTF and preserves direct gradient flow into the CTF head.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/additive_trigonometric_gate/`.
+
+### Temporal convolutional forecast heads
+
+The TCN-head ablation keeps the complementary additive CTF/DGF fusion but
+preserves each field's 72-step time axis. Separate CTF and DGF heads use five
+causal residual blocks with kernel size 3 and dilations 1, 2, 4, 8, and 16.
+Their 125-step receptive field covers the full history. The final historical
+state is combined separately with each of the 24 known-future calendar vectors
+before point and quantile decoding.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_tcn_head.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/additive_tcn_head/`.
+
+### Horizon-specific TCN history attention
+
+The attention TCN head retains all 72 temporal outputs instead of reducing them
+to the final TCN state. Each of the 24 future calendar embeddings becomes a
+query over the full historical key/value sequence, producing a distinct
+history summary for every forecast hour. Separate attention maps are exposed
+for the CTF and DGF branches.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_additive_tcn_attention_head.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/additive_tcn_attention_head/`.
+
+### Point-in-time AEMO supply-demand margin
+
+The maximum-spare-capacity experiment adds one known-future factor without
+changing the historical CTF/DGF decomposition or the additive fusion gate.
+For each hourly forecast origin, the builder selects only AEMO PASA runs that
+were already published. PD PASA supplies the available next-day intervals and
+ST PASA supplies the short tail where PD PASA stops at the market-day boundary.
+Each hourly value is the minimum of its two half-hour margins.
+
+```bash
+python -m forecasting.build_pdpasa_exogenous \
+  --start-year 2015 --end-year 2024
+
+python -m forecasting.train \
+  --config configs/aemo_forecast_max_spare.yaml \
+  --region NSW1
+```
+
+The future margin is projected into each horizon-specific attention query.
+Outputs are isolated under
+`outputs/forecasting/max_spare_future_context/`.
+
+### DGF-only maximum-spare residual adapter
+
+The follow-up experiment preserves the TCN-attention baseline exactly at
+initialization. It loads the selected regional baseline checkpoint, freezes all
+existing parameters, and trains only a zero-initialized nonlinear adapter. The
+calendar embedding continues to form the attention query; maximum spare is
+added only after attention in the DGF event forecast head. Validation total
+loss, MAE, and RMSE each receive an independently selected checkpoint.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_max_spare_dgf_adapter.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under
+`outputs/forecasting/max_spare_dgf_residual_adapter/`.
+
+### Stable progressive DGF fine-tuning
+
+The stable fine-tuning experiment preserves the DGF-only maximum-spare model
+and extends only its optimization procedure. It trains for at most 120 epochs,
+uses adapter, decoder, and temporal stages with discriminative learning rates,
+five-epoch stage-local warmups followed by cosine decay, gradient clipping,
+EMA validation weights, and a validation-relative MAE/RMSE composite for model
+selection. Early stopping cannot activate before epoch 80, ensuring every
+fine-tuning stage is exercised. CTF and the dual-field decomposition remain
+frozen throughout.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_stable_dgf_finetuning.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/stable_dgf_finetuning/`.
+
+### Stable training from scratch
+
+To separate optimizer effects from checkpoint fine-tuning, the from-scratch
+configuration disables warm starts and trains all model parameters. It retains
+AdamW, blended Huber/MSE point loss, gradient clipping, EMA, a five-epoch
+linear warmup, cosine learning-rate decay, and validation-based early stopping.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_stable_from_scratch.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/stable_from_scratch/`.
+
+### Asinh price target
+
+This configuration keeps the additive trigonometric CTF/DGF fusion unchanged
+and applies a variance-stabilizing `asinh((price - median) / MAD)` transform to
+the price channel before standardization. The median and normalized MAD are
+fitted on the training split only. Forecasts and quantiles are mapped back to
+AUD/MWh with the inverse transform before any metric is computed.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/asinh_additive_trigonometric_gate/`.
+RE-Price style metrics for archived checkpoints can be recomputed with
+`python -m forecasting.evaluate_paper_metrics`; see
+[`logs/forecasting/PAPER_METRICS.md`](logs/forecasting/PAPER_METRICS.md).
+Passing `--calibration-dir` additionally fits per-horizon asymmetric conformal
+interval offsets on the validation split and scores the calibrated intervals.
+
+### Price-space quantiles
+
+Setting `data.quantile_target: price` keeps the asinh target for the point
+head but trains the quantile head's pinball loss against the raw price,
+standardized with training statistics. No parameters are added.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_asinh_price_space_quantiles.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/asinh_price_space_quantiles/`.
+
+### Reconstruction residual path
+
+Setting `model.residual_path: true` feeds the remainder
+`history - CTF - DGF` to the CTF expert's linear heads, so history that
+neither field reconstructs still reaches the forecast. It requires a gated
+fusion mode with linear heads.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_residual_skip_path.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/residual_skip_path/`.
+
+### Gas-price CTF context
+
+The `origin_context` block adds one scalar per forecast origin to the CTF
+expert's linear heads: the log mean Victorian DWGM gas price over the seven
+gas days completed before the origin. The source is AEMO's
+`dwgm-prices-and-demand.xlsx`, sheet `Prices`, converted once to
+`data/aemo_exogenous/raw_gas/dwgm_prices.csv` with the columns `Gas_Date`,
+`Hour`, and `Price`.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/gas_price_ctf/`.
+
+### PD PASA scarcity for the DGF expert
+
+Setting `model.future_exogenous_mode: dgf_linear` with a `future_exogenous`
+block feeds the point-in-time 24-hour PD PASA `MAXSPARECAPACITY` trajectory
+to the DGF point and quantile heads and to the fusion gate. The CTF expert
+does not see it. The `.npz` inputs are built by
+`python -m forecasting.build_pdpasa_exogenous`.
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_pdpasa_dgf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/pdpasa_dgf/`.
+
+### PD PASA net load for the CTF expert
+
+The builder writes one `<region>_pdpasa.npz` per region with the hourly
+point-in-time PD PASA fields `max_spare_capacity_mw` (hourly minimum) and
+`demand10_mw`, `demand50_mw`, `demand90_mw`, `uigf_mw`, and
+`available_capacity_mw` (hourly means). Each field is filled from the newest
+run that had already published it. Years can be built in parallel and then
+joined:
+
+```bash
+python -m forecasting.build_pdpasa_exogenous build \
+  --start-year 2024 --end-year 2024 \
+  --output-dir data/aemo_exogenous/yearly_pdpasa/2024
+python -m forecasting.build_pdpasa_exogenous merge \
+  --shard-root data/aemo_exogenous/yearly_pdpasa \
+  --start-year 2015 --end-year 2024
+```
+
+A `ctf_exogenous` block feeds listed features to the CTF point and quantile
+heads only. Besides the stored fields, `net_load_mw` (`demand50_mw -
+uigf_mw`) and `demand_spread_mw` (`demand10_mw - demand90_mw`) are derived on
+load. Setting `clip_to_train_quantiles: [low, high]` in the block clips each
+standardized feature to those quantiles of its training values. Adding
+`out_of_range: log` keeps values inside the bounds unchanged and compresses
+the excess beyond each bound with `log1p` instead of clipping it
+(`configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml`).
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_pdpasa_netload_ctf.yaml \
+  --region NSW1
+```
+
+Outputs are isolated under `outputs/forecasting/pdpasa_netload_ctf/`.
+
+### Same-data baselines and the RE-Price comparison
+
+`forecasting/gbdt_baseline.py` fits one gradient-boosted tree per horizon on
+the same splits and inputs as a configuration.
+`forecasting/protocol_alignment.py` caches the trunk's forecasts over seeds
+and scores them with the baselines under raw, capped, and
+spike-window-removed prices. `forecasting/baselines.py` re-implements
+RE-Price's XGBoost, GRU, and DeepAR baselines on the same inputs, and
+`forecasting/summarize_baselines.py` tabulates them against the trunk
+(`logs/forecasting/BASELINES.md`). Setting `data.price_cap: <c>` clips the price
+column at `c` before training and scoring
+(`configs/aemo_forecast_capped650_trunk.yaml`). The results and commands are in
+`logs/forecasting/PROTOCOL_ALIGNMENT.md`.
+
+Setting `model.quantile_gate: true` gives each quantile level and horizon
+its own affine rescaling of the fusion-gate logit, so the tail quantiles can
+weight the DGF event field differently from the point forecast
+(`configs/aemo_forecast_quantile_gate.yaml`). A `quantile_exogenous` block
+feeds forecast features to the DGF quantile head only; with
+`shortfall_below_train_quantiles: [q, ...]` each feature is replaced by its
+shortfalls `max(knot - value, 0)` below those training quantiles
+(`configs/aemo_forecast_scarcity_quantile_inputs.yaml`). For ablations,
+`model.head_input: raw_history` feeds the raw history to both expert heads
+instead of the CTF and DGF fields
+(`configs/aemo_forecast_ablation_raw_history.yaml`).
+`model.dgf_type: detected` replaces the Gabor DGF with events detected
+explicitly in the price channel, as the largest departures from the window
+median with non-maximum suppression, so the CTF fits only what remains
+(`configs/aemo_forecast_detected_dgf.yaml`); `adaptive` locates atoms by
+attention, and `model.event_echo` echoes events 24 and 48 hours into the
+horizon. `model.detected_events`, `detected_min_separation`,
+`detected_learn_threshold`, and `detected_baseline` set the detector for
+ablations. `forecasting/significance.py` runs Diebold-Mariano tests between
+methods on per-origin errors averaged over seeds.
+
+Setting `training.device_batches: true` builds each split's samples once and
+serves batches from tensors on the training device, in the same order as the
+`DataLoader` with the same seed; a TAS1 trunk run reproduces its stored
+metrics exactly and takes 234 s instead of 375 s. `training.torch_threads`
+caps the CPU threads per process when several runs share a machine.
+
+Any configuration can be retrained with another seed for variance checks;
+`--seed N` overrides `training.seed` and writes to
+`<output_directory>_seed<N>`:
+
+```bash
+python -m forecasting.train \
+  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --region NSW1 --seed 2027
+```
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">

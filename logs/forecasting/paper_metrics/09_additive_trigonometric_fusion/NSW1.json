@@ -1,0 +1,60 @@
+{
+  "best_epoch": 0,
+  "checkpoint": "outputs/forecasting/additive_trigonometric_gate/NSW1/best_model.pt",
+  "config": "configs/aemo_forecast_additive_trigonometric_gate.yaml",
+  "evaluated_commit": "39676db",
+  "region": "NSW1",
+  "tag": "aemo-additive-trigonometric-fusion-30epoch",
+  "test": {
+    "model": {
+      "ais_80": 407.7500115381022,
+      "ais_90": 650.6523639264276,
+      "crps_quantile_approx": 41.440237641423835,
+      "mae": 67.58516270879358,
+      "piaw_80": 95.08067185640667,
+      "piaw_90": 167.16671573472794,
+      "picp_80": 0.6470021688259803,
+      "picp_90": 0.8422250442326351,
+      "rmse_global": 400.3283978254191,
+      "rmse_horizon_mean": 400.320141063966,
+      "rmse_window_mean": 121.63959368308382,
+      "sde_global": 400.27432188810764,
+      "sde_window_mean": 111.93756504869157
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 72.51223265000533,
+      "rmse_global": 528.0270172669971,
+      "rmse_horizon_mean": 528.0270172668796,
+      "rmse_window_mean": 157.0128812190375,
+      "sde_global": 528.0276450674402,
+      "sde_window_mean": 148.22164866960648
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 421.8308821427697,
+      "ais_90": 546.5213496966542,
+      "crps_quantile_approx": 43.35767447573271,
+      "mae": 69.01121566437557,
+      "piaw_80": 117.35868222774141,
+      "piaw_90": 189.20856613221616,
+      "picp_80": 0.6012218152683988,
+      "picp_90": 0.7859963374155888,
+      "rmse_global": 187.8241415393605,
+      "rmse_horizon_mean": 187.63984528615188,
+      "rmse_window_mean": 97.55929091376646,
+      "sde_global": 185.56356396946836,
+      "sde_window_mean": 82.89108625582742
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 56.03495433989345,
+      "rmse_global": 210.14724288886478,
+      "rmse_horizon_mean": 210.14724288580985,
+      "rmse_window_mean": 94.13007624325421,
+      "sde_global": 210.14774178805797,
+      "sde_window_mean": 84.97579179652675
+    }
+  }
+}
