@@ -143,6 +143,32 @@ scores, where the multi-quantile XGBoost is ahead. The comparison with the
 published RE-Price numbers still depends on the unstated price treatment and
 on news, which none of these models use.
 
+## Update: detected-event DGF trunk
+
+The research trunk is now the detected-event DGF (`e2cd5f8`). Against the
+same re-implemented baselines, three-seed means:
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | **48.31 / 42.53 / 33.79** | **41.54 ± 0.06** | **78.80** | **403.48** | 28.15 |
+| XGBoost | 50.85 / 44.70 / 33.89 | 43.15 ± 0.07 | 81.65 | 414.32 | **27.69** |
+| GRU | 52.35 / 46.21 / 38.39 | 45.65 ± 1.16 | 83.43 | 452.50 | 30.12 |
+| DeepAR | 54.24 / 50.84 / 38.51 | 47.86 ± 1.69 | 86.09 | 444.82 | 30.17 |
+
+| Capped at 650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | **29.79 / 30.38** / 30.80 | **30.32 ± 0.12** | **41.29** | 213.16 | 17.86 |
+| XGBoost | 32.88 / 31.18 / **30.77** | 31.61 ± 0.02 | 43.37 | **201.93** | **16.74** |
+| GRU | 34.25 / 34.06 / 35.54 | 34.62 ± 0.62 | 46.09 | 276.51 | 20.39 |
+| DeepAR | 37.09 / 38.75 / 35.19 | 37.01 ± 3.02 | 49.03 | 241.93 | 19.64 |
+
+The trunk now has the lowest MAE in every region on raw prices, and in NSW1
+and QLD1 on capped prices. Pooled Diebold-Mariano tests favour it over every
+baseline under both treatments (p < 0.0001). The TAS1 differences to XGBoost
+(-0.09 raw, +0.03 capped) are not significant. XGBoost keeps the best CRPS~,
+and the best AIS on capped prices. Details are in `EXPERIMENT_RESULTS.md`,
+"Step 5".
+
 ## Reproduction
 
 ```bash

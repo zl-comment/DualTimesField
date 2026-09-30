@@ -451,7 +451,10 @@ explicitly in the price channel, as the largest departures from the window
 median with non-maximum suppression, so the CTF fits only what remains
 (`configs/aemo_forecast_detected_dgf.yaml`); `adaptive` locates atoms by
 attention, and `model.event_echo` echoes events 24 and 48 hours into the
-horizon.
+horizon. `model.detected_events`, `detected_min_separation`,
+`detected_learn_threshold`, and `detected_baseline` set the detector for
+ablations. `forecasting/significance.py` runs Diebold-Mariano tests between
+methods on per-origin errors averaged over seeds.
 
 Setting `training.device_batches: true` builds each split's samples once and
 serves batches from tensors on the training device, in the same order as the

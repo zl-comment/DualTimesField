@@ -1417,6 +1417,80 @@ opens wider before spikes. The echoes do not help: they raise MAE, above
 all in QLD1 (42.53 to 43.8-44.1), although the modulated echo gives the
 lowest CRPS~.
 
+## Step 5: detector ablations, capped-price trunk, and significance
+
+### Detector ablations
+
+Each variant changes one setting of the detected-event DGF and runs seeds
+2026-2028. Configurations: `configs/aemo_forecast_detected_dgf_{k4,k16,sep1,sep6,nothreshold,mean}.yaml`
+(`model.detected_events`, `detected_min_separation`,
+`detected_learn_threshold`, `detected_baseline`); logs and metrics in
+[`step5/`](step5/).
+
+| Variant | Test MAE | Window RMSE | 90% AIS | CRPS~ | Paired MAE vs base (seeds 2026 / 2027 / 2028) |
+|---|---:|---:|---:|---:|---|
+| Base: 8 events, 3-hour separation, learned threshold, median baseline | 41.54 ± 0.06 | 78.80 | 403.48 | 28.15 | - |
+| 4 events | 41.65 ± 0.03 | 78.85 | 405.58 | 28.25 | +0.13 / +0.01 / +0.18 |
+| 16 events | **41.50 ± 0.08** | **78.76** | 404.63 | 28.15 | -0.08 / -0.03 / -0.03 |
+| 1-hour separation (no suppression) | 41.85 ± 0.03 | 79.00 | **399.65** | 28.05 | +0.36 / +0.21 / +0.35 |
+| 6-hour separation | 41.51 ± 0.05 | 78.77 | 407.23 | 28.28 | -0.05 / -0.11 / +0.05 |
+| No threshold (keep every departure) | 41.63 ± 0.08 | 78.98 | 400.41 | **27.97** | +0.21 / -0.03 / +0.07 |
+| Mean instead of median baseline | 41.64 ± 0.03 | 78.91 | 403.30 | 28.02 | +0.09 / +0.05 / +0.15 |
+
+The result is not tied to a lucky setting. Except for removing non-maximum
+suppression, every variant stays within 0.11 MAE of the base, and all of them
+beat the Gabor trunk (41.88) and the raw-history ablation (41.90). Two choices
+matter. Without suppression, neighbouring hours of one episode are counted as
+several events, and MAE rises by 0.31 for every seed. The median baseline
+beats the mean for every seed. Keeping every departure (no threshold) trades
+a little MAE for better intervals.
+
+### Capped-price trunk
+
+The detected-event DGF was also trained and scored on prices capped at 650
+AUD/MWh (`configs/aemo_forecast_capped650_detected_dgf.yaml`), the treatment
+that reproduces RE-Price's error ratios.
+
+| Capped at 650, three-seed mean | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | 29.79 / 30.38 / 30.80 | **30.32 ± 0.12** | **41.29** | 213.16 | 17.86 |
+| Soft-saturated net-load trunk | 30.05 / 30.69 / 31.94 | 30.89 ± 0.13 | 41.94 | 217.47 | 17.86 |
+| Re-implemented XGBoost | 32.88 / 31.18 / 30.77 | 31.61 ± 0.02 | 43.37 | **201.93** | **16.74** |
+
+### Diebold-Mariano tests
+
+[`forecasting/significance.py`](../../forecasting/significance.py) compares the
+detected-event DGF with each method on the per-origin mean absolute error
+over 24 hours, averaged over seeds, with a Newey-West variance (lag 48) for
+the overlapping hourly origins. The pooled test uses the three-region mean
+differential at each origin time. Negative differences favour the
+detected-event DGF. `*` marks p < 0.05, `**` p < 0.01.
+
+| Raw prices, MAE difference | Pooled (DM, p) | NSW1 | QLD1 | TAS1 |
+|---|---|---:|---:|---:|
+| Gabor-DGF trunk | -0.33 (-4.75, <0.0001) | -0.24* | -0.03 | -0.72** |
+| Raw-history ablation | -0.36 (-4.39, <0.0001) | -0.31* | +0.18 | -0.93** |
+| GBDT, same inputs (one seed) | -0.57 (-3.09, 0.002) | -1.63** | -0.05 | -0.04 |
+| XGBoost | -1.60 (-6.58, <0.0001) | -2.54** | -2.17** | -0.09 |
+| GRU | -4.11 (-15.50, <0.0001) | -4.05** | -3.68** | -4.60** |
+| DeepAR | -6.32 (-16.99, <0.0001) | -5.93** | -8.30** | -4.71** |
+| Seasonal naive | -15.63 (-6.47, <0.0001) | -24.21** | -16.63** | -6.04** |
+
+| Capped at 650, MAE difference | Pooled (DM, p) | NSW1 | QLD1 | TAS1 |
+|---|---|---:|---:|---:|
+| Soft-saturated trunk | -0.57 (-8.77, <0.0001) | -0.26** | -0.32** | -1.14** |
+| GBDT, same inputs (one seed) | -0.91 (-5.34, <0.0001) | -2.22** | -0.42* | -0.08 |
+| XGBoost | -1.29 (-6.88, <0.0001) | -3.09** | -0.81** | +0.03 |
+| GRU | -4.30 (-18.23, <0.0001) | -4.47** | -3.68** | -4.74** |
+| DeepAR | -6.69 (-18.76, <0.0001) | -7.30** | -8.38** | -4.39** |
+| Seasonal naive | -6.78 (-16.21, <0.0001) | -9.84** | -7.38** | -3.12** |
+
+Pooled over regions, the detected-event DGF is significantly more accurate
+than every comparator under both price treatments. Per region, it is not
+significantly different from the Gabor trunk, the raw-history ablation, and
+GBDT in QLD1 on raw prices, and it ties XGBoost and GBDT in TAS1 under both
+treatments. Test outputs: [`significance/`](significance/).
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
@@ -1427,29 +1501,30 @@ claim that later versions must dominate earlier ones.
 
 | Rank by average MAE | Version | Test origins / region | Average MAE | Average RMSE | Average 80% coverage | Average 90% coverage |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | Scarcity shortfalls for the DGF quantile head | 17,521 | **41.894** | 272.456 | 65.0% | 84.9% |
-| 2 | Quantile-specific fusion gate | 17,521 | 41.937 | **271.976** | 66.8% | 85.8% |
-| 3 | **Soft-saturated PD PASA net-load CTF input** | 17,521 | 41.963 | 272.031 | 66.4% | 86.4% |
-| 4 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
-| 5 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
-| 6 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
-| 7 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
-| 8 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
-| 9 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
-| 10 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
-| 11 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
-| 12 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
-| 13 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
-| 14 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
-| 15 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
-| 16 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
-| 17 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
-| 18 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
-| 19 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
-| 20 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
-| 21 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
-| 22 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
-| 23 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
+| 1 | **Detected-event DGF** | 17,521 | **41.513** | **271.053** | 62.1% | 83.1% |
+| 2 | Scarcity shortfalls for the DGF quantile head | 17,521 | 41.894 | 272.456 | 65.0% | 84.9% |
+| 3 | Quantile-specific fusion gate | 17,521 | 41.937 | **271.976** | 66.8% | 85.8% |
+| 4 | **Soft-saturated PD PASA net-load CTF input** | 17,521 | 41.963 | 272.031 | 66.4% | 86.4% |
+| 5 | Clipped PD PASA net-load CTF input | 17,521 | 42.497 | 272.409 | 65.6% | 85.6% |
+| 6 | PD PASA net-load CTF | 17,521 | 42.970 | 272.096 | 70.0% | 88.2% |
+| 7 | PD PASA scarcity DGF | 17,521 | 44.064 | 272.526 | 65.8% | 85.3% |
+| 8 | Reconstruction residual path | 17,521 | 44.314 | 276.507 | 60.4% | 82.5% |
+| 9 | Gas-price CTF context | 17,521 | 44.467 | 275.575 | 61.2% | 82.6% |
+| 10 | Asinh price target with price-space quantiles | 17,521 | 45.955 | 277.268 | 61.9% | 82.7% |
+| 11 | Asinh price target, additive trigonometric fusion | 17,521 | 45.989 | 277.596 | 61.6% | 83.5% |
+| 12 | `main` static normalization | 17,521 | 54.556 | 280.748 | 56.4% | 81.1% |
+| 13 | Additive trigonometric fusion | 17,521 | 54.965 | 280.122 | 59.8% | 85.1% |
+| 14 | Time-weighted training | 17,521 | 57.035 | 279.850 | 61.4% | 85.0% |
+| 15 | TCN history attention | 17,521 | 57.712 | 284.532 | 52.5% | 73.5% |
+| 16 | Stable full-model training from scratch | 17,521 | 57.902 | 281.409 | 54.4% | 71.5% |
+| 17 | **DGF maximum-spare residual adapter (recommended exogenous version)** | 17,521 | 58.367 | 282.413 | 53.0% | 74.8% |
+| 18 | Nonlinear GELU head | 17,521 | 59.374 | 281.103 | 61.6% | 84.3% |
+| 19 | TCN last-state head | 17,521 | 60.726 | 283.405 | 60.9% | 74.5% |
+| 20 | Daily grouped sampling, 30 epochs | 17,521 | 63.259 | 284.067 | 47.9% | 77.4% |
+| 21 | Maximum-spare query injection V1 | 17,521 | 64.089 | 278.557 | 53.1% | 77.4% |
+| 22 | Competitive trigonometric gate | 17,521 | 64.138 | 296.260 | 59.2% | 81.5% |
+| 23 | Daily grouped sampling, 240 epochs | 17,521 | 67.104 | 285.342 | 48.1% | 78.5% |
+| 24 | Dynamic window normalization | 17,521 | 74.510 | 318.513 | 68.7% | 91.0% |
 
 The asinh price-target versions lead on both aggregate MAE and aggregate RMSE
 and are the first dual-field versions to beat the `main` static baseline.
@@ -1465,7 +1540,9 @@ clipping of net load is a mixed result, while soft saturation improves MAE
 for every seed (three-seed MAE 41.86 ± 0.24). The quantile-specific gate
 and the scarcity shortfalls leave the point path unchanged, so their
 seed-2026 leads in this table (0.03-0.07 MAE) are not point-accuracy gains;
-their effect is on the intervals. The conformal calibration run reuses the asinh
+their effect is on the intervals. The detected-event DGF leads on seed-2026 MAE and RMSE and, over three
+seeds (41.54 ± 0.06), beats the previous trunk and the raw-history ablation
+for every seed. The conformal calibration run reuses the asinh
 checkpoints, so it has the same point metrics and is not ranked separately. Maximum-spare V1 has the second-lowest aggregate RMSE because
 it emphasizes extreme errors, but its ordinary-hour MAE is poor. The recommended residual-adapter version is the
 best scientific control for using the new factor: it starts exactly from the

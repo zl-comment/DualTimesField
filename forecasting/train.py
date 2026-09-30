@@ -126,6 +126,10 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         dgf_type=model_config.get("dgf_type", "gabor"),
         event_echo=model_config.get("event_echo", False),
         echo_modulation=model_config.get("echo_modulation", True),
+        detected_events=model_config.get("detected_events", 8),
+        detected_min_separation=model_config.get("detected_min_separation", 3),
+        detected_learn_threshold=model_config.get("detected_learn_threshold", True),
+        detected_baseline=model_config.get("detected_baseline", "median"),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])

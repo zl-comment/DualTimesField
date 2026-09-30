@@ -271,20 +271,34 @@ class DetectedEventField(nn.Module):
     makes the CTF fit only what is left, so the two fields separate.
     """
 
-    def __init__(self, num_variables: int, num_events: int = 8, min_separation: int = 3):
+    def __init__(self, num_variables: int, num_events: int = 8, min_separation: int = 3,
+                 learn_threshold: bool = True, baseline: str = "median"):
         super().__init__()
+        if baseline not in {"median", "mean"}:
+            raise ValueError("baseline must be 'median' or 'mean'")
         self.num_variables = num_variables
         self.num_events = num_events
         self.min_separation = min_separation
+        self.baseline = baseline
         self.raw_width = nn.Parameter(torch.tensor(math.log(math.expm1(1.0))))
-        self.raw_threshold = nn.Parameter(torch.tensor(math.log(math.expm1(0.5))))
+        # With learn_threshold=False the threshold is fixed at zero (every
+        # detected departure is kept at full size).
+        self.learn_threshold = learn_threshold
+        self.raw_threshold = nn.Parameter(
+            torch.tensor(math.log(math.expm1(0.5))), requires_grad=learn_threshold
+        )
         self.raw_echo_width = nn.Parameter(torch.tensor(math.log(math.expm1(1.0))))
         self.last_centres = None
         self.last_widths = None
         self.last_amplitudes = None
 
     def detect(self, price: torch.Tensor):
-        departure = price - price.median(dim=1, keepdim=True).values
+        reference = (
+            price.median(dim=1, keepdim=True).values
+            if self.baseline == "median"
+            else price.mean(dim=1, keepdim=True)
+        )
+        departure = price - reference
         remaining = departure.abs()
         steps = price.shape[1]
         index = torch.arange(steps, device=price.device)
@@ -300,7 +314,11 @@ class DetectedEventField(nn.Module):
     def extract_events(self, x: torch.Tensor, t: torch.Tensor, sigma_addition: float = 0.0):
         batch, steps, variables = x.shape
         positions, values = self.detect(x[..., 0])
-        threshold = nn.functional.softplus(self.raw_threshold)
+        threshold = (
+            nn.functional.softplus(self.raw_threshold)
+            if self.learn_threshold
+            else x.new_zeros(())
+        )
         amplitude_price = torch.sign(values) * torch.relu(values.abs() - threshold)
         width = nn.functional.softplus(self.raw_width) + 0.25
         index = torch.arange(steps, device=x.device, dtype=x.dtype)
@@ -482,6 +500,10 @@ class DualFieldLinearForecaster(nn.Module):
         dgf_type: str = "gabor",
         event_echo: bool = False,
         echo_modulation: bool = True,
+        detected_events: int = 8,
+        detected_min_separation: int = 3,
+        detected_learn_threshold: bool = True,
+        detected_baseline: str = "median",
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -684,7 +706,13 @@ class DualFieldLinearForecaster(nn.Module):
         if dgf_type == "adaptive":
             self.dual_field.dgf = AdaptiveEventField(num_variables, num_atoms)
         elif dgf_type == "detected":
-            self.dual_field.dgf = DetectedEventField(num_variables)
+            self.dual_field.dgf = DetectedEventField(
+                num_variables,
+                num_events=detected_events,
+                min_separation=detected_min_separation,
+                learn_threshold=detected_learn_threshold,
+                baseline=detected_baseline,
+            )
         self.echo_modulator = None
         if event_echo and echo_modulation:
             # Per forecast hour, spike and trough echo strengths from the hour's
