@@ -1307,6 +1307,50 @@ mixture event field is not yet a better event forecaster than a logistic
 regression on the same drivers, and the DGF, with atom positions fixed across
 samples, does not supply a useful event state.
 
+## Adaptive DGF with a daily event echo (first version)
+
+The future event field did not help, and the original DGF's atom centres are
+shared by every sample, so in a rolling window they cannot follow the clock
+hour of an event. Timing matters. Over 2015-2024, a spike at the same hour
+yesterday raises the chance of a spike to 51-67%, against 6-8% after a spike
+at another hour of the last day (troughs: 30-59% against 8-14%). Adding a
+"same hour yesterday" indicator to the logistic event regression raises
+spike PR-AUC from 0.303 to 0.322 (NSW1), 0.234 to 0.266 (QLD1), and 0.096 to
+0.166 (TAS1).
+
+This version replaces the DGF with `AdaptiveEventField`
+(`model.dgf_type: adaptive`). A two-layer convolutional encoder of the
+residual gives each of 16 atoms an attention distribution over the window;
+the atom's centre, signed amplitude, width, and gate follow from it, and the
+event signal is a sum of Gaussian bumps. With `model.event_echo: true` each
+atom is echoed 24 and 48 hours forward into the horizon (separate spike and
+trough channels), optionally scaled per hour by drivers (`echo_modulation`),
+and fed to the DGF heads and gate. Configurations:
+`configs/aemo_forecast_{adaptive_dgf,adaptive_dgf_echo_raw,adaptive_dgf_echo}.yaml`;
+logs and metrics in [`adaptive_dgf/`](adaptive_dgf/).
+
+| Three-seed mean | Test MAE | Window SDE | 90% AIS | CRPS~ | NSW1 / QLD1 / TAS1 MAE |
+|---|---:|---:|---:|---:|---|
+| Scarcity trunk (Gabor DGF) | 41.88 ± 0.22 | 72.97 | 412.60 | 28.43 | 48.55 / 42.57 / 34.51 |
+| Raw-history ablation | 41.90 ± 0.11 | 73.25 | 408.81 | 28.40 | 48.61 / 42.36 / 34.73 |
+| Adaptive atoms only | 42.04 ± 0.24 | 72.94 | 414.00 | 28.46 | 48.57 / 42.62 / 34.94 |
+| Adaptive atoms + echo | **41.84 ± 0.05** | **72.75** | **407.36** | **28.09** | 48.57 / **42.00** / 34.93 |
+| Adaptive atoms + modulated echo | **41.84 ± 0.17** | 72.84 | 410.92 | 28.26 | **48.44** / 42.01 / 35.08 |
+
+Paired over seeds, the echo variants' MAE changes against the trunk are
+-0.08, +0.25, -0.29 (unmodulated) and +0.12, +0.03, -0.24 (modulated), inside
+seed noise. CRPS~ falls by 0.60, 0.60, and rises by 0.20 for the unmodulated
+echo. QLD1 MAE improves by 0.57 and TAS1 worsens by about 0.45.
+
+The mechanism does not work as designed. On the test split, the 16 atom
+centres of a window collapse to almost one position (standard deviation
+0.1-0.8 hours across atoms). In windows with a spike, the three strongest
+atoms lie a median 17.5-18.4 hours from it, against about 22 hours for random
+placement. The lag-24 spike echo has no skill for future spikes (ROC-AUC
+0.50, 0.50, and 0.25). Soft attention with a reconstruction loss lets all
+atoms fit one broad bump; nothing forces them onto separate events. The small
+interval gains of the echo variants therefore do not come from event timing.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

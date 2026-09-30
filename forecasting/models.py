@@ -176,6 +176,88 @@ class TemporalConvForecastHead(nn.Module):
         )
 
 
+class AdaptiveEventField(nn.Module):
+    """DGF whose event atoms are located per sample.
+
+    The original DGF places its atoms at centres shared by every sample, so a
+    given centre falls on a different clock hour in each rolling window and
+    cannot follow where a sample's spikes and troughs actually are.  Here a
+    small convolutional encoder of the residual gives each atom an attention
+    distribution over the window; the atom's centre is the attention-weighted
+    time, its signed amplitude the attention-weighted residual, and its width
+    and gate come from the attended features.  The event field is the sum of
+    Gaussian bumps at those centres.  ``extract_events`` keeps the DGF
+    interface (event signal, gated amplitudes, gates); the last centres,
+    widths, and amplitudes are kept for the echo into the forecast horizon.
+    """
+
+    def __init__(self, num_variables: int, num_atoms: int = 16, hidden_dim: int = 32,
+                 kernel_size: int = 5, min_width: float = 0.5):
+        super().__init__()
+        padding = kernel_size // 2
+        self.encoder = nn.Sequential(
+            nn.Conv1d(num_variables, hidden_dim, kernel_size, padding=padding),
+            nn.GELU(),
+            nn.Conv1d(hidden_dim, hidden_dim, kernel_size, padding=padding),
+            nn.GELU(),
+        )
+        self.locator = nn.Conv1d(hidden_dim, num_atoms, 1)
+        self.width_head = nn.Linear(hidden_dim, 1)
+        self.gate_head = nn.Linear(hidden_dim, 1)
+        self.min_width = min_width
+        self.num_atoms = num_atoms
+        self.last_centres = None
+        self.last_widths = None
+        self.last_amplitudes = None
+
+    def extract_events(self, x: torch.Tensor, t: torch.Tensor, sigma_addition: float = 0.0):
+        batch, steps, _ = x.shape
+        features = self.encoder(x.transpose(1, 2))
+        attention = torch.softmax(self.locator(features), dim=-1)
+        index = torch.arange(steps, device=x.device, dtype=x.dtype)
+        centres = attention @ index
+        amplitude_raw = attention @ x
+        attended = attention @ features.transpose(1, 2)
+        # sigma_addition is in window units, like the original annealed width.
+        widths = (
+            nn.functional.softplus(self.width_head(attended)[..., 0])
+            + self.min_width
+            + sigma_addition * (steps - 1)
+        )
+        gate = torch.sigmoid(5 * self.gate_head(attended)[..., 0])
+        amplitude = amplitude_raw * gate.unsqueeze(-1)
+        bumps = torch.exp(
+            -((index.view(1, 1, -1) - centres.unsqueeze(-1)) ** 2)
+            / (2 * widths.unsqueeze(-1) ** 2)
+        )
+        event_signal = torch.einsum("bkt,bkd->btd", bumps, amplitude)
+        self.last_centres, self.last_widths, self.last_amplitudes = centres, widths, amplitude
+        return event_signal, amplitude, gate
+
+    def initialize_from_residual(self, residual, t):
+        return None
+
+    def echo(self, steps: int, horizon: int, lags=(24, 48)) -> torch.Tensor:
+        """Project each located atom forward by whole days into the horizon.
+
+        Returns ``[B, horizon, 2 * len(lags)]``: for each lag, the summed
+        positive (spike) and negative (trough) price-channel bumps landing on
+        each forecast hour.
+        """
+        hours = torch.arange(horizon, device=self.last_centres.device, dtype=self.last_centres.dtype)
+        price = self.last_amplitudes[..., 0]
+        parts = []
+        for lag in lags:
+            landing = self.last_centres + lag - steps
+            bumps = torch.exp(
+                -((hours.view(1, 1, -1) - landing.unsqueeze(-1)) ** 2)
+                / (2 * self.last_widths.unsqueeze(-1) ** 2)
+            )
+            parts.append(torch.einsum("bkh,bk->bh", bumps, torch.relu(price)))
+            parts.append(torch.einsum("bkh,bk->bh", bumps, torch.relu(-price)))
+        return torch.stack(parts, dim=-1)
+
+
 class FutureEventField(nn.Module):
     """Two-sided event process over the forecast horizon.
 
@@ -334,6 +416,9 @@ class DualFieldLinearForecaster(nn.Module):
         event_state_source: str = "dgf",
         event_detach_level: bool = True,
         event_recent_extremes: bool = False,
+        dgf_type: str = "gabor",
+        event_echo: bool = False,
+        echo_modulation: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -424,6 +509,17 @@ class DualFieldLinearForecaster(nn.Module):
             if future_exogenous_mode == "dgf_linear"
             else 0
         )
+        if dgf_type not in {"gabor", "adaptive"}:
+            raise ValueError("dgf_type must be 'gabor' or 'adaptive'")
+        if event_echo and dgf_type != "adaptive":
+            raise ValueError("event_echo needs the adaptive DGF")
+        self.dgf_type = dgf_type
+        self.event_echo = event_echo
+        self.echo_modulation = echo_modulation
+        self.echo_lags = (24, 48)
+        if event_echo:
+            # Echo features reach the DGF heads and the gate, like the scarcity inputs.
+            dgf_exogenous_dim += forecast_horizon * 2 * len(self.echo_lags)
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -522,6 +618,15 @@ class DualFieldLinearForecaster(nn.Module):
                 self.quantile_gate_bias = nn.Parameter(
                     torch.zeros(forecast_horizon, len(self.quantiles))
                 )
+        if dgf_type == "adaptive":
+            self.dual_field.dgf = AdaptiveEventField(num_variables, num_atoms)
+        self.echo_modulator = None
+        if event_echo and echo_modulation:
+            # Per forecast hour, spike and trough echo strengths from the hour's
+            # scarcity, surplus, and calendar inputs.
+            self.echo_modulator = nn.Linear(
+                future_exogenous_dim + quantile_exogenous_dim + ctf_exogenous_dim + calendar_dim, 2
+            )
 
     def _concatenated_forecast(
         self,
@@ -560,6 +665,7 @@ class DualFieldLinearForecaster(nn.Module):
         origin_context: torch.Tensor | None = None,
         ctf_exogenous: torch.Tensor | None = None,
         quantile_exogenous: torch.Tensor | None = None,
+        echo_features: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -567,6 +673,8 @@ class DualFieldLinearForecaster(nn.Module):
         dgf_extra = []
         if self.future_exogenous_mode == "dgf_linear":
             dgf_extra = [future_exogenous.flatten(start_dim=1)]
+        if echo_features is not None:
+            dgf_extra.append(echo_features.flatten(start_dim=1))
         gate_features = torch.cat(
             [ctf_flat, event_flat, calendar_flat, *dgf_extra], dim=1
         )
@@ -742,6 +850,20 @@ class DualFieldLinearForecaster(nn.Module):
         event_signal, amplitude, gate = self.dual_field.dgf.extract_events(
             residual, history_time, sigma_addition
         )
+        echo_features = None
+        if self.event_echo:
+            echo = self.dual_field.dgf.echo(self.input_length, self.forecast_horizon, self.echo_lags)
+            if self.echo_modulator is not None:
+                drivers = [
+                    part for part in (future_exogenous, quantile_exogenous, ctf_exogenous)
+                    if part is not None
+                ]
+                strength = torch.sigmoid(
+                    self.echo_modulator(torch.cat([*drivers, future_calendar], dim=-1))
+                )
+                # Channels alternate spike, trough for each lag.
+                echo = echo * strength.repeat(1, 1, len(self.echo_lags))
+            echo_features = echo
 
         if self.fusion_mode == "concatenate":
             forecasts = self._concatenated_forecast(
@@ -766,7 +888,10 @@ class DualFieldLinearForecaster(nn.Module):
                 origin_context,
                 ctf_exogenous,
                 quantile_exogenous,
+                echo_features,
             )
+            if echo_features is not None:
+                forecasts["event_echo"] = echo_features
 
         if self.event_field is not None:
             level_mean = forecasts["point_forecast"]

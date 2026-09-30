@@ -1,0 +1,58 @@
+{
+  "best_epoch": 13,
+  "checkpoint": "outputs/forecasting/adaptive_dgf_echo_seed2028/TAS1/best_model.pt",
+  "config": "configs/aemo_forecast_adaptive_dgf_echo.yaml",
+  "region": "TAS1",
+  "test": {
+    "model": {
+      "ais_80": 203.74863292131533,
+      "ais_90": 273.7137948105897,
+      "crps_quantile_approx": 20.648192082252166,
+      "mae": 35.062932778613735,
+      "piaw_80": 58.74268719512388,
+      "piaw_90": 96.88827876676547,
+      "picp_80": 0.5877661092403401,
+      "picp_90": 0.7957831554515534,
+      "rmse_global": 159.74639573043282,
+      "rmse_horizon_mean": 159.73904874858223,
+      "rmse_window_mean": 50.3468078378508,
+      "sde_global": 159.35567548246144,
+      "sde_window_mean": 43.6274001714144
+    },
+    "origins": 17521,
+    "seasonal_naive_24h": {
+      "mae": 39.83173428711957,
+      "rmse_global": 222.81398071289297,
+      "rmse_horizon_mean": 222.8139807125718,
+      "rmse_window_mean": 67.37131202809555,
+      "sde_global": 222.81424224969788,
+      "sde_window_mean": 61.28634379354252
+    }
+  },
+  "validation": {
+    "model": {
+      "ais_80": 456.42358182417723,
+      "ais_90": 677.2713690483561,
+      "crps_quantile_approx": 45.11444900148942,
+      "mae": 56.047925542761554,
+      "piaw_80": 66.01913217988665,
+      "piaw_90": 110.02175952726834,
+      "picp_80": 0.4526486971118996,
+      "picp_90": 0.6535996337415589,
+      "rmse_global": 267.9150824048439,
+      "rmse_horizon_mean": 267.8847999359734,
+      "rmse_window_mean": 85.21709338068808,
+      "sde_global": 266.3880111216381,
+      "sde_window_mean": 71.24187598156522
+    },
+    "origins": 8737,
+    "seasonal_naive_24h": {
+      "mae": 69.58768914132943,
+      "rmse_global": 376.2923340290235,
+      "rmse_horizon_mean": 376.29233402898217,
+      "rmse_window_mean": 120.54134674928261,
+      "sde_global": 376.2932206481938,
+      "sde_window_mean": 108.18133399776077
+    }
+  }
+}
