@@ -447,6 +447,12 @@ shortfalls `max(knot - value, 0)` below those training quantiles
 instead of the CTF and DGF fields
 (`configs/aemo_forecast_ablation_raw_history.yaml`).
 
+Setting `training.device_batches: true` builds each split's samples once and
+serves batches from tensors on the training device, in the same order as the
+`DataLoader` with the same seed; a TAS1 trunk run reproduces its stored
+metrics exactly and takes 234 s instead of 375 s. `training.torch_threads`
+caps the CPU threads per process when several runs share a machine.
+
 Any configuration can be retrained with another seed for variance checks;
 `--seed N` overrides `training.seed` and writes to
 `<output_directory>_seed<N>`:

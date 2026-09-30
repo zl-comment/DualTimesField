@@ -144,8 +144,74 @@ def build_loss(config: Mapping) -> DualFieldForecastLoss:
     )
 
 
-def build_loaders(datasets: Mapping, training_config: Mapping) -> Dict[str, DataLoader]:
+class DeviceBatches:
+    """Serves a dataset's batches from tensors kept on the training device.
+
+    Every sample is built once and stacked on the device, so an epoch only
+    indexes device tensors instead of running ``__getitem__`` per sample.
+    With ``shuffle`` the order reproduces a ``DataLoader`` with the same
+    generator. Each epoch, the loader draws its base seed, then
+    ``RandomSampler`` draws the ``randperm`` it serves and, once exhausted,
+    one more ``randperm`` for the (empty) remainder. Batches are consecutive
+    slices of the served permutation.
+    """
+
+    def __init__(
+        self,
+        dataset,
+        batch_size: int,
+        shuffle: bool,
+        device: torch.device,
+        generator: torch.Generator | None = None,
+    ):
+        if shuffle and generator is None:
+            raise ValueError("Shuffled device batches need a generator")
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.generator = generator
+        samples = [dataset[index] for index in range(len(dataset))]
+        self.tensors = {
+            key: torch.stack([sample[key] for sample in samples]).to(device)
+            for key, value in samples[0].items()
+            if torch.is_tensor(value)
+        }
+        self.size = len(samples)
+        self.device = device
+
+    def __len__(self) -> int:
+        return math.ceil(self.size / self.batch_size)
+
+    def __iter__(self):
+        if self.shuffle:
+            torch.empty((), dtype=torch.int64).random_(generator=self.generator)
+            order = torch.randperm(self.size, generator=self.generator)
+            torch.randperm(self.size, generator=self.generator)
+        else:
+            order = torch.arange(self.size)
+        order = order.to(self.device)
+        for start in range(0, self.size, self.batch_size):
+            index = order[start:start + self.batch_size]
+            yield {key: value[index] for key, value in self.tensors.items()}
+
+
+def build_loaders(
+    datasets: Mapping, training_config: Mapping, device: torch.device | None = None
+) -> Dict[str, DataLoader]:
     seed_generator = torch.Generator().manual_seed(training_config["seed"])
+    if training_config.get("device_batches", False):
+        if device is None:
+            raise ValueError("device_batches needs the training device")
+        return {
+            split: DeviceBatches(
+                datasets[split],
+                training_config["batch_size"],
+                shuffle=split == "train",
+                device=device,
+                generator=seed_generator if split == "train" else None,
+            )
+            for split in ("train", "validation", "test")
+        }
     return {
         "train": DataLoader(
             datasets["train"],
@@ -680,10 +746,12 @@ def run_training(
         config["training"]["seed"] = seed
         config["training"]["output_directory"] += f"_seed{seed}"
     training_config = config["training"]
+    if training_config.get("torch_threads") is not None:
+        torch.set_num_threads(int(training_config["torch_threads"]))
     set_seed(training_config["seed"])
     device = resolve_device(training_config["device"])
     datasets = build_region_datasets(config_path, region)
-    loaders = build_loaders(datasets, training_config)
+    loaders = build_loaders(datasets, training_config, device)
     model = build_model(config).to(device)
     criterion = build_loss(config).to(device)
     warm_start_metadata = initialize_from_warm_start(
