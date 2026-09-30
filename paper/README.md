@@ -13,6 +13,28 @@ trained models of `configs/aemo_forecast_scarcity_quantile_inputs.yaml` and
 `configs/aemo_forecast_detected_dgf.yaml`. Figures are written as vector PDF
 and 300-dpi PNG; tables are LaTeX fragments for `booktabs`.
 
+## LaTeX components
+
+`components/` wraps each figure and table in a float with a draft caption and
+label, ready to `\input`. They need `graphicx` and `booktabs`, and read files
+through `\materialsdir` (default `.`, i.e. compile from `paper/`); from another
+directory set it first, e.g. `\newcommand{\materialsdir}{../paper}`.
+
+| Component | Float | Label |
+|---|---|---|
+| `fig_architecture.tex` | `figure*`, 0.8 text width | `fig:architecture` |
+| `fig_field_separation.tex` | `figure*` | `fig:field-separation` |
+| `fig_ablation_ladder.tex` | `figure*` | `fig:ablation-ladder` |
+| `fig_comparison.tex` | `figure*` | `fig:comparison` |
+| `tab_main.tex` | `table*` | `tab:main` |
+| `tab_significance.tex` | `table*` | `tab:significance` |
+| `tab_ablations.tex` | `table*` | `tab:ablations` |
+| `tab_field_separation.tex` | `table` (one column) | `tab:field-separation` |
+| `tab_re_price.tex` | `table*` | `tab:re-price` |
+
+`preview.tex` inputs all of them in an ICML-sized two-column page
+(`pdflatex preview.tex` from `paper/`).
+
 ## Story in one paragraph
 
 Electricity prices combine a slowly varying level with rare scarcity spikes

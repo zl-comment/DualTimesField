@@ -1,0 +1,15 @@
+% Table: main same-data comparison. Needs booktabs.
+\providecommand{\materialsdir}{.}
+\begin{table*}[t]
+  \centering
+  \caption{Same-data comparison on the 2023--2024 test set (17{,}521 hourly
+    origins per region, 24-hour horizon). All models use the same splits and
+    inputs, without news; cells are means over three seeds, and Mean MAE
+    shows the seed standard deviation. Window RMSE is averaged over forecast
+    windows; 90\% AIS is the average interval score of the 5--95\% interval;
+    CRPS is approximated by twice the mean pinball loss over the quantiles
+    0.05, 0.10, 0.50, 0.90, 0.95. Lower is better; best in bold.}
+  \label{tab:main}
+  \small
+  \input{\materialsdir/tables/same_data_comparison.tex}
+\end{table*}

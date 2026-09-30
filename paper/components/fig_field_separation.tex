@@ -1,0 +1,14 @@
+% Figure: transplanted vs detected-event DGF. Needs graphicx.
+\providecommand{\materialsdir}{.}
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{\materialsdir/figures/field_separation.pdf}
+  \caption{Field separation. \emph{Top:} one NSW test window in standardized
+    asinh price. Transplanted from reconstruction, the Gabor DGF stays flat and
+    the CTF absorbs the spikes (left); with detected events the spikes and
+    troughs move into the DGF and the CTF keeps the level (right).
+    \emph{Bottom:} share of past spike-hour prices ($>300$~AUD/MWh) carried by
+    the event field on the test split: $-0.04$ to $0.00$ for the transplanted
+    model, $0.28$ to $0.33$ for ours.}
+  \label{fig:field-separation}
+\end{figure*}
