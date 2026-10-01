@@ -134,6 +134,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         field_forecast=bool(model_config.get("field_forecast", True)),
         field_normalization=model_config.get("field_normalization", "none"),
         ctf_heads=bool(model_config.get("ctf_heads", True)),
+        field_point=bool(model_config.get("field_point", True)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])

@@ -508,6 +508,7 @@ class DualFieldLinearForecaster(nn.Module):
         field_forecast: bool = True,
         field_normalization: str = "none",
         ctf_heads: bool = True,
+        field_point: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -742,6 +743,11 @@ class DualFieldLinearForecaster(nn.Module):
         # (an ablation; the CTF is still fitted by the decomposition loss).
         self.field_normalization = field_normalization
         self.ctf_heads = ctf_heads
+        # field_point=False: the fields add to the quantiles only and the
+        # point forecast is the linear base's.
+        if not field_point and not linear_base:
+            raise ValueError("field_point=False needs linear_base")
+        self.field_point = field_point
         self.linear_base = linear_base
         self.field_forecast = field_forecast
         if linear_base:
@@ -1049,7 +1055,9 @@ class DualFieldLinearForecaster(nn.Module):
             forecasts["base_point"] = base_point
             if self.field_forecast:
                 forecasts["field_point"] = forecasts["point_forecast"]
-                forecasts["point_forecast"] = base_point + forecasts["point_forecast"]
+                forecasts["point_forecast"] = (
+                    base_point + forecasts["point_forecast"] if self.field_point else base_point
+                )
                 base_quantile = base_quantile + forecasts["quantile_forecast"]
             else:
                 # Control: the linear base alone, trained in the dual-field

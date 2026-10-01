@@ -1671,6 +1671,56 @@ DGF-only) all lose to the linear base alone on mean MAE. The fields lower the
 probabilistic scores of the base (CRPS~ 28.2-28.6 against 29.67 raw), but not
 to the level of the linear quantile baseline (26.47).
 
+## Fields on the quantiles only, asinh-space quantiles
+
+Branch `feature/field-tails`. The point forecast is the linear base's
+(`field_point: false`), and the quantiles are learned in the asinh target space
+(`quantile_target: transformed`), as in the linear quantile baseline, as base
+quantiles plus the field residual. `tails_base_only` is the base alone;
+`tails_dgf` silences the CTF experts. Seeds 2026-2028; metrics in
+[`field_tails/paper_metrics/`](field_tails/paper_metrics/); tail scores from
+[`forecasting/tail_metrics.py`](../../forecasting/tail_metrics.py) on
+seed-averaged quantiles ([`field_tails/raw_tail_metrics.json`](field_tails/raw_tail_metrics.json),
+[`field_tails/capped650_tail_metrics.json`](field_tails/capped650_tail_metrics.json)).
+
+| Raw prices | Mean MAE | 90% PICP | 90% PIAW | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| `tails_base_only` | 40.58 ± 0.02 | 81.63 | 171.38 | 440.45 | 28.94 |
+| `tails_fields` | 40.58 ± 0.01 | 92.97 | 418.48 | 532.12 | 31.25 |
+| `tails_dgf` | 40.58 ± 0.02 | 88.30 | 537.22 | 673.63 | 34.94 |
+| `linear` baseline | 40.89 ± 0.04 | 83.80 | 141.42 | 389.01 | **26.29** |
+| XGBoost | 43.15 ± 0.07 | 84.48 | 164.15 | 414.32 | 27.69 |
+
+| Capped at 650 | Mean MAE | 90% PICP | 90% PIAW | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| `tails_base_only` | 29.42 ± 0.01 | 81.46 | 158.81 | 251.06 | 18.72 |
+| `tails_fields` | 29.45 ± 0.04 | 93.18 | 334.20 | 365.97 | 22.19 |
+| `tails_dgf` | 29.40 ± 0.04 | 88.18 | 357.66 | 413.46 | 23.49 |
+| `linear` baseline | 29.59 ± 0.04 | 83.77 | 132.16 | 208.57 | **16.37** |
+| XGBoost | 31.61 ± 0.02 | 83.01 | 113.06 | 201.93 | 16.74 |
+
+Tail scores, raw prices (mean of regions, seed-averaged quantiles):
+
+| Model | CRPS~ 100-300 | CRPS~ above 300 | q95 pinball, spike hours | q05 pinball, negative hours | Spike hit / false alarm | Negative hit / false alarm |
+|---|---:|---:|---:|---:|---|---|
+| `tails_base_only` | 24.50 | 830.78 | 689.1 | 16.58 | 85.1% / 10.9% | 87.1% / 16.0% |
+| `tails_fields` | 34.93 | **730.91** | **566.3** | 10.34 | 90.3% / 24.1% | 94.6% / 26.3% |
+| `linear` baseline | 23.51 | 811.02 | 671.9 | 10.11 | 85.5% / 10.8% | 84.4% / 14.1% |
+| XGBoost | 25.66 | 840.70 | 691.8 | 10.10 | 86.0% / 13.2% | 86.4% / 12.2% |
+| Detected-event DGF (price-space quantiles) | 25.00 | 863.59 | 714.0 | **6.67** | 52.3% / 4.8% | 91.8% / 20.3% |
+
+| Finding | Evidence |
+|---|---|
+| The point forecast stays at the linear level | MAE 40.58 raw and 29.40-29.45 capped in every variant |
+| In asinh space the fields widen the intervals instead of sharpening them | 90% width 418-537 against 171 for the base; coverage 88-93%; CRPS~ and AIS worse than the base and the linear baseline under both treatments |
+| They buy spike coverage with false alarms | Raw spike-hour CRPS~ 731 against 811 (linear) and q95 pinball 566 against 672, but the 100-300 band rises to 34.9 against 23.5 and spike false alarms double (24% against 11%); on capped prices the spike-hour gain disappears (160 against 135) |
+| The negative-price tail is best with price-space quantiles | q05 pinball on negative hours 6.67 for the detected-event DGF and 6.14 for base + fields with price-space quantiles (`linear_base`), against 10.1 for the linear baseline and XGBoost; asinh-space quantiles lose this (10.34) |
+| The base's asinh quantiles in the dual-field pipeline are weaker than the external linear model | CRPS~ 28.94 against 26.29, with the same inputs; the pipeline trains them jointly with the MSE point and selects the checkpoint by the total validation loss |
+
+No variant beats the linear quantile baseline on CRPS~ or AIS. The one tail
+where the fields are clearly ahead of every baseline is the lower tail on
+negative-price hours, with price-space quantiles.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
