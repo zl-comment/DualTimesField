@@ -112,6 +112,26 @@ def _validate_splits(frame: pd.DataFrame, config: Mapping) -> None:
         raise ValueError("Some timestamps fall outside the configured split periods")
 
 
+def _relabel_splits(frame: pd.DataFrame, config: Mapping) -> None:
+    """Labels rows by the configured split periods instead of the file's labels.
+
+    Used for rolling recalibration, where each refit has its own training,
+    validation, and test periods. Rows outside every period are labelled
+    "unused": they can still serve as history, but never as a target.
+    """
+    data_config = config["data"]
+    delivery = frame[data_config["delivery_column"]]
+    labels = np.full(len(frame), "unused", dtype=object)
+    for split_name, boundaries in data_config["split_boundaries"].items():
+        start = pd.Timestamp(boundaries["start"], tz=data_config["timezone"])
+        end = pd.Timestamp(boundaries["end_exclusive"], tz=data_config["timezone"])
+        in_period = (delivery.ge(start) & delivery.lt(end)).to_numpy()
+        if (labels[in_period] != "unused").any():
+            raise ValueError(f"The {split_name} period overlaps another split period")
+        labels[in_period] = split_name
+    frame[data_config["split_column"]] = labels
+
+
 def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     data_config = config["data"]
     region_files = data_config["region_files"]
@@ -129,7 +149,10 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     if frame[numeric_columns].isna().any().any():
         raise ValueError(f"Missing values found in model columns for {region}")
     _validate_hourly_timeline(frame, config)
-    _validate_splits(frame, config)
+    if data_config.get("relabel_splits", False):
+        _relabel_splits(frame, config)
+    else:
+        _validate_splits(frame, config)
     price_cap = data_config.get("price_cap")
     if price_cap is not None:
         # Clip the price column before it is used as history or target, so

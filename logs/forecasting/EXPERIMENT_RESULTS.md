@@ -1721,6 +1721,49 @@ No variant beats the linear quantile baseline on CRPS~ or AIS. The one tail
 where the fields are clearly ahead of every baseline is the lower tail on
 negative-price hours, with price-space quantiles.
 
+## Quarterly rolling recalibration
+
+Branch `feature/rolling-recalibration`. [`forecasting/rolling.py`](../../forecasting/rolling.py)
+refits a model before each of the eight test quarters of 2023-2024: refit `k`
+trains on 2015 up to three months before the quarter, selects its checkpoint
+on those three months, and forecasts the quarter's origins
+(`data.relabel_splits` labels rows by the configured periods; later rows are
+never targets). The stitched forecasts cover exactly the 17,521 origins of the
+static test split. Raw prices, seeds 2026-2028, 144 refits
+(`scripts/run_rolling.sh`); metrics in [`rolling/paper_metrics/`](rolling/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Static: linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| Static: linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Rolling: linear base only | 47.29 / 42.14 / 31.26 | 40.23 ± 0.01 | 77.49 | 424.29 | 27.68 |
+| Rolling: linear base + fields | 47.56 / 41.57 / 31.26 | **40.13 ± 0.07** | **77.27** | **392.87** | **26.90** |
+
+Diebold-Mariano on per-origin MAE ([`significance/raw_rolling.json`](significance/raw_rolling.json)),
+rolling base + fields minus rolling base only: pooled -0.10 (p = 0.25); NSW1
++0.27 (p = 0.04), QLD1 -0.57 (p = 0.001), TAS1 0.00 (p = 1.0).
+
+Tail scores on seed-averaged quantiles ([`rolling/raw_tail_metrics.json`](rolling/raw_tail_metrics.json)):
+
+| Model | CRPS~ | CRPS~ below 0 | CRPS~ 100-300 | CRPS~ above 300 | q95 pinball, spikes | q05 pinball, negative | Spike hit / false alarm |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Rolling: base only | 27.13 | 18.58 | 18.72 | 911.87 | 815.4 | 8.10 | 80.0% / 8.1% |
+| Rolling: base + fields | **25.85** | **15.49** | 20.14 | 840.76 | 705.6 | **4.59** | 83.7% / 9.4% |
+| Static: base + fields | 27.24 | 19.98 | 24.60 | 856.82 | 703.6 | 6.14 | 58.4% / 6.0% |
+| Static: `linear` quantile baseline | 26.11 | 21.11 | 23.51 | 811.02 | 671.9 | 10.11 | 85.5% / 10.8% |
+
+| Finding | Evidence |
+|---|---|
+| With recalibration the fields no longer cost point accuracy | Base + fields 40.13 against base 40.23 (pooled p = 0.25), where the static split cost 0.92 (p < 0.0001); QLD1 improves significantly, NSW1 worsens slightly |
+| Where the fields help and hurt | Of the absolute-error gain, negative prices contribute 77%, 0-100 AUD/MWh 44%, and spikes 35%, against -57% from the 100-300 band ([`rolling/raw_price_band_fields_vs_base.json`](rolling/raw_price_band_fields_vs_base.json)) |
+| They improve the probabilistic forecast | CRPS~ 25.85 against 27.13 for the same base (seed-averaged); 90% AIS 392.87 against 424.29; q05 pinball on negative-price hours 4.59 against 8.10, and spike-hour CRPS~ 841 against 912 |
+| Recalibration helps everything, most in TAS1 | Rolling base + fields is 2.53 below the static detected-event DGF in TAS1 and 1.41 below it pooled |
+
+The comparison with external baselines is not yet fair: they are still
+trained once on the static split. The linear quantile baseline, XGBoost,
+DLinear, and PatchTST must be recalibrated the same way before any claim
+against them.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
