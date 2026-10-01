@@ -1629,6 +1629,48 @@ The dual-field heads, as built, add capacity that fits the 2015-2021 price
 level and does not transfer to 2022-2024. Models that normalize each window
 (PatchTST, iTransformer) do not show this; Informer, which does not, does.
 
+## Window-normalized fields on the linear base
+
+Branch `feature/window-normalized-fields`. `field_normalization: window`
+normalizes each window's history (per variable, by its own mean and standard
+deviation, detached) before the CTF and DGF see it, fits the decomposition
+loss in that space, and multiplies the fused field forecast by the window's
+price scale before adding it to the linear base. `ctf_heads: false` silences
+the CTF experts. Configurations
+`configs/aemo_forecast_{,capped650_}{window_norm,window_norm_dgf_only,linear_base_dgf_only}.yaml`;
+seeds 2026-2028; metrics in [`window_norm/paper_metrics/`](window_norm/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 47.80 / 41.82 / 32.24 | **40.62 ± 0.02** | 77.87 | 449.34 | 29.67 |
+| Base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Base + DGF only | 48.39 / 42.47 / 33.86 | 41.58 ± 0.08 | 79.05 | 405.93 | 28.41 |
+| Base + window-normalized DGF only | 50.02 / 44.77 / 32.77 | 42.52 ± 0.26 | 80.40 | 402.67 | 28.19 |
+| Base + window-normalized fields | 50.80 / 48.98 / 33.10 | 44.29 ± 0.17 | 83.09 | 410.33 | 28.55 |
+
+| Capped at 650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 29.15 / 29.98 / 29.06 | **29.39 ± 0.05** | 40.32 | 235.63 | 19.07 |
+| Base + fields | 29.66 / 30.40 / 30.96 | 30.34 ± 0.17 | 41.30 | 204.99 | 17.38 |
+| Base + DGF only | 29.87 / 30.49 / 30.87 | 30.41 ± 0.04 | 41.54 | 216.62 | 18.15 |
+| Base + window-normalized DGF only | 31.57 / 34.35 / 29.68 | 31.87 ± 0.07 | 44.07 | 219.27 | 18.18 |
+| Base + window-normalized fields | 32.13 / 37.66 / 30.18 | 33.32 ± 0.58 | 46.23 | 212.85 | 17.70 |
+
+Against the base alone, every field variant is worse (pooled DM p < 0.0001
+under both treatments; [`significance/raw_window_norm.json`](significance/raw_window_norm.json),
+[`significance/capped650_window_norm.json`](significance/capped650_window_norm.json)).
+
+| Finding | Evidence |
+|---|---|
+| The DGF heads carry the loss; the CTF heads add nothing | Base + DGF only equals base + fields (41.58 against 41.54 raw, 30.41 against 30.34 capped) |
+| Window normalization makes it worse | +2.8 (fields) and +1.0 (DGF only) raw MAE over the unnormalized fields; only TAS1 improves (33.10 and 32.77 against 33.88), still behind the base alone |
+| Volatility, not only the level, shifted | Median window price standard deviation in QLD1 is 1.32 on test against 0.59 in training (target units); rescaling by it amplifies the field residual about 2.2 times, and QLD1 MAE rises by 6.4 |
+
+Three designs of the field residual (unnormalized, window-normalized, and
+DGF-only) all lose to the linear base alone on mean MAE. The fields lower the
+probabilistic scores of the base (CRPS~ 28.2-28.6 against 29.67 raw), but not
+to the level of the linear quantile baseline (26.47).
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

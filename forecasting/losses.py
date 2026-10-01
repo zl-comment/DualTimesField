@@ -97,7 +97,8 @@ class DualFieldForecastLoss(nn.Module):
             (quantiles - 1.0) * quantile_error,
         ).mean()
 
-        decomposition_loss = F.mse_loss(ctf_signal + event_signal, history_values)
+        decomposition_target = outputs.get("field_history", history_values)
+        decomposition_loss = F.mse_loss(ctf_signal + event_signal, decomposition_target)
         smoothness_loss = ((ctf_signal[:, 1:] - ctf_signal[:, :-1]) ** 2).mean()
 
         mean_gate = event_gate.mean()

@@ -506,6 +506,8 @@ class DualFieldLinearForecaster(nn.Module):
         detected_baseline: str = "median",
         linear_base: bool = False,
         field_forecast: bool = True,
+        field_normalization: str = "none",
+        ctf_heads: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -729,6 +731,17 @@ class DualFieldLinearForecaster(nn.Module):
         # parameter keeps its initialization.
         if not field_forecast and not linear_base:
             raise ValueError("field_forecast=False needs linear_base")
+        if field_normalization not in {"none", "window"}:
+            raise ValueError("field_normalization must be 'none' or 'window'")
+        if field_normalization == "window" and not linear_base:
+            raise ValueError("window-normalized fields need the linear base for the level")
+        # "window": the fields see each window's history normalized by its own
+        # mean and standard deviation, and their forecast is a residual in
+        # window units, rescaled by the window's price scale; the linear base
+        # carries the absolute level.  ctf_heads=False silences the CTF experts
+        # (an ablation; the CTF is still fitted by the decomposition loss).
+        self.field_normalization = field_normalization
+        self.ctf_heads = ctf_heads
         self.linear_base = linear_base
         self.field_forecast = field_forecast
         if linear_base:
@@ -834,6 +847,9 @@ class DualFieldLinearForecaster(nn.Module):
                 len(self.quantiles),
             )
         ctf_quantile = torch.sort(ctf_quantile, dim=-1).values
+        if not self.ctf_heads:
+            ctf_point = torch.zeros_like(ctf_point)
+            ctf_quantile = torch.zeros_like(ctf_quantile)
         dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
 
         gate_logit = self.fusion_gate(gate_features)
@@ -951,6 +967,13 @@ class DualFieldLinearForecaster(nn.Module):
         elif quantile_exogenous is not None:
             raise ValueError("quantile_exogenous was provided but the model has no quantile exogenous inputs")
 
+        raw_history = history_values
+        field_scale = None
+        if self.field_normalization == "window":
+            location = history_values.mean(dim=1, keepdim=True).detach()
+            field_scale = history_values.std(dim=1, keepdim=True, unbiased=False).clamp_min(1e-2).detach()
+            history_values = (history_values - location) / field_scale
+
         history_time = self._history_time(history_values)
         ctf_signal = self.dual_field.ctf(history_values, history_time)
         residual = history_values - ctf_signal
@@ -1007,9 +1030,13 @@ class DualFieldLinearForecaster(nn.Module):
             )
             if echo_features is not None:
                 forecasts["event_echo"] = echo_features
+            if field_scale is not None:
+                price_scale = field_scale[:, :, :1]
+                forecasts["point_forecast"] = forecasts["point_forecast"] * price_scale
+                forecasts["quantile_forecast"] = forecasts["quantile_forecast"] * price_scale
 
         if self.linear_base:
-            parts = [history_values, future_calendar, future_exogenous, ctf_exogenous]
+            parts = [raw_history, future_calendar, future_exogenous, ctf_exogenous]
             base_features = torch.cat(
                 [part.flatten(start_dim=1) for part in parts if part is not None]
                 + ([origin_context] if origin_context is not None else []),
@@ -1052,6 +1079,8 @@ class DualFieldLinearForecaster(nn.Module):
             **forecasts,
             "ctf_signal": ctf_signal,
             "event_signal": event_signal,
+            # The series the fields decompose (normalized per window if configured).
+            "field_history": history_values,
             "event_amplitude": amplitude,
             "event_gate": gate,
         }
