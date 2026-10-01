@@ -234,6 +234,66 @@ price history plus a linear map of the same known inputs. The claim that the
 dual-field model has the lowest MAE of all same-data baselines no longer holds;
 it holds against XGBoost, GRU, DeepAR, iTransformer, and Informer.
 
+### Attribution: what makes DLinear and PatchTST strong
+
+Variants on the same grid (raw and capped prices, seeds 2026-2028, three
+regions), each with the learning rate of the model it modifies. "Adapter" is
+the linear known-input adapter; `linear` is DLinear without the trend/seasonal
+decomposition (one linear map of the price history); `linear_mse` is `linear`
+with a separate point output trained by mean squared error in the target
+space, as the dual-field point head is (quantiles keep the pinball loss).
+
+| Variant | Price history | Known inputs | Raw MAE (NSW1 / QLD1 / TAS1) | Raw mean MAE | Capped mean MAE |
+|---|---|---|---|---:|---:|
+| Detected-event DGF | dual field | field-routed | 48.31 / 42.53 / 33.79 | 41.54 ± 0.06 | 30.32 ± 0.12 |
+| `dlinear` | decomposed linear | adapter | 48.58 / 41.99 / 32.17 | 40.91 ± 0.02 | 29.61 ± 0.04 |
+| `linear` | linear | adapter | 48.57 / 41.93 / 32.18 | 40.89 ± 0.04 | 29.59 ± 0.04 |
+| `linear_mse` | linear, MSE point | adapter | 47.88 / 41.53 / 32.14 | **40.52 ± 0.03** | **29.33 ± 0.06** |
+| `patchtst` | PatchTST | adapter | 48.82 / 42.30 / 31.95 | 41.02 ± 0.03 | 29.99 ± 0.05 |
+| `known_linear` | none | adapter | 56.64 / 55.44 / 46.74 | 52.94 ± 0.43 | 42.14 ± 0.43 |
+| `dlinear_noadapter` | decomposed linear | none | 52.68 / 45.53 / 33.28 | 43.83 ± 0.03 | 32.18 ± 0.05 |
+| `patchtst_noadapter` | PatchTST | none | 52.38 / 46.26 / 32.96 | 43.87 ± 0.08 | 32.53 ± 0.06 |
+
+Diebold-Mariano, detected-event DGF minus variant (positive: the detected-event
+DGF is worse; [`significance/raw_attribution.json`](significance/raw_attribution.json),
+[`significance/capped650_attribution.json`](significance/capped650_attribution.json)):
+
+| Variant | Raw pooled | Raw NSW1 / QLD1 / TAS1 | Capped pooled | Capped NSW1 / QLD1 / TAS1 |
+|---|---|---|---|---|
+| `linear_mse` | +1.03 (p < 0.0001) | +0.42 (0.08) / +1.01 / +1.66 | +0.99 (p < 0.0001) | +0.52 / +0.74 / +1.71 (all < 0.001) |
+| `linear` | +0.65 (p = 0.0002) | -0.26 (0.42) / +0.60 / +1.62 | +0.73 (p < 0.0001) | +0.04 (0.81) / +0.44 / +1.70 |
+| `dlinear_noadapter` | -2.28 (p < 0.0001) | -4.37 / -2.99 / +0.52 (0.02) | -1.86 (p < 0.0001) | -3.45 / -2.78 / +0.64 (0.002) |
+| `patchtst_noadapter` | -2.32 (p < 0.0001) | -4.08 / -3.73 / +0.83 (0.003) | -2.21 (p < 0.0001) | -3.71 / -3.72 / +0.79 (0.003) |
+
+| Finding | Evidence |
+|---|---|
+| Neither the decomposition nor the Transformer matters | `linear` equals `dlinear` (40.89 against 40.91) and is ahead of `patchtst` |
+| The known inputs and the price history are both needed | Without the adapter, MAE rises by about 2.9 (raw) and 2.6 (capped); without the price history, by 12 |
+| The pinball loss is not the reason | The MSE point output is better still: `linear_mse` 40.52 raw, 29.33 capped |
+| A linear regression on the same inputs beats the detected-event DGF | `linear_mse` is ahead in every region under both treatments, pooled DM p < 0.0001; the gap is largest in TAS1 (1.7) and QLD1 (0.7-1.0) |
+| The dual-field model beats the published price-only DLinear and PatchTST | By 2.3 (raw) and 1.9-2.2 (capped), except in TAS1, where even price-only DLinear is ahead |
+
+Absolute error by actual-price band, seed-ensemble forecasts, raw prices
+([`forecasting/error_by_price_band.py`](../../forecasting/error_by_price_band.py);
+[`baselines/raw_price_band_detected_vs_linear_mse.json`](baselines/raw_price_band_detected_vs_linear_mse.json),
+[`baselines/capped650_price_band_detected_vs_linear_mse.json`](baselines/capped650_price_band_detected_vs_linear_mse.json)):
+
+| Band (AUD/MWh) | Share of hours (NSW1 / QLD1 / TAS1) | Detected-event DGF MAE | `linear_mse` MAE | Share of the total error gap (raw / capped) |
+|---|---|---|---|---:|
+| below 0 | 6.2 / 13.2 / 7.4% | 50.20 / 30.94 / 35.51 | 46.24 / 28.86 / 35.16 | 18% / 13% |
+| 0-100 | 58.3 / 50.6 / 65.8% | 16.21 / 15.37 / 22.74 | 16.76 / 15.87 / 21.79 | 2% / -1% |
+| 100-300 | 33.7 / 34.4 / 26.3% | 41.78 / 44.82 / 44.97 | 40.03 / 41.69 / 41.57 | 85% / 91% |
+| above 300 | 1.8 / 1.9 / 0.5% | 1217 / 806 / 838 | 1225 / 811 / 817 | -5% / -3% |
+
+The gap is the elevated but ordinary level of 100-300 AUD/MWh and negative
+prices, not the spikes: in NSW1 and QLD1 the detected-event DGF is slightly
+better above 300 and between 0 and 100. Neither model forecasts spikes (errors
+of 800-1,200 AUD/MWh above 300).
+
+The dual-field model's advantage over the general baselines comes from the
+known inputs, which a linear regression uses better. Its field structure, as
+trained now, costs about 1 MAE relative to that regression.
+
 ## Reproduction
 
 ```bash
@@ -243,6 +303,7 @@ python -m forecasting.baselines --baseline xgboost \
 python -m forecasting.summarize_baselines
 python -m forecasting.summarize_baselines --compact   # all seven baselines
 scripts/run_general_baselines.sh "6 7" 4             # DLinear, PatchTST, iTransformer, Informer grid
+KINDS="linear linear_mse known_linear dlinear_noadapter patchtst_noadapter" scripts/run_general_baselines.sh "6 7" 4
 ```
 
 Repeat for `--baseline gru` and `deepar`, regions NSW1/QLD1/TAS1, seeds

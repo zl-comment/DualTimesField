@@ -308,7 +308,9 @@ def run(kind: str, config: Path, region: str, seed: int, output_dir: Path, devic
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--baseline", required=True, choices=("xgboost", "gru", "deepar", "dlinear", "patchtst", "itransformer", "informer"))
+    parser.add_argument("--baseline", required=True, choices=("xgboost", "gru", "deepar", "dlinear", "patchtst", "itransformer", "informer",
+                                 "dlinear_noadapter", "linear", "known_linear", "patchtst_noadapter",
+                                 "linear_mse"))
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--region", required=True, choices=("NSW1", "QLD1", "TAS1"))
     parser.add_argument("--seed", type=int, default=2026)

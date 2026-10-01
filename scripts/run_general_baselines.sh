@@ -2,6 +2,7 @@
 # Runs DLinear, PatchTST, iTransformer, and Informer on raw and 650-capped
 # prices, seeds 2026-2028, regions NSW1/QLD1/TAS1 (72 runs).
 # Usage: scripts/run_general_baselines.sh "6 7" 3   (GPUs, parallel runs per GPU)
+# KINDS overrides the models, e.g. KINDS="known_linear linear" for attribution runs.
 set -u
 GPUS=(${1:-6 7})
 PER_GPU=${2:-3}
@@ -13,7 +14,7 @@ jobs_list=()
 for protocol in raw capped650; do
   if [ "$protocol" = raw ]; then config=configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml
   else config=configs/aemo_forecast_capped650_trunk.yaml; fi
-  for kind in informer patchtst itransformer dlinear; do
+  for kind in ${KINDS:-informer patchtst itransformer dlinear}; do
     for seed in 2026 2027 2028; do
       for region in NSW1 QLD1 TAS1; do
         jobs_list+=("$protocol $config $kind $seed $region")

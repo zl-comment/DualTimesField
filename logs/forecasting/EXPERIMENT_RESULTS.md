@@ -1574,6 +1574,15 @@ prices (p = 0.008; capped p = 0.065). The gap is concentrated in TAS1 (+1.6 to
 PatchTST. The detected-event DGF still beats iTransformer and Informer
 everywhere except TAS1 against iTransformer.
 
+Attribution (same grid; [`BASELINES.md`](BASELINES.md), "Attribution"): the
+decomposition and the Transformer add nothing (`linear` 40.89 against
+`dlinear` 40.91 raw), and the pinball loss is not the cause. A plain linear
+regression on the same inputs, with an MSE point output like the dual-field
+point head, reaches 40.52 raw and 29.33 capped. It beats the detected-event
+DGF in every region under both treatments (pooled DM p < 0.0001), by 1.7 in
+TAS1 and 0.7-1.0 in QLD1. Without the known inputs, DLinear and PatchTST fall
+to 43.8-43.9 raw, behind the detected-event DGF.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

@@ -91,23 +91,27 @@ class DLinear(QuantileBaseline):
     """Series decomposition with one linear layer per component (moving average 25)."""
 
     def __init__(self, input_hours: int, output_hours: int, future_dim: int, history_exog_dim: int,
-                 kernel: int = 25):
+                 kernel: int = 25, decomposition: bool = True, adapter: bool = True):
         super().__init__()
         self.output_hours = output_hours
-        self.decompose = MovingAverage(kernel)
+        self.decompose = MovingAverage(kernel) if decomposition else None
         width = output_hours * len(QUANTILES)
         self.seasonal = nn.Linear(input_hours, width)
         self.trend = nn.Linear(input_hours, width)
         # DLinear initializes both maps to the mean of the window.
         for layer in (self.seasonal, self.trend):
             nn.init.constant_(layer.weight, 1.0 / input_hours)
-        self.adapter = KnownInputAdapter(future_dim, history_exog_dim, input_hours, output_hours)
+        self.adapter = KnownInputAdapter(future_dim, history_exog_dim, input_hours, output_hours) if adapter else None
 
     def forward(self, batch: dict) -> torch.Tensor:
         price = batch["history_values"][..., 0]
-        trend = self.decompose(price)
-        out = self.seasonal(price - trend) + self.trend(trend)
-        return out.view(-1, self.output_hours, len(QUANTILES)) + self.adapter(batch)
+        if self.decompose is None:
+            out = self.seasonal(price)
+        else:
+            trend = self.decompose(price)
+            out = self.seasonal(price - trend) + self.trend(trend)
+        out = out.view(-1, self.output_hours, len(QUANTILES))
+        return out if self.adapter is None else out + self.adapter(batch)
 
 
 # ---------------------------------------------------------------------------- PatchTST
@@ -169,7 +173,7 @@ class PatchTST(QuantileBaseline):
 
     def __init__(self, input_hours: int, output_hours: int, future_dim: int, history_exog_dim: int,
                  patch: int = 16, stride: int = 8, d_model: int = 128, heads: int = 16, layers: int = 3,
-                 d_ff: int = 256, dropout: float = 0.2):
+                 d_ff: int = 256, dropout: float = 0.2, adapter: bool = True):
         super().__init__()
         self.output_hours, self.patch, self.stride = output_hours, patch, stride
         patches = (input_hours - patch) // stride + 1 + 1  # "end" padding adds one patch
@@ -179,7 +183,7 @@ class PatchTST(QuantileBaseline):
         self.dropout = nn.Dropout(dropout)
         self.layers = nn.ModuleList(PatchTSTLayer(d_model, heads, d_ff, dropout) for _ in range(layers))
         self.head = nn.Linear(patches * d_model, output_hours * len(QUANTILES))
-        self.adapter = KnownInputAdapter(future_dim, history_exog_dim, input_hours, output_hours)
+        self.adapter = KnownInputAdapter(future_dim, history_exog_dim, input_hours, output_hours) if adapter else None
 
     def forward(self, batch: dict) -> torch.Tensor:
         price, stats = self.revin.normalize(batch["history_values"][..., 0])
@@ -188,8 +192,47 @@ class PatchTST(QuantileBaseline):
         x, scores = self.dropout(x), None
         for layer in self.layers:
             x, scores = layer(x, scores)
-        out = self.head(x.flatten(1)).view(-1, self.output_hours, len(QUANTILES))
-        return self.revin.denormalize(out, stats) + self.adapter(batch)
+        out = self.revin.denormalize(self.head(x.flatten(1)).view(-1, self.output_hours, len(QUANTILES)), stats)
+        return out if self.adapter is None else out + self.adapter(batch)
+
+
+class KnownLinear(QuantileBaseline):
+    """Attribution variant: the known-input adapter alone, without price history."""
+
+    def __init__(self, input_hours: int, output_hours: int, future_dim: int, history_exog_dim: int):
+        super().__init__()
+        self.adapter = KnownInputAdapter(future_dim, history_exog_dim, input_hours, output_hours)
+
+    def forward(self, batch: dict) -> torch.Tensor:
+        return self.adapter(batch)
+
+
+class LinearMSE(QuantileBaseline):
+    """Attribution variant: the "linear" model with a separate point output trained
+    by mean squared error in the target space, as the dual-field point head is;
+    the quantiles keep the pinball loss."""
+
+    def __init__(self, input_hours: int, output_hours: int, future_dim: int, history_exog_dim: int):
+        super().__init__()
+        self.output_hours = output_hours
+        self.history = nn.Linear(input_hours, output_hours * (len(QUANTILES) + 1))
+        nn.init.constant_(self.history.weight, 1.0 / input_hours)
+        self.adapter = nn.Linear(output_hours * future_dim + input_hours * history_exog_dim,
+                                 output_hours * (len(QUANTILES) + 1))
+
+    def forward(self, batch: dict) -> torch.Tensor:
+        known = torch.cat([_known_future(batch).flatten(1), batch["history_values"][..., 1:].flatten(1)], dim=1)
+        out = self.history(batch["history_values"][..., 0]) + self.adapter(known)
+        return out.view(-1, self.output_hours, len(QUANTILES) + 1)
+
+    def loss(self, batch: dict) -> torch.Tensor:
+        out, target = self(batch), batch["target_price"][..., 0]
+        return pinball(out[..., 1:], target) + nn.functional.mse_loss(out[..., 0], target)
+
+    @torch.no_grad()
+    def predict(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor]:
+        out = self(batch)
+        return out[..., 0], out[..., 1:]
 
 
 # ------------------------------------------------------------------------ iTransformer
@@ -427,8 +470,19 @@ def build(kind: str, example: dict) -> nn.Module:
                   history_exog_dim=history_exog_dim)
     if kind == "dlinear":
         return DLinear(**common)
+    # Attribution variants of DLinear and PatchTST.
+    if kind == "dlinear_noadapter":
+        return DLinear(**common, adapter=False)
+    if kind == "linear":
+        return DLinear(**common, decomposition=False)
+    if kind == "known_linear":
+        return KnownLinear(**common)
+    if kind == "linear_mse":
+        return LinearMSE(**common)
     if kind == "patchtst":
         return PatchTST(**common)
+    if kind == "patchtst_noadapter":
+        return PatchTST(**common, adapter=False)
     if kind == "itransformer":
         return ITransformer(**common)
     if kind == "informer":
@@ -441,3 +495,6 @@ def build(kind: str, example: dict) -> nn.Module:
 # Chosen from {1e-4, 5e-4, 1e-3} by the lowest validation pinball loss on raw
 # NSW1 prices, seed 2026, then fixed for every region, seed, and price treatment.
 LEARNING_RATES = {"dlinear": 1e-3, "patchtst": 1e-4, "itransformer": 1e-3, "informer": 1e-3}
+# Attribution variants use the learning rate of the model they modify.
+LEARNING_RATES |= {"dlinear_noadapter": 1e-3, "linear": 1e-3, "known_linear": 1e-3, "patchtst_noadapter": 1e-4,
+                   "linear_mse": 1e-3}
