@@ -1551,6 +1551,29 @@ DGF's contribution is therefore the separation of events from the level,
 which improves the point forecast, not a state for a separate event
 classifier. The future event field is not pursued further.
 
+## General time-series baselines
+
+DLinear, PatchTST, iTransformer, and Informer were re-implemented and run on the
+same data and inputs as the detected-event DGF (raw and 650-capped prices,
+seeds 2026-2028, three regions; full setup and tables in
+[`BASELINES.md`](BASELINES.md), "General time-series baselines"; learning-rate
+selection in [`baselines/general_lr_selection.json`](baselines/general_lr_selection.json)).
+
+| Mean of three regions | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---:|---:|---:|---:|
+| Detected-event DGF | 41.54 ± 0.06 | 28.15 | 30.32 ± 0.12 | 17.86 |
+| DLinear + known-input adapter | **40.91 ± 0.02** | 26.31 | **29.61 ± 0.04** | 16.40 |
+| PatchTST + known-input adapter | 41.02 ± 0.03 | **26.22** | 29.99 ± 0.05 | **16.37** |
+| iTransformer | 43.20 ± 0.06 | 34.36 | 32.00 ± 0.31 | 21.30 |
+| Informer | 46.65 ± 2.38 | 30.12 | 34.05 ± 0.48 | 17.58 |
+
+DLinear is significantly better than the detected-event DGF under both price
+treatments (pooled DM p = 0.0003 raw, < 0.0001 capped) and PatchTST on raw
+prices (p = 0.008; capped p = 0.065). The gap is concentrated in TAS1 (+1.6 to
++1.8 MAE) and QLD1; in NSW1 the detected-event DGF ties DLinear and beats
+PatchTST. The detected-event DGF still beats iTransformer and Informer
+everywhere except TAS1 against iTransformer.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

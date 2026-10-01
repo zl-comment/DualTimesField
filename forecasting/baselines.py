@@ -19,6 +19,10 @@ RE-Price gives the GRU and DeepAR a Gamma likelihood on shifted prices. Here
 the Gaussian is placed on the standardized asinh price, which is the target
 space of the dual-field model; its inverse gives a skewed price distribution
 and handles negative prices. None of the baselines receive news.
+
+The general time-series baselines of ``general_baselines`` (``dlinear``,
+``patchtst``, ``itransformer``, ``informer``) run through the same training
+loop, with a pinball loss on five quantiles instead of a likelihood.
 """
 
 from __future__ import annotations
@@ -35,6 +39,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
 from .datasets import build_region_datasets, load_forecast_config
+from . import general_baselines
 from .evaluate_paper_metrics import point_metrics, probabilistic_metrics
 from .gbdt_baseline import _features
 
@@ -167,7 +172,8 @@ def _to_device(batch: dict, device: torch.device) -> dict:
     return {key: value.to(device) for key, value in batch.items() if torch.is_tensor(value)}
 
 
-def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epochs: int) -> dict:
+def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epochs: int,
+                learning_rate: float | None = None) -> dict:
     torch.manual_seed(seed)
     np.random.seed(seed)
     windows = {name: SequenceWindows(datasets[name]) for name in ("train", "validation", "test")}
@@ -177,10 +183,14 @@ def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epoc
     future_dim = _known_future(example_batch).shape[-1]
     if kind == "gru":
         model = GRUForecaster(history_dim, future_dim)
-    else:
+    elif kind == "deepar":
         model = DeepARForecaster(_known_history(example_batch).shape[-1], future_dim)
+    else:
+        model = general_baselines.build(kind, example_batch)
     model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
+    if learning_rate is None:
+        learning_rate = general_baselines.LEARNING_RATES.get(kind, 1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
     generator = torch.Generator().manual_seed(seed)
     train_loader = DataLoader(windows["train"], batch_size=256, shuffle=True, generator=generator)
     validation_loader = DataLoader(windows["validation"], batch_size=1024)
@@ -201,6 +211,7 @@ def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epoc
                 model.loss(_to_device(batch, device)).item() for batch in validation_loader
             ]))
         history.append(validation_loss)
+        print(f"epoch {epoch + 1} validation {validation_loss:.5f}", flush=True)
         if validation_loss < best_loss:
             best_loss, best_epoch = validation_loss, epoch + 1
             best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
@@ -216,7 +227,8 @@ def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epoc
         "point": torch.cat(points).double().numpy(),
         "quantile": np.sort(torch.cat(quantiles).double().numpy(), axis=-1),
         "best_epoch": best_epoch,
-        "validation_nll": history,
+        "validation_nll" if kind in ("gru", "deepar") else "validation_pinball": history,
+        "learning_rate": learning_rate,
         "parameters": sum(p.numel() for p in model.parameters()),
     }
 
@@ -258,14 +270,14 @@ def _xgboost_run(datasets: dict, seed: int, device: torch.device) -> dict:
 
 
 def run(kind: str, config: Path, region: str, seed: int, output_dir: Path, device_name: str,
-        epochs: int) -> dict:
+        epochs: int, learning_rate: float | None = None) -> dict:
     device = torch.device(device_name if torch.cuda.is_available() or device_name == "cpu" else "cpu")
     datasets = build_region_datasets(config, region)
     start = time.time()
     if kind == "xgboost":
         result = _xgboost_run(datasets, seed, device)
     else:
-        result = _neural_run(kind, datasets, seed, device, epochs)
+        result = _neural_run(kind, datasets, seed, device, epochs, learning_rate)
     test = datasets["test"]
     origins = np.asarray(test.origin_indices)
     raw = np.asarray(test.target_values_raw, dtype=np.float64)
@@ -296,16 +308,18 @@ def run(kind: str, config: Path, region: str, seed: int, output_dir: Path, devic
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--baseline", required=True, choices=("xgboost", "gru", "deepar"))
+    parser.add_argument("--baseline", required=True, choices=("xgboost", "gru", "deepar", "dlinear", "patchtst", "itransformer", "informer"))
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--region", required=True, choices=("NSW1", "QLD1", "TAS1"))
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--learning-rate", type=float, default=None,
+                        help="defaults to 1e-3, or general_baselines.LEARNING_RATES")
     args = parser.parse_args()
     summary = run(args.baseline, args.config, args.region, args.seed, args.output_dir,
-                  args.device, args.epochs)
+                  args.device, args.epochs, args.learning_rate)
     test = summary["test"]
     print(
         f"{args.baseline} {args.region} seed={args.seed} mae={test['mae']:.4f} "
