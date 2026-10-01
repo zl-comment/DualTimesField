@@ -1583,6 +1583,52 @@ DGF in every region under both treatments (pooled DM p < 0.0001), by 1.7 in
 TAS1 and 0.7-1.0 in QLD1. Without the known inputs, DLinear and PatchTST fall
 to 43.8-43.9 raw, behind the detected-event DGF.
 
+## Linear base with dual-field residual
+
+Branch `feature/linear-base`. Configurations
+`configs/aemo_forecast_{,capped650_}linear_base{,_only}.yaml` add to the
+detected-event DGF a linear base: one linear map of the raw history and all
+known future inputs (the inputs of the `linear_mse` baseline) to the point
+and quantile outputs. `linear_base` adds the dual-field forecast to the base as
+a residual; `linear_base_only` forecasts with the base alone in the same
+training pipeline (the fields are still fitted by the decomposition loss). The
+base is created last, so every other parameter keeps its initialization.
+Seeds 2026-2028, three regions; runner `scripts/run_dual_field_seeds.sh`;
+metrics in [`linear_base/paper_metrics/`](linear_base/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | 48.31 / 42.53 / 33.79 | 41.54 ± 0.06 | 78.80 | 403.48 | 28.15 |
+| Linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| `linear_mse` baseline | 47.88 / 41.53 / 32.14 | 40.52 ± 0.03 | 77.71 | 394.28 | 26.47 |
+
+| Capped at 650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | 29.79 / 30.38 / 30.80 | 30.32 ± 0.12 | 41.29 | 213.16 | 17.86 |
+| Linear base + fields | 29.66 / 30.40 / 30.96 | 30.34 ± 0.17 | 41.30 | 204.99 | 17.38 |
+| Linear base only | 29.15 / 29.98 / 29.06 | 29.39 ± 0.05 | 40.32 | 235.63 | 19.07 |
+| `linear_mse` baseline | 29.27 / 29.64 / 29.09 | 29.33 ± 0.06 | 40.20 | 211.12 | 16.49 |
+
+Diebold-Mariano, linear base + fields minus linear base only: raw +0.92
+(pooled p < 0.0001; NSW1 +0.36, p = 0.17; QLD1 +0.74; TAS1 +1.64), capped
++0.95 (p < 0.0001; +0.52 / +0.42 / +1.90). Against the detected-event DGF the
+difference is not significant (raw -0.01, p = 0.76; capped +0.02, p = 0.50)
+([`significance/raw_linear_base.json`](significance/raw_linear_base.json),
+[`significance/capped650_linear_base.json`](significance/capped650_linear_base.json)).
+
+| Finding | Evidence |
+|---|---|
+| The training pipeline is not the cause | The base alone in the dual-field pipeline matches the external `linear_mse` (40.62 against 40.52 raw, 29.39 against 29.33 capped) |
+| The fields make the forecast worse, not better | Adding them to the base raises MAE by 0.9 under both treatments, back to the detected-event DGF's level |
+| They help spikes and hurt the ordinary level | Of the error gap between base + fields and base only, 83% (raw) and 89% (capped) is in the 100-300 AUD/MWh band and 15-21% in negative prices, while the band above 300 is 18-22% in favour of the fields ([`linear_base/`](linear_base/)) |
+| The cause is overfitting to the training regime | At the selected epoch (seed 2026), the fields lower the training loss but raise the 2022 validation MAE: NSW1 60.6 against 48.6, QLD1 84.1 against 75.4, TAS1 55.3 against 52.6 |
+| Probabilistically the fields help | CRPS~ 28.35 against 29.67 raw and 17.38 against 19.07 capped; but the external linear quantile model is better still (26.47, 16.49), as its quantiles are in asinh space |
+
+The dual-field heads, as built, add capacity that fits the 2015-2021 price
+level and does not transfer to 2022-2024. Models that normalize each window
+(PatchTST, iTransformer) do not show this; Informer, which does not, does.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

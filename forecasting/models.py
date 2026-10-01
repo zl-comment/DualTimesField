@@ -504,6 +504,8 @@ class DualFieldLinearForecaster(nn.Module):
         detected_min_separation: int = 3,
         detected_learn_threshold: bool = True,
         detected_baseline: str = "median",
+        linear_base: bool = False,
+        field_forecast: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -721,6 +723,22 @@ class DualFieldLinearForecaster(nn.Module):
             self.echo_modulator = nn.Linear(
                 future_exogenous_dim + quantile_exogenous_dim + ctf_exogenous_dim + calendar_dim, 2
             )
+        # Linear base: one linear map of the raw history and all known future
+        # inputs (the inputs of the linear_mse baseline), to which the dual-field
+        # forecast is added as a residual.  Created last so that every other
+        # parameter keeps its initialization.
+        if not field_forecast and not linear_base:
+            raise ValueError("field_forecast=False needs linear_base")
+        self.linear_base = linear_base
+        self.field_forecast = field_forecast
+        if linear_base:
+            base_dim = (
+                input_length * num_variables
+                + forecast_horizon * (calendar_dim + future_exogenous_dim + ctf_exogenous_dim)
+                + origin_context_dim
+            )
+            self.base_point_head = nn.Linear(base_dim, forecast_horizon)
+            self.base_quantile_head = nn.Linear(base_dim, forecast_horizon * len(self.quantiles))
 
     def _concatenated_forecast(
         self,
@@ -989,6 +1007,28 @@ class DualFieldLinearForecaster(nn.Module):
             )
             if echo_features is not None:
                 forecasts["event_echo"] = echo_features
+
+        if self.linear_base:
+            parts = [history_values, future_calendar, future_exogenous, ctf_exogenous]
+            base_features = torch.cat(
+                [part.flatten(start_dim=1) for part in parts if part is not None]
+                + ([origin_context] if origin_context is not None else []),
+                dim=1,
+            )
+            base_point = self.base_point_head(base_features).unsqueeze(-1)
+            base_quantile = self.base_quantile_head(base_features).view(
+                -1, self.forecast_horizon, len(self.quantiles)
+            )
+            forecasts["base_point"] = base_point
+            if self.field_forecast:
+                forecasts["field_point"] = forecasts["point_forecast"]
+                forecasts["point_forecast"] = base_point + forecasts["point_forecast"]
+                base_quantile = base_quantile + forecasts["quantile_forecast"]
+            else:
+                # Control: the linear base alone, trained in the dual-field
+                # pipeline; the fields are still fitted by the decomposition loss.
+                forecasts["point_forecast"] = base_point
+            forecasts["quantile_forecast"] = torch.sort(base_quantile, dim=-1).values
 
         if self.event_field is not None:
             level_mean = forecasts["point_forecast"]

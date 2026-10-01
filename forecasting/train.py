@@ -130,6 +130,8 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         detected_min_separation=model_config.get("detected_min_separation", 3),
         detected_learn_threshold=model_config.get("detected_learn_threshold", True),
         detected_baseline=model_config.get("detected_baseline", "median"),
+        linear_base=bool(model_config.get("linear_base", False)),
+        field_forecast=bool(model_config.get("field_forecast", True)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
