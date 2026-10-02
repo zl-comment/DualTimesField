@@ -1764,6 +1764,66 @@ trained once on the static split. The linear quantile baseline, XGBoost,
 DLinear, and PatchTST must be recalibrated the same way before any claim
 against them.
 
+## Quarterly recalibration of the baselines; capped prices
+
+The baselines are refit every test quarter like the dual-field models
+(`scripts/run_rolling_baselines.sh`; quarter configurations from their static
+configurations via `forecasting.rolling make-configs --name baseline_raw /
+baseline_capped650`; stitched by `forecasting.rolling stitch-baselines`), and
+the linear base and base + fields are refit on 650-capped prices
+(`capped650_linear_base{,_only}`). Seeds 2026-2028, 576 baseline refits and
+144 dual-field refits; metrics in [`baselines_rolling/`](baselines_rolling/) and
+[`rolling/paper_metrics/`](rolling/paper_metrics/).
+
+| raw | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 47.56 / 41.57 / 31.26 | 40.13 ± 0.07 | 77.27 | 91.10 | 392.87 | 26.90 |
+| Linear base only | 47.29 / 42.14 / 31.26 | 40.23 ± 0.01 | 77.49 | 90.61 | 424.29 | 27.68 |
+| linear_mse | 47.40 / 42.09 / 31.48 | 40.32 ± 0.02 | 77.54 | 86.23 | 386.36 | 25.89 |
+| DLinear | 48.21 / 41.49 / 31.30 | 40.33 ± 0.07 | 77.99 | 86.62 | 385.48 | 25.90 |
+| PatchTST | 47.81 / 41.13 / 30.99 | 39.97 ± 0.01 | 77.63 | 88.95 | 377.73 | 25.46 |
+| XGBoost | 47.68 / 39.84 / 31.09 | 39.53 ± 0.01 | 77.27 | 85.60 | 376.81 | 25.28 |
+
+| capped650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 29.01 / 29.58 / 28.34 | 28.98 ± 0.02 | 39.78 | 91.23 | 188.35 | 15.83 |
+| Linear base only | 28.77 / 30.11 / 28.23 | 29.04 ± 0.03 | 39.97 | 89.89 | 207.28 | 16.78 |
+| linear_mse | 28.88 / 29.97 / 28.46 | 29.10 ± 0.02 | 39.98 | 86.15 | 192.44 | 15.59 |
+| DLinear | 29.45 / 29.48 / 28.22 | 29.05 ± 0.05 | 40.19 | 86.54 | 192.53 | 15.62 |
+| PatchTST | 29.48 / 29.34 / 28.03 | 28.95 ± 0.01 | 40.18 | 89.01 | 189.15 | 15.37 |
+| XGBoost | 29.62 / 28.13 / 28.01 | 28.59 ± 0.01 | 39.70 | 84.46 | 178.27 | 14.90 |
+
+Diebold-Mariano, ours (rolling base + fields) minus each model, pooled over
+regions; per-origin MAE, and per-origin CRPS~ of seed-averaged quantiles
+([`significance/*_rolling_baselines_{mae,crps}.json`](significance/)):
+
+| Ours minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Linear base only | -0.10 (p = 0.25) | **-1.28 (p < 0.0001)** | -0.06 (p = 0.47) | **-1.06 (p < 0.0001)** |
+| XGBoost | +0.60 (p = 0.0002) | +0.83 (p < 0.0001) | +0.39 (p = 0.003) | +0.44 (p < 0.0001) |
+| PatchTST | +0.16 (p = 0.24) | +0.51 (p = 0.03) | +0.03 (p = 0.83) | -0.05 (p = 0.57) |
+| DLinear | -0.20 (p = 0.10) | +0.14 (p = 0.29) | -0.07 (p = 0.48) | **-0.22 (p = 0.008)** |
+| `linear_mse` | **-0.19 (p = 0.03)** | +0.12 (p = 0.36) | -0.13 (p = 0.14) | **-0.21 (p = 0.01)** |
+
+Tail scores on seed-averaged quantiles ([`baselines_rolling/raw_tail_metrics.json`](baselines_rolling/raw_tail_metrics.json),
+[`baselines_rolling/capped650_tail_metrics.json`](baselines_rolling/capped650_tail_metrics.json)):
+
+| Raw prices | CRPS~ | CRPS~ below 0 | CRPS~ 0-100 | CRPS~ 100-300 | CRPS~ above 300 | q05 pinball, negative hours | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ours | 25.85 | **15.49** | 11.02 | 20.14 | 840.76 | **4.59** | 93.5% |
+| XGBoost | **25.02** | 17.11 | 9.71 | 20.21 | 828.25 | 6.25 | 86.6% |
+| PatchTST | 25.34 | 18.74 | 9.96 | 21.38 | **797.33** | 7.68 | 89.4% |
+| DLinear | 25.71 | 18.70 | **9.68** | 21.35 | 832.67 | 7.71 | 87.3% |
+
+| Finding | Evidence |
+|---|---|
+| Recalibration helps the baselines more than the fields | XGBoost gains 3.6 MAE over its static fit (39.53 against 43.15 raw), PatchTST 1.1, while ours gains 1.4 over the static detected-event DGF |
+| XGBoost is the best model under recalibration | Lowest MAE and CRPS~ under both treatments, significantly ahead of ours (pooled p <= 0.003); the gap is QLD1 (+1.73 raw, +1.45 capped MAE); in NSW1 ours is ahead on capped prices (-0.61, p = 0.001) |
+| Ours ties PatchTST and the linear models on MAE | Pooled differences within 0.2, mostly not significant; ours beats `linear_mse` on raw MAE (p = 0.03) |
+| Probabilistically ours is mid-table | Behind XGBoost under both treatments and PatchTST on raw prices; ahead of DLinear and `linear_mse` on capped prices |
+| The negative-price tail is ours under every comparison | CRPS~ on negative-price hours 15.49 against 17.11 (XGBoost) and 18.7 (others); q05 pinball 4.59 against 6.25 and 7.7; the same on capped prices (15.62, 4.58) |
+| The cost is over-wide intervals elsewhere | 90% coverage 93.5% against 86.6-89.4%, CRPS~ 11.02 against 9.7-10.0 in the 0-100 band, and 25% negative false alarms against 13-19% |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

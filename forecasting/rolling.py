@@ -13,6 +13,8 @@ relabels rows by period; rows outside every period are used only as history).
 ``collect`` predicts each quarter with its refit and writes, per region, the
 seed-stacked test predictions (as ``protocol_alignment collect``) and
 RE-Price style metrics per seed (as ``evaluate_paper_metrics``).
+``stitch-baselines`` joins the per-quarter outputs of ``forecasting.baselines``
+(run on the quarter configurations) into one test forecast per seed.
 """
 
 from __future__ import annotations
@@ -126,6 +128,31 @@ def collect(name: str, static_npz_dir: Path, output_dir: Path, metrics_dir: Path
               f"MAE {np.mean([point_metrics(stacked[s]['point'], actual)['mae'] for s in SEEDS]):.2f}", flush=True)
 
 
+def stitch_baselines(root: Path, static_npz_dir: Path, metrics_dir: Path) -> None:
+    """Joins ``root/seed<S>/q<k>/<region>.npz`` into ``root/seed<S>/<region>.npz``."""
+    levels = [0.05, 0.10, 0.50, 0.90, 0.95]
+    for seed in SEEDS:
+        for region in REGIONS:
+            with np.load(static_npz_dir / f"{region}.npz") as archive:
+                static_origins = archive["origin_unix"]
+            parts = {"point": [], "quantile": [], "actual": [], "origin_unix": []}
+            for k in range(len(QUARTERS) - 1):
+                with np.load(root / f"seed{seed}" / f"q{k}" / f"{region}.npz") as archive:
+                    for key in parts:
+                        parts[key].append(archive[key])
+            stitched = {key: np.concatenate(values) for key, values in parts.items()}
+            if not np.array_equal(stitched["origin_unix"], static_origins):
+                raise ValueError(f"{root} seed {seed} {region}: stitched origins do not match the static test split")
+            np.savez_compressed(root / f"seed{seed}" / f"{region}.npz", **stitched)
+            metrics = point_metrics(stitched["point"], stitched["actual"]) | probabilistic_metrics(
+                stitched["quantile"], stitched["actual"], levels
+            )
+            path = metrics_dir / f"seed{seed}" / f"{region}.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps({"region": region, "rolling": str(root), "seed": seed, "test": metrics}, indent=2))
+        print(f"stitched {root} seed {seed}", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest="command", required=True)
@@ -139,12 +166,18 @@ def main() -> None:
     collect_parser.add_argument("--output-dir", required=True, type=Path)
     collect_parser.add_argument("--metrics-dir", required=True, type=Path)
     collect_parser.add_argument("--device", default="cuda")
+    stitch_parser = commands.add_parser("stitch-baselines")
+    stitch_parser.add_argument("--root", required=True, type=Path, help="contains seed<S>/q<k>/<region>.npz")
+    stitch_parser.add_argument("--static-npz-dir", required=True, type=Path)
+    stitch_parser.add_argument("--metrics-dir", required=True, type=Path)
     args = parser.parse_args()
     if args.command == "make-configs":
         for path in make_configs(args.base_config, args.name):
             print(path)
-    else:
+    elif args.command == "collect":
         collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+    else:
+        stitch_baselines(args.root, args.static_npz_dir, args.metrics_dir)
 
 
 if __name__ == "__main__":

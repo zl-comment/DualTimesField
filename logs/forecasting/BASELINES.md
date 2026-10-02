@@ -294,6 +294,14 @@ The dual-field model's advantage over the general baselines comes from the
 known inputs, which a linear regression uses better. Its field structure, as
 trained now, costs about 1 MAE relative to that regression.
 
+## Quarterly recalibration
+
+Under quarterly refits of every model (static training is not the field's
+practice), XGBoost has the lowest MAE and CRPS~ and the dual-field model ties
+PatchTST and the linear models on MAE. Tables and tests are in
+`EXPERIMENT_RESULTS.md`, "Quarterly recalibration of the baselines; capped
+prices".
+
 ## Reproduction
 
 ```bash
