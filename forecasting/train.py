@@ -85,6 +85,11 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         calendar_dim=len(protocol["calendar_features"]),
         future_exogenous_dim=(
             config.get("future_exogenous", {}).get("dimension", 0)
+            + (
+                len(config["predispatch_exogenous"]["features"])
+                if config.get("predispatch_exogenous", {}).get("enabled", False)
+                else 0
+            )
             if config.get("future_exogenous", {}).get("enabled", False)
             else 0
         ),

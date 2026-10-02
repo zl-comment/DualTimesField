@@ -342,6 +342,19 @@ class AEMOForecastDataset(Dataset):
                 self.future_exogenous_standardizer,
                 self.future_exogenous_by_origin,
             ) = self._load_forecast_exogenous(frame, config, region, "future_exogenous")
+        # AEMO predispatch forecasts, appended to the future exogenous inputs so
+        # that every reader of those inputs (DGF heads, gate, linear base, and
+        # the baselines) sees them.
+        if config.get("predispatch_exogenous", {}).get("enabled", False):
+            if not self.future_exogenous_by_origin:
+                raise ValueError("predispatch_exogenous needs future_exogenous")
+            names, _, predispatch = self._load_forecast_exogenous(frame, config, region, "predispatch_exogenous")
+            self.future_exogenous_feature_names += names
+            self.future_exogenous_by_origin = {
+                origin: np.concatenate([values, predispatch[origin]], axis=-1).astype(np.float32)
+                for origin, values in self.future_exogenous_by_origin.items()
+                if origin in predispatch
+            }
         # Forecast inputs for the CTF head (e.g. PD PASA net load).
         self.ctf_exogenous_feature_names: tuple[str, ...] = ()
         self.ctf_exogenous_standardizer = None
@@ -392,6 +405,12 @@ class AEMOForecastDataset(Dataset):
             )
         if len(np.unique(origins)) != len(origins):
             raise ValueError(f"Duplicate future exogenous origins for {region}")
+        price_features = exogenous_config.get("price_features", [])
+        for name in price_features:
+            # Forecast prices (e.g. AEMO predispatch) go through the target's
+            # price transform, so they are on the scale of the target itself.
+            index = feature_names.index(name)
+            raw_values[..., index] = self.price_transform.forward(raw_values[..., index].astype(np.float64))
         if np.isnan(raw_values).any():
             raise ValueError(f"Missing future exogenous values for {region}")
         if (
