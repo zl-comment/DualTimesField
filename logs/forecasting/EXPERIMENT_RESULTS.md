@@ -1824,6 +1824,61 @@ Tail scores on seed-averaged quantiles ([`baselines_rolling/raw_tail_metrics.jso
 | The negative-price tail is ours under every comparison | CRPS~ on negative-price hours 15.49 against 17.11 (XGBoost) and 18.7 (others); q05 pinball 4.59 against 6.25 and 7.7; the same on capped prices (15.62, 4.58) |
 | The cost is over-wide intervals elsewhere | 90% coverage 93.5% against 86.6-89.4%, CRPS~ 11.02 against 9.7-10.0 in the 0-100 band, and 25% negative false alarms against 13-19% |
 
+## AEMO predispatch inputs, static split
+
+Branch `feature/predispatch-inputs`. AEMO's predispatch re-runs dispatch every
+30 minutes with the current offers and publishes regional prices and
+quantities up to the end of the next trading day; RE-Price's WattClarity news
+is largely commentary on it and on other AEMO data.
+[`forecasting/build_predispatch_exogenous.py`](../../forecasting/build_predispatch_exogenous.py)
+takes, for each hourly origin, the latest run published by then
+(PREDISPATCHPRICE and PREDISPATCHREGIONSUM from the MMSDM `PREDISP_ALL_DATA`
+archive, 2015-2024, 4.7 GB) and gives price, total demand, available
+generation, and net interchange for the 24 hours, plus a coverage flag (93% of
+hours; runs published 04:00-12:30 end before the 24th hour). October 2022 has
+no run history in the archive and is filled as uncovered with 2015-2021
+medians ([`predispatch/predispatch_summary.json`](predispatch/predispatch_summary.json)).
+The `predispatch_exogenous` block appends the features to the future
+exogenous inputs, so every model reads them; the price goes through the
+target's asinh transform.
+
+Used directly as a forecast, predispatch has test MAE 147.5 / 153.3 / 69.4
+(NSW1 / QLD1 / TAS1), inflated by spikes that do not happen, with median
+absolute error 18.6 / 19.6 / 17.1.
+
+Screen on the static split, raw prices, seeds 2026-2028 (configurations
+`configs/aemo_forecast_pd_*.yaml`; metrics in [`predispatch/`](predispatch/)):
+
+| Raw prices, static split | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| Linear base only + predispatch | 45.32 / 39.72 / 30.29 | 38.44 ± 0.11 | 75.26 | 413.64 | 27.48 |
+| Linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Linear base + fields + predispatch | 45.70 / 41.22 / 30.92 | 39.28 ± 0.25 | 76.97 | 390.46 | 27.00 |
+| XGBoost | 50.85 / 44.70 / 33.89 | 43.15 ± 0.07 | 81.65 | 414.32 | 27.69 |
+| XGBoost + predispatch | 45.25 / 39.33 / 29.34 | 37.97 ± 0.01 | 76.20 | 391.16 | 25.37 |
+| linear_mse | 47.88 / 41.53 / 32.14 | 40.52 ± 0.03 | 77.71 | 394.28 | 26.47 |
+| linear_mse + predispatch | 45.78 / 40.26 / 31.12 | 39.05 ± 0.34 | 75.95 | 359.83 | 24.81 |
+
+Diebold-Mariano on per-origin MAE ([`significance/raw_predispatch_static_mae.json`](significance/raw_predispatch_static_mae.json))
+and CRPS~ ([`significance/raw_predispatch_static_crps.json`](significance/raw_predispatch_static_crps.json)):
+
+| Comparison | Pooled | NSW1 / QLD1 / TAS1 |
+|---|---|---|
+| XGBoost with minus without predispatch, MAE | -5.17 (p < 0.0001) | -5.60 / -5.37 / -4.55 |
+| Base + fields with minus without predispatch, MAE | -2.25 (p < 0.0001) | -2.46 / -1.34 / -2.96 |
+| XGBoost + predispatch minus base only + predispatch, MAE | -0.47 (p = 0.13) | -0.07 / -0.39 / -0.95 (p < 0.001) |
+| XGBoost + predispatch minus base + fields + predispatch, MAE | -1.31 (p < 0.0001) | -0.45 / -1.89 / -1.58 |
+| Base + fields minus base only, both with predispatch, MAE | +0.84 (p < 0.0001) | +0.38 / +1.50 / +0.64 |
+| Base + fields minus base only, both with predispatch, CRPS~ | -1.02 (p < 0.0001) | -1.25 / -0.89 / -0.92 |
+| Base + fields minus XGBoost, both with predispatch, CRPS~ | +0.99 (p < 0.0001) | +0.64 / +1.37 / +0.97 |
+
+| Finding | Evidence |
+|---|---|
+| Predispatch is information the other inputs lack | Every model improves by 1.5-5.2 MAE, significantly in every region; XGBoost most, from 43.15 to 37.97 |
+| The trees use it best | XGBoost with predispatch is the best model, ahead of the dual-field model by 1.31 MAE and 0.99 CRPS~ |
+| The fields still cost point accuracy and help the base's intervals | Same pattern as without predispatch: +0.84 MAE, -1.02 CRPS~ against the base alone |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
