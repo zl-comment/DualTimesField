@@ -3,6 +3,7 @@
 # NSW1/QLD1/TAS1, then stitches their test forecasts.
 # Usage: scripts/run_rolling.sh <log_root> "<GPUs>" <runs per GPU> <name>...
 # (configs from: python -m forecasting.rolling make-configs --base-config ... --name <name>)
+# STATIC_REF names a static prediction set used only to check the stitched origins.
 set -u
 ROOT=$1; GPUS=($2); PER_GPU=$3; shift 3; NAMES=("$@")
 cd "$(dirname "$0")/.."
@@ -25,7 +26,7 @@ for (( s = 0; s < slots; s++ )); do worker "$s" & done
 wait
 for name in "${NAMES[@]}"; do
   CUDA_VISIBLE_DEVICES=${GPUS[0]} PYTHONPATH=. .venv/bin/python -m forecasting.rolling collect --name "$name" \
-    --static-npz-dir "outputs/forecasting/significance_inputs/$name" \
+    --static-npz-dir "outputs/forecasting/significance_inputs/${STATIC_REF:-$name}" \
     --output-dir "outputs/forecasting/significance_inputs/rolling_$name" \
     --metrics-dir "$ROOT/paper_metrics/$name" --device cuda:0
 done

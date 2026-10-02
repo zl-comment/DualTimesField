@@ -1879,6 +1879,64 @@ and CRPS~ ([`significance/raw_predispatch_static_crps.json`](significance/raw_pr
 | The trees use it best | XGBoost with predispatch is the best model, ahead of the dual-field model by 1.31 MAE and 0.99 CRPS~ |
 | The fields still cost point accuracy and help the base's intervals | Same pattern as without predispatch: +0.84 MAE, -1.02 CRPS~ against the base alone |
 
+## Predispatch inputs under quarterly recalibration
+
+The dual-field models (`pd_linear_base{,_only}`, raw and capped) and the
+baselines (XGBoost, PatchTST, DLinear, `linear_mse`) with the predispatch
+inputs, all refit every test quarter (`forecasting.rolling`; 288 dual-field and
+576 baseline refits; `scripts/run_rolling.sh` with `STATIC_REF`,
+`scripts/run_rolling_baselines.sh` with `CONFIG_NAME=pd_baseline`). Seeds
+2026-2028; metrics in [`predispatch_rolling/`](predispatch_rolling/) and
+[`baselines_rolling_pd/`](baselines_rolling_pd/).
+
+| raw, rolling, with predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 44.59 / 39.43 / 27.75 | 37.26 ± 0.16 | 74.65 | 90.80 | 378.99 | 25.47 |
+| Linear base only | 44.86 / 39.01 / 28.91 | 37.60 ± 0.03 | 74.35 | 91.50 | 401.19 | 26.04 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+| PatchTST | 46.68 / 40.03 / 29.84 | 38.85 ± 0.07 | 75.94 | 89.46 | 355.33 | 24.33 |
+| DLinear | 46.09 / 39.54 / 28.98 | 38.20 ± 0.09 | 76.11 | 88.28 | 338.65 | 23.62 |
+| linear_mse | 45.16 / 39.51 / 29.10 | 37.92 ± 0.02 | 74.78 | 88.15 | 339.70 | 23.66 |
+
+| capped650, rolling, with predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 26.15 / 27.16 / 24.75 | 26.02 ± 0.04 | 37.17 | 91.02 | 170.81 | 14.20 |
+| Linear base only | 26.77 / 27.46 / 25.92 | 26.72 ± 0.00 | 38.08 | 91.21 | 183.77 | 14.96 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+| PatchTST | 28.77 / 28.67 / 26.87 | 28.10 ± 0.07 | 40.00 | 89.48 | 188.61 | 15.12 |
+| DLinear | 29.01 / 28.44 / 26.02 | 27.82 ± 0.05 | 41.50 | 88.14 | 185.67 | 14.96 |
+| linear_mse | 27.09 / 27.84 / 26.11 | 27.01 ± 0.01 | 38.42 | 87.80 | 186.12 | 14.98 |
+
+Diebold-Mariano, ours minus each model, pooled over regions
+([`significance/*_rolling_predispatch_{mae,crps}.json`](significance/)):
+
+| Ours minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Linear base only | **-0.34 (p = 0.01)** | **-1.13 (p < 0.0001)** | **-0.70 (p < 0.0001)** | **-0.94 (p < 0.0001)** |
+| XGBoost | +1.74 (p < 0.0001) | +1.40 (p < 0.0001) | +1.48 (p < 0.0001) | +0.55 (p < 0.0001) |
+| PatchTST | **-1.59 (p < 0.0001)** | +0.09 (p = 0.81) | **-2.08 (p < 0.0001)** | **-1.45 (p < 0.0001)** |
+| DLinear | **-0.94 (p = 0.006)** | +0.87 (p = 0.05) | **-1.80 (p < 0.0001)** | **-1.22 (p < 0.0001)** |
+| `linear_mse` | **-0.66 (p < 0.0001)** | +0.82 (p = 0.06) | **-0.99 (p < 0.0001)** | **-1.25 (p < 0.0001)** |
+
+Tail scores on seed-averaged quantiles, raw prices
+([`predispatch_rolling/raw_tail_metrics.json`](predispatch_rolling/raw_tail_metrics.json),
+[`predispatch_rolling/capped650_tail_metrics.json`](predispatch_rolling/capped650_tail_metrics.json)):
+
+| Model | CRPS~ | CRPS~ below 0 | CRPS~ 0-100 | CRPS~ 100-300 | CRPS~ above 300 | q05 pinball, negative hours | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ours | 24.27 | **15.04** | 9.49 | **18.14** | 837.50 | **4.35** | 93.7% |
+| Linear base only | 25.39 | 16.21 | 10.25 | 17.53 | 882.33 | 5.82 | 93.1% |
+| XGBoost | **22.86** | 15.96 | **8.22** | 18.45 | 790.55 | 6.13 | 87.7% |
+| DLinear | 23.40 | 17.25 | 8.55 | 21.33 | **740.25** | 7.33 | 89.1% |
+
+| Finding | Evidence |
+|---|---|
+| With predispatch and recalibration the fields help both point and interval accuracy | Against the same base: -0.34 / -0.70 MAE and -1.13 / -0.94 CRPS~ (raw / capped), all significant; without predispatch the MAE difference was not significant, and on the static split the fields cost 0.9 |
+| Ours is the best model other than XGBoost | Significantly lower MAE than PatchTST, DLinear, and `linear_mse` under both treatments, and lower capped CRPS~ |
+| XGBoost stays ahead | +1.74 raw and +1.48 capped MAE against ours; 78% (raw) and 70% (capped) of the gap is in the 100-300 band and 32-39% in negative prices, while ours is closer on spike hours (-27% and -16% of the gap) ([`predispatch_rolling/`](predispatch_rolling/)) |
+| The negative-price lower tail remains ours | q05 pinball on negative-price hours 4.35 against 5.82-7.38 for every other model; CRPS~ below 0 15.04 against 15.96 (XGBoost) |
+| Every model gains from predispatch under recalibration | XGBoost 39.53 to 35.52 raw, 28.59 to 24.54 capped; ours 40.13 to 37.26 and 28.98 to 26.02 |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
