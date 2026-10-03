@@ -509,6 +509,7 @@ class DualFieldLinearForecaster(nn.Module):
         field_normalization: str = "none",
         ctf_heads: bool = True,
         field_point: bool = True,
+        calibrator_hidden: int = 0,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -758,6 +759,22 @@ class DualFieldLinearForecaster(nn.Module):
             )
             self.base_point_head = nn.Linear(base_dim, forecast_horizon)
             self.base_quantile_head = nn.Linear(base_dim, forecast_horizon * len(self.quantiles))
+        # Calibrator: one small MLP shared by the forecast hours. For each hour
+        # it reads that hour's known inputs (predispatch, spare capacity, net
+        # load, calendar), a horizon embedding, and the last observed price
+        # and its 24-hour mean, and corrects the point and quantile forecasts.
+        # Its output layer starts at zero, so it starts as the model without it.
+        self.calibrator = None
+        if calibrator_hidden > 0:
+            self.horizon_embedding = nn.Parameter(torch.zeros(forecast_horizon, 4))
+            calibrator_in = calendar_dim + future_exogenous_dim + ctf_exogenous_dim + 4 + 2
+            self.calibrator = nn.Sequential(
+                nn.Linear(calibrator_in, calibrator_hidden), nn.GELU(),
+                nn.Linear(calibrator_hidden, calibrator_hidden), nn.GELU(),
+                nn.Linear(calibrator_hidden, 1 + len(self.quantiles)),
+            )
+            nn.init.zeros_(self.calibrator[-1].weight)
+            nn.init.zeros_(self.calibrator[-1].bias)
 
     def _concatenated_forecast(
         self,
@@ -1064,6 +1081,19 @@ class DualFieldLinearForecaster(nn.Module):
                 # pipeline; the fields are still fitted by the decomposition loss.
                 forecasts["point_forecast"] = base_point
             forecasts["quantile_forecast"] = torch.sort(base_quantile, dim=-1).values
+
+        if self.calibrator is not None:
+            batch = raw_history.shape[0]
+            level = torch.stack([raw_history[:, -1, 0], raw_history[:, -24:, 0].mean(dim=1)], dim=-1)
+            parts = [future_calendar, future_exogenous, ctf_exogenous,
+                     self.horizon_embedding.expand(batch, -1, -1),
+                     level[:, None, :].expand(-1, self.forecast_horizon, -1)]
+            correction = self.calibrator(torch.cat([part for part in parts if part is not None], dim=-1))
+            forecasts["calibrator_point"] = correction[..., :1]
+            forecasts["point_forecast"] = forecasts["point_forecast"] + correction[..., :1]
+            forecasts["quantile_forecast"] = torch.sort(
+                forecasts["quantile_forecast"] + correction[..., 1:], dim=-1
+            ).values
 
         if self.event_field is not None:
             level_mean = forecasts["point_forecast"]

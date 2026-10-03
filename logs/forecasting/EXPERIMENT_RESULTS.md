@@ -1937,6 +1937,71 @@ Tail scores on seed-averaged quantiles, raw prices
 | The negative-price lower tail remains ours | q05 pinball on negative-price hours 4.35 against 5.82-7.38 for every other model; CRPS~ below 0 15.04 against 15.96 (XGBoost) |
 | Every model gains from predispatch under recalibration | XGBoost 39.53 to 35.52 raw, 28.59 to 24.54 capped; ours 40.13 to 37.26 and 28.98 to 26.02 |
 
+## Nonlinear predispatch correction
+
+Branch `feature/predispatch-calibration`. Two ways to let the dual-field model
+bend its response to predispatch, on top of base + fields with predispatch,
+under quarterly recalibration (raw and capped, seeds 2026-2028, 288 refits;
+metrics in [`predispatch_calibration/`](predispatch_calibration/)):
+
+- (A) hinge features, `configs/aemo_forecast_{,capped650_}pd_hinge.yaml`: the
+  excess of the asinh predispatch price above its training 0.5/0.75/0.9/0.95/0.99
+  quantiles (`excess_features`, `excess_above_train_quantiles` in the
+  `predispatch_exogenous` block);
+- (B) calibrator, `configs/aemo_forecast_{,capped650_}pd_calibrator.yaml`
+  (`calibrator_hidden: 32`): one two-layer MLP shared by the forecast hours that
+  reads each hour's known inputs (predispatch, spare capacity, net load,
+  calendar), a horizon embedding, and the last price and its 24-hour mean, and
+  adds corrections to the point and quantile forecasts; its output layer starts
+  at zero.
+
+| raw, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Base + fields + calibrator (B) | 44.32 / 39.39 / 27.14 | 36.95 ± 0.12 | 74.07 | 89.61 | 369.16 | 25.13 |
+| Base + fields + hinge features (A) | 44.10 / 39.05 / 27.88 | 37.01 ± 0.08 | 74.45 | 89.76 | 352.24 | 24.67 |
+| Base + fields (previous) | 44.59 / 39.43 / 27.75 | 37.26 ± 0.16 | 74.65 | 90.80 | 378.99 | 25.47 |
+| Linear base only | 44.86 / 39.01 / 28.91 | 37.60 ± 0.03 | 74.35 | 91.50 | 401.19 | 26.04 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+| linear_mse | 45.16 / 39.51 / 29.10 | 37.92 ± 0.02 | 74.78 | 88.15 | 339.70 | 23.66 |
+
+| capped650, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Base + fields + calibrator (B) | 25.70 / 26.63 / 24.41 | 25.58 ± 0.19 | 36.40 | 89.62 | 166.22 | 13.83 |
+| Base + fields + hinge features (A) | 25.45 / 26.44 / 24.98 | 25.63 ± 0.04 | 36.48 | 89.60 | 166.34 | 13.95 |
+| Base + fields (previous) | 26.15 / 27.16 / 24.75 | 26.02 ± 0.04 | 37.17 | 91.02 | 170.81 | 14.20 |
+| Linear base only | 26.77 / 27.46 / 25.92 | 26.72 ± 0.00 | 38.08 | 91.21 | 183.77 | 14.96 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+| linear_mse | 27.09 / 27.84 / 26.11 | 27.01 ± 0.01 | 38.42 | 87.80 | 186.12 | 14.98 |
+
+Diebold-Mariano, calibrator minus each model, pooled
+([`significance/*_predispatch_calibration_{mae,crps}.json`](significance/)):
+
+| Calibrator minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Base + fields (previous) | **-0.31 (p = 0.01)** | **-0.26 (p = 0.04)** | **-0.44 (p < 0.0001)** | **-0.23 (p < 0.0001)** |
+| Hinge features | -0.06 (p = 0.60) | +0.69 (p = 0.03) | -0.05 (p = 0.56) | +0.03 (p = 0.53) |
+| XGBoost | +1.43 (p < 0.0001) | +1.14 (p < 0.0001) | +1.04 (p < 0.0001) | +0.32 (p < 0.0001) |
+| `linear_mse` | **-0.97 (p < 0.0001)** | +0.56 (p = 0.12) | **-1.43 (p < 0.0001)** | **-1.47 (p < 0.0001)** |
+
+Per region against XGBoost (MAE, raw / capped): NSW1 +0.98 / +0.50, QLD1 +2.92 /
++1.85, TAS1 +0.39 (p = 0.02) / +0.76; CRPS~ in TAS1 is tied (p = 0.74 / 0.91).
+
+Tail scores (seed-averaged quantiles; [`predispatch_calibration/raw_tail_metrics.json`](predispatch_calibration/raw_tail_metrics.json),
+[`predispatch_calibration/capped650_tail_metrics.json`](predispatch_calibration/capped650_tail_metrics.json)):
+
+| Model | Raw CRPS~ below 0 | Raw CRPS~ above 300 | Raw q05 pinball, negative | Capped CRPS~ below 0 | Capped CRPS~ above 300 |
+|---|---:|---:|---:|---:|---:|
+| Calibrator | **14.17** | 800.30 | **4.30** | **13.99** | **121.10** |
+| Hinge features | 15.54 | **761.58** | 4.40 | 15.22 | 124.05 |
+| Previous | 15.04 | 837.50 | 4.35 | 15.00 | 137.59 |
+| XGBoost | 15.96 | 790.55 | 6.13 | 15.47 | 138.29 |
+
+| Finding | Evidence |
+|---|---|
+| Both corrections help, by about the same on MAE | Calibrator -0.31 / -0.44 MAE (raw / capped) against the previous model; hinge features -0.25 / -0.39; calibrator and hinge features do not differ significantly on MAE |
+| The gap to XGBoost narrows but stays | From +1.74 / +1.48 to +1.43 / +1.04 MAE; QLD1 holds most of it (+2.92 / +1.85) |
+| The calibrator improves the tails most | Lowest negative-hour CRPS~ and q05 pinball of all models, and on capped prices the lowest spike-hour CRPS~ (121.1 against 138.3 for XGBoost) |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

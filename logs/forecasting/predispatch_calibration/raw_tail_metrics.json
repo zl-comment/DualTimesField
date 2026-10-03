@@ -1,0 +1,266 @@
+{
+  "calibrator": {
+    "NSW1": {
+      "crps_quantile_approx": 31.228489562084846,
+      "crps_by_band": {
+        "<0": 17.32896554229784,
+        "0-100": 9.170461900574814,
+        "100-300": 19.371440240239597,
+        ">300": 1042.9308729418783
+      },
+      "pinball_q95_spike_hours": 867.2148136029932,
+      "pinball_q05_negative_hours": 5.291111953368051,
+      "spike_hit_rate_q95": 0.9113735070575462,
+      "spike_false_alarm_rate_q95": 0.10318151891870958,
+      "negative_hit_rate_q05": 0.9568657576339543,
+      "negative_false_alarm_rate_q05": 0.15749019568077594,
+      "coverage_90": 0.9209710252458954
+    },
+    "QLD1": {
+      "crps_quantile_approx": 25.43829468846484,
+      "crps_by_band": {
+        "<0": 11.55762703072062,
+        "0-100": 9.861819478224092,
+        "100-300": 21.502294159763785,
+        ">300": 623.8623690068379
+      },
+      "pinball_q95_spike_hours": 489.86636175778995,
+      "pinball_q05_negative_hours": 3.579331157494102,
+      "spike_hit_rate_q95": 0.9196244855967078,
+      "spike_false_alarm_rate_q95": 0.1466995212343238,
+      "negative_hit_rate_q05": 0.9836676630532647,
+      "negative_false_alarm_rate_q05": 0.15798284790530728,
+      "coverage_90": 0.9378674162433651
+    },
+    "TAS1": {
+      "crps_quantile_approx": 15.341554304625854,
+      "crps_by_band": {
+        "<0": 13.620665123040709,
+        "0-100": 9.677475743096192,
+        "100-300": 16.434407980072166,
+        ">300": 734.0960701696414
+      },
+      "pinball_q95_spike_hours": 668.7875827535968,
+      "pinball_q05_negative_hours": 4.0338743258935414,
+      "spike_hit_rate_q95": 0.7974137931034483,
+      "spike_false_alarm_rate_q95": 0.0522207563764292,
+      "negative_hit_rate_q05": 0.9460043893622515,
+      "negative_false_alarm_rate_q05": 0.2948243992606285,
+      "coverage_90": 0.9170614310446512
+    },
+    "mean": {
+      "crps_quantile_approx": 24.002779518391847,
+      "pinball_q95_spike_hours": 675.2895860381267,
+      "pinball_q05_negative_hours": 4.301439145585231,
+      "spike_hit_rate_q95": 0.8761372619192341,
+      "spike_false_alarm_rate_q95": 0.10070059884315419,
+      "negative_hit_rate_q05": 0.9621792700164903,
+      "negative_false_alarm_rate_q05": 0.20343248094890387,
+      "coverage_90": 0.9252999575113039,
+      "crps_by_band": {
+        "<0": 14.16908589868639,
+        "0-100": 9.5699190406317,
+        "100-300": 19.10271412669185,
+        ">300": 800.2964373727858
+      }
+    }
+  },
+  "hinge": {
+    "NSW1": {
+      "crps_quantile_approx": 29.939941854785136,
+      "crps_by_band": {
+        "<0": 18.732538194697778,
+        "0-100": 8.969314125019467,
+        "100-300": 18.77637345907532,
+        ">300": 982.5799552221329
+      },
+      "pinball_q95_spike_hours": 790.062965191433,
+      "pinball_q05_negative_hours": 5.145895679786236,
+      "spike_hit_rate_q95": 0.881514657980456,
+      "spike_false_alarm_rate_q95": 0.08650904302699353,
+      "negative_hit_rate_q05": 0.9560207413097753,
+      "negative_false_alarm_rate_q05": 0.16854556378321237,
+      "coverage_90": 0.9227331963548504
+    },
+    "QLD1": {
+      "crps_quantile_approx": 24.294027629095385,
+      "crps_by_band": {
+        "<0": 11.921493539155264,
+        "0-100": 9.500170501361918,
+        "100-300": 21.425117463361225,
+        ">300": 570.7135005891143
+      },
+      "pinball_q95_spike_hours": 400.40503332194635,
+      "pinball_q05_negative_hours": 3.1393669775519735,
+      "spike_hit_rate_q95": 0.8949331275720165,
+      "spike_false_alarm_rate_q95": 0.10784826810877866,
+      "negative_hit_rate_q05": 0.9858104944718551,
+      "negative_false_alarm_rate_q05": 0.17488834698742362,
+      "coverage_90": 0.9420124422122025
+    },
+    "TAS1": {
+      "crps_quantile_approx": 15.717775323406793,
+      "crps_by_band": {
+        "<0": 15.974601042254807,
+        "0-100": 9.889310326695359,
+        "100-300": 16.724999427080924,
+        ">300": 731.4570424350408
+      },
+      "pinball_q95_spike_hours": 653.0430793972916,
+      "pinball_q05_negative_hours": 4.914779827602592,
+      "spike_hit_rate_q95": 0.7849616858237548,
+      "spike_false_alarm_rate_q95": 0.05273220909334251,
+      "negative_hit_rate_q05": 0.9331590498321715,
+      "negative_false_alarm_rate_q05": 0.31549599507085646,
+      "coverage_90": 0.9260506439891178
+    },
+    "mean": {
+      "crps_quantile_approx": 23.31724826909577,
+      "pinball_q95_spike_hours": 614.5036926368904,
+      "pinball_q05_negative_hours": 4.400014161646934,
+      "spike_hit_rate_q95": 0.8538031571254091,
+      "spike_false_alarm_rate_q95": 0.0823631734097049,
+      "negative_hit_rate_q05": 0.9583300952046007,
+      "negative_false_alarm_rate_q05": 0.21964330194716417,
+      "coverage_90": 0.9302654275187235,
+      "crps_by_band": {
+        "<0": 15.54287759203595,
+        "0-100": 9.452931651025581,
+        "100-300": 18.975496783172492,
+        ">300": 761.5834994154293
+      }
+    }
+  },
+  "previous": {
+    "NSW1": {
+      "crps_quantile_approx": 31.65670850437658,
+      "crps_by_band": {
+        "<0": 18.219110230178618,
+        "0-100": 9.184985217330652,
+        "100-300": 18.247694495215157,
+        ">300": 1085.3656193284717
+      },
+      "pinball_q95_spike_hours": 926.1913509453891,
+      "pinball_q05_negative_hours": 4.923107739077315,
+      "spike_hit_rate_q95": 0.9184310532030402,
+      "spike_false_alarm_rate_q95": 0.10112408504705472,
+      "negative_hit_rate_q05": 0.9532936431726522,
+      "negative_false_alarm_rate_q05": 0.15522385789504373,
+      "coverage_90": 0.9295131556418013
+    },
+    "QLD1": {
+      "crps_quantile_approx": 25.354480342606553,
+      "crps_by_band": {
+        "<0": 11.178869635238993,
+        "0-100": 9.425805955895799,
+        "100-300": 19.50106387262096,
+        ">300": 671.1370396190678
+      },
+      "pinball_q95_spike_hours": 535.4860887797281,
+      "pinball_q05_negative_hours": 3.3164478456673208,
+      "spike_hit_rate_q95": 0.9146090534979424,
+      "spike_false_alarm_rate_q95": 0.1219956000077533,
+      "negative_hit_rate_q05": 0.9857024525515901,
+      "negative_false_alarm_rate_q05": 0.17144696824396527,
+      "coverage_90": 0.9474012137815574
+    },
+    "TAS1": {
+      "crps_quantile_approx": 15.783852265203445,
+      "crps_by_band": {
+        "<0": 15.726015943656183,
+        "0-100": 9.856283620721646,
+        "100-300": 16.66503843733371,
+        ">300": 756.0073655123119
+      },
+      "pinball_q95_spike_hours": 679.2427727360683,
+      "pinball_q05_negative_hours": 4.807368649782347,
+      "spike_hit_rate_q95": 0.7811302681992337,
+      "spike_false_alarm_rate_q95": 0.05003871744866353,
+      "negative_hit_rate_q05": 0.9341918409501678,
+      "negative_false_alarm_rate_q05": 0.3084257547751078,
+      "coverage_90": 0.9342431938816278
+    },
+    "mean": {
+      "crps_quantile_approx": 24.265013704062195,
+      "pinball_q95_spike_hours": 713.6400708203952,
+      "pinball_q05_negative_hours": 4.3489747448423275,
+      "spike_hit_rate_q95": 0.8713901249667387,
+      "spike_false_alarm_rate_q95": 0.09105280083449052,
+      "negative_hit_rate_q05": 0.9577293122248034,
+      "negative_false_alarm_rate_q05": 0.2116988603047056,
+      "coverage_90": 0.9370525211016622,
+      "crps_by_band": {
+        "<0": 15.04133193635793,
+        "0-100": 9.489024931316033,
+        "100-300": 18.137932268389942,
+        ">300": 837.5033414866172
+      }
+    }
+  },
+  "xgboost": {
+    "NSW1": {
+      "crps_quantile_approx": 30.388029610914987,
+      "crps_by_band": {
+        "<0": 19.889023417731615,
+        "0-100": 7.767059417994866,
+        "100-300": 17.841228593326004,
+        ">300": 1062.0907720829498
+      },
+      "pinball_q95_spike_hours": 883.9304295776376,
+      "pinball_q05_negative_hours": 8.283945615927463,
+      "spike_hit_rate_q95": 0.8876221498371335,
+      "spike_false_alarm_rate_q95": 0.0897186398667751,
+      "negative_hit_rate_q05": 0.9082389091607451,
+      "negative_false_alarm_rate_q05": 0.08248556920822675,
+      "coverage_90": 0.865330650838042
+    },
+    "QLD1": {
+      "crps_quantile_approx": 22.822985682716652,
+      "crps_by_band": {
+        "<0": 10.591999182394591,
+        "0-100": 7.99611945216706,
+        "100-300": 20.29564769221351,
+        ">300": 562.7900639656372
+      },
+      "pinball_q95_spike_hours": 372.2016266863206,
+      "pinball_q05_negative_hours": 3.276757350164245,
+      "spike_hit_rate_q95": 0.9209104938271605,
+      "spike_false_alarm_rate_q95": 0.13003236998701323,
+      "negative_hit_rate_q05": 0.9639680195916015,
+      "negative_false_alarm_rate_q05": 0.09207606104611338,
+      "coverage_90": 0.8925242090443848
+    },
+    "TAS1": {
+      "crps_quantile_approx": 15.376484833042383,
+      "crps_by_band": {
+        "<0": 17.397488797832956,
+        "0-100": 8.90430044763383,
+        "100-300": 17.20603979026383,
+        ">300": 746.7567830501972
+      },
+      "pinball_q95_spike_hours": 664.8659901392566,
+      "pinball_q05_negative_hours": 6.815146219836219,
+      "spike_hit_rate_q95": 0.7432950191570882,
+      "spike_false_alarm_rate_q95": 0.03553162402967382,
+      "negative_hit_rate_q05": 0.8789375161373613,
+      "negative_false_alarm_rate_q05": 0.14442904087081537,
+      "coverage_90": 0.8729310541635752
+    },
+    "mean": {
+      "crps_quantile_approx": 22.862500042224678,
+      "pinball_q95_spike_hours": 640.332682134405,
+      "pinball_q05_negative_hours": 6.125283061975975,
+      "spike_hit_rate_q95": 0.8506092209404607,
+      "spike_false_alarm_rate_q95": 0.08509421129448737,
+      "negative_hit_rate_q05": 0.9170481482965692,
+      "negative_false_alarm_rate_q05": 0.10633022370838517,
+      "coverage_90": 0.8769286380153339,
+      "crps_by_band": {
+        "<0": 15.95950379931972,
+        "0-100": 8.22249310593192,
+        "100-300": 18.447638691934447,
+        ">300": 790.545873032928
+      }
+    }
+  }
+}

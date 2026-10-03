@@ -87,6 +87,8 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             config.get("future_exogenous", {}).get("dimension", 0)
             + (
                 len(config["predispatch_exogenous"]["features"])
+                + len(config["predispatch_exogenous"].get("excess_features", []))
+                * len(config["predispatch_exogenous"].get("excess_above_train_quantiles") or [])
                 if config.get("predispatch_exogenous", {}).get("enabled", False)
                 else 0
             )
@@ -140,6 +142,7 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         field_normalization=model_config.get("field_normalization", "none"),
         ctf_heads=bool(model_config.get("ctf_heads", True)),
         field_point=bool(model_config.get("field_point", True)),
+        calibrator_hidden=int(model_config.get("calibrator_hidden", 0)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])

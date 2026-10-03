@@ -436,6 +436,22 @@ class AEMOForecastDataset(Dataset):
         train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
         if not train_rows:
             raise ValueError(f"No training future exogenous values for {region}")
+        excess_quantiles = exogenous_config.get("excess_above_train_quantiles")
+        if excess_quantiles is not None:
+            # Append, for the listed features, the excess above several training
+            # quantiles, max(value - knot, 0), so that a linear head can bend
+            # its response (e.g. discount high predispatch prices).
+            columns = [feature_names.index(name) for name in exogenous_config["excess_features"]]
+            selected = raw_values[..., columns]
+            knots = np.quantile(
+                selected[train_rows].reshape(-1, len(columns)), [float(q) for q in excess_quantiles], axis=0
+            )
+            raw_values = np.concatenate(
+                [raw_values, *(np.maximum(selected - knot, 0.0) for knot in knots)], axis=-1
+            )
+            feature_names = feature_names + tuple(
+                f"{feature_names[c]}_excess_q{q}" for q in excess_quantiles for c in columns
+            )
         shortfall_quantiles = exogenous_config.get("shortfall_below_train_quantiles")
         if shortfall_quantiles is not None:
             # Replace each feature with its shortfall below several training
