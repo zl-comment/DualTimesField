@@ -2002,6 +2002,35 @@ Tail scores (seed-averaged quantiles; [`predispatch_calibration/raw_tail_metrics
 | The gap to XGBoost narrows but stays | From +1.74 / +1.48 to +1.43 / +1.04 MAE; QLD1 holds most of it (+2.92 / +1.85) |
 | The calibrator improves the tails most | Lowest negative-hour CRPS~ and q05 pinball of all models, and on capped prices the lowest spike-hour CRPS~ (121.1 against 138.3 for XGBoost) |
 
+## QLD1 gap to XGBoost: diagnosis
+
+Branch `feature/qld1-diagnosis`.
+[`forecasting/gap_diagnosis.py`](../../forecasting/gap_diagnosis.py) splits the
+absolute-error gap between two seed-ensemble forecasters over bins of one
+condition at a time. Here: the calibrator model against XGBoost, both refit
+quarterly with predispatch, QLD1, raw prices (MAE 38.56 against 36.25 for the
+ensembles; full tables in [`qld1_diagnosis/`](qld1_diagnosis/)).
+
+| Condition | Share of hours | MAE ours | MAE XGBoost | Share of the gap |
+|---|---:|---:|---:|---:|
+| Actual price at or below 0 | 13.2% | 25.76 | 17.56 | +47% |
+| Actual price 200-300 | 6.9% | 73.69 | 60.00 | +41% |
+| Actual price above 300 | 1.8% | 776.52 | 815.43 | -31% |
+| Predispatch price at or below 0 | 12.5% | 22.65 | 15.85 | +37% |
+| Lowest PD PASA net-load quintile | 20.0% | 23.64 | 18.15 | +48% |
+| Highest spare-capacity quintile | 20.0% | 21.82 | 17.17 | +40% |
+| Delivered 16:00-19:00 | 16.7% | 120.47 | 116.69 | +27% |
+
+The gap is spread evenly over horizons (23-27% per quarter of the day ahead)
+and over test quarters except 2024Q1, where ours is ahead.
+
+| Finding | Evidence |
+|---|---|
+| Half of the gap is the negative-price, high-solar hours | Actual <= 0, predispatch <= 0, low net load, and ample spare capacity each carry 37-48% of the gap (largely the same hours) |
+| The model over-extrapolates negative prices | Ours predicts below -100 AUD/MWh in 0.23% of hours, against 0.01% of actual prices and none for XGBoost; on negative-price hours its 1st percentile is -110 against -61 actual. The 3.2% of hours where ours predicts below -50 hold 31% of the gap (MAE 79 against 13). A linear head extrapolates in asinh space and the inverse transform inflates it; trees stay inside the training range |
+| A floor recovers part of it, but needs a validation-chosen level | Clipping our forecasts at the 2015-2022 0.5% price quantile lowers QLD1 MAE from 39.39 to 38.55 (floor -41.2), but raises NSW1 from 44.32 to 44.46 (floor -8.5); the 0.1% quantile changes little (39.17 QLD1) |
+| The rest is dispersion in the 100-300 band and evening peaks | In 200-300 our bias is smaller (-16 against -43) but MAE larger (73.7 against 60.0); ours is better on spike hours |
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
