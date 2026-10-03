@@ -2031,6 +2031,40 @@ and over test quarters except 2024Q1, where ours is ahead.
 | A floor recovers part of it, but needs a validation-chosen level | Clipping our forecasts at the 2015-2022 0.5% price quantile lowers QLD1 MAE from 39.39 to 38.55 (floor -41.2), but raises NSW1 from 44.32 to 44.46 (floor -8.5); the 0.1% quantile changes little (39.17 QLD1) |
 | The rest is dispersion in the 100-300 band and evening peaks | In 200-300 our bias is smaller (-16 against -43) but MAE larger (73.7 against 60.0); ours is better on spike hours |
 
+## Validation-chosen price floor
+
+Branch `feature/price-floor`. [`forecasting/price_floor.py`](../../forecasting/price_floor.py)
+clips the calibrator model's quarterly-refit forecasts from below. For each
+refit and region the level is chosen on that refit's validation quarter only,
+seed-averaged: none, or the 0.05/0.1/0.2/0.5/1% quantile of the refit's
+training prices capped at zero; the point forecast's floor by validation MAE,
+the quantiles' floor by validation CRPS~. No retraining: the existing
+checkpoints predict the validation and test quarters. Chosen point floors are
+mostly -40 to -48 AUD/MWh in QLD1, -11 to -27 in TAS1, and vary in NSW1
+([`price_floor/paper_metrics/`](price_floor/paper_metrics/), `choices_*.json`).
+
+| raw, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Calibrator + price floor | 44.27 / 38.57 / 27.07 | 36.64 ± 0.14 | 73.69 | 88.73 | 367.84 | 25.07 |
+| Calibrator | 44.32 / 39.39 / 27.14 | 36.95 ± 0.12 | 74.07 | 89.61 | 369.16 | 25.13 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+
+| capped650, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Calibrator + price floor | 25.64 / 25.89 / 24.35 | 25.29 ± 0.17 | 36.07 | 88.87 | 165.76 | 13.80 |
+| Calibrator | 25.70 / 26.63 / 24.41 | 25.58 ± 0.19 | 36.40 | 89.62 | 166.22 | 13.83 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+
+Diebold-Mariano ([`significance/*_price_floor_{mae,crps}.json`](significance/)):
+floor minus calibrator, MAE -0.31 raw and -0.29 capped (pooled p < 0.0001,
+significant in every region; QLD1 -0.82 / -0.74); CRPS~ -0.03 (p = 0.006) and
+-0.02 (p = 0.13). Floor minus XGBoost, MAE +1.12 raw (TAS1 +0.31, p = 0.06)
+and +0.75 capped; CRPS~ +1.11 and +0.31, tied in TAS1.
+
+The floor gives up a little of the negative-price lower tail (raw q05 pinball
+on negative hours 4.74 against 4.30), still the best of all models (XGBoost
+6.13) ([`price_floor/raw_tail_metrics.json`](price_floor/raw_tail_metrics.json)).
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

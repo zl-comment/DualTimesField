@@ -1,0 +1,68 @@
+{
+  "reference": "floor",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "floor": 3,
+    "calibrator": 3,
+    "xgboost": 3
+  },
+  "comparisons": {
+    "calibrator": {
+      "NSW1": {
+        "mean_difference": -0.04722562541017545,
+        "statistic": -3.03304589714376,
+        "p_value": 0.0024209877546832806,
+        "reference_mae": 44.2693041568061,
+        "other_mae": 44.316529782216286
+      },
+      "QLD1": {
+        "mean_difference": -0.8204468908177429,
+        "statistic": -9.089417392544505,
+        "p_value": 9.957116844246655e-20,
+        "reference_mae": 38.572963571622246,
+        "other_mae": 39.39341046243998
+      },
+      "TAS1": {
+        "mean_difference": -0.07520257193788393,
+        "statistic": -3.922929585503282,
+        "p_value": 8.747872430926092e-05,
+        "reference_mae": 27.068391125099733,
+        "other_mae": 27.143593697037616
+      },
+      "three_region_mean": {
+        "mean_difference": -0.31429169605526747,
+        "statistic": -9.062190345005195,
+        "p_value": 1.2785683716733868e-19
+      }
+    },
+    "xgboost": {
+      "NSW1": {
+        "mean_difference": 0.931425602024773,
+        "statistic": 3.9136631370122346,
+        "p_value": 9.090643389246791e-05,
+        "reference_mae": 44.2693041568061,
+        "other_mae": 43.337878554781334
+      },
+      "QLD1": {
+        "mean_difference": 2.0991233297764142,
+        "statistic": 7.290094102090946,
+        "p_value": 3.0973860545178096e-13,
+        "reference_mae": 38.572963571622246,
+        "other_mae": 36.47384024184583
+      },
+      "TAS1": {
+        "mean_difference": 0.31321663387764537,
+        "statistic": 1.8645041905110333,
+        "p_value": 0.06225093364747174,
+        "reference_mae": 27.068391125099733,
+        "other_mae": 26.755174491222085
+      },
+      "three_region_mean": {
+        "mean_difference": 1.114588521892944,
+        "statistic": 6.91497705745662,
+        "p_value": 4.679390978965705e-12
+      }
+    }
+  }
+}

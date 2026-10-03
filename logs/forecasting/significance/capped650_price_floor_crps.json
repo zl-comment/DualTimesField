@@ -1,0 +1,68 @@
+{
+  "reference": "floor",
+  "lag": 48,
+  "loss": "per-origin CRPS~ over 24 hours, seed-averaged quantiles",
+  "seeds": {
+    "floor": 3,
+    "calibrator": 3,
+    "xgboost": 3
+  },
+  "comparisons": {
+    "calibrator": {
+      "NSW1": {
+        "mean_difference": 0.04046204744072254,
+        "statistic": 2.142279862569788,
+        "p_value": 0.032170968296555295,
+        "reference_mae": 13.883623856148288,
+        "other_mae": 13.843161808707565
+      },
+      "QLD1": {
+        "mean_difference": -0.09895704166862385,
+        "statistic": -6.36303744685562,
+        "p_value": 1.97802441044481e-10,
+        "reference_mae": 13.68429522141157,
+        "other_mae": 13.783252263080193
+      },
+      "TAS1": {
+        "mean_difference": 0.01485108075656418,
+        "statistic": 0.886807462906029,
+        "p_value": 0.37518256898895574,
+        "reference_mae": 12.303388947021224,
+        "other_mae": 12.288537866264662
+      },
+      "three_region_mean": {
+        "mean_difference": -0.014547971157112372,
+        "statistic": -1.52952189195862,
+        "p_value": 0.12613511618841045
+      }
+    },
+    "xgboost": {
+      "NSW1": {
+        "mean_difference": 0.2875539441890945,
+        "statistic": 2.666344246049507,
+        "p_value": 0.007668112896772453,
+        "reference_mae": 13.883623856148288,
+        "other_mae": 13.596069911959194
+      },
+      "QLD1": {
+        "mean_difference": 0.6358343204129344,
+        "statistic": 8.131070371514243,
+        "p_value": 4.255162180301495e-16,
+        "reference_mae": 13.68429522141157,
+        "other_mae": 13.048460900998634
+      },
+      "TAS1": {
+        "mean_difference": 0.0031076019847569095,
+        "statistic": 0.032248447753515,
+        "p_value": 0.9742739205306947,
+        "reference_mae": 12.303388947021224,
+        "other_mae": 12.300281345036467
+      },
+      "three_region_mean": {
+        "mean_difference": 0.3088319555289286,
+        "statistic": 4.449242915308036,
+        "p_value": 8.617350952710455e-06
+      }
+    }
+  }
+}
