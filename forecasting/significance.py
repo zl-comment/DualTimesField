@@ -8,6 +8,10 @@ Newey-West (Bartlett) long-run variance, because rolling hourly origins
 overlap and are strongly autocorrelated. Tests are run per region and on the
 three-region mean differential at each origin time.
 
+With ``--loss crps`` the per-origin loss is CRPS~ (twice the mean pinball loss
+over the five quantiles of ``quantile``, averaged over the 24 horizons); a
+method with several seeds then uses its seed-averaged quantiles.
+
 Sources are ``name=pattern`` where ``pattern`` is an ``.npz`` path containing
 ``{region}`` and optionally ``{seed}``; each file holds ``point`` (``[N, 24]``
 or ``[S, N, 24]``), ``actual``, and ``origin_unix``. The name ``naive`` with a
@@ -25,23 +29,32 @@ import numpy as np
 
 REGIONS = ("NSW1", "QLD1", "TAS1")
 SEEDS = (2026, 2027, 2028)
+LEVELS = np.array([0.05, 0.10, 0.50, 0.90, 0.95])
 
 
-def _load(pattern: str, region: str, use_naive: bool = False):
+def _crps(quantile: np.ndarray, actual: np.ndarray) -> np.ndarray:
+    error = actual[..., None] - np.sort(quantile, axis=-1)
+    return 2 * np.maximum(LEVELS * error, (LEVELS - 1) * error).mean(axis=-1).mean(axis=1)
+
+
+def _load(pattern: str, region: str, use_naive: bool = False, loss: str = "mae"):
     paths = (
         [pattern.format(region=region, seed=seed) for seed in SEEDS]
         if "{seed}" in pattern
         else [pattern.format(region=region)]
     )
     points, actual, origins = [], None, None
+    key = "quantile" if loss == "crps" else ("naive" if use_naive else "point")
     for path in paths:
         with np.load(path) as archive:
-            point = archive["naive" if use_naive else "point"]
-            points.extend(point if point.ndim == 3 else [point])
+            point = archive[key]
+            points.extend(point if point.ndim == (4 if loss == "crps" else 3) else [point])
             if actual is None:
                 actual, origins = archive["actual"], archive["origin_unix"]
             elif not (np.array_equal(archive["origin_unix"], origins) and np.allclose(archive["actual"], actual)):
                 raise ValueError(f"{path} is not aligned with the other seeds")
+    if loss == "crps":
+        return _crps(np.mean(points, axis=0), actual), actual, origins, len(points)
     losses = np.mean([np.abs(p - actual).mean(axis=1) for p in points], axis=0)
     return losses, actual, origins, len(points)
 
@@ -57,13 +70,15 @@ def diebold_mariano(differential: np.ndarray, lag: int) -> dict:
     return {"mean_difference": float(differential.mean()), "statistic": float(statistic), "p_value": float(p_value)}
 
 
-def run(reference: str, sources: dict[str, str], lag: int, output: Path) -> dict:
+def run(reference: str, sources: dict[str, str], lag: int, output: Path, loss: str = "mae") -> dict:
     loaded = {}
     for name, pattern in sources.items():
         loaded[name] = {}
         for region in REGIONS:
-            loaded[name][region] = _load(pattern, region, use_naive=name == "naive")
-    result = {"reference": reference, "lag": lag, "loss": "per-origin mean absolute error over 24 hours",
+            loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+    description = ("per-origin CRPS~ over 24 hours, seed-averaged quantiles" if loss == "crps"
+                   else "per-origin mean absolute error over 24 hours")
+    result = {"reference": reference, "lag": lag, "loss": description,
               "seeds": {name: loaded[name][REGIONS[0]][3] for name in sources}, "comparisons": {}}
     for name in sources:
         if name == reference:
@@ -93,9 +108,10 @@ def main() -> None:
     parser.add_argument("--source", action="append", required=True, help="name=pattern")
     parser.add_argument("--lag", type=int, default=48)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--loss", choices=("mae", "crps"), default="mae")
     args = parser.parse_args()
     sources = dict(item.split("=", 1) for item in args.source)
-    result = run(args.reference, sources, args.lag, args.output)
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
     for name, comparison in result["comparisons"].items():
         pooled = comparison["three_region_mean"]
         regions = " ".join(

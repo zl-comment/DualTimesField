@@ -4,6 +4,10 @@ Run from the repository root:
 
     PYTHONPATH=. .venv/bin/python paper/make_materials.py
 
+The main line is the quarterly-refit setting with AEMO predispatch inputs; the
+static-split development ladder, the structural ablations of the detected-event
+DGF, and the field-separation figure are supplementary.
+
 Figures go to ``paper/figures`` (PDF and PNG) and tables to ``paper/tables``
 (LaTeX, booktabs). Every number is read from ``logs/forecasting`` or recomputed
 from the saved checkpoints; nothing is typed in by hand except the RE-Price
@@ -43,7 +47,8 @@ plt.rcParams.update({
 
 
 def _metrics(directory: Path, region: str) -> dict:
-    return json.loads((directory / f"{region}.json").read_text())["test"]["model"]
+    test = json.loads((directory / f"{region}.json").read_text())["test"]
+    return test.get("model", test)
 
 
 def _three_seed(paths: dict[str, Path], key: str) -> tuple[dict, float, float]:
@@ -89,7 +94,36 @@ MODELS = {
 for variant in ("k4", "k16", "sep1", "sep6", "nothreshold", "mean"):
     MODELS[f"detected_{variant}"] = _nested(f"step5/paper_metrics/detected_dgf_{variant}")
 
-# Ablation ladder: three-region mean test MAE and CRPS~ (three seeds from step 4 on).
+# Main line: every model refit each test quarter (forecasting.rolling).
+# "{pre}" is "" for raw prices and "capped650_" for prices capped at 650.
+PROTOCOLS = (("raw", ""), ("capped650", "capped650_"))
+BASELINES = (("XGBoost", "xgboost"), ("PatchTST", "patchtst"), ("DLinear", "dlinear"), ("Linear", "linear_mse"))
+SETTINGS = {  # setting -> model -> run root (seed directories below it)
+    "Static split": {
+        "Ours": "linear_base/paper_metrics/{pre}linear_base",
+        "Linear base only": "linear_base/paper_metrics/{pre}linear_base_only",
+        **{name: "baselines/{p}/" + kind for name, kind in BASELINES},
+    },
+    "Quarterly refit": {
+        "Ours": "rolling/paper_metrics/{pre}linear_base",
+        "Linear base only": "rolling/paper_metrics/{pre}linear_base_only",
+        **{name: "baselines_rolling/{p}/" + kind for name, kind in BASELINES},
+    },
+    "Quarterly refit + predispatch": {
+        "Ours": "price_floor/paper_metrics/{pre}pd_calibrator_floor",
+        "Linear base only": "predispatch_rolling/paper_metrics/{pre}pd_linear_base_only",
+        **{name: "baselines_rolling_pd/{p}/" + kind for name, kind in BASELINES},
+    },
+}
+FINAL = "price_floor/paper_metrics/{pre}pd_calibrator_floor"
+
+
+def _run(root: str, protocol: str, prefix: str) -> dict[str, Path]:
+    return _nested(root.format(p=protocol, pre=prefix))
+
+
+# Development ladder on the static split (supplementary): three-region mean
+# test MAE and CRPS~ (three seeds from step 4 on).
 LADDER = [
     ("Static linear baseline", "paper_metrics/01_static_normalization_baseline", None),
     ("asinh price target", "paper_metrics/16_asinh_additive_trigonometric_fusion", None),
@@ -145,41 +179,71 @@ def figure_ladder() -> None:
     _save(fig, "ablation_ladder")
 
 
+def figure_settings() -> None:
+    """Three-region mean MAE of every model in the three settings."""
+    colors = {"Ours": BLUE, "XGBoost": ORANGE, "PatchTST": AQUA, "Linear base only": "#8fb8ea",
+              "DLinear": "#8a8983", "Linear": "#b4b2a9"}
+    settings = list(SETTINGS)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.9))
+    for ax, (protocol, prefix), title in zip(axes, PROTOCOLS, ("Raw prices", "Prices capped at 650 AUD/MWh")):
+        x = np.arange(len(settings))
+        ends = []
+        for name, color in colors.items():
+            values = [_three_seed(_run(SETTINGS[s][name], protocol, prefix), "mae")[1] for s in settings]
+            final = name == "Ours"
+            ax.plot(x, values, color=color, lw=2.0 if final else 1.2, zorder=3 if final else 2)
+            ax.scatter(x, values, s=30 if final else 18, color=color, edgecolor="white", linewidth=1.0, zorder=4)
+            ends.append((values[-1], name, color))
+        # Direct labels at the right end, spread so they do not overlap.
+        ends.sort()
+        span = max(v for v, _, _ in ends) - min(v for v, _, _ in ends)
+        placed = []
+        for value, name, color in ends:
+            y = value if not placed else max(value, placed[-1] + span * 0.11 + 0.1)
+            placed.append(y)
+            ax.text(x[-1] + 0.08, y, f"{name} {value:.2f}", va="center", fontsize=6.5, color=INK)
+        ax.set_xticks(x, ["Static\nsplit", "Quarterly\nrefit", "Quarterly refit\n+ predispatch"])
+        ax.set_xlim(-0.2, len(settings) - 1 + 0.95)
+        ax.set_title(f"{title}: test MAE (AUD/MWh)", loc="left", color=INK)
+        ax.grid(axis="x", visible=False)
+    fig.text(0.01, 0.0, "Three-region means over seeds 2026-2028. Ours in the last setting includes the calibrator and "
+             "the validation-chosen price floor. Axes do not start at zero.", fontsize=6.5, color=MUTED)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    _save(fig, "settings")
+
+
 def figure_comparison() -> None:
-    models = [("Ours", None), ("XGBoost", "xgboost"), ("GRU", "gru"), ("DeepAR", "deepar")]
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.4))
-    for ax, protocol, ours_key, title in (
-        (axes[0], "raw", "detected", "Raw prices"),
-        (axes[1], "capped650", "detected_capped", "Prices capped at 650 AUD/MWh"),
-    ):
-        width = 0.2
+    models = [("Ours", FINAL)] + [(name, "baselines_rolling_pd/{p}/" + kind) for name, kind in BASELINES]
+    shades = [BLUE, ORANGE, "#8a8983", "#b4b2a9", "#d3d1c7"]
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.5))
+    for ax, (protocol, prefix), title in zip(axes, PROTOCOLS, ("Raw prices", "Prices capped at 650 AUD/MWh")):
+        width = 0.16
         x = np.arange(len(REGIONS))
-        for i, (name, kind) in enumerate(models):
-            per_region = (_three_seed(MODELS[ours_key], "mae")[0] if kind is None
-                          else _baseline(protocol, kind, "mae")[0])
-            values = [per_region[r] for r in REGIONS]
-            color = BLUE if kind is None else ["#8a8983", "#b4b2a9", "#d3d1c7"][i - 1]
-            ax.bar(x + (i - 1.5) * width, values, width=width - 0.02, color=color, label=name)
+        for i, ((name, root), color) in enumerate(zip(models, shades)):
+            per_region = _three_seed(_run(root, protocol, prefix), "mae")[0]
+            ax.bar(x + (i - 2) * width, [per_region[r] for r in REGIONS], width=width - 0.02, color=color, label=name)
         ax.set_xticks(x, [r[:-1] for r in REGIONS])
         ax.set_title(f"{title}: test MAE (AUD/MWh)", loc="left", color=INK)
         ax.grid(axis="x", visible=False)
         ax.set_ylim(0, None)
-    axes[0].legend(ncols=4, frameon=False, loc="upper left", bbox_to_anchor=(0, -0.12))
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, ncols=5, frameon=False, loc="lower center")
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
     _save(fig, "same_data_comparison")
 
 
 def figure_architecture() -> None:
     from matplotlib.patches import FancyBboxPatch
 
-    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+    fig, ax = plt.subplots(figsize=(7.0, 4.9))
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 66)
+    ax.set_ylim(-6, 72)
     ax.axis("off")
     styles = {
         "input": ("#f1efe8", "#888780"),
         "ctf": ("#e6f1fb", BLUE),
         "dgf": ("#fdeee7", ORANGE),
+        "base": ("#e8f6f0", AQUA),
         "neutral": ("#ffffff", "#888780"),
     }
 
@@ -187,38 +251,48 @@ def figure_architecture() -> None:
         face, edge = styles[kind]
         ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.25,rounding_size=1.2",
                                     facecolor=face, edgecolor=edge, linewidth=0.9))
-        ax.text(x + w / 2, y + h * 0.64, title, ha="center", va="center", fontsize=8, color=INK, weight="bold")
-        ax.text(x + w / 2, y + h * 0.28, subtitle, ha="center", va="center", fontsize=6.5, color=MUTED)
-        return x, y, w, h
+        ax.text(x + w / 2, y + h * 0.64, title, ha="center", va="center", fontsize=7.5, color=INK, weight="bold")
+        ax.text(x + w / 2, y + h * 0.27, subtitle, ha="center", va="center", fontsize=6.2, color=MUTED)
 
     def arrow(start, end):
         ax.annotate("", xy=end, xytext=start,
                     arrowprops=dict(arrowstyle="-|>", color="#888780", lw=0.8, shrinkA=0, shrinkB=0,
                                     mutation_scale=8))
 
-    box(34, 58, 32, 7, "72-h history", "price (asinh, standardized), demand", "input")
-    box(56, 46.5, 36, 7.5, "Event detection", "median departures, top-K, suppression", "dgf")
-    box(56, 35.5, 36, 7.5, "DGF: event field", "sparse bumps, learned threshold, width", "dgf")
-    box(8, 35.5, 36, 7.5, "CTF: trend field", "band-limited Fourier INR", "ctf")
-    ax.text(50, 31.4, "decomposition loss: history = CTF + DGF", ha="center", fontsize=6.5, color=MUTED)
-    box(20, 21.5, 24, 7, "Fundamentals", "gas price, net load forecast", "input")
-    box(56, 21.5, 24, 7, "Scarcity", "spare capacity, shortfalls", "input")
-    box(8, 11.5, 36, 7, "CTF linear heads", "level: point and quantiles", "ctf")
-    box(56, 11.5, 36, 7, "DGF linear heads", "events: point and quantiles", "dgf")
-    box(30, 1.2, 40, 7.5, "Trigonometric fusion", "CTF + sin\u00b2\u03b8\u00b7DGF, per-quantile gates", "neutral")
+    # Inputs
+    box(2, 63, 28, 7, "72-h history", "price (asinh), demand", "input")
+    box(36, 63, 28, 7, "AEMO predispatch", "price, demand, generation, flows", "input")
+    box(70, 63, 28, 7, "PD PASA, gas", "spare capacity, net load, gas", "input")
+    # Dual field (left half)
+    box(2, 49, 22, 7.5, "Event detection", "median departures", "dgf")
+    box(2, 36.5, 22, 7.5, "DGF: event field", "sparse bumps", "dgf")
+    box(26, 36.5, 22, 7.5, "CTF: trend field", "remainder", "ctf")
+    ax.text(25, 32.6, "loss: history = CTF + DGF", ha="center", fontsize=6.0, color=MUTED)
+    # Known inputs (right half)
+    box(52, 42.5, 46, 7.5, "Known inputs and history", "predispatch, spare capacity, net load, gas, calendar", "input")
+    # Heads
+    box(2, 22, 22, 7, "DGF heads", "events + scarcity", "dgf")
+    box(26, 22, 22, 7, "CTF heads", "level + net load", "ctf")
+    box(52, 22, 22, 7, "Linear base", "linear map", "base")
+    box(76, 22, 22, 7, "Calibrator", "per-hour MLP", "neutral")
+    box(10, 9, 80, 7, "Fusion", "base + CTF + sin\u00b2\u03b8\u00b7DGF + calibrator, per-quantile gates", "neutral")
+    box(30, -1.8, 40, 7, "Price floor", "level chosen on the validation quarter", "neutral")
 
-    arrow((50, 58), (50, 56.3))
-    arrow((50, 56.3), (74, 54.3))
-    arrow((50, 56.3), (26, 43.3))
-    arrow((74, 46.5), (74, 43.3))
-    arrow((14, 35.5), (14, 18.7))
-    arrow((86, 35.5), (86, 18.7))
-    arrow((32, 21.5), (32, 18.7))
-    arrow((68, 21.5), (68, 18.7))
-    arrow((26, 11.5), (38, 8.9))
-    arrow((74, 11.5), (62, 8.9))
-    ax.text(50, -1.8, "Output: 24-hour point forecast and 0.05/0.10/0.50/0.90/0.95 quantiles",
-            ha="center", fontsize=6.5, color=MUTED)
+    arrow((13, 63), (13, 56.8))                 # history -> detection
+    arrow((24, 52.5), (34, 44.3))               # detection -> CTF (remainder)
+    arrow((13, 49), (13, 44.3))                 # detection -> DGF
+    arrow((28, 63), (60, 50.3))                 # history -> known inputs
+    arrow((50, 63), (70, 50.3))                 # predispatch -> known inputs
+    arrow((84, 63), (84, 50.3))                 # PD PASA, gas -> known inputs
+    arrow((7, 36.5), (7, 29.3))                 # DGF -> heads
+    arrow((43, 36.5), (43, 29.3))               # CTF -> heads
+    arrow((63, 42.5), (63, 29.3))               # known inputs -> base
+    arrow((87, 42.5), (87, 29.3))               # known inputs -> calibrator
+    for x in (13, 37, 63, 87):                  # heads -> fusion
+        arrow((x, 22), (min(max(x, 14), 86), 16.3))
+    arrow((50, 9), (50, 5.5))
+    ax.text(50, -5.4, "Refit every test quarter. Output: 24-hour point forecast and 0.05/0.10/0.50/0.90/0.95 quantiles",
+            ha="center", fontsize=6.2, color=MUTED)
     _save(fig, "architecture")
 
 
@@ -336,20 +410,22 @@ def _fmt(value: float, best: bool = False, digits: int = 2) -> str:
     return f"\\textbf{{{text}}}" if best else text
 
 
+def _stars(p: float) -> str:
+    return "$^{**}$" if p < 0.01 else ("$^{*}$" if p < 0.05 else "")
+
+
 def table_main() -> None:
     rows = []
-    for protocol, ours in (("raw", "detected"), ("capped650", "detected_capped")):
+    models = [("Ours", FINAL), ("Linear base only", SETTINGS["Quarterly refit + predispatch"]["Linear base only"])]
+    models += [(name, "baselines_rolling_pd/{p}/" + kind) for name, kind in BASELINES]
+    for protocol, prefix in PROTOCOLS:
         entries = []
-        region, mean, std = _three_seed(MODELS[ours], "mae")
-        entries.append(("Ours", region, mean, std,
-                        _three_seed(MODELS[ours], "rmse_window_mean")[1],
-                        _three_seed(MODELS[ours], "ais_90")[1],
-                        _three_seed(MODELS[ours], "crps_quantile_approx")[1]))
-        for name, kind in (("XGBoost", "xgboost"), ("GRU", "gru"), ("DeepAR", "deepar")):
-            region, mean, std = _baseline(protocol, kind, "mae")
-            entries.append((name, region, mean, std, _baseline(protocol, kind, "rmse_window_mean")[1],
-                            _baseline(protocol, kind, "ais_90")[1], _baseline(protocol, kind, "crps_quantile_approx")[1]))
-        best = {k: min(e[i] if k != "region" else 0 for e in entries) for i, k in ((2, "mean"), (4, "rmse"), (5, "ais"), (6, "crps"))}
+        for name, root in models:
+            paths = _run(root, protocol, prefix)
+            region, mean, std = _three_seed(paths, "mae")
+            entries.append((name, region, mean, std, _three_seed(paths, "rmse_window_mean")[1],
+                            _three_seed(paths, "ais_90")[1], _three_seed(paths, "crps_quantile_approx")[1]))
+        best = {k: min(e[i] for e in entries) for i, k in ((2, "mean"), (4, "rmse"), (5, "ais"), (6, "crps"))}
         best_region = {r: min(e[1][r] for e in entries) for r in REGIONS}
         label = "Raw prices" if protocol == "raw" else "Capped at 650"
         rows.append(f"\\multicolumn{{8}}{{l}}{{\\emph{{{label}}}}} \\\\")
@@ -375,35 +451,35 @@ def table_main() -> None:
 
 
 def table_significance() -> None:
-    lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrrr}", "\\toprule",
-             "Comparator & Pooled $\\Delta$MAE & DM & NSW & QLD & TAS \\\\", "\\midrule"]
-    names = {"gabor_trunk": "Transplanted dual field", "softclip_trunk": "Previous trunk", "raw_history_ablation": "No decomposition",
-             "gbdt": "GBDT (same inputs)", "xgboost": "XGBoost", "gru": "GRU", "deepar": "DeepAR", "naive": "Seasonal naive"}
+    result = json.loads((LOGS / "significance" / "paper_final.json").read_text())["final_vs"]
+    names = {"base_only": "Linear base only", "xgboost": "XGBoost", "patchtst": "PatchTST",
+             "dlinear": "DLinear", "linear_mse": "Linear"}
+    lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrrrrr}", "\\toprule",
+             "& \\multicolumn{5}{c}{Raw prices} & \\multicolumn{2}{c}{Capped at 650} \\\\",
+             "\\cmidrule(lr){2-6}\\cmidrule(lr){7-8}",
+             "Comparator & $\\Delta$MAE & NSW & QLD & TAS & $\\Delta$CRPS & $\\Delta$MAE & $\\Delta$CRPS \\\\", "\\midrule"]
 
-    def star(p: float) -> str:
-        return "$^{**}$" if p < 0.01 else ("$^{*}$" if p < 0.05 else "")
+    def cell(entry: dict) -> str:
+        return f"{entry['mean_difference']:+.2f}{_stars(entry['p_value'])}"
 
-    for protocol, file in (("Raw prices", "raw_detected_dgf.json"), ("Capped at 650", "capped650_detected_dgf.json")):
-        result = json.loads((LOGS / "significance" / file).read_text())
-        lines.append(f"\\multicolumn{{6}}{{l}}{{\\emph{{{protocol}}}}} \\\\")
-        for name, comparison in result["comparisons"].items():
-            pooled = comparison["three_region_mean"]
-            cells = [f"{pooled['mean_difference']:+.2f}{star(pooled['p_value'])}", f"{pooled['statistic']:+.2f}"]
-            cells += [f"{comparison[r]['mean_difference']:+.2f}{star(comparison[r]['p_value'])}" for r in REGIONS]
-            lines.append(f"{names.get(name, name)} & " + " & ".join(cells) + " \\\\")
-        lines.append("\\midrule")
-    lines[-1] = "\\bottomrule"
-    lines.append("\\end{tabular}")
+    for key, name in names.items():
+        raw_mae, raw_crps = result["raw"]["mae"][key], result["raw"]["crps"][key]
+        cap_mae, cap_crps = result["capped650"]["mae"][key], result["capped650"]["crps"][key]
+        cells = [cell(raw_mae["three_region_mean"]), *(cell(raw_mae[r]) for r in REGIONS),
+                 cell(raw_crps["three_region_mean"]), cell(cap_mae["three_region_mean"]), cell(cap_crps["three_region_mean"])]
+        lines.append(f"{name} & " + " & ".join(cells) + " \\\\")
+    lines += ["\\bottomrule", "\\end{tabular}"]
     _write("significance", "\n".join(lines) + "\n")
 
 
-def table_ablations(summary: dict) -> None:
+def table_ablations_static(summary: dict) -> None:
+    """Supplementary: structure and detector variants of the detected-event DGF, static split."""
     structural = [
         ("Transplanted dual field (Gabor DGF)", "gabor_trunk"),
         ("No decomposition (heads read raw history)", "raw_history"),
         ("Adaptive attention atoms + echo", "adaptive"),
         ("Detected events + daily echo", "detected_echo"),
-        ("Detected-event DGF (ours)", "detected"),
+        ("Detected-event DGF", "detected"),
     ]
     detector = [
         ("4 events", "detected_k4"), ("16 events", "detected_k16"),
@@ -412,11 +488,11 @@ def table_ablations(summary: dict) -> None:
     ]
     base = [np.mean([_metrics(MODELS["detected"][s], r)["mae"] for r in REGIONS]) for s in SEEDS]
     lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrr}", "\\toprule",
-             "Variant & MAE & Window RMSE & CRPS & $\\Delta$MAE vs ours (seeds) \\\\", "\\midrule",
+             "Variant & MAE & Window RMSE & CRPS & $\\Delta$MAE vs detected (seeds) \\\\", "\\midrule",
              "\\multicolumn{5}{l}{\\emph{Structure}} \\\\"]
     for group, entries in (("structure", structural), ("detector", detector)):
         if group == "detector":
-            lines += ["\\midrule", "\\multicolumn{5}{l}{\\emph{Detector settings (ours: 8 events, 3-hour separation, learned threshold, median)}} \\\\"]
+            lines += ["\\midrule", "\\multicolumn{5}{l}{\\emph{Detector settings (8 events, 3-hour separation, learned threshold, median)}} \\\\"]
         for label, key in entries:
             _, mae, std = _three_seed(MODELS[key], "mae")
             rmse = _three_seed(MODELS[key], "rmse_window_mean")[1]
@@ -425,7 +501,7 @@ def table_ablations(summary: dict) -> None:
             delta = "--" if key == "detected" else " / ".join(f"{a - b:+.2f}" for a, b in zip(seeds, base))
             lines.append(f"{label} & {mae:.2f} $\\pm$ {std:.2f} & {rmse:.2f} & {crps:.2f} & {delta} \\\\")
     lines += ["\\bottomrule", "\\end{tabular}"]
-    _write("ablations", "\n".join(lines) + "\n")
+    _write("ablations_static", "\n".join(lines) + "\n")
     _write("field_separation", "\n".join([
         "% Generated by paper/make_materials.py",
         "\\begin{tabular}{lrrr}", "\\toprule",
@@ -434,6 +510,80 @@ def table_ablations(summary: dict) -> None:
           for label, key in (("Transplanted (Gabor)", "gabor"), ("Detected events (ours)", "detected"))),
         "\\bottomrule", "\\end{tabular}",
     ]) + "\n")
+
+
+def table_ablations() -> None:
+    """When the fields help, and what each later component adds (Diebold-Mariano, pooled)."""
+    pairs = json.loads((LOGS / "significance" / "paper_final.json").read_text())["pairs"]
+    rows = [
+        ("\\emph{Fields minus linear base}", None),
+        ("Static split", "fields_static"),
+        ("Quarterly refit", "fields_rolling"),
+        ("Quarterly refit + predispatch", "fields_rolling_predispatch"),
+        ("\\emph{Added to fields + predispatch}", None),
+        ("Hinge features on predispatch price", "hinge"),
+        ("Calibrator", "calibrator"),
+        ("Price floor (after calibrator)", "floor"),
+        ("Interconnector inputs (after floor)", "interconnector"),
+    ]
+    lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrr}", "\\toprule",
+             "& \\multicolumn{2}{c}{Raw prices} & \\multicolumn{2}{c}{Capped at 650} \\\\",
+             "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
+             "Change & $\\Delta$MAE & $\\Delta$CRPS & $\\Delta$MAE & $\\Delta$CRPS \\\\", "\\midrule"]
+    for label, key in rows:
+        if key is None:
+            lines.append(f"\\multicolumn{{5}}{{l}}{{{label}}} \\\\")
+            continue
+        cells = []
+        for protocol in ("raw", "capped650"):
+            for loss in ("mae", "crps"):
+                entry = pairs[protocol][loss][key]["three_region_mean"]
+                cells.append(f"{entry['mean_difference']:+.2f}{_stars(entry['p_value'])}")
+        lines.append(f"\\quad {label} & " + " & ".join(cells) + " \\\\")
+    lines += ["\\bottomrule", "\\end{tabular}"]
+    _write("ablations", "\n".join(lines) + "\n")
+
+
+def table_settings() -> None:
+    lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrrrr}", "\\toprule",
+             "& \\multicolumn{3}{c}{Raw prices} & \\multicolumn{3}{c}{Capped at 650} \\\\",
+             "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}",
+             "Model & Static & Refit & Refit + PD & Static & Refit & Refit + PD \\\\", "\\midrule"]
+    models = list(SETTINGS["Static split"])
+    values = {m: [_three_seed(_run(SETTINGS[s][m], p, pre), "mae")[1] for p, pre in PROTOCOLS for s in SETTINGS]
+              for m in models}
+    best = [min(values[m][i] for m in models) for i in range(6)]
+    for m in models:
+        lines.append(f"{m} & " + " & ".join(_fmt(v, v == best[i]) for i, v in enumerate(values[m])) + " \\\\")
+    lines += ["\\bottomrule", "\\end{tabular}"]
+    _write("settings", "\n".join(lines) + "\n")
+
+
+def table_tails() -> None:
+    names = [("Ours", None), ("Linear base only", "base_only"), ("XGBoost", "xgboost"), ("PatchTST", "patchtst"),
+             ("DLinear", "dlinear"), ("Linear", "linear_mse")]
+    keys = (("crps_by_band", "<0"), ("pinball_q05_negative_hours", None), ("crps_by_band", ">300"),
+            ("pinball_q95_spike_hours", None), ("coverage_90", None))
+    lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrrr}", "\\toprule",
+             "& \\multicolumn{2}{c}{Negative-price hours} & \\multicolumn{2}{c}{Spike hours ($>$300)} & \\\\",
+             "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
+             "Model & CRPS & $q_{0.05}$ pinball & CRPS & $q_{0.95}$ pinball & 90\\% coverage \\\\", "\\midrule"]
+    for protocol, _ in PROTOCOLS:
+        tails = json.loads((LOGS / "predispatch_rolling" / f"{protocol}_tail_metrics.json").read_text())
+        final = json.loads((LOGS / "price_floor" / f"{protocol}_tail_metrics.json").read_text())["floor"]
+        table = {name: (final if key is None else tails[key])["mean"] for name, key in names}
+        values = {name: [table[name][k][sub] if sub else table[name][k] for k, sub in keys] for name, _ in names}
+        best = [min(values[n][i] for n, _ in names) for i in range(4)]
+        label = "Raw prices" if protocol == "raw" else "Capped at 650"
+        lines.append(f"\\multicolumn{{6}}{{l}}{{\\emph{{{label}}}}} \\\\")
+        for name, _ in names:
+            v = values[name]
+            cells = [_fmt(v[i], v[i] == best[i], 1 if i in (2, 3) else 2) for i in range(4)] + [f"{100 * v[4]:.1f}\\%"]
+            lines.append(f"{name} & " + " & ".join(cells) + " \\\\")
+        lines.append("\\midrule")
+    lines[-1] = "\\bottomrule"
+    lines.append("\\end{tabular}")
+    _write("tails", "\n".join(lines) + "\n")
 
 
 def table_re_price() -> None:
@@ -445,13 +595,14 @@ def table_re_price() -> None:
         "GRU": ((33.24, 43.24, 30.40), (25.12, 28.48, 19.66)),
         "XGBoost": ((38.63, 44.70, 37.56), (28.79, 29.17, 23.43)),
     }
-    region, mean, _ = _three_seed(MODELS["detected_capped"], "mae")
-    crps_region, crps_mean, _ = _three_seed(MODELS["detected_capped"], "crps_quantile_approx")
+    ours = _run(FINAL, "capped650", "capped650_")
+    region, mean, _ = _three_seed(ours, "mae")
+    crps_region, crps_mean, _ = _three_seed(ours, "crps_quantile_approx")
     lines = ["% Generated by paper/make_materials.py", "\\begin{tabular}{lrrrrrrrr}", "\\toprule",
              "& \\multicolumn{4}{c}{MAE} & \\multicolumn{4}{c}{CRPS} \\\\",
              "\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}",
              "Model & NSW & QLD & TAS & Mean & NSW & QLD & TAS & Mean \\\\", "\\midrule",
-             f"Ours (no news, capped at 650) & {' & '.join(f'{region[r]:.2f}' for r in REGIONS)} & {mean:.2f} & "
+             f"Ours (no news, predispatch, capped at 650) & {' & '.join(f'{region[r]:.2f}' for r in REGIONS)} & {mean:.2f} & "
              f"{' & '.join(f'{crps_region[r]:.2f}' for r in REGIONS)} & {crps_mean:.2f} \\\\", "\\midrule"]
     for name, (mae, crps) in reported.items():
         lines.append(f"{name} (reported, with news) & {' & '.join(f'{v:.2f}' for v in mae)} & {np.mean(mae):.2f} & "
@@ -462,12 +613,16 @@ def table_re_price() -> None:
 
 def main() -> None:
     figure_architecture()
-    figure_ladder()
+    figure_settings()
     figure_comparison()
+    figure_ladder()
     summary = figure_mechanism(mechanism_data())
     table_main()
     table_significance()
-    table_ablations(summary)
+    table_ablations()
+    table_settings()
+    table_tails()
+    table_ablations_static(summary)
     table_re_price()
     print(json.dumps({"field_separation_share": summary}, indent=2))
 

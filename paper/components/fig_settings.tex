@@ -1,0 +1,13 @@
+% Figure: models across settings. Needs graphicx.
+\providecommand{\materialsdir}{.}
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{\materialsdir/figures/settings.pdf}
+  \caption{Three-region mean test MAE of every model in three settings: a
+    single fit on 2015--2021 (static split), a refit before each 2023--2024
+    test quarter, and a refit with AEMO predispatch inputs. On the static
+    split the dual-field model is behind a linear model with the same inputs;
+    with recalibration and predispatch it is ahead of every model except
+    XGBoost. Means over seeds 2026--2028; axes do not start at zero.}
+  \label{fig:settings}
+\end{figure*}

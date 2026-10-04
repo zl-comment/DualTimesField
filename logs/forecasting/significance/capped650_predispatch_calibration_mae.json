@@ -1,0 +1,126 @@
+{
+  "reference": "calibrator",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "calibrator": 3,
+    "hinge": 3,
+    "previous": 3,
+    "xgboost": 3,
+    "linear_mse": 3
+  },
+  "comparisons": {
+    "hinge": {
+      "NSW1": {
+        "mean_difference": 0.24709077931865775,
+        "statistic": 2.5958234747490923,
+        "p_value": 0.009436453203656213,
+        "reference_mae": 25.70090789485031,
+        "other_mae": 25.453817115531656
+      },
+      "QLD1": {
+        "mean_difference": 0.1838123023812299,
+        "statistic": 1.7116565831208757,
+        "p_value": 0.0869599741817189,
+        "reference_mae": 26.62696118166136,
+        "other_mae": 26.443148879280127
+      },
+      "TAS1": {
+        "mean_difference": -0.5691774378466242,
+        "statistic": -3.483307560346652,
+        "p_value": 0.0004952590375195832,
+        "reference_mae": 24.412508871183586,
+        "other_mae": 24.981686309030206
+      },
+      "three_region_mean": {
+        "mean_difference": -0.04609145204891216,
+        "statistic": -0.5764453085109464,
+        "p_value": 0.5643142269117214
+      }
+    },
+    "previous": {
+      "NSW1": {
+        "mean_difference": -0.44732637424598104,
+        "statistic": -3.2765662186954616,
+        "p_value": 0.0010507766935462274,
+        "reference_mae": 25.70090789485031,
+        "other_mae": 26.14823426909629
+      },
+      "QLD1": {
+        "mean_difference": -0.537300769871227,
+        "statistic": -3.328136191966095,
+        "p_value": 0.0008742911405105726,
+        "reference_mae": 26.62696118166136,
+        "other_mae": 27.164261951532588
+      },
+      "TAS1": {
+        "mean_difference": -0.33532477377025943,
+        "statistic": -2.666299310436397,
+        "p_value": 0.007669138010316049,
+        "reference_mae": 24.412508871183586,
+        "other_mae": 24.747833644953843
+      },
+      "three_region_mean": {
+        "mean_difference": -0.4399839726291558,
+        "statistic": -4.376417462602651,
+        "p_value": 1.2064584606929347e-05
+      }
+    },
+    "xgboost": {
+      "NSW1": {
+        "mean_difference": 0.4998303426428577,
+        "statistic": 3.5094040545814766,
+        "p_value": 0.0004491120620769174,
+        "reference_mae": 25.70090789485031,
+        "other_mae": 25.201077552207455
+      },
+      "QLD1": {
+        "mean_difference": 1.85044489371711,
+        "statistic": 11.652814440157973,
+        "p_value": 2.220035297376509e-31,
+        "reference_mae": 26.62696118166136,
+        "other_mae": 24.776516287944247
+      },
+      "TAS1": {
+        "mean_difference": 0.7639729087544213,
+        "statistic": 4.477491783023415,
+        "p_value": 7.552513358118563e-06,
+        "reference_mae": 24.412508871183586,
+        "other_mae": 23.648535962429168
+      },
+      "three_region_mean": {
+        "mean_difference": 1.0380827150381295,
+        "statistic": 9.879652525057349,
+        "p_value": 5.100947763681373e-23
+      }
+    },
+    "linear_mse": {
+      "NSW1": {
+        "mean_difference": -1.3871320437579817,
+        "statistic": -4.505137295630645,
+        "p_value": 6.633004287944675e-06,
+        "reference_mae": 25.70090789485031,
+        "other_mae": 27.08803993860829
+      },
+      "QLD1": {
+        "mean_difference": -1.2134605579764233,
+        "statistic": -4.515042437151601,
+        "p_value": 6.330408786290792e-06,
+        "reference_mae": 26.62696118166136,
+        "other_mae": 27.840421739637787
+      },
+      "TAS1": {
+        "mean_difference": -1.7014078474888341,
+        "statistic": -9.937331638736204,
+        "p_value": 2.863959429001597e-23,
+        "reference_mae": 24.412508871183586,
+        "other_mae": 26.11391671867242
+      },
+      "three_region_mean": {
+        "mean_difference": -1.43400014974108,
+        "statistic": -7.465383610747174,
+        "p_value": 8.3057279213277e-14
+      }
+    }
+  }
+}

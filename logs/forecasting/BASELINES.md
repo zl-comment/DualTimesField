@@ -169,6 +169,139 @@ baseline under both treatments (p < 0.0001). The TAS1 differences to XGBoost
 and the best AIS on capped prices. Details are in `EXPERIMENT_RESULTS.md`,
 "Step 5".
 
+## General time-series baselines
+
+DLinear (Zeng et al., AAAI 2023), PatchTST (Nie et al., ICLR 2023),
+iTransformer (Liu et al., ICLR 2024), and Informer (Zhou et al., AAAI 2021),
+re-implemented in [`forecasting/general_baselines.py`](../../forecasting/general_baselines.py)
+and trained by the same loop as GRU and DeepAR.
+
+| Item | Setting |
+|---|---|
+| Inputs | Same as every other model: 72-hour price and demand history with calendar; known future calendar, PD PASA spare capacity, soft-saturated net load, and gas-price context. All are used in the "MS" setting of their code bases (multivariate inputs, price target) |
+| Known inputs | Informer: extra decoder channels and calendar time features. iTransformer: each history series, calendar feature, and known future series is a token. DLinear and PatchTST are channel-independent and would forecast the price from its own history alone, so both add a linear known-input adapter (flattened known future inputs and demand history to the 24 x 5 outputs), added to the backbone forecast. Their rows are therefore "backbone + adapter" |
+| Output and loss | 0.05/0.10/0.50/0.90/0.95 quantiles of the standardized asinh price, pinball loss; the median is the point forecast |
+| Architecture | DLinear: moving average 25, 63,720 parameters. PatchTST: patch 16, stride 8, RevIN, d_model 128, 16 heads, 3 layers, 585,330 parameters. iTransformer: non-stationary normalization, d_model 128, 8 heads, 2 layers, 227,448 parameters. Informer: ProbSparse factor 5, d_model 512, 8 heads, 2+1 layers with distilling, label length 36, 11,325,445 parameters |
+| Learning rate | Chosen from 1e-4, 5e-4, 1e-3 by the lowest validation pinball loss on raw NSW1, seed 2026, then fixed: DLinear 1e-3, PatchTST 1e-4, iTransformer 1e-3, Informer 1e-3 |
+| Training | Adam, batch 256, 30 epochs, weight decay 1e-5, checkpoint with the lowest validation loss; seeds 2026-2028, both price treatments (72 runs, logs in [`baselines/logs/general/`](baselines/logs/general/)) |
+
+Three-seed means, with the detected-event DGF (the trunk) and the RE-Price
+baselines for reference:
+
+| raw | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Detected-event DGF | 48.31 / 42.53 / 33.79 | 41.54 ± 0.06 | 78.80 | 84.19 | 403.48 | 28.15 |
+| XGBoost | 50.85 / 44.70 / 33.89 | 43.15 ± 0.07 | 81.65 | 84.48 | 414.32 | 27.69 |
+| GRU | 52.35 / 46.21 / 38.39 | 45.65 ± 1.16 | 83.43 | 84.06 | 452.50 | 30.12 |
+| DeepAR | 54.24 / 50.84 / 38.51 | 47.86 ± 1.69 | 86.09 | 82.78 | 444.82 | 30.17 |
+| DLinear | 48.58 / 41.99 / 32.17 | 40.91 ± 0.02 | 78.59 | 83.81 | 389.26 | 26.31 |
+| PatchTST | 48.82 / 42.30 / 31.95 | 41.02 ± 0.03 | 78.78 | 89.32 | 389.71 | 26.22 |
+| iTransformer | 51.15 / 45.04 / 33.42 | 43.20 ± 0.06 | 81.43 | 86.94 | 648.84 | 34.36 |
+| Informer | 54.92 / 47.81 / 37.20 | 46.65 ± 2.38 | 85.32 | 86.31 | 450.81 | 30.12 |
+
+| capped650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Detected-event DGF | 29.79 / 30.38 / 30.80 | 30.32 ± 0.12 | 41.29 | 84.26 | 213.16 | 17.86 |
+| XGBoost | 32.88 / 31.18 / 30.77 | 31.61 ± 0.02 | 43.37 | 83.01 | 201.93 | 16.74 |
+| GRU | 34.25 / 34.06 / 35.54 | 34.62 ± 0.62 | 46.09 | 84.72 | 276.51 | 20.39 |
+| DeepAR | 37.09 / 38.75 / 35.19 | 37.01 ± 3.02 | 49.03 | 82.36 | 241.93 | 19.64 |
+| DLinear | 29.77 / 29.95 / 29.09 | 29.61 ± 0.04 | 40.82 | 83.82 | 209.10 | 16.40 |
+| PatchTST | 30.39 / 30.56 / 29.01 | 29.99 ± 0.05 | 41.43 | 89.65 | 208.78 | 16.37 |
+| iTransformer | 32.27 / 33.55 / 30.18 | 32.00 ± 0.31 | 44.04 | 86.65 | 339.89 | 21.30 |
+| Informer | 34.15 / 33.85 / 34.13 | 34.05 ± 0.48 | 45.85 | 86.46 | 209.97 | 17.58 |
+
+Diebold-Mariano tests (per-origin MAE, seed-averaged, Newey-West lag 48;
+positive means the detected-event DGF is worse;
+[`significance/raw_general_baselines.json`](significance/raw_general_baselines.json),
+[`significance/capped650_general_baselines.json`](significance/capped650_general_baselines.json)):
+
+| Detected-event DGF minus | Raw pooled | Raw NSW1 / QLD1 / TAS1 | Capped pooled | Capped NSW1 / QLD1 / TAS1 |
+|---|---|---|---|---|
+| DLinear | +0.63 (p = 0.0003) | -0.27 (0.41) / +0.54 (0.002) / +1.63 (<0.001) | +0.72 (p < 0.0001) | +0.02 (0.92) / +0.42 (0.004) / +1.71 (<0.001) |
+| PatchTST | +0.52 (p = 0.008) | -0.52 (0.051) / +0.24 (0.30) / +1.84 (<0.001) | +0.34 (p = 0.065) | -0.60 (0.005) / -0.18 (0.37) / +1.79 (<0.001) |
+| iTransformer | -1.66 (p < 0.0001) | -2.85 / -2.50 / +0.38 (0.03) | -1.68 (p < 0.0001) | -2.48 / -3.17 / +0.62 (all < 0.001) |
+| Informer | -5.10 (p < 0.0001) | -6.62 / -5.28 / -3.41 (all < 0.001) | -3.72 (p < 0.0001) | -4.36 / -3.48 / -3.33 (all < 0.001) |
+
+| Finding | Evidence |
+|---|---|
+| DLinear and PatchTST with the known-input adapter beat the detected-event DGF on mean MAE, significantly for DLinear | Raw mean MAE 40.91 and 41.02 against 41.54; capped 29.61 and 29.99 against 30.32. Pooled DM p = 0.0003 and 0.008 (raw), < 0.0001 and 0.065 (capped) |
+| The gap is mostly TAS1, then QLD1 | TAS1 differences of +1.6 to +1.8 MAE under both treatments. The detected-event DGF is ahead of PatchTST in NSW1 (-0.52 raw, -0.60 capped) and ties DLinear there |
+| They are also better probabilistically | Mean CRPS~ 26.31 (DLinear) and 26.22 (PatchTST) against 28.15 on raw prices, below XGBoost's 27.69; mean 90% AIS 389 against 403. Only in NSW1 is the detected-event DGF's AIS lower (519.8 against 532.2 and 528.6) |
+| iTransformer and Informer are weaker | iTransformer's point accuracy is close to XGBoost's but its upper quantiles are too wide (raw AIS 648.84). Informer's validation loss is lowest after 1-5 epochs: without instance normalization it overfits the 2015-2021 level and does not follow the 2022 validation regime |
+
+The strongest same-data baselines are now linear or patch-based models on the
+price history plus a linear map of the same known inputs. The claim that the
+dual-field model has the lowest MAE of all same-data baselines no longer holds;
+it holds against XGBoost, GRU, DeepAR, iTransformer, and Informer.
+
+### Attribution: what makes DLinear and PatchTST strong
+
+Variants on the same grid (raw and capped prices, seeds 2026-2028, three
+regions), each with the learning rate of the model it modifies. "Adapter" is
+the linear known-input adapter; `linear` is DLinear without the trend/seasonal
+decomposition (one linear map of the price history); `linear_mse` is `linear`
+with a separate point output trained by mean squared error in the target
+space, as the dual-field point head is (quantiles keep the pinball loss).
+
+| Variant | Price history | Known inputs | Raw MAE (NSW1 / QLD1 / TAS1) | Raw mean MAE | Capped mean MAE |
+|---|---|---|---|---:|---:|
+| Detected-event DGF | dual field | field-routed | 48.31 / 42.53 / 33.79 | 41.54 ± 0.06 | 30.32 ± 0.12 |
+| `dlinear` | decomposed linear | adapter | 48.58 / 41.99 / 32.17 | 40.91 ± 0.02 | 29.61 ± 0.04 |
+| `linear` | linear | adapter | 48.57 / 41.93 / 32.18 | 40.89 ± 0.04 | 29.59 ± 0.04 |
+| `linear_mse` | linear, MSE point | adapter | 47.88 / 41.53 / 32.14 | **40.52 ± 0.03** | **29.33 ± 0.06** |
+| `patchtst` | PatchTST | adapter | 48.82 / 42.30 / 31.95 | 41.02 ± 0.03 | 29.99 ± 0.05 |
+| `known_linear` | none | adapter | 56.64 / 55.44 / 46.74 | 52.94 ± 0.43 | 42.14 ± 0.43 |
+| `dlinear_noadapter` | decomposed linear | none | 52.68 / 45.53 / 33.28 | 43.83 ± 0.03 | 32.18 ± 0.05 |
+| `patchtst_noadapter` | PatchTST | none | 52.38 / 46.26 / 32.96 | 43.87 ± 0.08 | 32.53 ± 0.06 |
+
+Diebold-Mariano, detected-event DGF minus variant (positive: the detected-event
+DGF is worse; [`significance/raw_attribution.json`](significance/raw_attribution.json),
+[`significance/capped650_attribution.json`](significance/capped650_attribution.json)):
+
+| Variant | Raw pooled | Raw NSW1 / QLD1 / TAS1 | Capped pooled | Capped NSW1 / QLD1 / TAS1 |
+|---|---|---|---|---|
+| `linear_mse` | +1.03 (p < 0.0001) | +0.42 (0.08) / +1.01 / +1.66 | +0.99 (p < 0.0001) | +0.52 / +0.74 / +1.71 (all < 0.001) |
+| `linear` | +0.65 (p = 0.0002) | -0.26 (0.42) / +0.60 / +1.62 | +0.73 (p < 0.0001) | +0.04 (0.81) / +0.44 / +1.70 |
+| `dlinear_noadapter` | -2.28 (p < 0.0001) | -4.37 / -2.99 / +0.52 (0.02) | -1.86 (p < 0.0001) | -3.45 / -2.78 / +0.64 (0.002) |
+| `patchtst_noadapter` | -2.32 (p < 0.0001) | -4.08 / -3.73 / +0.83 (0.003) | -2.21 (p < 0.0001) | -3.71 / -3.72 / +0.79 (0.003) |
+
+| Finding | Evidence |
+|---|---|
+| Neither the decomposition nor the Transformer matters | `linear` equals `dlinear` (40.89 against 40.91) and is ahead of `patchtst` |
+| The known inputs and the price history are both needed | Without the adapter, MAE rises by about 2.9 (raw) and 2.6 (capped); without the price history, by 12 |
+| The pinball loss is not the reason | The MSE point output is better still: `linear_mse` 40.52 raw, 29.33 capped |
+| A linear regression on the same inputs beats the detected-event DGF | `linear_mse` is ahead in every region under both treatments, pooled DM p < 0.0001; the gap is largest in TAS1 (1.7) and QLD1 (0.7-1.0) |
+| The dual-field model beats the published price-only DLinear and PatchTST | By 2.3 (raw) and 1.9-2.2 (capped), except in TAS1, where even price-only DLinear is ahead |
+
+Absolute error by actual-price band, seed-ensemble forecasts, raw prices
+([`forecasting/error_by_price_band.py`](../../forecasting/error_by_price_band.py);
+[`baselines/raw_price_band_detected_vs_linear_mse.json`](baselines/raw_price_band_detected_vs_linear_mse.json),
+[`baselines/capped650_price_band_detected_vs_linear_mse.json`](baselines/capped650_price_band_detected_vs_linear_mse.json)):
+
+| Band (AUD/MWh) | Share of hours (NSW1 / QLD1 / TAS1) | Detected-event DGF MAE | `linear_mse` MAE | Share of the total error gap (raw / capped) |
+|---|---|---|---|---:|
+| below 0 | 6.2 / 13.2 / 7.4% | 50.20 / 30.94 / 35.51 | 46.24 / 28.86 / 35.16 | 18% / 13% |
+| 0-100 | 58.3 / 50.6 / 65.8% | 16.21 / 15.37 / 22.74 | 16.76 / 15.87 / 21.79 | 2% / -1% |
+| 100-300 | 33.7 / 34.4 / 26.3% | 41.78 / 44.82 / 44.97 | 40.03 / 41.69 / 41.57 | 85% / 91% |
+| above 300 | 1.8 / 1.9 / 0.5% | 1217 / 806 / 838 | 1225 / 811 / 817 | -5% / -3% |
+
+The gap is the elevated but ordinary level of 100-300 AUD/MWh and negative
+prices, not the spikes: in NSW1 and QLD1 the detected-event DGF is slightly
+better above 300 and between 0 and 100. Neither model forecasts spikes (errors
+of 800-1,200 AUD/MWh above 300).
+
+The dual-field model's advantage over the general baselines comes from the
+known inputs, which a linear regression uses better. Its field structure, as
+trained now, costs about 1 MAE relative to that regression.
+
+## Quarterly recalibration
+
+Under quarterly refits of every model (static training is not the field's
+practice), XGBoost has the lowest MAE and CRPS~ and the dual-field model ties
+PatchTST and the linear models on MAE. Tables and tests are in
+`EXPERIMENT_RESULTS.md`, "Quarterly recalibration of the baselines; capped
+prices".
+
 ## Reproduction
 
 ```bash
@@ -176,6 +309,9 @@ python -m forecasting.baselines --baseline xgboost \
   --config configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml \
   --region NSW1 --seed 2026 --output-dir outputs/forecasting/baselines/raw/xgboost/seed2026
 python -m forecasting.summarize_baselines
+python -m forecasting.summarize_baselines --compact   # all seven baselines
+scripts/run_general_baselines.sh "6 7" 4             # DLinear, PatchTST, iTransformer, Informer grid
+KINDS="linear linear_mse known_linear dlinear_noadapter patchtst_noadapter" scripts/run_general_baselines.sh "6 7" 4
 ```
 
 Repeat for `--baseline gru` and `deepar`, regions NSW1/QLD1/TAS1, seeds

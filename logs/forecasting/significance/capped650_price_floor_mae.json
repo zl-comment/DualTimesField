@@ -1,0 +1,68 @@
+{
+  "reference": "floor",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "floor": 3,
+    "calibrator": 3,
+    "xgboost": 3
+  },
+  "comparisons": {
+    "calibrator": {
+      "NSW1": {
+        "mean_difference": -0.058873745027986785,
+        "statistic": -3.155143992965896,
+        "p_value": 0.001604189111245807,
+        "reference_mae": 25.642034149822322,
+        "other_mae": 25.70090789485031
+      },
+      "QLD1": {
+        "mean_difference": -0.7375587593794045,
+        "statistic": -9.112134489169838,
+        "p_value": 8.077683267155186e-20,
+        "reference_mae": 25.88940242228195,
+        "other_mae": 26.62696118166136
+      },
+      "TAS1": {
+        "mean_difference": -0.06252683813220446,
+        "statistic": -4.171414740645963,
+        "p_value": 3.0271432073249773e-05,
+        "reference_mae": 24.34998203305138,
+        "other_mae": 24.412508871183586
+      },
+      "three_region_mean": {
+        "mean_difference": -0.286319780846532,
+        "statistic": -8.994288528291971,
+        "p_value": 2.3776718236749693e-19
+      }
+    },
+    "xgboost": {
+      "NSW1": {
+        "mean_difference": 0.44095659761487094,
+        "statistic": 3.108944419197141,
+        "p_value": 0.0018775703525854028,
+        "reference_mae": 25.642034149822322,
+        "other_mae": 25.201077552207455
+      },
+      "QLD1": {
+        "mean_difference": 1.1128861343377057,
+        "statistic": 8.004598356534071,
+        "p_value": 1.1985722399590623e-15,
+        "reference_mae": 25.88940242228195,
+        "other_mae": 24.776516287944247
+      },
+      "TAS1": {
+        "mean_difference": 0.7014460706222166,
+        "statistic": 4.142839761320697,
+        "p_value": 3.430316292141936e-05,
+        "reference_mae": 24.34998203305138,
+        "other_mae": 23.648535962429168
+      },
+      "three_region_mean": {
+        "mean_difference": 0.7517629341915978,
+        "statistic": 7.441064691600079,
+        "p_value": 9.987701742189941e-14
+      }
+    }
+  }
+}

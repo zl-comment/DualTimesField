@@ -3,12 +3,15 @@
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{\materialsdir/figures/architecture.pdf}
-  \caption{Detected-event dual-field forecaster. Events detected in the
+  \caption{Dual-field forecaster with a linear base. Events detected in the
     72-hour history, as the largest departures from the window median after
     non-maximum suppression, form the discrete event field (DGF); the
     continuous trend field (CTF) fits the remainder under the decomposition
-    loss. Field-specific linear heads read field-matched AEMO forecasts (gas
-    price and net load for the CTF, spare capacity and shortfalls for the DGF)
-    and are fused by a trigonometric gate with per-quantile variants.}
+    loss. Field-specific linear heads and a linear base on the raw history
+    and all known inputs (AEMO predispatch, PD PASA spare capacity and net
+    load, gas price, calendar) are fused by a trigonometric gate; a per-hour
+    calibrator corrects the response to the known inputs, and the forecast is
+    clipped at a price floor chosen on the validation quarter. Every model is
+    refit before each test quarter.}
   \label{fig:architecture}
 \end{figure*}

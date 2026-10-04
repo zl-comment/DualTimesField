@@ -504,6 +504,12 @@ class DualFieldLinearForecaster(nn.Module):
         detected_min_separation: int = 3,
         detected_learn_threshold: bool = True,
         detected_baseline: str = "median",
+        linear_base: bool = False,
+        field_forecast: bool = True,
+        field_normalization: str = "none",
+        ctf_heads: bool = True,
+        field_point: bool = True,
+        calibrator_hidden: int = 0,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -721,6 +727,54 @@ class DualFieldLinearForecaster(nn.Module):
             self.echo_modulator = nn.Linear(
                 future_exogenous_dim + quantile_exogenous_dim + ctf_exogenous_dim + calendar_dim, 2
             )
+        # Linear base: one linear map of the raw history and all known future
+        # inputs (the inputs of the linear_mse baseline), to which the dual-field
+        # forecast is added as a residual.  Created last so that every other
+        # parameter keeps its initialization.
+        if not field_forecast and not linear_base:
+            raise ValueError("field_forecast=False needs linear_base")
+        if field_normalization not in {"none", "window"}:
+            raise ValueError("field_normalization must be 'none' or 'window'")
+        if field_normalization == "window" and not linear_base:
+            raise ValueError("window-normalized fields need the linear base for the level")
+        # "window": the fields see each window's history normalized by its own
+        # mean and standard deviation, and their forecast is a residual in
+        # window units, rescaled by the window's price scale; the linear base
+        # carries the absolute level.  ctf_heads=False silences the CTF experts
+        # (an ablation; the CTF is still fitted by the decomposition loss).
+        self.field_normalization = field_normalization
+        self.ctf_heads = ctf_heads
+        # field_point=False: the fields add to the quantiles only and the
+        # point forecast is the linear base's.
+        if not field_point and not linear_base:
+            raise ValueError("field_point=False needs linear_base")
+        self.field_point = field_point
+        self.linear_base = linear_base
+        self.field_forecast = field_forecast
+        if linear_base:
+            base_dim = (
+                input_length * num_variables
+                + forecast_horizon * (calendar_dim + future_exogenous_dim + ctf_exogenous_dim)
+                + origin_context_dim
+            )
+            self.base_point_head = nn.Linear(base_dim, forecast_horizon)
+            self.base_quantile_head = nn.Linear(base_dim, forecast_horizon * len(self.quantiles))
+        # Calibrator: one small MLP shared by the forecast hours. For each hour
+        # it reads that hour's known inputs (predispatch, spare capacity, net
+        # load, calendar), a horizon embedding, and the last observed price
+        # and its 24-hour mean, and corrects the point and quantile forecasts.
+        # Its output layer starts at zero, so it starts as the model without it.
+        self.calibrator = None
+        if calibrator_hidden > 0:
+            self.horizon_embedding = nn.Parameter(torch.zeros(forecast_horizon, 4))
+            calibrator_in = calendar_dim + future_exogenous_dim + ctf_exogenous_dim + 4 + 2
+            self.calibrator = nn.Sequential(
+                nn.Linear(calibrator_in, calibrator_hidden), nn.GELU(),
+                nn.Linear(calibrator_hidden, calibrator_hidden), nn.GELU(),
+                nn.Linear(calibrator_hidden, 1 + len(self.quantiles)),
+            )
+            nn.init.zeros_(self.calibrator[-1].weight)
+            nn.init.zeros_(self.calibrator[-1].bias)
 
     def _concatenated_forecast(
         self,
@@ -816,6 +870,9 @@ class DualFieldLinearForecaster(nn.Module):
                 len(self.quantiles),
             )
         ctf_quantile = torch.sort(ctf_quantile, dim=-1).values
+        if not self.ctf_heads:
+            ctf_point = torch.zeros_like(ctf_point)
+            ctf_quantile = torch.zeros_like(ctf_quantile)
         dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
 
         gate_logit = self.fusion_gate(gate_features)
@@ -933,6 +990,13 @@ class DualFieldLinearForecaster(nn.Module):
         elif quantile_exogenous is not None:
             raise ValueError("quantile_exogenous was provided but the model has no quantile exogenous inputs")
 
+        raw_history = history_values
+        field_scale = None
+        if self.field_normalization == "window":
+            location = history_values.mean(dim=1, keepdim=True).detach()
+            field_scale = history_values.std(dim=1, keepdim=True, unbiased=False).clamp_min(1e-2).detach()
+            history_values = (history_values - location) / field_scale
+
         history_time = self._history_time(history_values)
         ctf_signal = self.dual_field.ctf(history_values, history_time)
         residual = history_values - ctf_signal
@@ -989,6 +1053,47 @@ class DualFieldLinearForecaster(nn.Module):
             )
             if echo_features is not None:
                 forecasts["event_echo"] = echo_features
+            if field_scale is not None:
+                price_scale = field_scale[:, :, :1]
+                forecasts["point_forecast"] = forecasts["point_forecast"] * price_scale
+                forecasts["quantile_forecast"] = forecasts["quantile_forecast"] * price_scale
+
+        if self.linear_base:
+            parts = [raw_history, future_calendar, future_exogenous, ctf_exogenous]
+            base_features = torch.cat(
+                [part.flatten(start_dim=1) for part in parts if part is not None]
+                + ([origin_context] if origin_context is not None else []),
+                dim=1,
+            )
+            base_point = self.base_point_head(base_features).unsqueeze(-1)
+            base_quantile = self.base_quantile_head(base_features).view(
+                -1, self.forecast_horizon, len(self.quantiles)
+            )
+            forecasts["base_point"] = base_point
+            if self.field_forecast:
+                forecasts["field_point"] = forecasts["point_forecast"]
+                forecasts["point_forecast"] = (
+                    base_point + forecasts["point_forecast"] if self.field_point else base_point
+                )
+                base_quantile = base_quantile + forecasts["quantile_forecast"]
+            else:
+                # Control: the linear base alone, trained in the dual-field
+                # pipeline; the fields are still fitted by the decomposition loss.
+                forecasts["point_forecast"] = base_point
+            forecasts["quantile_forecast"] = torch.sort(base_quantile, dim=-1).values
+
+        if self.calibrator is not None:
+            batch = raw_history.shape[0]
+            level = torch.stack([raw_history[:, -1, 0], raw_history[:, -24:, 0].mean(dim=1)], dim=-1)
+            parts = [future_calendar, future_exogenous, ctf_exogenous,
+                     self.horizon_embedding.expand(batch, -1, -1),
+                     level[:, None, :].expand(-1, self.forecast_horizon, -1)]
+            correction = self.calibrator(torch.cat([part for part in parts if part is not None], dim=-1))
+            forecasts["calibrator_point"] = correction[..., :1]
+            forecasts["point_forecast"] = forecasts["point_forecast"] + correction[..., :1]
+            forecasts["quantile_forecast"] = torch.sort(
+                forecasts["quantile_forecast"] + correction[..., 1:], dim=-1
+            ).values
 
         if self.event_field is not None:
             level_mean = forecasts["point_forecast"]
@@ -1012,6 +1117,8 @@ class DualFieldLinearForecaster(nn.Module):
             **forecasts,
             "ctf_signal": ctf_signal,
             "event_signal": event_signal,
+            # The series the fields decompose (normalized per window if configured).
+            "field_history": history_values,
             "event_amplitude": amplitude,
             "event_gate": gate,
         }

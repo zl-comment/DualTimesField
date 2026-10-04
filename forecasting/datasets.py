@@ -36,6 +36,10 @@ class PriceTransform:
         return sinh(values) * self.scale + self.location
 
 
+# Forecast blocks appended to the future exogenous inputs, in this order.
+APPENDED_FUTURE_BLOCKS = ("predispatch_exogenous", "interconnector_exogenous")
+
+
 def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
     if kind == "identity":
         return PriceTransform()
@@ -112,6 +116,26 @@ def _validate_splits(frame: pd.DataFrame, config: Mapping) -> None:
         raise ValueError("Some timestamps fall outside the configured split periods")
 
 
+def _relabel_splits(frame: pd.DataFrame, config: Mapping) -> None:
+    """Labels rows by the configured split periods instead of the file's labels.
+
+    Used for rolling recalibration, where each refit has its own training,
+    validation, and test periods. Rows outside every period are labelled
+    "unused": they can still serve as history, but never as a target.
+    """
+    data_config = config["data"]
+    delivery = frame[data_config["delivery_column"]]
+    labels = np.full(len(frame), "unused", dtype=object)
+    for split_name, boundaries in data_config["split_boundaries"].items():
+        start = pd.Timestamp(boundaries["start"], tz=data_config["timezone"])
+        end = pd.Timestamp(boundaries["end_exclusive"], tz=data_config["timezone"])
+        in_period = (delivery.ge(start) & delivery.lt(end)).to_numpy()
+        if (labels[in_period] != "unused").any():
+            raise ValueError(f"The {split_name} period overlaps another split period")
+        labels[in_period] = split_name
+    frame[data_config["split_column"]] = labels
+
+
 def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     data_config = config["data"]
     region_files = data_config["region_files"]
@@ -129,7 +153,10 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     if frame[numeric_columns].isna().any().any():
         raise ValueError(f"Missing values found in model columns for {region}")
     _validate_hourly_timeline(frame, config)
-    _validate_splits(frame, config)
+    if data_config.get("relabel_splits", False):
+        _relabel_splits(frame, config)
+    else:
+        _validate_splits(frame, config)
     price_cap = data_config.get("price_cap")
     if price_cap is not None:
         # Clip the price column before it is used as history or target, so
@@ -319,6 +346,21 @@ class AEMOForecastDataset(Dataset):
                 self.future_exogenous_standardizer,
                 self.future_exogenous_by_origin,
             ) = self._load_forecast_exogenous(frame, config, region, "future_exogenous")
+        # AEMO predispatch forecasts, appended to the future exogenous inputs so
+        # that every reader of those inputs (DGF heads, gate, linear base, and
+        # the baselines) sees them.
+        for block in APPENDED_FUTURE_BLOCKS:
+            if not config.get(block, {}).get("enabled", False):
+                continue
+            if not self.future_exogenous_by_origin:
+                raise ValueError(f"{block} needs future_exogenous")
+            names, _, appended = self._load_forecast_exogenous(frame, config, region, block)
+            self.future_exogenous_feature_names += names
+            self.future_exogenous_by_origin = {
+                origin: np.concatenate([values, appended[origin]], axis=-1).astype(np.float32)
+                for origin, values in self.future_exogenous_by_origin.items()
+                if origin in appended
+            }
         # Forecast inputs for the CTF head (e.g. PD PASA net load).
         self.ctf_exogenous_feature_names: tuple[str, ...] = ()
         self.ctf_exogenous_standardizer = None
@@ -369,6 +411,12 @@ class AEMOForecastDataset(Dataset):
             )
         if len(np.unique(origins)) != len(origins):
             raise ValueError(f"Duplicate future exogenous origins for {region}")
+        price_features = exogenous_config.get("price_features", [])
+        for name in price_features:
+            # Forecast prices (e.g. AEMO predispatch) go through the target's
+            # price transform, so they are on the scale of the target itself.
+            index = feature_names.index(name)
+            raw_values[..., index] = self.price_transform.forward(raw_values[..., index].astype(np.float64))
         if np.isnan(raw_values).any():
             raise ValueError(f"Missing future exogenous values for {region}")
         if (
@@ -394,6 +442,22 @@ class AEMOForecastDataset(Dataset):
         train_rows = [origin_to_row[int(origin)] for origin in train_origins if int(origin) in origin_to_row]
         if not train_rows:
             raise ValueError(f"No training future exogenous values for {region}")
+        excess_quantiles = exogenous_config.get("excess_above_train_quantiles")
+        if excess_quantiles is not None:
+            # Append, for the listed features, the excess above several training
+            # quantiles, max(value - knot, 0), so that a linear head can bend
+            # its response (e.g. discount high predispatch prices).
+            columns = [feature_names.index(name) for name in exogenous_config["excess_features"]]
+            selected = raw_values[..., columns]
+            knots = np.quantile(
+                selected[train_rows].reshape(-1, len(columns)), [float(q) for q in excess_quantiles], axis=0
+            )
+            raw_values = np.concatenate(
+                [raw_values, *(np.maximum(selected - knot, 0.0) for knot in knots)], axis=-1
+            )
+            feature_names = feature_names + tuple(
+                f"{feature_names[c]}_excess_q{q}" for q in excess_quantiles for c in columns
+            )
         shortfall_quantiles = exogenous_config.get("shortfall_below_train_quantiles")
         if shortfall_quantiles is not None:
             # Replace each feature with its shortfall below several training

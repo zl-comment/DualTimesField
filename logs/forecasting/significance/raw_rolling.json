@@ -1,0 +1,126 @@
+{
+  "reference": "rolling_linear_base",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "rolling_linear_base": 3,
+    "rolling_linear_base_only": 3,
+    "static_linear_base_only": 3,
+    "static_detected_dgf": 3,
+    "linear_mse": 3
+  },
+  "comparisons": {
+    "rolling_linear_base_only": {
+      "NSW1": {
+        "mean_difference": 0.2695732515968078,
+        "statistic": 2.022714510758729,
+        "p_value": 0.0431025899607008,
+        "reference_mae": 47.56123386977646,
+        "other_mae": 47.291660618179655
+      },
+      "QLD1": {
+        "mean_difference": -0.5706367447656542,
+        "statistic": -3.3526735640152525,
+        "p_value": 0.0008003504187383578,
+        "reference_mae": 41.57316469992739,
+        "other_mae": 42.14380144469304
+      },
+      "TAS1": {
+        "mean_difference": 0.0005503806775103765,
+        "statistic": 0.004719700798487678,
+        "p_value": 0.9962342375820372,
+        "reference_mae": 31.260384545231002,
+        "other_mae": 31.259834164553496
+      },
+      "three_region_mean": {
+        "mean_difference": -0.10017103749711198,
+        "statistic": -1.1407428210546886,
+        "p_value": 0.2539769613248776
+      }
+    },
+    "static_linear_base_only": {
+      "NSW1": {
+        "mean_difference": -0.24161369280312855,
+        "statistic": -1.3222183224870918,
+        "p_value": 0.18609546151446005,
+        "reference_mae": 47.56123386977646,
+        "other_mae": 47.802847562579586
+      },
+      "QLD1": {
+        "mean_difference": -0.24997403394377885,
+        "statistic": -1.2322401241630576,
+        "p_value": 0.21785939900117368,
+        "reference_mae": 41.57316469992739,
+        "other_mae": 41.823138733871176
+      },
+      "TAS1": {
+        "mean_difference": -0.9782975171974464,
+        "statistic": -6.174026497641971,
+        "p_value": 6.65723762395993e-10,
+        "reference_mae": 31.260384545231002,
+        "other_mae": 32.238682062428445
+      },
+      "three_region_mean": {
+        "mean_difference": -0.48996174798145126,
+        "statistic": -4.082737595288826,
+        "p_value": 4.45082696105888e-05
+      }
+    },
+    "static_detected_dgf": {
+      "NSW1": {
+        "mean_difference": -0.7448071409930695,
+        "statistic": -3.36338563000476,
+        "p_value": 0.0007699273110734644,
+        "reference_mae": 47.56123386977646,
+        "other_mae": 48.30604101076952
+      },
+      "QLD1": {
+        "mean_difference": -0.9604256179825433,
+        "statistic": -3.763402089210485,
+        "p_value": 0.00016761737046922385,
+        "reference_mae": 41.57316469992739,
+        "other_mae": 42.53359031790993
+      },
+      "TAS1": {
+        "mean_difference": -2.533954843643745,
+        "statistic": -12.052963822870696,
+        "p_value": 1.8709919465660816e-33,
+        "reference_mae": 31.260384545231002,
+        "other_mae": 33.79433938887475
+      },
+      "three_region_mean": {
+        "mean_difference": -1.4130625342064527,
+        "statistic": -9.061944326225428,
+        "p_value": 1.281456030316748e-19
+      }
+    },
+    "linear_mse": {
+      "NSW1": {
+        "mean_difference": -0.32178069082137345,
+        "statistic": -1.8660602793667516,
+        "p_value": 0.062032932397229054,
+        "reference_mae": 47.56123386977646,
+        "other_mae": 47.88301456059783
+      },
+      "QLD1": {
+        "mean_difference": 0.04512676442464426,
+        "statistic": 0.2546691826634288,
+        "p_value": 0.7989786202517701,
+        "reference_mae": 41.57316469992739,
+        "other_mae": 41.528037935502745
+      },
+      "TAS1": {
+        "mean_difference": -0.8751756228977728,
+        "statistic": -6.1065126714142925,
+        "p_value": 1.0183155525076651e-09,
+        "reference_mae": 31.260384545231002,
+        "other_mae": 32.13556016812878
+      },
+      "three_region_mean": {
+        "mean_difference": -0.3839431830981673,
+        "statistic": -3.676165975654287,
+        "p_value": 0.00023676551243699377
+      }
+    }
+  }
+}

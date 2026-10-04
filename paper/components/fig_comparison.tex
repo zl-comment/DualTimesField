@@ -1,11 +1,11 @@
-% Figure: same-data comparison with re-implemented baselines. Needs graphicx.
+% Figure: per-region comparison in the main setting. Needs graphicx.
 \providecommand{\materialsdir}{.}
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{\materialsdir/figures/same_data_comparison.pdf}
-  \caption{Test MAE per region against re-implemented XGBoost, GRU, and
-    DeepAR on raw prices (left) and prices capped at 650~AUD/MWh (right).
-    All models share the splits, inputs, and scoring; bars are means over
-    three seeds.}
+  \caption{Test MAE per region in the main setting (quarterly refit with
+    predispatch inputs) on raw prices (left) and prices capped at
+    650~AUD/MWh (right). All models share the splits, inputs, refit
+    schedule, and scoring; bars are means over three seeds.}
   \label{fig:comparison}
 \end{figure*}

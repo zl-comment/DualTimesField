@@ -1551,6 +1551,564 @@ DGF's contribution is therefore the separation of events from the level,
 which improves the point forecast, not a state for a separate event
 classifier. The future event field is not pursued further.
 
+## General time-series baselines
+
+DLinear, PatchTST, iTransformer, and Informer were re-implemented and run on the
+same data and inputs as the detected-event DGF (raw and 650-capped prices,
+seeds 2026-2028, three regions; full setup and tables in
+[`BASELINES.md`](BASELINES.md), "General time-series baselines"; learning-rate
+selection in [`baselines/general_lr_selection.json`](baselines/general_lr_selection.json)).
+
+| Mean of three regions | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---:|---:|---:|---:|
+| Detected-event DGF | 41.54 ± 0.06 | 28.15 | 30.32 ± 0.12 | 17.86 |
+| DLinear + known-input adapter | **40.91 ± 0.02** | 26.31 | **29.61 ± 0.04** | 16.40 |
+| PatchTST + known-input adapter | 41.02 ± 0.03 | **26.22** | 29.99 ± 0.05 | **16.37** |
+| iTransformer | 43.20 ± 0.06 | 34.36 | 32.00 ± 0.31 | 21.30 |
+| Informer | 46.65 ± 2.38 | 30.12 | 34.05 ± 0.48 | 17.58 |
+
+DLinear is significantly better than the detected-event DGF under both price
+treatments (pooled DM p = 0.0003 raw, < 0.0001 capped) and PatchTST on raw
+prices (p = 0.008; capped p = 0.065). The gap is concentrated in TAS1 (+1.6 to
++1.8 MAE) and QLD1; in NSW1 the detected-event DGF ties DLinear and beats
+PatchTST. The detected-event DGF still beats iTransformer and Informer
+everywhere except TAS1 against iTransformer.
+
+Attribution (same grid; [`BASELINES.md`](BASELINES.md), "Attribution"): the
+decomposition and the Transformer add nothing (`linear` 40.89 against
+`dlinear` 40.91 raw), and the pinball loss is not the cause. A plain linear
+regression on the same inputs, with an MSE point output like the dual-field
+point head, reaches 40.52 raw and 29.33 capped. It beats the detected-event
+DGF in every region under both treatments (pooled DM p < 0.0001), by 1.7 in
+TAS1 and 0.7-1.0 in QLD1. Without the known inputs, DLinear and PatchTST fall
+to 43.8-43.9 raw, behind the detected-event DGF.
+
+## Linear base with dual-field residual
+
+Branch `feature/linear-base`. Configurations
+`configs/aemo_forecast_{,capped650_}linear_base{,_only}.yaml` add to the
+detected-event DGF a linear base: one linear map of the raw history and all
+known future inputs (the inputs of the `linear_mse` baseline) to the point
+and quantile outputs. `linear_base` adds the dual-field forecast to the base as
+a residual; `linear_base_only` forecasts with the base alone in the same
+training pipeline (the fields are still fitted by the decomposition loss). The
+base is created last, so every other parameter keeps its initialization.
+Seeds 2026-2028, three regions; runner `scripts/run_dual_field_seeds.sh`;
+metrics in [`linear_base/paper_metrics/`](linear_base/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | 48.31 / 42.53 / 33.79 | 41.54 ± 0.06 | 78.80 | 403.48 | 28.15 |
+| Linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| `linear_mse` baseline | 47.88 / 41.53 / 32.14 | 40.52 ± 0.03 | 77.71 | 394.28 | 26.47 |
+
+| Capped at 650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Detected-event DGF | 29.79 / 30.38 / 30.80 | 30.32 ± 0.12 | 41.29 | 213.16 | 17.86 |
+| Linear base + fields | 29.66 / 30.40 / 30.96 | 30.34 ± 0.17 | 41.30 | 204.99 | 17.38 |
+| Linear base only | 29.15 / 29.98 / 29.06 | 29.39 ± 0.05 | 40.32 | 235.63 | 19.07 |
+| `linear_mse` baseline | 29.27 / 29.64 / 29.09 | 29.33 ± 0.06 | 40.20 | 211.12 | 16.49 |
+
+Diebold-Mariano, linear base + fields minus linear base only: raw +0.92
+(pooled p < 0.0001; NSW1 +0.36, p = 0.17; QLD1 +0.74; TAS1 +1.64), capped
++0.95 (p < 0.0001; +0.52 / +0.42 / +1.90). Against the detected-event DGF the
+difference is not significant (raw -0.01, p = 0.76; capped +0.02, p = 0.50)
+([`significance/raw_linear_base.json`](significance/raw_linear_base.json),
+[`significance/capped650_linear_base.json`](significance/capped650_linear_base.json)).
+
+| Finding | Evidence |
+|---|---|
+| The training pipeline is not the cause | The base alone in the dual-field pipeline matches the external `linear_mse` (40.62 against 40.52 raw, 29.39 against 29.33 capped) |
+| The fields make the forecast worse, not better | Adding them to the base raises MAE by 0.9 under both treatments, back to the detected-event DGF's level |
+| They help spikes and hurt the ordinary level | Of the error gap between base + fields and base only, 83% (raw) and 89% (capped) is in the 100-300 AUD/MWh band and 15-21% in negative prices, while the band above 300 is 18-22% in favour of the fields ([`linear_base/`](linear_base/)) |
+| The cause is overfitting to the training regime | At the selected epoch (seed 2026), the fields lower the training loss but raise the 2022 validation MAE: NSW1 60.6 against 48.6, QLD1 84.1 against 75.4, TAS1 55.3 against 52.6 |
+| Probabilistically the fields help | CRPS~ 28.35 against 29.67 raw and 17.38 against 19.07 capped; but the external linear quantile model is better still (26.47, 16.49), as its quantiles are in asinh space |
+
+The dual-field heads, as built, add capacity that fits the 2015-2021 price
+level and does not transfer to 2022-2024. Models that normalize each window
+(PatchTST, iTransformer) do not show this; Informer, which does not, does.
+
+## Window-normalized fields on the linear base
+
+Branch `feature/window-normalized-fields`. `field_normalization: window`
+normalizes each window's history (per variable, by its own mean and standard
+deviation, detached) before the CTF and DGF see it, fits the decomposition
+loss in that space, and multiplies the fused field forecast by the window's
+price scale before adding it to the linear base. `ctf_heads: false` silences
+the CTF experts. Configurations
+`configs/aemo_forecast_{,capped650_}{window_norm,window_norm_dgf_only,linear_base_dgf_only}.yaml`;
+seeds 2026-2028; metrics in [`window_norm/paper_metrics/`](window_norm/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 47.80 / 41.82 / 32.24 | **40.62 ± 0.02** | 77.87 | 449.34 | 29.67 |
+| Base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Base + DGF only | 48.39 / 42.47 / 33.86 | 41.58 ± 0.08 | 79.05 | 405.93 | 28.41 |
+| Base + window-normalized DGF only | 50.02 / 44.77 / 32.77 | 42.52 ± 0.26 | 80.40 | 402.67 | 28.19 |
+| Base + window-normalized fields | 50.80 / 48.98 / 33.10 | 44.29 ± 0.17 | 83.09 | 410.33 | 28.55 |
+
+| Capped at 650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 29.15 / 29.98 / 29.06 | **29.39 ± 0.05** | 40.32 | 235.63 | 19.07 |
+| Base + fields | 29.66 / 30.40 / 30.96 | 30.34 ± 0.17 | 41.30 | 204.99 | 17.38 |
+| Base + DGF only | 29.87 / 30.49 / 30.87 | 30.41 ± 0.04 | 41.54 | 216.62 | 18.15 |
+| Base + window-normalized DGF only | 31.57 / 34.35 / 29.68 | 31.87 ± 0.07 | 44.07 | 219.27 | 18.18 |
+| Base + window-normalized fields | 32.13 / 37.66 / 30.18 | 33.32 ± 0.58 | 46.23 | 212.85 | 17.70 |
+
+Against the base alone, every field variant is worse (pooled DM p < 0.0001
+under both treatments; [`significance/raw_window_norm.json`](significance/raw_window_norm.json),
+[`significance/capped650_window_norm.json`](significance/capped650_window_norm.json)).
+
+| Finding | Evidence |
+|---|---|
+| The DGF heads carry the loss; the CTF heads add nothing | Base + DGF only equals base + fields (41.58 against 41.54 raw, 30.41 against 30.34 capped) |
+| Window normalization makes it worse | +2.8 (fields) and +1.0 (DGF only) raw MAE over the unnormalized fields; only TAS1 improves (33.10 and 32.77 against 33.88), still behind the base alone |
+| Volatility, not only the level, shifted | Median window price standard deviation in QLD1 is 1.32 on test against 0.59 in training (target units); rescaling by it amplifies the field residual about 2.2 times, and QLD1 MAE rises by 6.4 |
+
+Three designs of the field residual (unnormalized, window-normalized, and
+DGF-only) all lose to the linear base alone on mean MAE. The fields lower the
+probabilistic scores of the base (CRPS~ 28.2-28.6 against 29.67 raw), but not
+to the level of the linear quantile baseline (26.47).
+
+## Fields on the quantiles only, asinh-space quantiles
+
+Branch `feature/field-tails`. The point forecast is the linear base's
+(`field_point: false`), and the quantiles are learned in the asinh target space
+(`quantile_target: transformed`), as in the linear quantile baseline, as base
+quantiles plus the field residual. `tails_base_only` is the base alone;
+`tails_dgf` silences the CTF experts. Seeds 2026-2028; metrics in
+[`field_tails/paper_metrics/`](field_tails/paper_metrics/); tail scores from
+[`forecasting/tail_metrics.py`](../../forecasting/tail_metrics.py) on
+seed-averaged quantiles ([`field_tails/raw_tail_metrics.json`](field_tails/raw_tail_metrics.json),
+[`field_tails/capped650_tail_metrics.json`](field_tails/capped650_tail_metrics.json)).
+
+| Raw prices | Mean MAE | 90% PICP | 90% PIAW | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| `tails_base_only` | 40.58 ± 0.02 | 81.63 | 171.38 | 440.45 | 28.94 |
+| `tails_fields` | 40.58 ± 0.01 | 92.97 | 418.48 | 532.12 | 31.25 |
+| `tails_dgf` | 40.58 ± 0.02 | 88.30 | 537.22 | 673.63 | 34.94 |
+| `linear` baseline | 40.89 ± 0.04 | 83.80 | 141.42 | 389.01 | **26.29** |
+| XGBoost | 43.15 ± 0.07 | 84.48 | 164.15 | 414.32 | 27.69 |
+
+| Capped at 650 | Mean MAE | 90% PICP | 90% PIAW | 90% AIS | CRPS~ |
+|---|---:|---:|---:|---:|---:|
+| `tails_base_only` | 29.42 ± 0.01 | 81.46 | 158.81 | 251.06 | 18.72 |
+| `tails_fields` | 29.45 ± 0.04 | 93.18 | 334.20 | 365.97 | 22.19 |
+| `tails_dgf` | 29.40 ± 0.04 | 88.18 | 357.66 | 413.46 | 23.49 |
+| `linear` baseline | 29.59 ± 0.04 | 83.77 | 132.16 | 208.57 | **16.37** |
+| XGBoost | 31.61 ± 0.02 | 83.01 | 113.06 | 201.93 | 16.74 |
+
+Tail scores, raw prices (mean of regions, seed-averaged quantiles):
+
+| Model | CRPS~ 100-300 | CRPS~ above 300 | q95 pinball, spike hours | q05 pinball, negative hours | Spike hit / false alarm | Negative hit / false alarm |
+|---|---:|---:|---:|---:|---|---|
+| `tails_base_only` | 24.50 | 830.78 | 689.1 | 16.58 | 85.1% / 10.9% | 87.1% / 16.0% |
+| `tails_fields` | 34.93 | **730.91** | **566.3** | 10.34 | 90.3% / 24.1% | 94.6% / 26.3% |
+| `linear` baseline | 23.51 | 811.02 | 671.9 | 10.11 | 85.5% / 10.8% | 84.4% / 14.1% |
+| XGBoost | 25.66 | 840.70 | 691.8 | 10.10 | 86.0% / 13.2% | 86.4% / 12.2% |
+| Detected-event DGF (price-space quantiles) | 25.00 | 863.59 | 714.0 | **6.67** | 52.3% / 4.8% | 91.8% / 20.3% |
+
+| Finding | Evidence |
+|---|---|
+| The point forecast stays at the linear level | MAE 40.58 raw and 29.40-29.45 capped in every variant |
+| In asinh space the fields widen the intervals instead of sharpening them | 90% width 418-537 against 171 for the base; coverage 88-93%; CRPS~ and AIS worse than the base and the linear baseline under both treatments |
+| They buy spike coverage with false alarms | Raw spike-hour CRPS~ 731 against 811 (linear) and q95 pinball 566 against 672, but the 100-300 band rises to 34.9 against 23.5 and spike false alarms double (24% against 11%); on capped prices the spike-hour gain disappears (160 against 135) |
+| The negative-price tail is best with price-space quantiles | q05 pinball on negative hours 6.67 for the detected-event DGF and 6.14 for base + fields with price-space quantiles (`linear_base`), against 10.1 for the linear baseline and XGBoost; asinh-space quantiles lose this (10.34) |
+| The base's asinh quantiles in the dual-field pipeline are weaker than the external linear model | CRPS~ 28.94 against 26.29, with the same inputs; the pipeline trains them jointly with the MSE point and selects the checkpoint by the total validation loss |
+
+No variant beats the linear quantile baseline on CRPS~ or AIS. The one tail
+where the fields are clearly ahead of every baseline is the lower tail on
+negative-price hours, with price-space quantiles.
+
+## Quarterly rolling recalibration
+
+Branch `feature/rolling-recalibration`. [`forecasting/rolling.py`](../../forecasting/rolling.py)
+refits a model before each of the eight test quarters of 2023-2024: refit `k`
+trains on 2015 up to three months before the quarter, selects its checkpoint
+on those three months, and forecasts the quarter's origins
+(`data.relabel_splits` labels rows by the configured periods; later rows are
+never targets). The stitched forecasts cover exactly the 17,521 origins of the
+static test split. Raw prices, seeds 2026-2028, 144 refits
+(`scripts/run_rolling.sh`); metrics in [`rolling/paper_metrics/`](rolling/paper_metrics/).
+
+| Raw prices | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Static: linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| Static: linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Rolling: linear base only | 47.29 / 42.14 / 31.26 | 40.23 ± 0.01 | 77.49 | 424.29 | 27.68 |
+| Rolling: linear base + fields | 47.56 / 41.57 / 31.26 | **40.13 ± 0.07** | **77.27** | **392.87** | **26.90** |
+
+Diebold-Mariano on per-origin MAE ([`significance/raw_rolling.json`](significance/raw_rolling.json)),
+rolling base + fields minus rolling base only: pooled -0.10 (p = 0.25); NSW1
++0.27 (p = 0.04), QLD1 -0.57 (p = 0.001), TAS1 0.00 (p = 1.0).
+
+Tail scores on seed-averaged quantiles ([`rolling/raw_tail_metrics.json`](rolling/raw_tail_metrics.json)):
+
+| Model | CRPS~ | CRPS~ below 0 | CRPS~ 100-300 | CRPS~ above 300 | q95 pinball, spikes | q05 pinball, negative | Spike hit / false alarm |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Rolling: base only | 27.13 | 18.58 | 18.72 | 911.87 | 815.4 | 8.10 | 80.0% / 8.1% |
+| Rolling: base + fields | **25.85** | **15.49** | 20.14 | 840.76 | 705.6 | **4.59** | 83.7% / 9.4% |
+| Static: base + fields | 27.24 | 19.98 | 24.60 | 856.82 | 703.6 | 6.14 | 58.4% / 6.0% |
+| Static: `linear` quantile baseline | 26.11 | 21.11 | 23.51 | 811.02 | 671.9 | 10.11 | 85.5% / 10.8% |
+
+| Finding | Evidence |
+|---|---|
+| With recalibration the fields no longer cost point accuracy | Base + fields 40.13 against base 40.23 (pooled p = 0.25), where the static split cost 0.92 (p < 0.0001); QLD1 improves significantly, NSW1 worsens slightly |
+| Where the fields help and hurt | Of the absolute-error gain, negative prices contribute 77%, 0-100 AUD/MWh 44%, and spikes 35%, against -57% from the 100-300 band ([`rolling/raw_price_band_fields_vs_base.json`](rolling/raw_price_band_fields_vs_base.json)) |
+| They improve the probabilistic forecast | CRPS~ 25.85 against 27.13 for the same base (seed-averaged); 90% AIS 392.87 against 424.29; q05 pinball on negative-price hours 4.59 against 8.10, and spike-hour CRPS~ 841 against 912 |
+| Recalibration helps everything, most in TAS1 | Rolling base + fields is 2.53 below the static detected-event DGF in TAS1 and 1.41 below it pooled |
+
+The comparison with external baselines is not yet fair: they are still
+trained once on the static split. The linear quantile baseline, XGBoost,
+DLinear, and PatchTST must be recalibrated the same way before any claim
+against them.
+
+## Quarterly recalibration of the baselines; capped prices
+
+The baselines are refit every test quarter like the dual-field models
+(`scripts/run_rolling_baselines.sh`; quarter configurations from their static
+configurations via `forecasting.rolling make-configs --name baseline_raw /
+baseline_capped650`; stitched by `forecasting.rolling stitch-baselines`), and
+the linear base and base + fields are refit on 650-capped prices
+(`capped650_linear_base{,_only}`). Seeds 2026-2028, 576 baseline refits and
+144 dual-field refits; metrics in [`baselines_rolling/`](baselines_rolling/) and
+[`rolling/paper_metrics/`](rolling/paper_metrics/).
+
+| raw | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 47.56 / 41.57 / 31.26 | 40.13 ± 0.07 | 77.27 | 91.10 | 392.87 | 26.90 |
+| Linear base only | 47.29 / 42.14 / 31.26 | 40.23 ± 0.01 | 77.49 | 90.61 | 424.29 | 27.68 |
+| linear_mse | 47.40 / 42.09 / 31.48 | 40.32 ± 0.02 | 77.54 | 86.23 | 386.36 | 25.89 |
+| DLinear | 48.21 / 41.49 / 31.30 | 40.33 ± 0.07 | 77.99 | 86.62 | 385.48 | 25.90 |
+| PatchTST | 47.81 / 41.13 / 30.99 | 39.97 ± 0.01 | 77.63 | 88.95 | 377.73 | 25.46 |
+| XGBoost | 47.68 / 39.84 / 31.09 | 39.53 ± 0.01 | 77.27 | 85.60 | 376.81 | 25.28 |
+
+| capped650 | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 29.01 / 29.58 / 28.34 | 28.98 ± 0.02 | 39.78 | 91.23 | 188.35 | 15.83 |
+| Linear base only | 28.77 / 30.11 / 28.23 | 29.04 ± 0.03 | 39.97 | 89.89 | 207.28 | 16.78 |
+| linear_mse | 28.88 / 29.97 / 28.46 | 29.10 ± 0.02 | 39.98 | 86.15 | 192.44 | 15.59 |
+| DLinear | 29.45 / 29.48 / 28.22 | 29.05 ± 0.05 | 40.19 | 86.54 | 192.53 | 15.62 |
+| PatchTST | 29.48 / 29.34 / 28.03 | 28.95 ± 0.01 | 40.18 | 89.01 | 189.15 | 15.37 |
+| XGBoost | 29.62 / 28.13 / 28.01 | 28.59 ± 0.01 | 39.70 | 84.46 | 178.27 | 14.90 |
+
+Diebold-Mariano, ours (rolling base + fields) minus each model, pooled over
+regions; per-origin MAE, and per-origin CRPS~ of seed-averaged quantiles
+([`significance/*_rolling_baselines_{mae,crps}.json`](significance/)):
+
+| Ours minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Linear base only | -0.10 (p = 0.25) | **-1.28 (p < 0.0001)** | -0.06 (p = 0.47) | **-1.06 (p < 0.0001)** |
+| XGBoost | +0.60 (p = 0.0002) | +0.83 (p < 0.0001) | +0.39 (p = 0.003) | +0.44 (p < 0.0001) |
+| PatchTST | +0.16 (p = 0.24) | +0.51 (p = 0.03) | +0.03 (p = 0.83) | -0.05 (p = 0.57) |
+| DLinear | -0.20 (p = 0.10) | +0.14 (p = 0.29) | -0.07 (p = 0.48) | **-0.22 (p = 0.008)** |
+| `linear_mse` | **-0.19 (p = 0.03)** | +0.12 (p = 0.36) | -0.13 (p = 0.14) | **-0.21 (p = 0.01)** |
+
+Tail scores on seed-averaged quantiles ([`baselines_rolling/raw_tail_metrics.json`](baselines_rolling/raw_tail_metrics.json),
+[`baselines_rolling/capped650_tail_metrics.json`](baselines_rolling/capped650_tail_metrics.json)):
+
+| Raw prices | CRPS~ | CRPS~ below 0 | CRPS~ 0-100 | CRPS~ 100-300 | CRPS~ above 300 | q05 pinball, negative hours | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ours | 25.85 | **15.49** | 11.02 | 20.14 | 840.76 | **4.59** | 93.5% |
+| XGBoost | **25.02** | 17.11 | 9.71 | 20.21 | 828.25 | 6.25 | 86.6% |
+| PatchTST | 25.34 | 18.74 | 9.96 | 21.38 | **797.33** | 7.68 | 89.4% |
+| DLinear | 25.71 | 18.70 | **9.68** | 21.35 | 832.67 | 7.71 | 87.3% |
+
+| Finding | Evidence |
+|---|---|
+| Recalibration helps the baselines more than the fields | XGBoost gains 3.6 MAE over its static fit (39.53 against 43.15 raw), PatchTST 1.1, while ours gains 1.4 over the static detected-event DGF |
+| XGBoost is the best model under recalibration | Lowest MAE and CRPS~ under both treatments, significantly ahead of ours (pooled p <= 0.003); the gap is QLD1 (+1.73 raw, +1.45 capped MAE); in NSW1 ours is ahead on capped prices (-0.61, p = 0.001) |
+| Ours ties PatchTST and the linear models on MAE | Pooled differences within 0.2, mostly not significant; ours beats `linear_mse` on raw MAE (p = 0.03) |
+| Probabilistically ours is mid-table | Behind XGBoost under both treatments and PatchTST on raw prices; ahead of DLinear and `linear_mse` on capped prices |
+| The negative-price tail is ours under every comparison | CRPS~ on negative-price hours 15.49 against 17.11 (XGBoost) and 18.7 (others); q05 pinball 4.59 against 6.25 and 7.7; the same on capped prices (15.62, 4.58) |
+| The cost is over-wide intervals elsewhere | 90% coverage 93.5% against 86.6-89.4%, CRPS~ 11.02 against 9.7-10.0 in the 0-100 band, and 25% negative false alarms against 13-19% |
+
+## AEMO predispatch inputs, static split
+
+Branch `feature/predispatch-inputs`. AEMO's predispatch re-runs dispatch every
+30 minutes with the current offers and publishes regional prices and
+quantities up to the end of the next trading day; RE-Price's WattClarity news
+is largely commentary on it and on other AEMO data.
+[`forecasting/build_predispatch_exogenous.py`](../../forecasting/build_predispatch_exogenous.py)
+takes, for each hourly origin, the latest run published by then
+(PREDISPATCHPRICE and PREDISPATCHREGIONSUM from the MMSDM `PREDISP_ALL_DATA`
+archive, 2015-2024, 4.7 GB) and gives price, total demand, available
+generation, and net interchange for the 24 hours, plus a coverage flag (93% of
+hours; runs published 04:00-12:30 end before the 24th hour). October 2022 has
+no run history in the archive and is filled as uncovered with 2015-2021
+medians ([`predispatch/predispatch_summary.json`](predispatch/predispatch_summary.json)).
+The `predispatch_exogenous` block appends the features to the future
+exogenous inputs, so every model reads them; the price goes through the
+target's asinh transform.
+
+Used directly as a forecast, predispatch has test MAE 147.5 / 153.3 / 69.4
+(NSW1 / QLD1 / TAS1), inflated by spikes that do not happen, with median
+absolute error 18.6 / 19.6 / 17.1.
+
+Screen on the static split, raw prices, seeds 2026-2028 (configurations
+`configs/aemo_forecast_pd_*.yaml`; metrics in [`predispatch/`](predispatch/)):
+
+| Raw prices, static split | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Linear base only | 47.80 / 41.82 / 32.24 | 40.62 ± 0.02 | 77.87 | 449.34 | 29.67 |
+| Linear base only + predispatch | 45.32 / 39.72 / 30.29 | 38.44 ± 0.11 | 75.26 | 413.64 | 27.48 |
+| Linear base + fields | 48.17 / 42.56 / 33.88 | 41.54 ± 0.02 | 78.76 | 399.89 | 28.35 |
+| Linear base + fields + predispatch | 45.70 / 41.22 / 30.92 | 39.28 ± 0.25 | 76.97 | 390.46 | 27.00 |
+| XGBoost | 50.85 / 44.70 / 33.89 | 43.15 ± 0.07 | 81.65 | 414.32 | 27.69 |
+| XGBoost + predispatch | 45.25 / 39.33 / 29.34 | 37.97 ± 0.01 | 76.20 | 391.16 | 25.37 |
+| linear_mse | 47.88 / 41.53 / 32.14 | 40.52 ± 0.03 | 77.71 | 394.28 | 26.47 |
+| linear_mse + predispatch | 45.78 / 40.26 / 31.12 | 39.05 ± 0.34 | 75.95 | 359.83 | 24.81 |
+
+Diebold-Mariano on per-origin MAE ([`significance/raw_predispatch_static_mae.json`](significance/raw_predispatch_static_mae.json))
+and CRPS~ ([`significance/raw_predispatch_static_crps.json`](significance/raw_predispatch_static_crps.json)):
+
+| Comparison | Pooled | NSW1 / QLD1 / TAS1 |
+|---|---|---|
+| XGBoost with minus without predispatch, MAE | -5.17 (p < 0.0001) | -5.60 / -5.37 / -4.55 |
+| Base + fields with minus without predispatch, MAE | -2.25 (p < 0.0001) | -2.46 / -1.34 / -2.96 |
+| XGBoost + predispatch minus base only + predispatch, MAE | -0.47 (p = 0.13) | -0.07 / -0.39 / -0.95 (p < 0.001) |
+| XGBoost + predispatch minus base + fields + predispatch, MAE | -1.31 (p < 0.0001) | -0.45 / -1.89 / -1.58 |
+| Base + fields minus base only, both with predispatch, MAE | +0.84 (p < 0.0001) | +0.38 / +1.50 / +0.64 |
+| Base + fields minus base only, both with predispatch, CRPS~ | -1.02 (p < 0.0001) | -1.25 / -0.89 / -0.92 |
+| Base + fields minus XGBoost, both with predispatch, CRPS~ | +0.99 (p < 0.0001) | +0.64 / +1.37 / +0.97 |
+
+| Finding | Evidence |
+|---|---|
+| Predispatch is information the other inputs lack | Every model improves by 1.5-5.2 MAE, significantly in every region; XGBoost most, from 43.15 to 37.97 |
+| The trees use it best | XGBoost with predispatch is the best model, ahead of the dual-field model by 1.31 MAE and 0.99 CRPS~ |
+| The fields still cost point accuracy and help the base's intervals | Same pattern as without predispatch: +0.84 MAE, -1.02 CRPS~ against the base alone |
+
+## Predispatch inputs under quarterly recalibration
+
+The dual-field models (`pd_linear_base{,_only}`, raw and capped) and the
+baselines (XGBoost, PatchTST, DLinear, `linear_mse`) with the predispatch
+inputs, all refit every test quarter (`forecasting.rolling`; 288 dual-field and
+576 baseline refits; `scripts/run_rolling.sh` with `STATIC_REF`,
+`scripts/run_rolling_baselines.sh` with `CONFIG_NAME=pd_baseline`). Seeds
+2026-2028; metrics in [`predispatch_rolling/`](predispatch_rolling/) and
+[`baselines_rolling_pd/`](baselines_rolling_pd/).
+
+| raw, rolling, with predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 44.59 / 39.43 / 27.75 | 37.26 ± 0.16 | 74.65 | 90.80 | 378.99 | 25.47 |
+| Linear base only | 44.86 / 39.01 / 28.91 | 37.60 ± 0.03 | 74.35 | 91.50 | 401.19 | 26.04 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+| PatchTST | 46.68 / 40.03 / 29.84 | 38.85 ± 0.07 | 75.94 | 89.46 | 355.33 | 24.33 |
+| DLinear | 46.09 / 39.54 / 28.98 | 38.20 ± 0.09 | 76.11 | 88.28 | 338.65 | 23.62 |
+| linear_mse | 45.16 / 39.51 / 29.10 | 37.92 ± 0.02 | 74.78 | 88.15 | 339.70 | 23.66 |
+
+| capped650, rolling, with predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Linear base + fields (ours) | 26.15 / 27.16 / 24.75 | 26.02 ± 0.04 | 37.17 | 91.02 | 170.81 | 14.20 |
+| Linear base only | 26.77 / 27.46 / 25.92 | 26.72 ± 0.00 | 38.08 | 91.21 | 183.77 | 14.96 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+| PatchTST | 28.77 / 28.67 / 26.87 | 28.10 ± 0.07 | 40.00 | 89.48 | 188.61 | 15.12 |
+| DLinear | 29.01 / 28.44 / 26.02 | 27.82 ± 0.05 | 41.50 | 88.14 | 185.67 | 14.96 |
+| linear_mse | 27.09 / 27.84 / 26.11 | 27.01 ± 0.01 | 38.42 | 87.80 | 186.12 | 14.98 |
+
+Diebold-Mariano, ours minus each model, pooled over regions
+([`significance/*_rolling_predispatch_{mae,crps}.json`](significance/)):
+
+| Ours minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Linear base only | **-0.34 (p = 0.01)** | **-1.13 (p < 0.0001)** | **-0.70 (p < 0.0001)** | **-0.94 (p < 0.0001)** |
+| XGBoost | +1.74 (p < 0.0001) | +1.40 (p < 0.0001) | +1.48 (p < 0.0001) | +0.55 (p < 0.0001) |
+| PatchTST | **-1.59 (p < 0.0001)** | +0.09 (p = 0.81) | **-2.08 (p < 0.0001)** | **-1.45 (p < 0.0001)** |
+| DLinear | **-0.94 (p = 0.006)** | +0.87 (p = 0.05) | **-1.80 (p < 0.0001)** | **-1.22 (p < 0.0001)** |
+| `linear_mse` | **-0.66 (p < 0.0001)** | +0.82 (p = 0.06) | **-0.99 (p < 0.0001)** | **-1.25 (p < 0.0001)** |
+
+Tail scores on seed-averaged quantiles, raw prices
+([`predispatch_rolling/raw_tail_metrics.json`](predispatch_rolling/raw_tail_metrics.json),
+[`predispatch_rolling/capped650_tail_metrics.json`](predispatch_rolling/capped650_tail_metrics.json)):
+
+| Model | CRPS~ | CRPS~ below 0 | CRPS~ 0-100 | CRPS~ 100-300 | CRPS~ above 300 | q05 pinball, negative hours | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ours | 24.27 | **15.04** | 9.49 | **18.14** | 837.50 | **4.35** | 93.7% |
+| Linear base only | 25.39 | 16.21 | 10.25 | 17.53 | 882.33 | 5.82 | 93.1% |
+| XGBoost | **22.86** | 15.96 | **8.22** | 18.45 | 790.55 | 6.13 | 87.7% |
+| DLinear | 23.40 | 17.25 | 8.55 | 21.33 | **740.25** | 7.33 | 89.1% |
+
+| Finding | Evidence |
+|---|---|
+| With predispatch and recalibration the fields help both point and interval accuracy | Against the same base: -0.34 / -0.70 MAE and -1.13 / -0.94 CRPS~ (raw / capped), all significant; without predispatch the MAE difference was not significant, and on the static split the fields cost 0.9 |
+| Ours is the best model other than XGBoost | Significantly lower MAE than PatchTST, DLinear, and `linear_mse` under both treatments, and lower capped CRPS~ |
+| XGBoost stays ahead | +1.74 raw and +1.48 capped MAE against ours; 78% (raw) and 70% (capped) of the gap is in the 100-300 band and 32-39% in negative prices, while ours is closer on spike hours (-27% and -16% of the gap) ([`predispatch_rolling/`](predispatch_rolling/)) |
+| The negative-price lower tail remains ours | q05 pinball on negative-price hours 4.35 against 5.82-7.38 for every other model; CRPS~ below 0 15.04 against 15.96 (XGBoost) |
+| Every model gains from predispatch under recalibration | XGBoost 39.53 to 35.52 raw, 28.59 to 24.54 capped; ours 40.13 to 37.26 and 28.98 to 26.02 |
+
+## Nonlinear predispatch correction
+
+Branch `feature/predispatch-calibration`. Two ways to let the dual-field model
+bend its response to predispatch, on top of base + fields with predispatch,
+under quarterly recalibration (raw and capped, seeds 2026-2028, 288 refits;
+metrics in [`predispatch_calibration/`](predispatch_calibration/)):
+
+- (A) hinge features, `configs/aemo_forecast_{,capped650_}pd_hinge.yaml`: the
+  excess of the asinh predispatch price above its training 0.5/0.75/0.9/0.95/0.99
+  quantiles (`excess_features`, `excess_above_train_quantiles` in the
+  `predispatch_exogenous` block);
+- (B) calibrator, `configs/aemo_forecast_{,capped650_}pd_calibrator.yaml`
+  (`calibrator_hidden: 32`): one two-layer MLP shared by the forecast hours that
+  reads each hour's known inputs (predispatch, spare capacity, net load,
+  calendar), a horizon embedding, and the last price and its 24-hour mean, and
+  adds corrections to the point and quantile forecasts; its output layer starts
+  at zero.
+
+| raw, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Base + fields + calibrator (B) | 44.32 / 39.39 / 27.14 | 36.95 ± 0.12 | 74.07 | 89.61 | 369.16 | 25.13 |
+| Base + fields + hinge features (A) | 44.10 / 39.05 / 27.88 | 37.01 ± 0.08 | 74.45 | 89.76 | 352.24 | 24.67 |
+| Base + fields (previous) | 44.59 / 39.43 / 27.75 | 37.26 ± 0.16 | 74.65 | 90.80 | 378.99 | 25.47 |
+| Linear base only | 44.86 / 39.01 / 28.91 | 37.60 ± 0.03 | 74.35 | 91.50 | 401.19 | 26.04 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+| linear_mse | 45.16 / 39.51 / 29.10 | 37.92 ± 0.02 | 74.78 | 88.15 | 339.70 | 23.66 |
+
+| capped650, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Base + fields + calibrator (B) | 25.70 / 26.63 / 24.41 | 25.58 ± 0.19 | 36.40 | 89.62 | 166.22 | 13.83 |
+| Base + fields + hinge features (A) | 25.45 / 26.44 / 24.98 | 25.63 ± 0.04 | 36.48 | 89.60 | 166.34 | 13.95 |
+| Base + fields (previous) | 26.15 / 27.16 / 24.75 | 26.02 ± 0.04 | 37.17 | 91.02 | 170.81 | 14.20 |
+| Linear base only | 26.77 / 27.46 / 25.92 | 26.72 ± 0.00 | 38.08 | 91.21 | 183.77 | 14.96 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+| linear_mse | 27.09 / 27.84 / 26.11 | 27.01 ± 0.01 | 38.42 | 87.80 | 186.12 | 14.98 |
+
+Diebold-Mariano, calibrator minus each model, pooled
+([`significance/*_predispatch_calibration_{mae,crps}.json`](significance/)):
+
+| Calibrator minus | Raw MAE | Raw CRPS~ | Capped MAE | Capped CRPS~ |
+|---|---|---|---|---|
+| Base + fields (previous) | **-0.31 (p = 0.01)** | **-0.26 (p = 0.04)** | **-0.44 (p < 0.0001)** | **-0.23 (p < 0.0001)** |
+| Hinge features | -0.06 (p = 0.60) | +0.69 (p = 0.03) | -0.05 (p = 0.56) | +0.03 (p = 0.53) |
+| XGBoost | +1.43 (p < 0.0001) | +1.14 (p < 0.0001) | +1.04 (p < 0.0001) | +0.32 (p < 0.0001) |
+| `linear_mse` | **-0.97 (p < 0.0001)** | +0.56 (p = 0.12) | **-1.43 (p < 0.0001)** | **-1.47 (p < 0.0001)** |
+
+Per region against XGBoost (MAE, raw / capped): NSW1 +0.98 / +0.50, QLD1 +2.92 /
++1.85, TAS1 +0.39 (p = 0.02) / +0.76; CRPS~ in TAS1 is tied (p = 0.74 / 0.91).
+
+Tail scores (seed-averaged quantiles; [`predispatch_calibration/raw_tail_metrics.json`](predispatch_calibration/raw_tail_metrics.json),
+[`predispatch_calibration/capped650_tail_metrics.json`](predispatch_calibration/capped650_tail_metrics.json)):
+
+| Model | Raw CRPS~ below 0 | Raw CRPS~ above 300 | Raw q05 pinball, negative | Capped CRPS~ below 0 | Capped CRPS~ above 300 |
+|---|---:|---:|---:|---:|---:|
+| Calibrator | **14.17** | 800.30 | **4.30** | **13.99** | **121.10** |
+| Hinge features | 15.54 | **761.58** | 4.40 | 15.22 | 124.05 |
+| Previous | 15.04 | 837.50 | 4.35 | 15.00 | 137.59 |
+| XGBoost | 15.96 | 790.55 | 6.13 | 15.47 | 138.29 |
+
+| Finding | Evidence |
+|---|---|
+| Both corrections help, by about the same on MAE | Calibrator -0.31 / -0.44 MAE (raw / capped) against the previous model; hinge features -0.25 / -0.39; calibrator and hinge features do not differ significantly on MAE |
+| The gap to XGBoost narrows but stays | From +1.74 / +1.48 to +1.43 / +1.04 MAE; QLD1 holds most of it (+2.92 / +1.85) |
+| The calibrator improves the tails most | Lowest negative-hour CRPS~ and q05 pinball of all models, and on capped prices the lowest spike-hour CRPS~ (121.1 against 138.3 for XGBoost) |
+
+## QLD1 gap to XGBoost: diagnosis
+
+Branch `feature/qld1-diagnosis`.
+[`forecasting/gap_diagnosis.py`](../../forecasting/gap_diagnosis.py) splits the
+absolute-error gap between two seed-ensemble forecasters over bins of one
+condition at a time. Here: the calibrator model against XGBoost, both refit
+quarterly with predispatch, QLD1, raw prices (MAE 38.56 against 36.25 for the
+ensembles; full tables in [`qld1_diagnosis/`](qld1_diagnosis/)).
+
+| Condition | Share of hours | MAE ours | MAE XGBoost | Share of the gap |
+|---|---:|---:|---:|---:|
+| Actual price at or below 0 | 13.2% | 25.76 | 17.56 | +47% |
+| Actual price 200-300 | 6.9% | 73.69 | 60.00 | +41% |
+| Actual price above 300 | 1.8% | 776.52 | 815.43 | -31% |
+| Predispatch price at or below 0 | 12.5% | 22.65 | 15.85 | +37% |
+| Lowest PD PASA net-load quintile | 20.0% | 23.64 | 18.15 | +48% |
+| Highest spare-capacity quintile | 20.0% | 21.82 | 17.17 | +40% |
+| Delivered 16:00-19:00 | 16.7% | 120.47 | 116.69 | +27% |
+
+The gap is spread evenly over horizons (23-27% per quarter of the day ahead)
+and over test quarters except 2024Q1, where ours is ahead.
+
+| Finding | Evidence |
+|---|---|
+| Half of the gap is the negative-price, high-solar hours | Actual <= 0, predispatch <= 0, low net load, and ample spare capacity each carry 37-48% of the gap (largely the same hours) |
+| The model over-extrapolates negative prices | Ours predicts below -100 AUD/MWh in 0.23% of hours, against 0.01% of actual prices and none for XGBoost; on negative-price hours its 1st percentile is -110 against -61 actual. The 3.2% of hours where ours predicts below -50 hold 31% of the gap (MAE 79 against 13). A linear head extrapolates in asinh space and the inverse transform inflates it; trees stay inside the training range |
+| A floor recovers part of it, but needs a validation-chosen level | Clipping our forecasts at the 2015-2022 0.5% price quantile lowers QLD1 MAE from 39.39 to 38.55 (floor -41.2), but raises NSW1 from 44.32 to 44.46 (floor -8.5); the 0.1% quantile changes little (39.17 QLD1) |
+| The rest is dispersion in the 100-300 band and evening peaks | In 200-300 our bias is smaller (-16 against -43) but MAE larger (73.7 against 60.0); ours is better on spike hours |
+
+## Validation-chosen price floor
+
+Branch `feature/price-floor`. [`forecasting/price_floor.py`](../../forecasting/price_floor.py)
+clips the calibrator model's quarterly-refit forecasts from below. For each
+refit and region the level is chosen on that refit's validation quarter only,
+seed-averaged: none, or the 0.05/0.1/0.2/0.5/1% quantile of the refit's
+training prices capped at zero; the point forecast's floor by validation MAE,
+the quantiles' floor by validation CRPS~. No retraining: the existing
+checkpoints predict the validation and test quarters. Chosen point floors are
+mostly -40 to -48 AUD/MWh in QLD1, -11 to -27 in TAS1, and vary in NSW1
+([`price_floor/paper_metrics/`](price_floor/paper_metrics/), `choices_*.json`).
+
+| raw, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Calibrator + price floor | 44.27 / 38.57 / 27.07 | 36.64 ± 0.14 | 73.69 | 88.73 | 367.84 | 25.07 |
+| Calibrator | 44.32 / 39.39 / 27.14 | 36.95 ± 0.12 | 74.07 | 89.61 | 369.16 | 25.13 |
+| XGBoost | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 86.65 | 347.59 | 23.11 |
+
+| capped650, rolling, predispatch | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% PICP | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|---:|
+| Calibrator + price floor | 25.64 / 25.89 / 24.35 | 25.29 ± 0.17 | 36.07 | 88.87 | 165.76 | 13.80 |
+| Calibrator | 25.70 / 26.63 / 24.41 | 25.58 ± 0.19 | 36.40 | 89.62 | 166.22 | 13.83 |
+| XGBoost | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 85.59 | 160.68 | 13.10 |
+
+Diebold-Mariano ([`significance/*_price_floor_{mae,crps}.json`](significance/)):
+floor minus calibrator, MAE -0.31 raw and -0.29 capped (pooled p < 0.0001,
+significant in every region; QLD1 -0.82 / -0.74); CRPS~ -0.03 (p = 0.006) and
+-0.02 (p = 0.13). Floor minus XGBoost, MAE +1.12 raw (TAS1 +0.31, p = 0.06)
+and +0.75 capped; CRPS~ +1.11 and +0.31, tied in TAS1.
+
+The floor gives up a little of the negative-price lower tail (raw q05 pinball
+on negative hours 4.74 against 4.30), still the best of all models (XGBoost
+6.13) ([`price_floor/raw_tail_metrics.json`](price_floor/raw_tail_metrics.json)).
+
+## Predispatch interconnector inputs
+
+Branch `feature/interconnector-inputs`. `build-interconnector` in
+[`forecasting/build_predispatch_exogenous.py`](../../forecasting/build_predispatch_exogenous.py)
+reads PREDISPATCHINTERCONNECTORRES (MMSDM `PREDISP_ALL_DATA`, 2015-2024, 119
+of 120 months; October 2022 is missing as for the price tables) and gives each
+region, from the latest run published by the origin: net import over its
+interconnectors (NSW1: QNI, VIC1-NSW1, Terranora; QLD1: QNI, Terranora; TAS1:
+Basslink), room for more import and for more export within the limits, import
+room on the main link, and a coverage flag. The predispatch marginal value is
+always zero, so binding is read from flows against limits. The
+`interconnector_exogenous` block appends these after the predispatch inputs.
+Our calibrator model and XGBoost were refit quarterly with them (raw and
+capped, seeds 2026-2028, 288 refits); ours then takes the validation-chosen
+price floor. Metrics in [`interconnector/`](interconnector/),
+[`baselines_rolling_ic/`](baselines_rolling_ic/), and
+[`price_floor/paper_metrics/`](price_floor/paper_metrics/).
+
+| raw, rolling | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Ours + interconnector + floor | 44.54 / 38.26 / 27.24 | 36.68 ± 0.18 | 73.73 | 369.98 | 25.29 |
+| Ours + interconnector | 44.52 / 39.23 / 27.30 | 37.02 ± 0.16 | 74.15 | 371.09 | 25.34 |
+| Ours + floor (predispatch only) | 44.27 / 38.57 / 27.07 | 36.64 ± 0.14 | 73.69 | 367.84 | 25.07 |
+| XGBoost + interconnector | 43.36 / 36.47 / 26.56 | 35.47 ± 0.02 | 73.09 | 348.22 | 23.11 |
+| XGBoost (predispatch only) | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 347.59 | 23.11 |
+
+| capped650, rolling | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Ours + interconnector + floor | 26.01 / 26.09 / 24.35 | 25.48 ± 0.10 | 36.29 | 165.12 | 13.81 |
+| Ours + interconnector | 26.02 / 26.98 / 24.40 | 25.80 ± 0.09 | 36.68 | 165.88 | 13.85 |
+| Ours + floor (predispatch only) | 25.64 / 25.89 / 24.35 | 25.29 ± 0.17 | 36.07 | 165.76 | 13.80 |
+| XGBoost + interconnector | 25.17 / 24.80 / 23.49 | 24.49 ± 0.03 | 35.44 | 160.33 | 13.08 |
+| XGBoost (predispatch only) | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 160.68 | 13.10 |
+
+Diebold-Mariano ([`significance/*_interconnector_{mae,crps}.json`](significance/)),
+ours with minus without interconnector inputs (both with the floor): MAE +0.04
+raw (p = 0.51; NSW1 +0.27, QLD1 -0.31, both p = 0.01) and +0.19 capped
+(p = 0.0001); CRPS~ +0.04 (p = 0.40) and -0.04 (p = 0.11). XGBoost gains 0.05
+MAE. Ours minus XGBoost with interconnector inputs: +1.21 raw and +1.00 capped
+MAE (QLD1 +1.79 / +1.29, from +2.10 / +1.11 before).
+
+The interconnector solution adds almost nothing beyond the predispatch price,
+which is computed with the same network constraints.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.

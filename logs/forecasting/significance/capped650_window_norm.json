@@ -1,0 +1,126 @@
+{
+  "reference": "linear_base_only",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "linear_base_only": 3,
+    "linear_base": 3,
+    "linear_base_dgf_only": 3,
+    "window_norm": 3,
+    "window_norm_dgf_only": 3
+  },
+  "comparisons": {
+    "linear_base": {
+      "NSW1": {
+        "mean_difference": -0.5183156183738272,
+        "statistic": -3.5530962479183197,
+        "p_value": 0.0003807251390401343,
+        "reference_mae": 29.145658157393605,
+        "other_mae": 29.66397377576743
+      },
+      "QLD1": {
+        "mean_difference": -0.41983347499528373,
+        "statistic": -3.1229915402897923,
+        "p_value": 0.0017902289353384066,
+        "reference_mae": 29.97521169571124,
+        "other_mae": 30.395045170706528
+      },
+      "TAS1": {
+        "mean_difference": -1.9011210492195258,
+        "statistic": -12.24733529130837,
+        "p_value": 1.7360690470340774e-34,
+        "reference_mae": 29.060572940626923,
+        "other_mae": 30.96169398984644
+      },
+      "three_region_mean": {
+        "mean_difference": -0.9464233808628789,
+        "statistic": -9.071405597914705,
+        "p_value": 1.1749142042414293e-19
+      }
+    },
+    "linear_base_dgf_only": {
+      "NSW1": {
+        "mean_difference": -0.7266861049063787,
+        "statistic": -4.651107877523553,
+        "p_value": 3.301565556759362e-06,
+        "reference_mae": 29.145658157393605,
+        "other_mae": 29.87234426229998
+      },
+      "QLD1": {
+        "mean_difference": -0.5127714381854992,
+        "statistic": -4.121654003638984,
+        "p_value": 3.76161874810156e-05,
+        "reference_mae": 29.97521169571124,
+        "other_mae": 30.487983133896748
+      },
+      "TAS1": {
+        "mean_difference": -1.8104741255695802,
+        "statistic": -14.96528731899157,
+        "p_value": 1.2378814102540554e-50,
+        "reference_mae": 29.060572940626923,
+        "other_mae": 30.8710470661965
+      },
+      "three_region_mean": {
+        "mean_difference": -1.0166438895538192,
+        "statistic": -11.548294077279316,
+        "p_value": 7.530022673431106e-31
+      }
+    },
+    "window_norm": {
+      "NSW1": {
+        "mean_difference": -2.97976853684601,
+        "statistic": -7.656243973478169,
+        "p_value": 1.9144986260682645e-14,
+        "reference_mae": 29.145658157393605,
+        "other_mae": 32.125426694239614
+      },
+      "QLD1": {
+        "mean_difference": -7.6864558726775725,
+        "statistic": -12.947223988368682,
+        "p_value": 2.436048441334256e-38,
+        "reference_mae": 29.97521169571124,
+        "other_mae": 37.661667568388815
+      },
+      "TAS1": {
+        "mean_difference": -1.1231550657828282,
+        "statistic": -6.840548636538127,
+        "p_value": 7.889045697598428e-12,
+        "reference_mae": 29.060572940626923,
+        "other_mae": 30.183728006409744
+      },
+      "three_region_mean": {
+        "mean_difference": -3.92979315843547,
+        "statistic": -15.649990016429056,
+        "p_value": 3.322716450542221e-55
+      }
+    },
+    "window_norm_dgf_only": {
+      "NSW1": {
+        "mean_difference": -2.424255083611769,
+        "statistic": -5.842355641097627,
+        "p_value": 5.146778171449569e-09,
+        "reference_mae": 29.145658157393605,
+        "other_mae": 31.569913241005374
+      },
+      "QLD1": {
+        "mean_difference": -4.3734767622804,
+        "statistic": -10.813628394244551,
+        "p_value": 2.9669757626455854e-27,
+        "reference_mae": 29.97521169571124,
+        "other_mae": 34.34868845799164
+      },
+      "TAS1": {
+        "mean_difference": -0.6228812905088084,
+        "statistic": -10.781848787227538,
+        "p_value": 4.193710012551342e-27,
+        "reference_mae": 29.060572940626923,
+        "other_mae": 29.68345423113573
+      },
+      "three_region_mean": {
+        "mean_difference": -2.473537712133659,
+        "statistic": -12.271669762546948,
+        "p_value": 1.2857413847392464e-34
+      }
+    }
+  }
+}

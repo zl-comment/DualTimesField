@@ -15,7 +15,7 @@ import sklearn
 import torch
 from torch.utils.data import DataLoader
 
-from .datasets import build_region_datasets, load_forecast_config
+from .datasets import build_region_datasets, load_forecast_config, APPENDED_FUTURE_BLOCKS
 from .losses import DualFieldForecastLoss
 from .models import DualFieldLinearForecaster
 
@@ -85,6 +85,13 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         calendar_dim=len(protocol["calendar_features"]),
         future_exogenous_dim=(
             config.get("future_exogenous", {}).get("dimension", 0)
+            + sum(
+                len(config[block]["features"])
+                + len(config[block].get("excess_features", []))
+                * len(config[block].get("excess_above_train_quantiles") or [])
+                for block in APPENDED_FUTURE_BLOCKS
+                if config.get(block, {}).get("enabled", False)
+            )
             if config.get("future_exogenous", {}).get("enabled", False)
             else 0
         ),
@@ -130,6 +137,12 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         detected_min_separation=model_config.get("detected_min_separation", 3),
         detected_learn_threshold=model_config.get("detected_learn_threshold", True),
         detected_baseline=model_config.get("detected_baseline", "median"),
+        linear_base=bool(model_config.get("linear_base", False)),
+        field_forecast=bool(model_config.get("field_forecast", True)),
+        field_normalization=model_config.get("field_normalization", "none"),
+        ctf_heads=bool(model_config.get("ctf_heads", True)),
+        field_point=bool(model_config.get("field_point", True)),
+        calibrator_hidden=int(model_config.get("calibrator_hidden", 0)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])

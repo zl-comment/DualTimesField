@@ -1,10 +1,12 @@
-% Table: Diebold-Mariano tests. Needs booktabs.
+% Table: Diebold-Mariano tests of the final model. Needs booktabs.
 \providecommand{\materialsdir}{.}
 \begin{table*}[t]
   \centering
-  \caption{Diebold--Mariano tests of absolute error, ours minus comparator
-    (negative favours ours). Pooled uses the three-region mean loss; DM is
-    its test statistic. $^{*}p<0.05$, $^{**}p<0.01$.}
+  \caption{Diebold--Mariano tests, ours minus comparator, in the main setting
+    (negative favours ours). Losses are per-origin MAE averaged over seeds and
+    per-origin CRPS of seed-averaged quantiles; $\Delta$ columns pool the
+    three regions, and NSW, QLD, TAS give the raw-price MAE difference per
+    region. Newey--West variance with 48 lags. $^{*}p<0.05$, $^{**}p<0.01$.}
   \label{tab:significance}
   \small
   \input{\materialsdir/tables/significance.tex}
