@@ -1,0 +1,10 @@
+zips: 119/120
+FAILED PREDISPATCHINTERCONNECTORRES_202210.zip: RuntimeError('Expected one PREDISPATCHINTERCONNECTORRES archive in https://www.nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/, found []')
+no archive for 2022-10; its origins are filled as uncovered
+NSW1 {'origins': 87671, 'dropped_origins': 0, 'stale_origins_filled': 739, 'duplicate_rows_dropped': 18648, 'covered_hours_share': 0.9295933090759773, 'first_origin': '2015-01-01 05:00:00', 'last_origin': '2025-01-01 03:00:00'}
+QLD1 {'origins': 87671, 'dropped_origins': 0, 'stale_origins_filled': 739, 'duplicate_rows_dropped': 18648, 'covered_hours_share': 0.9295933090759773, 'first_origin': '2015-01-01 05:00:00', 'last_origin': '2025-01-01 03:00:00'}
+TAS1 {'origins': 87671, 'dropped_origins': 0, 'stale_origins_filled': 739, 'duplicate_rows_dropped': 18648, 'covered_hours_share': 0.9295933090759773, 'first_origin': '2015-01-01 05:00:00', 'last_origin': '2025-01-01 03:00:00'}
+NSW1 {'train': 61273, 'validation': 8737, 'test': 17521} ('ic_net_import_mw', 'ic_import_room_mw', 'ic_export_room_mw', 'ic_main_import_room_mw', 'ic_covered')
+QLD1 {'train': 61273, 'validation': 8737, 'test': 17521} ('ic_net_import_mw', 'ic_import_room_mw', 'ic_export_room_mw', 'ic_main_import_room_mw', 'ic_covered')
+TAS1 {'train': 61273, 'validation': 8737, 'test': 17521} ('ic_net_import_mw', 'ic_import_room_mw', 'ic_export_room_mw', 'ic_main_import_room_mw', 'ic_covered')
+grids done

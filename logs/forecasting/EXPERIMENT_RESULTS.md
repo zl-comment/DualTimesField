@@ -2065,6 +2065,50 @@ The floor gives up a little of the negative-price lower tail (raw q05 pinball
 on negative hours 4.74 against 4.30), still the best of all models (XGBoost
 6.13) ([`price_floor/raw_tail_metrics.json`](price_floor/raw_tail_metrics.json)).
 
+## Predispatch interconnector inputs
+
+Branch `feature/interconnector-inputs`. `build-interconnector` in
+[`forecasting/build_predispatch_exogenous.py`](../../forecasting/build_predispatch_exogenous.py)
+reads PREDISPATCHINTERCONNECTORRES (MMSDM `PREDISP_ALL_DATA`, 2015-2024, 119
+of 120 months; October 2022 is missing as for the price tables) and gives each
+region, from the latest run published by the origin: net import over its
+interconnectors (NSW1: QNI, VIC1-NSW1, Terranora; QLD1: QNI, Terranora; TAS1:
+Basslink), room for more import and for more export within the limits, import
+room on the main link, and a coverage flag. The predispatch marginal value is
+always zero, so binding is read from flows against limits. The
+`interconnector_exogenous` block appends these after the predispatch inputs.
+Our calibrator model and XGBoost were refit quarterly with them (raw and
+capped, seeds 2026-2028, 288 refits); ours then takes the validation-chosen
+price floor. Metrics in [`interconnector/`](interconnector/),
+[`baselines_rolling_ic/`](baselines_rolling_ic/), and
+[`price_floor/paper_metrics/`](price_floor/paper_metrics/).
+
+| raw, rolling | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Ours + interconnector + floor | 44.54 / 38.26 / 27.24 | 36.68 ± 0.18 | 73.73 | 369.98 | 25.29 |
+| Ours + interconnector | 44.52 / 39.23 / 27.30 | 37.02 ± 0.16 | 74.15 | 371.09 | 25.34 |
+| Ours + floor (predispatch only) | 44.27 / 38.57 / 27.07 | 36.64 ± 0.14 | 73.69 | 367.84 | 25.07 |
+| XGBoost + interconnector | 43.36 / 36.47 / 26.56 | 35.47 ± 0.02 | 73.09 | 348.22 | 23.11 |
+| XGBoost (predispatch only) | 43.34 / 36.47 / 26.76 | 35.52 ± 0.02 | 73.14 | 347.59 | 23.11 |
+
+| capped650, rolling | MAE (NSW1 / QLD1 / TAS1) | Mean MAE | Window RMSE | 90% AIS | CRPS~ |
+|---|---|---:|---:|---:|---:|
+| Ours + interconnector + floor | 26.01 / 26.09 / 24.35 | 25.48 ± 0.10 | 36.29 | 165.12 | 13.81 |
+| Ours + interconnector | 26.02 / 26.98 / 24.40 | 25.80 ± 0.09 | 36.68 | 165.88 | 13.85 |
+| Ours + floor (predispatch only) | 25.64 / 25.89 / 24.35 | 25.29 ± 0.17 | 36.07 | 165.76 | 13.80 |
+| XGBoost + interconnector | 25.17 / 24.80 / 23.49 | 24.49 ± 0.03 | 35.44 | 160.33 | 13.08 |
+| XGBoost (predispatch only) | 25.20 / 24.78 / 23.65 | 24.54 ± 0.02 | 35.51 | 160.68 | 13.10 |
+
+Diebold-Mariano ([`significance/*_interconnector_{mae,crps}.json`](significance/)),
+ours with minus without interconnector inputs (both with the floor): MAE +0.04
+raw (p = 0.51; NSW1 +0.27, QLD1 -0.31, both p = 0.01) and +0.19 capped
+(p = 0.0001); CRPS~ +0.04 (p = 0.40) and -0.04 (p = 0.11). XGBoost gains 0.05
+MAE. Ours minus XGBoost with interconnector inputs: +1.21 raw and +1.00 capped
+MAE (QLD1 +1.79 / +1.29, from +2.10 / +1.11 before).
+
+The interconnector solution adds almost nothing beyond the predispatch price,
+which is computed with the same network constraints.
+
 ## All archived local versions
 
 The following table uses each run's canonical validation-selected checkpoint.
