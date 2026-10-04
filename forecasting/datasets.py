@@ -36,6 +36,10 @@ class PriceTransform:
         return sinh(values) * self.scale + self.location
 
 
+# Forecast blocks appended to the future exogenous inputs, in this order.
+APPENDED_FUTURE_BLOCKS = ("predispatch_exogenous", "interconnector_exogenous")
+
+
 def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
     if kind == "identity":
         return PriceTransform()
@@ -345,15 +349,17 @@ class AEMOForecastDataset(Dataset):
         # AEMO predispatch forecasts, appended to the future exogenous inputs so
         # that every reader of those inputs (DGF heads, gate, linear base, and
         # the baselines) sees them.
-        if config.get("predispatch_exogenous", {}).get("enabled", False):
+        for block in APPENDED_FUTURE_BLOCKS:
+            if not config.get(block, {}).get("enabled", False):
+                continue
             if not self.future_exogenous_by_origin:
-                raise ValueError("predispatch_exogenous needs future_exogenous")
-            names, _, predispatch = self._load_forecast_exogenous(frame, config, region, "predispatch_exogenous")
+                raise ValueError(f"{block} needs future_exogenous")
+            names, _, appended = self._load_forecast_exogenous(frame, config, region, block)
             self.future_exogenous_feature_names += names
             self.future_exogenous_by_origin = {
-                origin: np.concatenate([values, predispatch[origin]], axis=-1).astype(np.float32)
+                origin: np.concatenate([values, appended[origin]], axis=-1).astype(np.float32)
                 for origin, values in self.future_exogenous_by_origin.items()
-                if origin in predispatch
+                if origin in appended
             }
         # Forecast inputs for the CTF head (e.g. PD PASA net load).
         self.ctf_exogenous_feature_names: tuple[str, ...] = ()

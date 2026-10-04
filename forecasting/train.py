@@ -15,7 +15,7 @@ import sklearn
 import torch
 from torch.utils.data import DataLoader
 
-from .datasets import build_region_datasets, load_forecast_config
+from .datasets import build_region_datasets, load_forecast_config, APPENDED_FUTURE_BLOCKS
 from .losses import DualFieldForecastLoss
 from .models import DualFieldLinearForecaster
 
@@ -85,12 +85,12 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         calendar_dim=len(protocol["calendar_features"]),
         future_exogenous_dim=(
             config.get("future_exogenous", {}).get("dimension", 0)
-            + (
-                len(config["predispatch_exogenous"]["features"])
-                + len(config["predispatch_exogenous"].get("excess_features", []))
-                * len(config["predispatch_exogenous"].get("excess_above_train_quantiles") or [])
-                if config.get("predispatch_exogenous", {}).get("enabled", False)
-                else 0
+            + sum(
+                len(config[block]["features"])
+                + len(config[block].get("excess_features", []))
+                * len(config[block].get("excess_above_train_quantiles") or [])
+                for block in APPENDED_FUTURE_BLOCKS
+                if config.get(block, {}).get("enabled", False)
             )
             if config.get("future_exogenous", {}).get("enabled", False)
             else 0

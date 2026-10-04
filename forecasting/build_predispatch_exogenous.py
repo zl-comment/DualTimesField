@@ -23,6 +23,14 @@ Usage::
 
     python -m forecasting.build_predispatch_exogenous download --start 2015-01 --end 2024-12
     python -m forecasting.build_predispatch_exogenous build --start 2015-01 --end 2024-12
+    python -m forecasting.build_predispatch_exogenous download-interconnector ...
+    python -m forecasting.build_predispatch_exogenous build-interconnector ...
+
+``build-interconnector`` gives each region four hourly features from
+PREDISPATCHINTERCONNECTORRES over its interconnectors (NSW1: QNI, VIC1-NSW1,
+Terranora; QLD1: QNI, Terranora; TAS1: Basslink): net import, total room for
+more import and for more export within the limits, and the import room on the
+region's main link (VIC1-NSW1, QNI, Basslink; near zero when its limit binds).
 """
 
 from __future__ import annotations
@@ -122,11 +130,12 @@ def _download_one(year: int, month: int, table: str, cache_dir: Path, proxy: str
     return f"FAILED {path.name}: invalid archive"
 
 
-def download(start: str, end: str, cache_dir: Path, proxy: str | None, workers: int = 1) -> None:
+def download(start: str, end: str, cache_dir: Path, proxy: str | None, workers: int = 1,
+             tables: tuple[str, ...] = TABLES) -> None:
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     cache_dir.mkdir(parents=True, exist_ok=True)
-    tasks = [(year, month, table) for year, month in _months(start, end) for table in TABLES]
+    tasks = [(year, month, table) for year, month in _months(start, end) for table in tables]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [pool.submit(_download_one, y, m, t, cache_dir, proxy) for y, m, t in tasks]
         for future in as_completed(futures):
@@ -176,6 +185,81 @@ STALE_SECONDS = 6 * 3600
 TRAIN_END = pd.Timestamp("2022-01-01")
 
 
+def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str], covered_name: str,
+           output: Path) -> dict:
+    """Writes, for every hourly origin, the 24 hourly values of the latest run
+    available at the origin (``rows``: PREDISPATCHSEQNO, period_end, changed,
+    and the value ``columns`` for one region)."""
+    # Some monthly archives repeat the first days of the next month (e.g.
+    # 2016-08 holds the runs of 1-7 September); keep one copy of each row.
+    duplicates = int(rows.duplicated(["PREDISPATCHSEQNO", "period_end"]).sum())
+    rows = rows.sort_values("changed").drop_duplicates(["PREDISPATCHSEQNO", "period_end"], keep="last")
+    # A run is available once every one of its rows has been published.
+    availability = rows.groupby("PREDISPATCHSEQNO")["changed"].transform("max")
+    rows = rows.assign(available=availability).sort_values(["available", "PREDISPATCHSEQNO", "period_end"])
+    values = rows[columns].to_numpy(np.float64)
+    period_end = rows["period_end"].to_numpy(np.int64)
+    runs = rows.groupby("PREDISPATCHSEQNO", sort=False)["available"].first()
+    run_ids = runs.index.to_numpy()
+    run_available = runs.to_numpy(np.int64)
+    order = np.argsort(run_available, kind="stable")
+    run_ids, run_available = run_ids[order], run_available[order]
+    # Exact (run, half hour) lookup: a period missing from a run is uncovered.
+    run_position = pd.Series(np.arange(len(run_ids)), index=run_ids)[rows["PREDISPATCHSEQNO"].to_numpy()].to_numpy()
+    base = period_end.min()
+    slot = (period_end - base) // HALF_HOUR
+    keys = run_position.astype(np.int64) * (1 << 24) + slot
+    key_order = np.argsort(keys, kind="stable")
+    sorted_keys = keys[key_order]
+    first_origin = int(np.ceil(run_available[0] / 3600) * 3600)
+    last_origin = int(np.floor(run_available[-1] / 3600) * 3600)
+    origins = np.arange(first_origin, last_origin + 1, 3600, dtype=np.int64)
+    latest = np.searchsorted(run_available, origins, side="right") - 1
+    # Half hour j (0..47) of an origin ends at origin + (j + 1) * 30 min.
+    ends = origins[:, None] + (np.arange(48)[None, :] + 1) * HALF_HOUR
+    query = latest[:, None].astype(np.int64) * (1 << 24) + (ends - base) // HALF_HOUR
+    found = np.clip(np.searchsorted(sorted_keys, query), 0, len(sorted_keys) - 1)
+    covered = (sorted_keys[found] == query) & (ends >= base)
+    row_index = np.where(covered, key_order[found], 0)
+    if np.any(period_end[row_index][covered] != ends[covered]):
+        raise RuntimeError(f"{region}: predispatch lookup mismatch")
+    half = np.where(covered[..., None], values[row_index], np.nan)
+    hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(columns)), axis=2)
+    hour_covered = covered.reshape(len(origins), 24, 2).all(axis=2)
+    hourly[~hour_covered] = np.nan
+    stale = origins - run_available[latest] > STALE_SECONDS
+    hour_covered[stale] = False
+    hourly[stale] = np.nan
+    # Repeat the last covered hour over the uncovered tail.
+    filled = np.stack(
+        [pd.DataFrame(hourly[..., f]).ffill(axis=1).to_numpy() for f in range(len(columns))], axis=-1
+    )
+    train = (origins < (TRAIN_END - AEST_OFFSET - pd.Timestamp("1970-01-01")).total_seconds()) & ~stale
+    medians = np.nanmedian(filled[train].reshape(-1, len(columns)), axis=0)
+    filled[stale] = medians
+    complete = np.isfinite(filled).all(axis=(1, 2))
+    np.savez_compressed(
+        output,
+        forecast_origin_unix=origins[complete],
+        **{name: filled[complete][..., i].astype(np.float32) for i, name in enumerate(names)},
+        **{covered_name: hour_covered[complete].astype(np.float32)},
+        source_run_unix=run_available[latest][complete],
+        source_last_changed_unix=run_available[latest][complete],
+        source_run_seqno=run_ids[latest][complete].astype(np.int64),
+    )
+    summary = {
+        "origins": int(complete.sum()),
+        "dropped_origins": int((~complete).sum()),
+        "stale_origins_filled": int((stale & complete).sum()),
+        "duplicate_rows_dropped": duplicates,
+        "covered_hours_share": float(hour_covered[complete].mean()),
+        "first_origin": str(pd.to_datetime(origins[complete][0], unit="s") + AEST_OFFSET),
+        "last_origin": str(pd.to_datetime(origins[complete][-1], unit="s") + AEST_OFFSET),
+    }
+    print(region, summary, flush=True)
+    return summary
+
+
 def build(start: str, end: str, cache_dir: Path, output_dir: Path) -> dict:
     per_region = {region: [] for region in REGIONS}
     for year, month in _months(start, end):
@@ -187,87 +271,82 @@ def build(start: str, end: str, cache_dir: Path, output_dir: Path) -> dict:
             per_region[region].append(frame[frame["REGIONID"] == region].drop(columns="REGIONID"))
         print(f"read {year}-{month:02d}: {len(frame)} rows", flush=True)
     output_dir.mkdir(parents=True, exist_ok=True)
-    summary = {}
-    for region in REGIONS:
-        rows = pd.concat(per_region[region], ignore_index=True)
-        # Some monthly archives repeat the first days of the next month (e.g.
-        # 2016-08 holds the runs of 1-7 September); keep one copy of each row.
-        duplicates = int(rows.duplicated(["PREDISPATCHSEQNO", "period_end"]).sum())
-        rows = rows.sort_values("changed").drop_duplicates(["PREDISPATCHSEQNO", "period_end"], keep="last")
-        # A run is available once every one of its rows has been published.
-        availability = rows.groupby("PREDISPATCHSEQNO")["changed"].transform("max")
-        rows = rows.assign(available=availability).sort_values(["available", "PREDISPATCHSEQNO", "period_end"])
-        values = rows[[c for _, _, c in FIELDS]].to_numpy(np.float64)
-        period_end = rows["period_end"].to_numpy(np.int64)
-        runs = rows.groupby("PREDISPATCHSEQNO", sort=False)["available"].first()
-        run_ids = runs.index.to_numpy()
-        run_available = runs.to_numpy(np.int64)
-        order = np.argsort(run_available, kind="stable")
-        run_ids, run_available = run_ids[order], run_available[order]
-        # Exact (run, half hour) lookup: a period missing from a run is uncovered.
-        run_position = pd.Series(np.arange(len(run_ids)), index=run_ids)[rows["PREDISPATCHSEQNO"].to_numpy()].to_numpy()
-        base = period_end.min()
-        slot = (period_end - base) // HALF_HOUR
-        keys = run_position.astype(np.int64) * (1 << 24) + slot
-        key_order = np.argsort(keys, kind="stable")
-        sorted_keys = keys[key_order]
-        first_origin = int(np.ceil(run_available[0] / 3600) * 3600)
-        last_origin = int(np.floor(run_available[-1] / 3600) * 3600)
-        origins = np.arange(first_origin, last_origin + 1, 3600, dtype=np.int64)
-        latest = np.searchsorted(run_available, origins, side="right") - 1
-        # Half hour j (0..47) of an origin ends at origin + (j + 1) * 30 min.
-        ends = origins[:, None] + (np.arange(48)[None, :] + 1) * HALF_HOUR
-        query = latest[:, None].astype(np.int64) * (1 << 24) + (ends - base) // HALF_HOUR
-        found = np.clip(np.searchsorted(sorted_keys, query), 0, len(sorted_keys) - 1)
-        covered = (sorted_keys[found] == query) & (ends >= base)
-        row_index = np.where(covered, key_order[found], 0)
-        if np.any(period_end[row_index][covered] != ends[covered]):
-            raise RuntimeError(f"{region}: predispatch lookup mismatch")
-        # Diagnostic: half hours missing inside a run's covered span.
-        span_gaps = int(rows.groupby("PREDISPATCHSEQNO")["period_end"].agg(lambda e: (e.max() - e.min()) // HALF_HOUR + 1 - len(e)).sum())
-        half = np.where(covered[..., None], values[row_index], np.nan)
-        hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(FIELDS)), axis=2)
-        hour_covered = covered.reshape(len(origins), 24, 2).all(axis=2)
-        hourly[~hour_covered] = np.nan
-        stale = origins - run_available[latest] > STALE_SECONDS
-        hour_covered[stale] = False
-        hourly[stale] = np.nan
-        # Repeat the last covered hour over the uncovered tail.
-        filled = np.stack(
-            [pd.DataFrame(hourly[..., f]).ffill(axis=1).to_numpy() for f in range(len(FIELDS))], axis=-1
-        )
-        train = (origins < (TRAIN_END - AEST_OFFSET - pd.Timestamp("1970-01-01")).total_seconds()) & ~stale
-        medians = np.nanmedian(filled[train].reshape(-1, len(FIELDS)), axis=0)
-        filled[stale] = medians
-        complete = np.isfinite(filled).all(axis=(1, 2))
-        output = output_dir / f"{region.lower()}_predispatch.npz"
-        np.savez_compressed(
-            output,
-            forecast_origin_unix=origins[complete],
-            **{name: filled[complete][..., i].astype(np.float32) for i, (name, _, _) in enumerate(FIELDS)},
-            predispatch_covered=hour_covered[complete].astype(np.float32),
-            source_run_unix=run_available[latest][complete],
-            source_last_changed_unix=run_available[latest][complete],
-            source_run_seqno=run_ids[latest][complete].astype(np.int64),
-        )
-        summary[region] = {
-            "origins": int(complete.sum()),
-            "dropped_origins": int((~complete).sum()),
-            "stale_origins_filled": int((stale & complete).sum()),
-            "duplicate_rows_dropped": duplicates,
-            "half_hours_missing_inside_runs": span_gaps,
-            "covered_hours_share": float(hour_covered[complete].mean()),
-            "first_origin": str(pd.to_datetime(origins[complete][0], unit="s") + AEST_OFFSET),
-            "last_origin": str(pd.to_datetime(origins[complete][-1], unit="s") + AEST_OFFSET),
-        }
-        print(region, summary[region], flush=True)
+    summary = {
+        region: _align(region, pd.concat(per_region[region], ignore_index=True), [c for _, _, c in FIELDS],
+                       [n for n, _, _ in FIELDS], "predispatch_covered", output_dir / f"{region.lower()}_predispatch.npz")
+        for region in REGIONS
+    }
     (output_dir / "predispatch_summary.json").write_text(json.dumps(summary, indent=2))
+    return summary
+
+
+INTERCONNECTOR_TABLE = "PREDISPATCHINTERCONNECTORRES"
+# Interconnectors of each region and whether the region is the flow's
+# destination (positive MWFLOW runs from the first to the second region).
+REGION_INTERCONNECTORS = {
+    "NSW1": {"NSW1-QLD1": False, "VIC1-NSW1": True, "N-Q-MNSP1": False},
+    "QLD1": {"NSW1-QLD1": True, "N-Q-MNSP1": True},
+    "TAS1": {"T-V-MNSP1": False},
+}
+# The region's main import link, whose room is a separate feature.
+MAIN_LINK = {"NSW1": "VIC1-NSW1", "QLD1": "NSW1-QLD1", "TAS1": "T-V-MNSP1"}
+INTERCONNECTOR_FIELDS = ("ic_net_import_mw", "ic_import_room_mw", "ic_export_room_mw", "ic_main_import_room_mw")
+
+
+def _read_interconnector_month(cache_dir: Path, year: int, month: int) -> dict[str, pd.DataFrame]:
+    columns = ["PREDISPATCHSEQNO", "INTERCONNECTORID", "PERIODID", "INTERVENTION", "LASTCHANGED", "DATETIME",
+               "MWFLOW", "EXPORTLIMIT", "IMPORTLIMIT"]
+    frame = _read_table(_cache_path(cache_dir, INTERCONNECTOR_TABLE, year, month), INTERCONNECTOR_TABLE, columns)
+    frame = frame[frame["INTERVENTION"] == 0]
+    frame = frame.sort_values("LASTCHANGED").drop_duplicates(["PREDISPATCHSEQNO", "INTERCONNECTORID", "PERIODID"], keep="last")
+    frame["period_end"] = _parse_aest(frame["DATETIME"])
+    frame["changed"] = _parse_aest(frame["LASTCHANGED"])
+    result = {}
+    for region, links in REGION_INTERCONNECTORS.items():
+        part = frame[frame["INTERCONNECTORID"].isin(links)].copy()
+        inbound = part["INTERCONNECTORID"].map(links).to_numpy(bool)
+        flow, export, imp = (part[c].to_numpy(np.float64) for c in ("MWFLOW", "EXPORTLIMIT", "IMPORTLIMIT"))
+        part["inflow"] = np.where(inbound, flow, -flow)
+        # Room for more flow into and out of the region on this link.
+        part["import_room"] = np.maximum(np.where(inbound, export - flow, flow - imp), 0.0)
+        part["export_room"] = np.maximum(np.where(inbound, flow - imp, export - flow), 0.0)
+        part["main_import_room"] = np.where(part["INTERCONNECTORID"] == MAIN_LINK[region], part["import_room"], 0.0)
+        grouped = part.groupby(["PREDISPATCHSEQNO", "period_end"])
+        result[region] = pd.DataFrame({
+            "changed": grouped["changed"].max(),
+            "ic_net_import_mw": grouped["inflow"].sum(),
+            "ic_import_room_mw": grouped["import_room"].sum(),
+            "ic_export_room_mw": grouped["export_room"].sum(),
+            "ic_main_import_room_mw": grouped["main_import_room"].sum(),
+            "links": grouped["inflow"].size(),
+        }).reset_index()
+        # Keep half hours where every link of the region was solved.
+        result[region] = result[region][result[region]["links"] == len(links)].drop(columns="links")
+    return result
+
+
+def build_interconnector(start: str, end: str, cache_dir: Path, output_dir: Path) -> dict:
+    per_region = {region: [] for region in REGIONS}
+    for year, month in _months(start, end):
+        if not _cache_path(cache_dir, INTERCONNECTOR_TABLE, year, month).exists():
+            print(f"no archive for {year}-{month:02d}; its origins are filled as uncovered", flush=True)
+            continue
+        for region, rows in _read_interconnector_month(cache_dir, year, month).items():
+            per_region[region].append(rows)
+        print(f"read {year}-{month:02d}", flush=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    summary = {
+        region: _align(region, pd.concat(per_region[region], ignore_index=True), list(INTERCONNECTOR_FIELDS),
+                       list(INTERCONNECTOR_FIELDS), "ic_covered", output_dir / f"{region.lower()}_predispatch_interconnector.npz")
+        for region in REGIONS
+    }
+    (output_dir / "predispatch_interconnector_summary.json").write_text(json.dumps(summary, indent=2))
     return summary
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("download", "build"))
+    parser.add_argument("command", choices=("download", "build", "download-interconnector", "build-interconnector"))
     parser.add_argument("--start", default="2015-01")
     parser.add_argument("--end", default="2024-12")
     parser.add_argument("--cache-dir", type=Path, default=Path("data/aemo_exogenous/raw/predispatch"))
@@ -277,8 +356,12 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "download":
         download(args.start, args.end, args.cache_dir, args.proxy, args.workers)
-    else:
+    elif args.command == "download-interconnector":
+        download(args.start, args.end, args.cache_dir, args.proxy, args.workers, (INTERCONNECTOR_TABLE,))
+    elif args.command == "build":
         build(args.start, args.end, args.cache_dir, args.output_dir)
+    else:
+        build_interconnector(args.start, args.end, args.cache_dir, args.output_dir)
 
 
 if __name__ == "__main__":
