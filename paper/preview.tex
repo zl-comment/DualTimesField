@@ -11,21 +11,29 @@
 
 \begin{document}
 \input{components/fig_architecture}
-\section{Components}
-Figure~\ref{fig:architecture} shows the model, Figure~\ref{fig:field-separation}
-the field separation, Figure~\ref{fig:ablation-ladder} the development ladder,
-and Figure~\ref{fig:comparison} the same-data comparison. Tables
-\ref{tab:main}, \ref{tab:significance}, \ref{tab:ablations},
-\ref{tab:field-separation}, and \ref{tab:re-price} give the numbers.
+\section{Main components}
+Figure~\ref{fig:architecture} shows the model, Figure~\ref{fig:settings} the
+models across settings, and Figure~\ref{fig:comparison} the per-region
+comparison. Tables \ref{tab:main}, \ref{tab:significance}, \ref{tab:ablations},
+\ref{tab:settings}, \ref{tab:tails}, and \ref{tab:re-price} give the numbers.
 
+\section{Supplementary components}
+Figure~\ref{fig:field-separation} and Table~\ref{tab:field-separation} show the
+field separation, Figure~\ref{fig:ablation-ladder} the static development
+ladder, and Table~\ref{tab:ablations-static} the structural ablations.
 
-\input{components/fig_field_separation}
+\input{components/fig_settings}
 \input{components/tab_main}
 \input{components/tab_significance}
-\input{components/tab_field_separation}
-\clearpage
-\input{components/fig_ablation_ladder}
 \input{components/tab_ablations}
+\input{components/tab_settings}
+\clearpage
 \input{components/fig_comparison}
+\input{components/tab_tails}
 \input{components/tab_re_price}
+\clearpage
+\input{components/fig_field_separation}
+\input{components/tab_field_separation}
+\input{components/fig_ablation_ladder}
+\input{components/tab_ablations_static}
 \end{document}

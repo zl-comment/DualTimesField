@@ -1,14 +1,16 @@
-% Table: main same-data comparison. Needs booktabs.
+% Table: main comparison (quarterly refit with predispatch). Needs booktabs.
 \providecommand{\materialsdir}{.}
 \begin{table*}[t]
   \centering
-  \caption{Same-data comparison on the 2023--2024 test set (17{,}521 hourly
-    origins per region, 24-hour horizon). All models use the same splits and
-    inputs, without news; cells are means over three seeds, and Mean MAE
-    shows the seed standard deviation. Window RMSE is averaged over forecast
-    windows; 90\% AIS is the average interval score of the 5--95\% interval;
-    CRPS is approximated by twice the mean pinball loss over the quantiles
-    0.05, 0.10, 0.50, 0.90, 0.95. Lower is better; best in bold.}
+  \caption{Main comparison on the 2023--2024 test set (17{,}521 hourly
+    origins per region, 24-hour horizon). Every model is refit before each
+    test quarter and uses the same inputs, including AEMO predispatch and no
+    news; cells are means over three seeds, and Mean MAE shows the seed
+    standard deviation. Ours includes the calibrator and the price floor;
+    Linear base only is ours without the dual fields. Window RMSE is averaged
+    over forecast windows; 90\% AIS is the average interval score of the
+    5--95\% interval; CRPS is approximated by twice the mean pinball loss over
+    the quantiles 0.05, 0.10, 0.50, 0.90, 0.95. Lower is better; best in bold.}
   \label{tab:main}
   \small
   \input{\materialsdir/tables/same_data_comparison.tex}

@@ -2,10 +2,12 @@
 \providecommand{\materialsdir}{.}
 \begin{table*}[t]
   \centering
-  \caption{Ours on prices capped at 650~AUD/MWh beside the numbers reported
-    by RE-Price (its Tables 2--3). The reported models use self-collected news
-    and an unstated spike treatment; the 650 cap is inferred from their error
-    ratios. This is a reference, not a same-data comparison.}
+  \caption{Ours (main setting, prices capped at 650~AUD/MWh) beside the
+    numbers reported by RE-Price (its Tables 2--3). The reported models use
+    self-collected news and an unstated spike treatment and are trained once;
+    the 650 cap is inferred from their error ratios. Ours uses AEMO
+    predispatch, which news commentary largely draws on, and quarterly refits.
+    This is a reference, not a same-data comparison.}
   \label{tab:re-price}
   \small
   \input{\materialsdir/tables/re_price_reference.tex}
