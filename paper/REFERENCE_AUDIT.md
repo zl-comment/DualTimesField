@@ -10,17 +10,19 @@ the statement actually cited, and full experimental reproducibility. Finding a
 publisher record is not a full-text or independent replication check. No paper
 is labelled fabricated merely because a direct request was blocked.
 
-**The useful additional document to obtain is the full RE-Price paper**:
+**RE-Price full-text check completed using the user-supplied 13-page PDF**:
 Chen et al., *Reasoning-enhanced probabilistic electricity price forecasting
 using parameter-efficient large language models*, DOI
 [10.1016/j.apenergy.2026.128712](https://doi.org/10.1016/j.apenergy.2026.128712).
-The publisher's indexed abstract, section extracts and CRediT statement confirm
-the title, DOI, four author names and broad method. The complete experimental
-tables, split protocol, information-availability controls and tuning budget were
-not accessible for verification. The inherited volume 426 also needs a final
-check against the PDF or publisher citation export. The revised manuscript
-therefore cites only its broad method, does not quote its percentage gains,
-and explicitly does not present it as a reproduced same-data competitor.
+The title, DOI, four author names, volume **426**, publication year **2026**
+and article number **128712** all agree with the existing BibTeX entry. Page 1
+records online publication on **28 August 2026**, so the browser's December
+2026 issue date does not imply that the paper was unavailable on the audit
+date. The full experimental setup and result tables can now be inspected;
+the previous request for this PDF and uncertainty about the volume are closed.
+The manuscript now describes the method and distinguishes its input/evaluation
+protocol from ours. This is a document audit, not an independent replication;
+remaining reproducibility questions are recorded below.
 
 For historical market-rule provenance, the newly cited AEMO procedure is the
 accessible **2026 version 19**, not a claimed archived 2024 version. Its section
@@ -63,7 +65,7 @@ conference year rather than their earlier arXiv submission year.
 | `marcjasz2023distributional` | [Authors' manuscript and journal reference](https://arxiv.org/abs/2207.02832) | Confirmed: distributional neural networks, Energy Economics 125, 106843, 2023. |
 | `ziel2018day` | [Publisher](https://www.sciencedirect.com/science/article/pii/S014098831730436X) | Confirmed: high-dimensional linear price forecasting. |
 | `tashman2000out` | [Publisher](https://www.sciencedirect.com/science/article/pii/S0169207000000650) | Confirmed: out-of-sample evaluation principles, not proof that our exact split or tail-test weighting is optimal. |
-| `chen2026reprice` | [Publisher abstract and section extracts](https://www.sciencedirect.com/science/article/pii/S0306261926013681) | Identity and broad method confirmed; full experimental protocol and publisher volume metadata remain to be checked as described above. |
+| `chen2026reprice` | User-supplied full publisher PDF; [publisher record](https://www.sciencedirect.com/science/article/pii/S0306261926013681) | Full-text check completed: Applied Energy 426 (2026), 128712; existing authors/DOI correct. Setup and tables checked; not a same-protocol comparison or independent replication. See detailed audit below. |
 | `zhang2003time` | [Publisher](https://www.sciencedirect.com/science/article/pii/S0925231201007020) | Confirmed: hybrid ARIMA/neural forecasting precedent. Normalized author given name to G. Peter. |
 | `gneiting2011making` | [Authors' manuscript](https://arxiv.org/abs/0912.0902) | Confirmed: point-forecast evaluation and loss-dependent targets. |
 | `zhang2026dualtimesfield` | [Official PMLR record](https://proceedings.mlr.press/v306/zhang26co.html) | Confirmed: ICML 2026, PMLR 306, 156544–156566. Added official volume/pages/URL; removed unverified venue location. Original reconstruction/interpolation setting is distinguished from our forecasting adaptation. |
@@ -87,6 +89,86 @@ Autoformer, SIREN, Fourier Features and the tabular-tree benchmark. Their
 identities and official links are confirmed; primary proceedings pagination
 was not retrieved in this audit. BibTeX reports these as non-fatal empty-page
 warnings. No page range was invented to suppress a warning.
+
+## RE-Price full-text follow-up
+
+Evidence: the user-supplied file
+`Reasoning-enhanced probabilistic electricity price forecasting using parameter-efficient large language models.pdf`,
+13 pages, SHA-256
+`a0f4aceafb3cb09778c027b7248e17da2ae9354564cbff8b4f70cd040e40d91d`.
+Page references below are printed PDF pages. The copyrighted full PDF is not
+copied into the Git repository.
+
+### Confirmed method and protocol
+
+- Pages 1 and 12: Haoxuan Chen, Yinliang Xu, Wenchuan Wu and Hongbin Sun;
+  accepted 20 August 2026, online 28 August 2026. No correction to the existing
+  BibTeX author, year, volume, article number or DOI fields is needed.
+- Sections 3–4, pages 3–7: news is distilled into impact categories and event
+  attributes, then combined with numerical features using cross-modal
+  attention. A frozen reasoning branch is distinguished from the adapted
+  forecasting backbone. Probabilistic trajectories come from Monte Carlo
+  dropout under standard and tail-aware prompts, not ordinary token sampling;
+  adaptive Gamma-kernel density estimation follows a positive-space shift.
+  Section 6 explicitly cautions that these are not exact samples from the
+  true conditional price distribution.
+- Section 5.1 and Table 1, page 8: hourly NSW, QLD and TAS data, 1 January
+  2015–31 December 2024; chronological 70/10/20 train/validation/test split;
+  72-hour history and 24-hour forecast horizon. Inputs include price, load
+  forecasts, weather proxies and more than 2,000 WattClarity articles.
+- Table 1: Qwen3-4B with 4-bit NF4, LoRA rank 8 and alpha 16; one LoRA-stage
+  epoch plus 50 main-stage epochs, Adam, learning rate 2e-4, batch size 32,
+  MSE loss, 100 generated scenarios and 10% tail-aware scenarios. Table 7
+  reports 11.54 million **trainable** parameters, not total backbone size.
+- Section 5.2, pages 8–9: the paper says all baselines receive its numerical
+  and extracted text inputs, with MiniLM sentence embeddings adapted to each
+  architecture. Comparators are GPT4TS, Informer, DeepAR, GRU and quantile
+  XGBoost. This is an internal same-input comparison, not the same inputs as
+  the present repository's benchmark.
+
+Tables 2–3 (page 9) report the following RE-Price results. They are transcribed
+as evidence only and must not be merged into our benchmark tables:
+
+| Region | Reported MAE | Reported CRPS |
+|---|---:|---:|
+| NSW | 23.48 | 17.36 |
+| QLD | 25.85 | 20.58 |
+| TAS | 18.96 | 13.13 |
+
+### Remaining interpretation and reproducibility limits
+
+1. **Weather availability needs care.** Section 5.1 constructs its day-ahead
+   temperature proxy by adding Gaussian noise (standard deviation 1.5 degrees
+   Celsius) to observed daily temperatures. This is not an archived forecast
+   issued before the origin. Our assessment: adding noise alone does not
+   establish ex-ante availability, so the paper's stated intention to avoid
+   look-ahead bias is not independent evidence that this weather input is
+   point-in-time safe. Exact alignment would require code/data; this is not
+   a finding that every reported experiment is invalid.
+2. **News controls are described but not independently verified.** Section
+   3.3.2 uses the latest publication/edit timestamp and excludes subsequent
+   articles; Section 5.1 additionally removes update components. Section
+   3.3.3 explicitly says the extracted labels were not manually verified.
+   Auditing these safeguards requires the timestamped corpus and extraction
+   pipeline, not merely the paper's prose.
+3. **Protocol matching is incomplete.** The PDF reports split proportions,
+   not exact sample-index boundaries or an explicit forecast-origin stride.
+   Section 5.6 discusses monthly/quarterly updates as deployment options;
+   that does not establish that Tables 2–3 used the quarterly expanding-window
+   refits used in our main experiment. Price transformations, clipping rules
+   and target-window handling also require implementation-level matching.
+4. **Training configuration is available, exhaustive tuning provenance is
+   not.** Table 1 supplies the retained model settings. The PDF does not
+   establish per-baseline search budgets, repeated-seed uncertainty, or the
+   validation/test provenance of every selection in the tail-ratio sensitivity
+   study. Published point estimates should not be treated as our matched
+   Diebold–Mariano comparisons.
+
+Decision: retain and describe the citation more specifically, without importing
+its performance gains or claiming our model is better/worse by comparing
+unmatched table values. The user does not need to obtain this paper again.
+Code, archived forecasts and the timestamped news corpus would be needed only
+for a future reproduction or fair direct comparison.
 
 ## Alignment changes grounded in repository results
 
@@ -122,7 +204,8 @@ The preceding result audit checked generated tables against saved results and
 recomputed 108 metric sets from saved predictions (maximum observed absolute
 discrepancy approximately 4.5e-13). This revision does not change those numbers.
 The updated manuscript was rebuilt with `pdflatex`, `bibtex` and two further
-`pdflatex` passes (29 pages). Checks passed for all 33 unique/cited BibTeX keys,
+`pdflatex` passes (29 pages in the initial revision; 30 pages after the
+RE-Price full-text follow-up). Checks passed for all 33 unique/cited BibTeX keys,
 the six included figure copies, unchanged numerical tables, Python source
 syntax, absence of unresolved citations/references and overfull boxes, and
 `git diff --check`. The framework and its manuscript-page rendering were
