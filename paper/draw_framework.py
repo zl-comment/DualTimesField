@@ -1,9 +1,15 @@
-"""Editable vector overview; no illustrative traces or checkpoint dependency.
+"""Export the accepted native-image overview, or explicitly render the legacy one.
 
 Run ``.venv/bin/python paper/draw_framework.py`` from the repository root.
 The same function is called by ``paper/make_materials.py``.
+The accepted artwork and prompts live in ``figures/ai_generated``. PDF and SVG
+are raster containers, not editable vector reconstructions. No plot is data.
+Use ``--legacy`` only to reproduce the previous code-drawn overview.
 """
+import argparse
+import base64
 from pathlib import Path
+import shutil
 
 import matplotlib
 
@@ -127,10 +133,29 @@ def draw_framework():
         return fig
 
 
-def save_framework(directory=None):
-    """Use identical export settings in standalone and full-materials builds."""
+def save_framework(directory=None, *, legacy=False):
+    """Preserve the accepted illustration across full-materials rebuilds."""
     directory = Path(directory) if directory is not None else Path(__file__).resolve().parent / "figures"
     directory.mkdir(parents=True, exist_ok=True)
+    if not legacy:
+        from PIL import Image
+
+        source = Path(__file__).resolve().parent / "figures/ai_generated/figure_final.png"
+        if not source.is_file():
+            raise FileNotFoundError(f"Accepted artwork missing: {source}; restore it or explicitly use --legacy")
+        shutil.copy2(source, directory / "framework.png")
+        with Image.open(source) as artwork:
+            width, height = artwork.size
+            # Format conversion only: no redraw, resampling, or synthetic traces.
+            artwork.convert("RGB").save(directory / "framework.pdf", resolution=300.0)
+        encoded = base64.b64encode(source.read_bytes()).decode("ascii")
+        (directory / "framework.svg").write_text(
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">'
+            '<title>Dual-field forecasting architecture; illustrative signals</title>'
+            f'<image width="{width}" height="{height}" href="data:image/png;base64,{encoded}"/>'
+            '</svg>\n', encoding="utf-8")
+        return
     figure = draw_framework()
     with plt.rc_context({"pdf.fonttype": 42, "svg.fonttype": "none"}):
         for extension in ("pdf", "svg", "png"):
@@ -140,4 +165,6 @@ def save_framework(directory=None):
 
 
 if __name__ == "__main__":
-    save_framework()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy", action="store_true", help="Explicitly regenerate the old vector layout")
+    save_framework(legacy=parser.parse_args().legacy)
