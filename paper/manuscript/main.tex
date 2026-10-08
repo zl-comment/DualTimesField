@@ -1,0 +1,396 @@
+%% Manuscript prepared for Applied Energy (Elsevier, elsarticle class).
+%% Build: pdflatex main && bibtex main && pdflatex main && pdflatex main
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+\usepackage{microtype}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+
+\newcommand{\eg}{e.g.,\ }
+\newcommand{\ie}{i.e.,\ }
+\newcommand{\pd}{\mathrm{PD}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\med}{med}
+\DeclareMathOperator{\asinh}{asinh}
+
+\journal{Applied Energy}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{When does a trend--event decomposition help electricity price forecasting? Dual-field models with market-operator forecasts and quarterly recalibration}
+
+%% Author details to be completed by the author before submission.
+\author[inst1]{zl\corref{cor1}}
+\ead{[e-mail]}
+\cortext[cor1]{Corresponding author.}
+\affiliation[inst1]{organization={[Affiliation]},
+            city={[City]},
+            country={[Country]}}
+
+\begin{abstract}
+Wholesale electricity prices in markets with high renewable shares combine a slowly moving level with sparse events: scarcity spikes and, increasingly, negative-price troughs. Decomposing a series into a continuous trend and discrete events, as reconstruction models such as DualTimesField do, is a natural prior. We ask whether it improves day-ahead forecasting, and when. We adapt the dual-field structure to forecasting the next 24 hourly prices in three regions of the Australian National Electricity Market (2023--2024 test period, 17{,}521 origins per region) by detecting price events explicitly, adding the fields as a residual to a linear base, and conditioning on point-in-time forecasts from the market operator. Fitted once on 2015--2021, the decomposition does not help: a linear model with the same inputs is more accurate, because the fields add no information about the future and overfit a price regime that shifted after 2021. Two changes reverse this. Refitting before each test quarter removes most of the regime shift, and the operator's predispatch forecasts add information that no other input carries. The dual fields then reduce both the mean absolute error (MAE) and the continuous ranked probability score of the same linear base, and the model outperforms PatchTST, DLinear and a linear model (Diebold--Mariano $p<0.01$). A per-hour calibrator and a validation-chosen price floor, derived from an error diagnosis, add significant gains. XGBoost with the same inputs keeps the lowest MAE (35.5 against 36.6~AUD/MWh), but our model gives the best probabilistic forecasts on negative-price hours of all models compared ($p<0.001$).
+\end{abstract}
+
+\begin{highlights}
+\item A trend--event dual-field model is adapted from reconstruction to price forecasting.
+\item On a static split the decomposition loses to a linear model with the same inputs.
+\item Quarterly refits and operator forecasts make the dual fields improve accuracy.
+\item The model gives the best probabilistic forecasts on negative-price hours.
+\item Ablations, Diebold--Mariano tests and error diagnoses trace each gain to a cause.
+\end{highlights}
+
+\begin{keyword}
+Electricity price forecasting \sep Probabilistic forecasting \sep Time-series decomposition \sep Negative prices \sep National Electricity Market \sep Predispatch
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+%% ---------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:introduction}
+
+Short-term electricity price forecasts drive bidding, storage dispatch, demand response and hedging decisions \citep{weron2014electricity,hong2020energy}. In markets with a fast-growing share of wind and solar generation, these forecasts have become harder. Prices still follow a daily and seasonal level, but they are increasingly punctuated by events: scarcity spikes when supply margins tighten and negative-price troughs when renewable output exceeds demand. In the Australian National Electricity Market (NEM), the share of hours with negative prices in Queensland rose from 1.6\% in 2015--2021 to 13.2\% in 2023--2024 (Section~\ref{sec:data}). A forecaster that treats these events as noise around a level misses exactly the hours in which storage and flexible demand earn or lose most.
+
+Separating a series into a continuous trend and discrete events is therefore an attractive structural prior. Classical decompositions and their neural successors \citep{wu2021autoformer,oreshkin2020nbeats,zeng2023transformers} split trend from seasonality; DualTimesField \citep{zhang2026dualtimesfield} goes further and represents a series as a continuous trend field (CTF), an implicit neural representation in continuous time \citep{sitzmann2020implicit,tancik2020fourier}, plus a discrete event field (DGF) of localized atoms. It was designed for reconstruction and interpolation. Whether such a representation helps forecasting is not obvious: describing the past more faithfully does not by itself add information about the future, and a richer description of a past regime can overfit it.
+
+This paper studies that question for day-ahead price forecasting in three NEM regions, under a same-data protocol in which every compared model receives the same inputs, the same training periods and the same evaluation. Our findings are sequential, and the paper follows them:
+
+\begin{enumerate}
+\item \emph{Transplanted, the dual field does not separate events.} The CTF absorbs spikes and the DGF collapses. Detecting events explicitly, as the largest departures from the window median, restores the separation (\ref{app:static}).
+\item \emph{Separation alone does not improve forecasts.} On a single fit to 2015--2021, a linear model on the same inputs is more accurate than the dual-field model, and adding the fields to that linear model makes it worse (Section~\ref{sec:when}). The fields lower the training loss but raise the error on the 2022 validation year: they fit a price regime that did not persist.
+\item \emph{Recalibration and market-operator information make the fields useful.} Refitting every model before each test quarter, as is standard practice in electricity price forecasting \citep{lago2021forecasting}, removes most of the regime shift. AEMO's predispatch, the operator's own dispatch simulation with current offers, adds forward-looking information that no other input carries and lowers the error of every model. In this setting the dual fields improve both point and probabilistic accuracy over the same linear base.
+\item \emph{Diagnosis-driven corrections.} A per-region analysis of the errors that remain against the strongest competitor locates them in negative-price hours, where linear heads over-extrapolate in the transformed target space. A shared per-hour calibrator and a price floor chosen on validation data address this and are each significant.
+\end{enumerate}
+
+The final model is more accurate than PatchTST \citep{nie2023time}, DLinear \citep{zeng2023transformers} and a linear model, and gives the best probabilistic forecasts on negative-price hours of all compared models. XGBoost \citep{chen2016xgboost} with the same inputs and refits remains more accurate on mean absolute error, which we report and analyse rather than tune away. Beyond the model, the study offers a protocol lesson: a structured forecaster should be evaluated against strong same-input baselines and under the recalibration regime it will be deployed in, because both change which model is best.
+
+The rest of the paper is organized as follows. Section~\ref{sec:related} reviews related work. Section~\ref{sec:data} describes the data and the forecasting task, Section~\ref{sec:method} the model, and Section~\ref{sec:setup} the experimental protocol. Section~\ref{sec:results} reports the results, Section~\ref{sec:discussion} discusses them, and Section~\ref{sec:conclusion} concludes.
+
+%% ---------------------------------------------------------------------------
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Electricity price forecasting} Reviews by \citet{weron2014electricity} and \citet{nowotarski2018recent} survey point and probabilistic electricity price forecasting. \citet{lago2021forecasting} established an open benchmark and best practices, among them daily recalibration on a rolling window, variance-stabilizing transformations \citep{uniejewski2018variance}, and comparison against well-specified linear (LEAR) and neural baselines with Diebold--Mariano tests \citep{diebold1995comparing}. High-dimensional linear models \citep{ziel2018day} and distributional neural networks \citep{marcjasz2023distributional} are strong references. We follow these practices: an asinh transformation, rolling recalibration, same-input baselines, and significance tests.
+
+\paragraph{Deep time-series forecasting and decomposition} Transformer forecasters such as Informer \citep{zhou2021informer}, Autoformer \citep{wu2021autoformer}, PatchTST \citep{nie2023time} and iTransformer \citep{liu2024itransformer}, recurrent models \citep{hochreiter1997long,cho2014learning} and DeepAR \citep{salinas2020deepar} have been widely applied. \citet{zeng2023transformers} showed that a decomposed linear model (DLinear) is competitive with many of them. N-BEATS \citep{oreshkin2020nbeats} and Autoformer use trend and seasonal decompositions inside the network; hybrid models combine a linear component with a nonlinear residual \citep{zhang2003time}. DualTimesField \citep{zhang2026dualtimesfield} represents trend and events as continuous-time fields for reconstruction. Our model adds dual fields as a residual to a linear base, and asks when this structure pays off in forecasting.
+
+\paragraph{Exogenous information and strong tabular baselines} Fundamental forecasts (load, renewable output, capacity) are the most informative exogenous inputs in electricity price forecasting \citep{weron2014electricity,lago2021forecasting}. Recent work adds text: \citet{chen2026reprice} extract market events from news with a large language model. We instead use the market operator's own forward-looking forecasts, the primary source on which much market commentary is based. On tabular inputs, gradient-boosted trees remain hard to beat \citep{grinsztajn2022tree}, which is why XGBoost is a central baseline here.
+
+%% ---------------------------------------------------------------------------
+\section{Data and forecasting task}
+\label{sec:data}
+
+\paragraph{Market and prices} We use hourly regional reference prices (RRP) and operational demand for New South Wales (NSW1), Queensland (QLD1) and Tasmania (TAS1) from AEMO's aggregated price and demand data \citep{aemo2025priceanddemand}, 1 January 2015 to 31 December 2024 in market time (AEST), with half-hourly records averaged to hours. Table~\ref{tab:data} summarizes the series. The test period, 2023--2024, differs markedly from 2015--2021: negative prices are four to eight times more frequent, spikes above 300~AUD/MWh are more frequent in NSW1 and QLD1, and 2022, the energy-crisis year that separates them, has a much higher level.
+
+\begin{table}[t]
+\centering
+\caption{Hourly regional reference prices (AUD/MWh) by period. Neg.: share of hours below zero; $>300$: share of hours above 300~AUD/MWh.}
+\label{tab:data}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Region & Period & Mean & Median & Std. dev. & Neg. & $>300$ \\
+\midrule
+NSW1 & 2015--2021 & 70.5 & 58.0 & 164.9 & 0.37\% & 0.25\% \\
+     & 2022       & 182.7 & 135.4 & 215.3 & 2.61\% & 14.79\% \\
+     & 2023--2024 & 113.5 & 82.7 & 408.8 & 6.20\% & 1.75\% \\
+\midrule
+QLD1 & 2015--2021 & 70.9 & 55.2 & 202.5 & 1.63\% & 0.68\% \\
+     & 2022       & 205.1 & 139.9 & 456.2 & 4.05\% & 15.73\% \\
+     & 2023--2024 & 101.1 & 81.3 & 289.2 & 13.21\% & 1.85\% \\
+\midrule
+TAS1 & 2015--2021 & 69.4 & 57.6 & 68.7 & 2.53\% & 0.43\% \\
+     & 2022       & 147.0 & 104.9 & 285.3 & 1.82\% & 8.57\% \\
+     & 2023--2024 & 75.8 & 60.3 & 168.2 & 7.36\% & 0.50\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Forecasting task} At every hour $t$ of the test period, the task is to forecast the prices of the next 24 hours, $p_{t+1},\dots,p_{t+24}$, from information published at or before $t$. Origins are hourly, so each region has 17{,}521 test origins. All models see a 72-hour history of price and demand.
+
+\paragraph{Known inputs} Four groups of forward-looking information enter every model, each as published at the origin:
+\begin{itemize}
+\item \emph{Calendar}: hour of day, day of week and day of year (sine and cosine), month, weekend flag and a standardized year.
+\item \emph{PD PASA}: AEMO's pre-dispatch projected assessment of system adequacy \citep{aemo2025mmsdm}, from which we take maximum spare capacity and net load (50\%-probability demand minus semi-scheduled wind and solar availability) for each forecast hour, from the latest run published by the origin, with the short-term PASA run filling hours beyond its horizon.
+\item \emph{Gas}: the logarithm of the seven-day trailing mean of the Victorian declared wholesale gas market price \citep{aemo2025dwgm}, using only gas days ended before the origin.
+\item \emph{Predispatch}: AEMO's predispatch re-solves the market dispatch every 30 minutes with the current offers, constraints and demand forecasts, and publishes regional prices and quantities up to the end of the next trading day \citep{aemo2025mmsdm}. For each origin we take the latest run whose rows were all published by then and keep the forecast price, total demand, available generation and net interchange for each hour. Runs published between about 04:00 and 12:30 end before the 24th forecast hour; the uncovered hours repeat the last covered hour and are flagged (93\% of hours are covered). The archive has no run history for October 2022, whose origins are marked uncovered and filled with training-period medians.
+\end{itemize}
+Used directly as a forecast, the predispatch price has a test MAE of 147.5, 153.3 and 69.4~AUD/MWh in NSW1, QLD1 and TAS1, inflated by spikes that do not materialize, but a median absolute error of only 17--20~AUD/MWh: it is informative but must be calibrated.
+
+\paragraph{Price treatments} We evaluate on raw prices and, as a robustness check that limits the weight of a few extreme hours in absolute-error metrics, on prices capped at 650~AUD/MWh, with the cap applied to the price series used as target and as history, in training and in scoring.
+
+%% ---------------------------------------------------------------------------
+\section{Method}
+\label{sec:method}
+
+Fig.~\ref{fig:framework} gives an overview. The forecast is the sum of a linear base on all inputs, a dual-field residual built from a trend--event decomposition of the history, and a calibration term, followed by a price floor. Every component is refit before each test quarter.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/framework.pdf}
+\caption{Overview. (a) At origin $t$ the model reads the 72-hour history and the forecasts published by then (AEMO predispatch, PD PASA, gas price, calendar). (b) Events detected in the history form the discrete event field (DGF); the continuous trend field (CTF) fits the remainder under a decomposition loss; field-specific linear heads read each field with matching inputs. (c) A linear base on all inputs and a per-hour calibrator are fused with the field heads. (d) The forecast is clipped at a price floor chosen on validation data. (e) Every model is refit before each test quarter. Thumbnails show one QLD1 test day (1 October 2023).}
+\label{fig:framework}
+\end{figure}
+
+\subsection{Target transformation}
+Prices are mapped by the area hyperbolic sine with median and median-absolute-deviation scaling \citep{uniejewski2018variance},
+\begin{equation}
+y = \asinh\!\left(\frac{p-\mu}{\sigma}\right),\qquad \mu=\med(p^{\mathrm{train}}),\quad \sigma=\frac{\med|p^{\mathrm{train}}-\mu|}{0.6745},
+\end{equation}
+and standardized with training statistics. The point forecast is produced in this space and mapped back by the inverse transform. The quantile forecasts are produced directly in standardized price space, which keeps their spread in the units on which they are scored.
+
+\subsection{Dual-field decomposition of the history}
+Let $x\in\mathbb{R}^{72\times 2}$ be the standardized history of transformed price and demand, indexed by $\tau=1,\dots,72$.
+
+\paragraph{Event field (DGF)} Events are detected in the price channel $x^{(1)}$ relative to a robust level. With departures $d_\tau=x^{(1)}_\tau-\med_\tau x^{(1)}_\tau$, we select $K=8$ positions $c_1,\dots,c_K$ greedily by largest $|d_\tau|$, suppressing positions closer than three hours to an already selected one. Each event keeps its departure, soft-thresholded by a learned level $\kappa>0$, and becomes a Gaussian bump of learned width $w$:
+\begin{equation}
+e(\tau)=\sum_{k=1}^{K} a_k \exp\!\left(-\frac{(\tau-c_k)^2}{2w^2}\right),\qquad a_k=\operatorname{sign}(d_{c_k})\max\!\left(|d_{c_k}|-\kappa,\,0\right).
+\end{equation}
+Positions are data, not parameters, so the event field is fixed by the history; this is what makes the two fields separate (\ref{app:static}).
+
+\paragraph{Trend field (CTF)} The CTF is a Fourier-feature implicit neural representation \citep{tancik2020fourier,zhang2026dualtimesfield}. With normalized time $\tau'\in[0,1]$, learned band-limited frequencies $b_j=\omega_{\max}\,\mathrm{sigmoid}(\beta_j)$, $j=1,\dots,16$, and a low-pass filtered copy $\tilde x_\tau$ of the history,
+\begin{equation}
+\gamma(\tau')=\big[\cos 2\pi b_j\tau',\ \sin 2\pi b_j\tau'\big]_{j=1}^{16},\qquad c(\tau)=f_\theta\big(\gamma(\tau'),\,\tilde x_\tau\big),
+\end{equation}
+where $f_\theta$ is a small multilayer perceptron. The decomposition loss $\mathcal{L}_{\mathrm{dec}}=\|c+e-x\|_2^2/|x|$ makes the CTF fit what the events leave, and $r=x-c-e$ is the remainder.
+
+\subsection{Forecast heads, linear base and fusion}
+For each of the 24 forecast hours $h$, linear heads map field features to a point forecast in transformed space and to quantiles at the levels 0.05, 0.10, 0.50, 0.90 and 0.95 in price space:
+\begin{itemize}
+\item \emph{CTF heads} read the trend $c$, the remainder $r$, the calendar, the gas price and the PD PASA net load: the level and its fundamental drivers.
+\item \emph{DGF heads} read the event field $e$, the calendar, the PD PASA spare capacity and the predispatch inputs; the DGF quantile head also reads the shortfalls of spare capacity below its training 1\%, 5\% and 10\% quantiles, a piecewise-linear scarcity response.
+\end{itemize}
+The two are fused by an additive trigonometric gate, $\hat y^{\mathrm{F}}_h=\hat y^{\mathrm{C}}_h+\sin^2(\theta_h)\,\hat y^{\mathrm{D}}_h$, with $\theta_h=\tfrac{\pi}{2}\,\mathrm{sigmoid}(g_h)$ and $g_h$ linear in the fields, the calendar and the DGF inputs; each quantile level has its own affine rescaling of $g_h$, so tail quantiles can draw on the event field more than the median.
+
+The \emph{linear base} $\hat y^{\mathrm{B}}$ is one linear map from the raw history and all known inputs to the 24 point and quantile outputs. The fused field forecast is added to it as a residual, so the fields only need to model what a linear function of the inputs cannot.
+
+\paragraph{Calibrator} A single two-layer perceptron (32 hidden units), shared by all forecast hours, reads hour $h$'s known inputs (predispatch, PD PASA, calendar), a learned four-dimensional horizon embedding and the current price level (last observed value and 24-hour mean), and outputs additive corrections $\delta_h$ to the point and quantile forecasts. Its output layer is initialized at zero. It lets the model learn a nonlinear response to predispatch, for example that high predispatch prices are often not realized. The forecast before the floor is
+\begin{equation}
+\hat y_h=\hat y^{\mathrm{B}}_h+\hat y^{\mathrm{F}}_h+\delta_h .
+\end{equation}
+
+\paragraph{Training} The parameters are trained jointly by minimizing
+\begin{equation}
+\mathcal{L}=\underbrace{\tfrac{1}{24}\textstyle\sum_h(\hat y_h-y_h)^2}_{\text{point}}+\underbrace{\tfrac{1}{24\cdot5}\textstyle\sum_{h,q}\rho_q\!\left(\tilde p_h-\hat{\tilde p}_{h,q}\right)}_{\text{quantiles}}+\mathcal{L}_{\mathrm{dec}}+\lambda_s\mathcal{L}_{\mathrm{smooth}}+\lambda_g\mathcal{L}_{\mathrm{sparse}},
+\end{equation}
+where $\rho_q$ is the pinball loss \citep{koenker1978regression}, $\tilde p$ is the standardized price, $\mathcal{L}_{\mathrm{smooth}}$ penalizes first differences of the CTF, and $\mathcal{L}_{\mathrm{sparse}}$ penalizes the share of active events, ten times more steeply above 30\% ($\lambda_s=\lambda_g=10^{-3}$). We use AdamW with learning rate $3\times10^{-4}$, weight decay $10^{-4}$, batch size 128 and 30 epochs, and keep the epoch with the lowest validation loss. The model has 277{,}747 parameters.
+
+\subsection{Price floor}
+Negative prices in the NEM are bounded in practice by renewable offers priced near the negative value of the associated certificates, but a linear head extrapolating in asinh space can, after the inverse transform, forecast prices far below any observed level (Section~\ref{sec:diagnosis}). We therefore clip forecasts from below, $\hat p_h\leftarrow\max(\hat p_h,\phi)$. For each refit and region, $\phi$ is chosen on that refit's validation quarter from $\{$none$\}\cup\{\min(Q_\alpha(p^{\mathrm{train}}),0):\alpha\in\{0.05,0.1,0.2,0.5,1\}\%\}$, separately for the point forecast (by validation MAE) and the quantiles (by validation CRPS). The test quarter is never used.
+
+\subsection{Quarterly recalibration}
+Before each of the eight test quarters $k$ (2023Q1 to 2024Q4), every model is refit on data from January 2015 to three months before the quarter, selects its checkpoint on those three months, and forecasts the origins of the quarter. Forecasts of the eight quarters together cover exactly the 17{,}521 test origins of each region. Transformations, standardizations and quantile knots are re-estimated on each refit's training data.
+
+%% ---------------------------------------------------------------------------
+\section{Experimental setup}
+\label{sec:setup}
+
+\paragraph{Baselines} All baselines receive the same history and known inputs, including predispatch, and are refit on the same quarterly schedule.
+\begin{itemize}
+\item \emph{XGBoost} \citep{chen2016xgboost}: one multi-quantile model per forecast hour on the flattened history, gas price and that hour's calendar and known inputs (depth 6, learning rate 0.05, subsampling 0.8, up to 2{,}000 rounds with early stopping on validation); the median is the point forecast.
+\item \emph{PatchTST} \citep{nie2023time} (patch length 16, stride 8, instance normalization, three layers, $d_{\mathrm{model}}=128$) and \emph{DLinear} \citep{zeng2023transformers} (moving-average decomposition). Both are channel-independent and would otherwise ignore the known inputs, so each adds a linear map from the known future inputs and the demand history to its outputs.
+\item \emph{Linear}: one linear map of the price history plus the same linear map of known inputs, with a mean-squared-error point output and pinball-loss quantiles; in our experiments it is the strongest linear specification and dominates DLinear.
+\item \emph{Linear base only}: our model without the dual fields, the calibrator and the floor, trained by the same pipeline; it isolates the contribution of the structure.
+\end{itemize}
+Neural baselines output the five quantiles of the transformed price and are trained with the pinball loss (Adam, batch size 256, 30 epochs, weight decay $10^{-5}$, best validation epoch); their learning rates were chosen from $\{10^{-4},5\cdot10^{-4},10^{-3}\}$ on validation data. Two further neural baselines, iTransformer \citep{liu2024itransformer} and Informer \citep{zhou2021informer}, were less accurate than PatchTST and DLinear in a static-split screening (\ref{app:negative}) and are not refit.
+
+\paragraph{Metrics} Point forecasts are scored by MAE and by window RMSE, the root mean squared error of each 24-hour window averaged over windows. Probabilistic forecasts are scored by the coverage and average interval score (AIS) of the 5--95\% interval and by an approximation of the continuous ranked probability score \citep{gneiting2007strictly}, twice the mean pinball loss over the five quantiles (CRPS). MAE is minimized by the median \citep{gneiting2011making}. We also score the tails: CRPS and the 0.05-quantile pinball loss on hours with negative prices, and CRPS and the 0.95-quantile pinball loss on hours above 300~AUD/MWh.
+
+\paragraph{Statistical tests} Each model is trained with seeds 2026, 2027 and 2028; tables report seed means. Differences are tested with the Diebold--Mariano test \citep{diebold1995comparing} on per-origin losses (MAE averaged over the 24 hours and the seeds; CRPS of seed-averaged quantiles), with a Newey--West long-run variance \citep{newey1987simple} with 48 lags because hourly origins overlap. Pooled tests use the three-region mean loss at each origin. For tail losses, each origin's loss is its mean over the event hours in its horizon, and origins without such hours are dropped. Out-of-sample evaluation follows \citet{tashman2000out}.
+
+\paragraph{Implementation} The models are implemented in PyTorch 2.5 and XGBoost 3.2 and trained on NVIDIA L40 GPUs. Code and configurations reproduce every table and figure.
+
+%% ---------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+
+\subsection{Main comparison}
+Table~\ref{tab:main} and Fig.~\ref{fig:comparison} compare the models in the main setting, with quarterly refits and predispatch inputs, and Table~\ref{tab:significance} tests the differences. The dual-field model reduces the mean MAE of the same linear base from 37.60 to 36.64~AUD/MWh on raw prices and from 26.72 to 25.29 on capped prices, and its CRPS from 26.04 to 25.07 and from 14.96 to 13.80 (all $p<0.01$). It is more accurate than PatchTST, DLinear and the linear model on MAE under both price treatments and in every region ($p<0.05$), and on capped CRPS ($p<0.01$); on raw CRPS the differences to these three models are not significant. XGBoost has the lowest MAE and CRPS: our model is behind by 1.11 (raw) and 0.75 (capped) on MAE, most in QLD1 (2.10 raw); in TAS1 the raw MAE difference is not significant.
+
+\begin{table}[t]
+\centering
+\caption{Main comparison on the 2023--2024 test set (17{,}521 hourly origins per region, 24-hour horizon). Every model is refit before each test quarter and uses the same inputs, including AEMO predispatch. Cells are means over three seeds; Mean MAE also shows the seed standard deviation. Ours includes the calibrator and the price floor; Linear base only is ours without them and without the dual fields. Lower is better; best in bold.}
+\label{tab:main}
+\resizebox{\textwidth}{!}{\input{tables/same_data_comparison.tex}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/same_data_comparison.pdf}
+\caption{Test MAE per region in the main setting, raw prices (left) and prices capped at 650~AUD/MWh (right); means over three seeds.}
+\label{fig:comparison}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Diebold--Mariano tests, ours minus comparator, in the main setting (negative favours ours). $\Delta$ columns pool the three regions; NSW, QLD and TAS give the raw-price MAE difference per region. Newey--West variance with 48 lags. $^{*}p<0.05$, $^{**}p<0.01$.}
+\label{tab:significance}
+\resizebox{\textwidth}{!}{\input{tables/significance.tex}}
+\end{table}
+
+\subsection{When does the decomposition help?}
+\label{sec:when}
+Fig.~\ref{fig:settings} and Table~\ref{tab:settings} trace every model across three settings, and the first block of Table~\ref{tab:ablations} isolates the dual fields against the same linear base in each.
+
+On the static split (a single fit to 2015--2021), the fields \emph{raise} MAE by 0.92 (raw) and 0.95 (capped) ($p<0.01$), and the dual-field model (41.54) is behind the linear model with the same inputs (40.52). The fields lower the training loss but raise the error on the 2022 validation year: at the selected epoch in NSW1, validation MAE is 60.6 with the fields against 48.6 without. They fit the 2015--2021 level, which shifted in 2022 and again in 2023--2024 (Table~\ref{tab:data}). Normalizing each history window to remove the level did not help, because volatility shifted as well: the median window standard deviation of QLD1 prices is 2.2 times larger in the test period than in training (\ref{app:negative}).
+
+With quarterly refits, the fields no longer cost point accuracy ($-0.10$ raw, $-0.06$ capped, not significant) and lower CRPS by about 1.1--1.3 ($p<0.01$). With predispatch inputs as well, they lower both MAE ($-0.34$ raw, $p<0.05$; $-0.70$ capped, $p<0.01$) and CRPS ($-1.13$, $-0.94$, $p<0.01$). Predispatch lowers the MAE of every model, and of XGBoost most (39.53 to 35.52 raw): it carries information about current offers that no other input has.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/settings.pdf}
+\caption{Three-region mean test MAE of every model in three settings: a single fit on 2015--2021, quarterly refits, and quarterly refits with predispatch. Ours in the last setting includes the calibrator and the price floor. Means over three seeds; axes do not start at zero.}
+\label{fig:settings}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Three-region mean test MAE across settings: static split, quarterly refit, quarterly refit with predispatch (PD). Means over three seeds; best per column in bold.}
+\label{tab:settings}
+\small
+\input{tables/settings.tex}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Ablations. Pooled Diebold--Mariano differences (negative is better). The first block compares the dual fields with the same linear base in each setting; each row of the second block is compared with the model it modifies. $^{*}p<0.05$, $^{**}p<0.01$.}
+\label{tab:ablations}
+\small
+\input{tables/ablations.tex}
+\end{table}
+
+\subsection{Diagnosis and corrections}
+\label{sec:diagnosis}
+To locate the remaining gap to XGBoost, we split the absolute-error difference by condition. In QLD1, where the gap was largest (2.9~AUD/MWh before the corrections), hours with a non-positive actual price (13\% of hours) account for 47\% of it, and hours in the lowest net-load quintile, largely the same midday solar hours, for 48\%. The dual-field model forecast prices below $-100$~AUD/MWh in 0.23\% of hours, against 0.01\% of actual prices and none for XGBoost: the 3.2\% of hours in which it forecast below $-50$ carry 31\% of the gap. Linear heads extrapolate in asinh space, and the inverse transform turns small extrapolations into deep negative prices, whereas trees stay inside the range seen in training.
+
+Two corrections follow (second block of Table~\ref{tab:ablations}). Letting the model respond nonlinearly to predispatch, by hinge features of the predispatch price or by the calibrator, lowers MAE by 0.25--0.44 ($p<0.01$ except the raw calibrator, $p<0.05$); the calibrator is retained because it also gives the best tail scores. The validation-chosen price floor lowers MAE by a further 0.31 (raw) and 0.29 (capped), significantly in every region and most in QLD1 ($-0.82$ raw). In QLD1 the chosen point floors are $-37$ to $-48$~AUD/MWh in seven of the eight refits. Adding predispatch interconnector flows and limits does not help ($+0.04$ raw, $+0.19$ capped): the predispatch price already reflects the network constraints.
+
+\subsection{Price tails}
+Table~\ref{tab:tails} scores the tails. On negative-price hours, our model has the lowest CRPS and 0.05-quantile pinball loss of all models under both price treatments, significantly lower than every comparator including XGBoost (raw CRPS 14.52 against 15.96; $p<0.001$). On capped prices it also has the lowest CRPS on spike hours (121.1 against 138.3 for XGBoost; $p<0.01$). On raw spike hours it ties XGBoost and is worse than PatchTST, DLinear and the linear model ($p<0.05$), whose upper quantiles react more to extreme predispatch prices.
+
+\begin{table}[t]
+\centering
+\caption{Probabilistic scores in the price tails, main setting, mean of the three regions, seed-averaged quantiles. Lower is better; best in bold. $^{\dagger}$/$^{\ddagger}$: ours is significantly better/worse than that model (pooled Diebold--Mariano test on per-origin event-hour losses, $p<0.05$).}
+\label{tab:tails}
+\resizebox{\textwidth}{!}{\input{tables/tails.tex}}
+\end{table}
+
+\subsection{Case studies}
+Fig.~\ref{fig:cases} shows two test days chosen by fixed rules. On the QLD1 day with the lowest mean price (1 October 2023), the linear base and the dual fields keep the midday forecast positive; the calibrator brings it into negative prices but overshoots to about $-85$~AUD/MWh, and the floor ($-43$) clips the overshoot. The day's MAE is 12.2 for our model, 14.1 for XGBoost and 17.3 for predispatch. On the NSW1 day on which predispatch most overstated the peak (24 October 2024, predispatch 17{,}500~AUD/MWh against an actual price below 300), every model is pulled up at 17:00; ours reaches about 470 and XGBoost about 280 (day MAE 57.1 and 52.8). Such phantom spikes remain a failure mode.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/cases.pdf}
+\caption{Case studies, chosen by fixed rules on the test split. Top: QLD1 day with the lowest mean price. Bottom: NSW1 day on which predispatch most overstated the peak (forecast above 1{,}000, actual below 300~AUD/MWh). Left: our forecast with its 90\% interval, XGBoost, predispatch and the actual price. Right: our forecast stage by stage for the seed-2026 refit; on the NSW1 day the floor is not binding, so the calibrated and final forecasts coincide.}
+\label{fig:cases}
+\end{figure}
+
+\subsection{Computational cost}
+Table~\ref{tab:cost} reports the size of each model and the wall-clock time of one quarterly refit (NSW1, 2023Q3 test quarter, seed 2026) on one GPU. Every model refits in four to six minutes; the dual-field model costs about 20\% more than its linear base and less than PatchTST. A full evaluation (eight refits, three regions, three seeds) takes a few hours per model on one GPU.
+
+\begin{table}[t]
+\centering
+\caption{Model size and wall-clock time of one quarterly refit (NSW1, 2023Q3, seed 2026), each run alone on an NVIDIA L40 shared with other users; times are indicative. XGBoost size is the total number of boosting rounds over the 24 per-hour models; Linear base only keeps the field modules, which are still fitted by the decomposition loss.}
+\label{tab:cost}
+\small
+\input{tables/cost.tex}
+\end{table}
+
+%% ---------------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Why decomposition alone does not help} Decomposing the history is a change of representation: $c+e+r=x$, so the heads receive no information that a linear map of $x$ lacks. Its possible benefit is an inductive bias, and on a static split that bias works against the model, because the fields describe the price regime of the training period and it shifted. The same pattern appears in the case of Informer, which lacks instance normalization and overfit the 2015--2021 level in our screening (\ref{app:negative}).
+
+\paragraph{Why recalibration and predispatch make it help} Refitting brings the training distribution close to the test quarter, so a richer description of recent history transfers. Predispatch adds information about the future that the history does not contain; the fields then have something to combine with, and the gated event heads respond to scarcity and to predispatch where a linear base cannot. The improvement is largest where events are frequent and regular: negative-price hours, driven by midday solar output and visible in the predispatch and net-load forecasts.
+
+\paragraph{The gap to XGBoost} Trees use predispatch better on average: they learn threshold responses, such as discounting high predispatch prices, and cannot extrapolate beyond the training range. The calibrator and the floor recover part of this, but XGBoost remains ahead in the 100--300~AUD/MWh band and in QLD1. Practitioners who care about mean absolute error alone should prefer gradient-boosted trees on these inputs; the dual-field model is preferable when negative-price hours and calibrated tails matter, for example for storage and flexible demand.
+
+\paragraph{Limitations} The study covers three regions of one market and a two-year test period. The price floor is a post-hoc clip chosen on validation data rather than part of the trained model. On raw spike hours the model is behind the linear models. Predispatch run history is missing for October 2022, and the predispatch horizon does not always cover the 24th hour. Hyperparameters of the dual-field model were developed on the static split; they were not re-tuned for the recalibrated setting.
+
+%% ---------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+
+A trend--event decomposition helps electricity price forecasting only under the right conditions. Adapted from reconstruction, the dual-field structure separates price events once they are detected explicitly, but on a static split it is less accurate than a linear model with the same inputs. With quarterly recalibration and the market operator's predispatch forecasts, the same structure significantly improves point and probabilistic accuracy over its linear base, is more accurate than PatchTST, DLinear and a linear model, and gives the best probabilistic forecasts on negative-price hours of all compared models; a calibrator and a price floor, motivated by an error diagnosis, add further gains. XGBoost on the same inputs remains more accurate on mean absolute error. Future work should move the price floor into training, model the predispatch error explicitly to handle phantom spikes, and test the approach in other markets with frequent negative prices.
+
+%% ---------------------------------------------------------------------------
+\section*{CRediT authorship contribution statement}
+\textbf{zl:} Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+%% To be confirmed and completed by the author before submission.
+During the preparation of this work the author(s) used [tool name] in order to [purpose]. After using this tool, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article.
+
+\section*{Data availability}
+All data are public and were obtained from the Australian Energy Market Operator \citep{aemo2025priceanddemand,aemo2025mmsdm,aemo2025dwgm}. Code and configurations that reproduce the results will be made available.
+
+%% ---------------------------------------------------------------------------
+\appendix
+
+\section{Field separation and static-split development}
+\label{app:static}
+
+Transplanted from reconstruction, the original DGF of DualTimesField, with atoms at globally learned positions, collapses in forecasting: the CTF absorbs the spikes, and the event field carries $-0.04$ to $0.00$ of past spike-hour prices on the test split. With detected events it carries 0.28 to 0.33 (Fig.~\ref{fig:field-separation}, Table~\ref{tab:field-separation}). Fig.~\ref{fig:ladder} shows the development on the static split, where most of the gain came from the target transformation and the fundamental inputs, and Table~\ref{tab:ablations-static} the structural and detector ablations of the detected-event DGF: suppression of nearby events and the median level matter, while the number of events and the threshold matter little.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/field_separation.pdf}
+\caption{Field separation. Top: one NSW1 test window in standardized asinh price; transplanted, the Gabor DGF stays flat and the CTF absorbs the spikes (left); with detected events the spikes and troughs move into the DGF (right). Bottom: share of past spike-hour prices ($>300$~AUD/MWh) carried by the event field on the test split.}
+\label{fig:field-separation}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Share of past spike-hour prices carried by the event field on the test split.}
+\label{tab:field-separation}
+\small
+\input{tables/field_separation.tex}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/ablation_ladder.pdf}
+\caption{Development on the static split: three-region mean test MAE and CRPS on raw prices; each step changes one component. Grey: seed 2026 only; blue: means over seeds 2026--2028. Axes do not start at zero.}
+\label{fig:ladder}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Structural and detector ablations of the detected-event DGF on the static split, raw prices, three-region means over three seeds (MAE $\pm$ seed standard deviation). The last column gives the paired MAE difference to the detected-event DGF per seed; positive means the variant is worse.}
+\label{tab:ablations-static}
+\resizebox{\textwidth}{!}{\input{tables/ablations_static.tex}}
+\end{table}
+
+\section{Designs that did not help}
+\label{app:negative}
+
+The following were tested with three seeds and are reported for completeness (full records are in the code repository).
+\begin{itemize}
+\item \emph{Window-normalized fields} on the linear base, with the residual rescaled by the window's price scale: raw MAE 44.29 against 41.54 unnormalized (static split), because test-period volatility is about twice the training volatility.
+\item \emph{Fields on the quantiles only}, with asinh-space quantiles and the point forecast from the linear base: the fields widened the 90\% interval from 171 to 418~AUD/MWh and raised CRPS from 28.94 to 31.25 (static split).
+\item \emph{A future event field}, a three-component mixture for spike and trough probabilities, did not beat a logistic regression on the same inputs in precision--recall.
+\item \emph{iTransformer and Informer} (static split, raw MAE 43.20 and 46.65) were less accurate than PatchTST (41.02) and DLinear (40.91); Informer's validation loss was lowest after one to five epochs.
+\item \emph{Predispatch interconnector inputs}: no gain (Section~\ref{sec:diagnosis}).
+\end{itemize}
+
+\clearpage
+\bibliographystyle{elsarticle-num-names}
+\bibliography{references}
+
+\end{document}
