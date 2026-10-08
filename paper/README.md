@@ -30,11 +30,13 @@ statement are placeholders to complete before submission. The current title is
 reference checks, corrections and remaining full-text limits are recorded in
 [`REFERENCE_AUDIT.md`](REFERENCE_AUDIT.md).
 
-The main framework figure is an editable vector schematic, generated without
-checkpoints by `.venv/bin/python paper/draw_framework.py` (PDF, SVG and PNG).
-After regenerating an included figure, copy its PDF into `manuscript/figures/`
-before rebuilding the manuscript. The manuscript remains in the Elsevier
-Applied Energy template; only the diagram adopts a compact ML-paper style.
+The manuscript framework figure is `figures/framework_lanes.pdf`, a vector
+figure in a lane layout with no connecting wires, drawn by
+`PYTHONPATH=. .venv/bin/python paper/draw_framework_lanes.py`. Its thumbnails are
+recorded data and model outputs for one QLD1 test day, so the script needs the
+quarterly-refit checkpoints. The earlier image-model version and its prompts
+are kept in `figures/ai_generated` and `draw_framework.py` but are not used in
+the manuscript.
 
 ## LaTeX components
 
@@ -97,7 +99,8 @@ not fixed-origin day-ahead auction forecasts.
 |---|---|---|
 | `figures/architecture.pdf` | Model structure | See `fig_architecture.tex` |
 | `figures/settings.pdf` | Mean MAE of every model across static split, quarterly refit, and quarterly refit with predispatch | The dual fields fall behind a linear model on the static split and pull ahead of every model except XGBoost with recalibration and predispatch |
-| `figures/framework.pdf` | Vector schematic of the additive model, forecast transformations and quarterly protocol | Main overview figure; editable source in `draw_framework.py` |
+| `figures/framework_lanes.pdf` | Lane-layout overview: inputs, four additive terms, bounded forecast, quarterly refits; thumbnails from one QLD1 test day | Main overview figure; source `draw_framework_lanes.py` |
+| `figures/framework.pdf` | Earlier image-model schematic (not used in the manuscript) | `draw_framework.py`, `figures/ai_generated` |
 | `figures/cases.pdf` | Two test days chosen by fixed rules: deepest negative-price day (QLD1), predispatch phantom spike (NSW1) | Forecast stage by stage: base, + fields, + calibrator, + floor |
 | `figures/same_data_comparison.pdf` | Per-region MAE in the main setting, raw and capped | Same splits, inputs, refits, and scoring; three seeds each |
 | `figures/field_separation.pdf` | Transplanted Gabor DGF vs detected-event DGF (supplementary) | Event-to-price mean ratio in standardized asinh space on historical spike positions: 0.28-0.33 versus -0.04 to 0.00; not a monetary share |

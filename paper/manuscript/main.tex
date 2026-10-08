@@ -93,7 +93,7 @@ The rest of the paper is organized as follows. Section~\ref{sec:related} reviews
 \section{Data and forecasting task}
 \label{sec:data}
 
-\paragraph{Market and prices} We use hourly regional reference prices (RRP) and operational demand for New South Wales (NSW1), Queensland (QLD1) and Tasmania (TAS1) from AEMO's aggregated price and demand data \citep{aemo2025priceanddemand}, 1 January 2015 to 31 December 2024 in market time (AEST), with half-hourly records averaged to hours. Table~\ref{tab:data} summarizes the series. The test period, 2023--2024, differs markedly from 2015--2021: negative prices are four to eight times more frequent, spikes above 300~AUD/MWh are more frequent in NSW1 and QLD1, and 2022, the energy-crisis year that separates them, has a much higher level.
+\paragraph{Market and prices} We use hourly regional reference prices (RRP) and operational demand for New South Wales (NSW1), Queensland (QLD1) and Tasmania (TAS1) from AEMO's aggregated price and demand data \citep{aemo2025priceanddemand}, 1 January 2015 to 31 December 2024 in market time (AEST). Half-hourly records (to September 2021) and five-minute records (from October 2021, when five-minute settlement began) are averaged to hours. Table~\ref{tab:data} summarizes the series. The test period, 2023--2024, differs markedly from 2015--2021: negative prices are about three to seventeen times more frequent (2.9 times in TAS1, 8.1 in QLD1 and 16.8 in NSW1), spikes above 300~AUD/MWh are more frequent in NSW1 and QLD1, and 2022, the energy-crisis year that separates them, has a much higher level.
 
 \begin{table}[t]
 \centering
@@ -138,10 +138,10 @@ Used directly as a forecast, the predispatch price has a test MAE of 147.5, 153.
 
 Fig.~\ref{fig:framework} gives an overview. The forecast is the sum of a linear base on all inputs, a dual-field residual built from a trend--event decomposition of the history, and a calibration term, followed by a price floor. Every component is refit before each test quarter.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/framework.pdf}
-\caption{Dual-field forecasting architecture. (a) The 72-hour price and demand history $x$ and information $z$ published by origin $t$ supply the model inputs; matching tags indicate the context used by each head. (b) The CTF reads low-pass full history and Fourier time features, while the DGF detects localized price events directly from history. Their forecast heads, a linear base and a shared per-hour calibrator contribute additively; the CTF head also reads the remainder $r=x-c-e$, and the event contribution is gated. (c) Point outputs are inverse-transformed, price-space quantiles are sorted, and separate validation-selected lower bounds are applied. The solid point forecast need not equal the dashed median; shaded bands denote the central 80\% and 90\% quantile intervals. All curves are illustrative, not recorded predictions. Exact feature routing and quantile-specific gates are specified in Section~\ref{sec:method}.}
+\includegraphics[width=\textwidth]{figures/framework_lanes.pdf}
+\caption{Overview of the forecaster. (1) At origin $t$, the model reads the 72-hour price and demand history $x$, observed up to $t-1$, and the information $z$ published by $t$ (AEMO predispatch, PD PASA spare capacity and net load, gas price, calendar). (2) The forecast is the sum of four terms, each in its own lane; the tags at the start of a lane show which inputs it reads. The linear base $B_h$ maps $x$ and $z$ linearly. The trend field (CTF) and the event field (DGF) decompose the history, $x=c+e+r$, under the decomposition loss, and their heads give $C_h$ and the gated event term $g_hD_h$, with $g_h=\sin^2\theta_h$. A shared per-hour calibrator gives $\delta_h$. (3) The summed point forecast $\hat y_h$ is inverse-transformed and clipped at a lower bound $\varphi$ selected on the validation quarter; the quantiles, produced in price space, are clipped at their own selected bound (Section~\ref{sec:method}). Every model is refit before each test quarter. Thumbnails are recorded data and model outputs for one QLD1 test day (1 October 2023, seed-2026 refit): the price history, the fitted trend and detected events, and the final forecast with its 90\% interval, the actual price and the selected bound.}
 \label{fig:framework}
 \end{figure}
 
@@ -258,7 +258,7 @@ The static-split result is metric-dependent: despite worsening MAE, the fields i
 
 \begin{table}[t]
 \centering
-\caption{Three-region mean test MAE across settings: static split, quarterly refit, quarterly refit with predispatch (PD). Means over three seeds; best per column in bold.}
+\caption{Three-region mean test MAE across settings: static split, quarterly refit, quarterly refit with predispatch (PD). Means over three seeds; best per column in bold. Ours is the linear base with the dual fields; in the last setting it also includes the calibrator and the price floor.}
 \label{tab:settings}
 \small
 \input{tables/settings.tex}
@@ -276,7 +276,7 @@ The static-split result is metric-dependent: despite worsening MAE, the fields i
 \label{sec:diagnosis}
 To locate the remaining gap to XGBoost, we split the absolute-error difference by condition for the calibrated model before applying the lower bound. In QLD1, its seed-mean MAE gap is 2.9~AUD/MWh; for the seed-averaged point forecasts used in this diagnosis, the gap is 2.31 (38.56 against 36.25). Hours with a non-positive actual price (13\% of hours) account for 47\% of the latter gap, and hours in the lowest net-load quintile, largely the same midday solar hours, for 48\%. The calibrated model forecast prices below $-100$~AUD/MWh in 0.23\% of hours, against 0.01\% of actual prices and none for XGBoost: the 3.2\% of hours in which it forecast below $-50$ carry 31\% of the gap. Linear heads extrapolate in asinh space, and the inverse transform can turn modest transformed-space deviations into deep negative prices. The fitted XGBoost comparator did not exhibit these extrapolations; this observation is not a general range-preservation guarantee for boosted trees.
 
-Two corrections follow (second block of Table~\ref{tab:ablations}). Letting the model respond nonlinearly to predispatch, by hinge features of the predispatch price or by the calibrator, lowers MAE by 0.25--0.44 ($p<0.01$ except the raw calibrator, $p<0.05$); the calibrator is retained because it also gives the best tail scores. The validation-chosen price floor lowers MAE by a further 0.31 (raw) and 0.29 (capped), significantly in every region and most in QLD1 ($-0.82$ raw). In QLD1 the chosen point floors are $-37$ to $-48$~AUD/MWh in seven of the eight refits. Adding predispatch interconnector flows and limits does not help ($+0.04$ raw, $+0.19$ capped): the predispatch price already reflects the network constraints.
+Two corrections follow (second block of Table~\ref{tab:ablations}). Letting the model respond nonlinearly to predispatch, by hinge features of the predispatch price or by the calibrator, lowers MAE by 0.25--0.44 ($p<0.01$ except the raw calibrator, $p<0.05$); the calibrator is retained because it gives better negative-price tail scores than the hinge features. The validation-chosen price floor lowers MAE by a further 0.31 (raw) and 0.29 (capped), significantly in every region and most in QLD1 ($-0.82$ raw). In QLD1 the chosen point floors are $-37$ to $-48$~AUD/MWh in seven of the eight refits. Adding predispatch interconnector flows and limits does not help ($+0.04$ raw, $+0.19$ capped): the predispatch price already reflects the network constraints.
 
 \subsection{Price tails}
 Table~\ref{tab:tails} scores the tails. On negative-price hours, our final model has lower CRPS and 0.05-quantile pinball loss than all five comparators in that table under both price treatments, significantly lower in the pooled tests including against XGBoost (raw CRPS 14.52 against 15.96; $p<0.001$). This does not establish superiority to every development variant: the calibrator without the lower bound achieves raw negative-price CRPS 14.17 and lower-tail pinball loss 4.30, compared with 14.52 and 4.74 after clipping. Capped negative-price CRPS likewise changes from 13.99 to 14.28. The lower bound therefore trades some tail accuracy for lower overall MAE. On capped prices the final model has the lowest spike-hour CRPS in the table (121.1 against 138.3 for XGBoost; $p<0.01$); its difference to PatchTST is not significant, and PatchTST has slightly lower upper-tail pinball loss. On raw spike hours its CRPS difference to XGBoost is not significant, while it is worse than PatchTST, DLinear and the linear model ($p<0.05$).
@@ -334,9 +334,9 @@ The value of trend--event decomposition in rolling electricity price forecasting
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
-\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
-%% To be confirmed and completed by the author before submission.
-During the preparation of this work the author(s) used [tool name] in order to [purpose]. After using this tool, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article.
+\section*{Funding}
+%% To be completed by the author before submission.
+[Funding statement, e.g., ``This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.'']
 
 \section*{Data availability}
 All data are public and were obtained from the Australian Energy Market Operator \citep{aemo2025priceanddemand,aemo2025mmsdm,aemo2025dwgm}. Code and configurations that reproduce the results will be made available.
@@ -391,6 +391,10 @@ The following were tested with three seeds and are reported for completeness (fu
 \end{itemize}
 
 \clearpage
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+%% To be confirmed and completed by the author before submission.
+During the preparation of this work the author(s) used [tool name] in order to [purpose]. After using this tool, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article.
+
 \bibliographystyle{elsarticle-num-names}
 \bibliography{references}
 
