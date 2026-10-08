@@ -13,6 +13,21 @@ saved checkpoints of `configs/aemo_forecast_scarcity_quantile_inputs.yaml` and
 `configs/aemo_forecast_detected_dgf.yaml`. Figures are vector PDF and 300-dpi
 PNG; tables are LaTeX fragments for `booktabs`.
 
+## Manuscript
+
+`manuscript/` holds the Applied Energy manuscript (`main.tex`, Elsevier
+`elsarticle` class and `elsarticle-num-names` style from CTAN, verified
+`references.bib`) with copies of the figures and tables it uses. Build from
+`paper/manuscript/`:
+
+```bash
+pdflatex main && bibtex main && pdflatex main && pdflatex main
+```
+
+Author details, the generative-AI declaration, and the code-availability
+statement are placeholders to complete before submission. References with a
+DOI were taken from Crossref; the others are checked against arXiv.
+
 ## LaTeX components
 
 `components/` wraps each figure and table in a float with a draft caption and
@@ -29,7 +44,6 @@ through `\materialsdir` (default `.`, i.e. compile from `paper/`).
 | `tab_ablations.tex` | `table*` | `tab:ablations` | Main |
 | `tab_settings.tex` | `table*` | `tab:settings` | Main |
 | `tab_tails.tex` | `table*` | `tab:tails` | Main |
-| `tab_re_price.tex` | `table*` | `tab:re-price` | Main (reference) |
 | `fig_field_separation.tex` | `figure*` | `fig:field-separation` | Supplementary |
 | `tab_field_separation.tex` | `table` | `tab:field-separation` | Supplementary |
 | `fig_ablation_ladder.tex` | `figure*` | `fig:ablation-ladder` | Supplementary |
@@ -53,9 +67,8 @@ reconstruction adds no information about the future, and the fields overfit
 the training-period price level, which shifts in 2022-2024. Two changes,
 standard in electricity-price forecasting practice, reverse this. Refitting
 every test quarter removes most of the regime shift, and AEMO's predispatch
-(the market operator's own dispatch simulation with current offers, the
-primary source behind market news such as RE-Price's) adds information no
-other input carries. In that setting the dual fields, added as a residual to a
+(the market operator's own dispatch simulation with current offers) adds
+information no other input carries. In that setting the dual fields, added as a residual to a
 linear base, improve both point and interval accuracy over the same base, and
 the model beats PatchTST, DLinear, and a linear model on MAE. A diagnosis of
 the remaining gap to XGBoost found over-extrapolated negative prices, which a
@@ -80,6 +93,8 @@ tail and, on capped prices, on spike hours.
 |---|---|---|
 | `figures/architecture.pdf` | Model structure | See `fig_architecture.tex` |
 | `figures/settings.pdf` | Mean MAE of every model across static split, quarterly refit, and quarterly refit with predispatch | The dual fields fall behind a linear model on the static split and pull ahead of every model except XGBoost with recalibration and predispatch |
+| `figures/framework.pdf` | Overview with data thumbnails from one QLD1 test day | Main overview figure of the manuscript |
+| `figures/cases.pdf` | Two test days chosen by fixed rules: deepest negative-price day (QLD1), predispatch phantom spike (NSW1) | Forecast stage by stage: base, + fields, + calibrator, + floor |
 | `figures/same_data_comparison.pdf` | Per-region MAE in the main setting, raw and capped | Same splits, inputs, refits, and scoring; three seeds each |
 | `figures/field_separation.pdf` | Transplanted Gabor DGF vs detected-event DGF (supplementary) | With detected events, the event field carries 28-33% of spike-hour prices, against -0.04 to 0.00 before |
 | `figures/ablation_ladder.pdf` | Development on the static split (supplementary) | Each step changes one component |
@@ -93,7 +108,7 @@ tail and, on capped prices, on spike hours.
 | `tables/ablations.tex` | Fields against the linear base in each setting; hinge features, calibrator, floor, interconnector inputs | same |
 | `tables/settings.tex` | Mean MAE across settings | `logs/forecasting/{linear_base,rolling,baselines,baselines_rolling,...}` |
 | `tables/tails.tex` | Negative-price and spike-hour scores | `logs/forecasting/{predispatch_rolling,price_floor}/*_tail_metrics.json` |
-| `tables/re_price_reference.tex` | Ours (capped) beside RE-Price's reported numbers | RE-Price Tables 2-3 (reported, with news) |
+| `tables/cost.tex` | Parameters and seconds per quarterly refit | `logs/forecasting/cost/seconds.tsv` (`scripts/benchmark_cost.sh`) |
 | `tables/field_separation.tex`, `tables/ablations_static.tex` | Supplementary: field separation; structural and detector ablations on the static split | recomputed from checkpoints; `logs/forecasting/{detected_dgf,step5,...}` |
 
 ## Limitations to state
@@ -109,9 +124,8 @@ tail and, on capped prices, on spike hours.
   predispatch.
 - October 2022 has no predispatch run history in AEMO's archive; its origins
   carry no predispatch information.
-- RE-Price's reported numbers use self-collected news, an undisclosed spike
-  treatment, and a single fit; the comparison is a reference only
-  (`logs/forecasting/PROTOCOL_ALIGNMENT.md`).
+- On raw spike hours, ours is worse than PatchTST, DLinear, and the linear
+  model (tail tests in `logs/forecasting/significance/paper_tails.json`).
 - Tried and rejected, with records in `logs/forecasting/EXPERIMENT_RESULTS.md`:
   a mixture future event field, attention-located atoms, daily event echoes,
   a clock-anchored CTF extrapolation, window-normalized fields, and

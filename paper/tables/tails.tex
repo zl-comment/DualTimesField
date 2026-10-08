@@ -7,18 +7,18 @@ Model & CRPS & $q_{0.05}$ pinball & CRPS & $q_{0.95}$ pinball & 90\% coverage \\
 \midrule
 \multicolumn{6}{l}{\emph{Raw prices}} \\
 Ours & \textbf{14.52} & \textbf{4.74} & 800.3 & 675.3 & 91.5\% \\
-Linear base only & 16.21 & 5.82 & 882.3 & 777.2 & 93.1\% \\
-XGBoost & 15.96 & 6.13 & 790.5 & 640.3 & 87.7\% \\
-PatchTST & 17.99 & 7.51 & 745.2 & 600.3 & 90.0\% \\
-DLinear & 17.25 & 7.33 & \textbf{740.3} & \textbf{591.7} & 89.1\% \\
-Linear & 17.25 & 7.38 & 741.8 & 593.8 & 89.0\% \\
+Linear base only & 16.21$^{\dagger}$ & 5.82$^{\dagger}$ & 882.3$^{\dagger}$ & 777.2$^{\dagger}$ & 93.1\% \\
+XGBoost & 15.96$^{\dagger}$ & 6.13$^{\dagger}$ & 790.5 & 640.3 & 87.7\% \\
+PatchTST & 17.99$^{\dagger}$ & 7.51$^{\dagger}$ & 745.2$^{\ddagger}$ & 600.3$^{\ddagger}$ & 90.0\% \\
+DLinear & 17.25$^{\dagger}$ & 7.33$^{\dagger}$ & \textbf{740.3}$^{\ddagger}$ & \textbf{591.7}$^{\ddagger}$ & 89.1\% \\
+Linear & 17.25$^{\dagger}$ & 7.38$^{\dagger}$ & 741.8$^{\ddagger}$ & 593.8$^{\ddagger}$ & 89.0\% \\
 \midrule
 \multicolumn{6}{l}{\emph{Capped at 650}} \\
 Ours & \textbf{14.28} & \textbf{4.83} & \textbf{121.1} & 77.2 & 90.5\% \\
-Linear base only & 16.23 & 6.07 & 146.7 & 87.5 & 92.4\% \\
-XGBoost & 15.47 & 6.13 & 138.3 & 91.0 & 86.2\% \\
-PatchTST & 17.90 & 7.42 & 127.8 & \textbf{77.0} & 90.0\% \\
-DLinear & 17.19 & 7.32 & 141.7 & 85.5 & 89.0\% \\
-Linear & 17.31 & 7.44 & 141.9 & 85.5 & 88.7\% \\
+Linear base only & 16.23$^{\dagger}$ & 6.07$^{\dagger}$ & 146.7$^{\dagger}$ & 87.5$^{\dagger}$ & 92.4\% \\
+XGBoost & 15.47$^{\dagger}$ & 6.13$^{\dagger}$ & 138.3$^{\dagger}$ & 91.0$^{\dagger}$ & 86.2\% \\
+PatchTST & 17.90$^{\dagger}$ & 7.42$^{\dagger}$ & 127.8 & \textbf{77.0} & 90.0\% \\
+DLinear & 17.19$^{\dagger}$ & 7.32$^{\dagger}$ & 141.7$^{\dagger}$ & 85.5 & 89.0\% \\
+Linear & 17.31$^{\dagger}$ & 7.44$^{\dagger}$ & 141.9$^{\dagger}$ & 85.5 & 88.7\% \\
 \bottomrule
 \end{tabular}
