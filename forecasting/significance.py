@@ -12,6 +12,12 @@ With ``--loss crps`` the per-origin loss is CRPS~ (twice the mean pinball loss
 over the five quantiles of ``quantile``, averaged over the 24 horizons); a
 method with several seeds then uses its seed-averaged quantiles.
 
+Tail losses restrict the per-origin loss to event hours within the horizon:
+``crps_negative`` and ``q05_negative`` (CRPS~ and the 0.05-quantile pinball
+loss on hours with a negative price), ``crps_spike`` and ``q95_spike`` (on hours
+above 300 AUD/MWh). Origins without such hours are dropped; they are the same
+for every method, since the actual prices are shared.
+
 Sources are ``name=pattern`` where ``pattern`` is an ``.npz`` path containing
 ``{region}`` and optionally ``{seed}``; each file holds ``point`` (``[N, 24]``
 or ``[S, N, 24]``), ``actual``, and ``origin_unix``. The name ``naive`` with a
@@ -32,9 +38,31 @@ SEEDS = (2026, 2027, 2028)
 LEVELS = np.array([0.05, 0.10, 0.50, 0.90, 0.95])
 
 
-def _crps(quantile: np.ndarray, actual: np.ndarray) -> np.ndarray:
+TAIL_LOSSES = {
+    # name: (event mask on actual prices, quantile level index or None for CRPS~)
+    "crps_negative": (lambda actual: actual < 0, None),
+    "q05_negative": (lambda actual: actual < 0, 0),
+    "crps_spike": (lambda actual: actual > 300, None),
+    "q95_spike": (lambda actual: actual > 300, 4),
+}
+
+
+def _hourly_pinball(quantile: np.ndarray, actual: np.ndarray) -> np.ndarray:
     error = actual[..., None] - np.sort(quantile, axis=-1)
-    return 2 * np.maximum(LEVELS * error, (LEVELS - 1) * error).mean(axis=-1).mean(axis=1)
+    return np.maximum(LEVELS * error, (LEVELS - 1) * error)
+
+
+def _crps(quantile: np.ndarray, actual: np.ndarray) -> np.ndarray:
+    return 2 * _hourly_pinball(quantile, actual).mean(axis=-1).mean(axis=1)
+
+
+def _tail(quantile: np.ndarray, actual: np.ndarray, loss: str) -> np.ndarray:
+    select, level = TAIL_LOSSES[loss]
+    pinball = _hourly_pinball(quantile, actual)
+    hourly = 2 * pinball.mean(axis=-1) if level is None else pinball[..., level]
+    mask = select(actual)
+    with np.errstate(invalid="ignore"):
+        return np.where(mask.any(axis=1), (hourly * mask).sum(axis=1) / mask.sum(axis=1), np.nan)
 
 
 def _load(pattern: str, region: str, use_naive: bool = False, loss: str = "mae"):
@@ -44,22 +72,27 @@ def _load(pattern: str, region: str, use_naive: bool = False, loss: str = "mae")
         else [pattern.format(region=region)]
     )
     points, actual, origins = [], None, None
-    key = "quantile" if loss == "crps" else ("naive" if use_naive else "point")
+    probabilistic = loss == "crps" or loss in TAIL_LOSSES
+    key = "quantile" if probabilistic else ("naive" if use_naive else "point")
     for path in paths:
         with np.load(path) as archive:
             point = archive[key]
-            points.extend(point if point.ndim == (4 if loss == "crps" else 3) else [point])
+            points.extend(point if point.ndim == (4 if probabilistic else 3) else [point])
             if actual is None:
                 actual, origins = archive["actual"], archive["origin_unix"]
             elif not (np.array_equal(archive["origin_unix"], origins) and np.allclose(archive["actual"], actual)):
                 raise ValueError(f"{path} is not aligned with the other seeds")
     if loss == "crps":
         return _crps(np.mean(points, axis=0), actual), actual, origins, len(points)
+    if loss in TAIL_LOSSES:
+        return _tail(np.mean(points, axis=0), actual, loss), actual, origins, len(points)
     losses = np.mean([np.abs(p - actual).mean(axis=1) for p in points], axis=0)
     return losses, actual, origins, len(points)
 
 
 def diebold_mariano(differential: np.ndarray, lag: int) -> dict:
+    # Tail losses are undefined at origins without event hours; drop them.
+    differential = differential[np.isfinite(differential)]
     d = differential - differential.mean()
     n = d.size
     variance = d @ d / n
@@ -76,8 +109,9 @@ def run(reference: str, sources: dict[str, str], lag: int, output: Path, loss: s
         loaded[name] = {}
         for region in REGIONS:
             loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
-    description = ("per-origin CRPS~ over 24 hours, seed-averaged quantiles" if loss == "crps"
-                   else "per-origin mean absolute error over 24 hours")
+    description = {"crps": "per-origin CRPS~ over 24 hours, seed-averaged quantiles",
+                   "mae": "per-origin mean absolute error over 24 hours"}.get(
+        loss, f"per-origin {loss} over the event hours of the horizon, seed-averaged quantiles")
     result = {"reference": reference, "lag": lag, "loss": description,
               "seeds": {name: loaded[name][REGIONS[0]][3] for name in sources}, "comparisons": {}}
     for name in sources:
@@ -95,7 +129,9 @@ def run(reference: str, sources: dict[str, str], lag: int, output: Path, loss: s
                 "reference_mae": float(ref_loss.mean()), "other_mae": float(loss.mean()),
             }
             pooled.append(differential)
-        comparison["three_region_mean"] = diebold_mariano(np.mean(pooled, axis=0), lag)
+        with np.errstate(invalid="ignore"), __import__("warnings").catch_warnings():
+            __import__("warnings").simplefilter("ignore", RuntimeWarning)
+            comparison["three_region_mean"] = diebold_mariano(np.nanmean(pooled, axis=0), lag)
         result["comparisons"][name] = comparison
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2))
@@ -108,7 +144,7 @@ def main() -> None:
     parser.add_argument("--source", action="append", required=True, help="name=pattern")
     parser.add_argument("--lag", type=int, default=48)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--loss", choices=("mae", "crps"), default="mae")
+    parser.add_argument("--loss", choices=("mae", "crps", *TAIL_LOSSES), default="mae")
     args = parser.parse_args()
     sources = dict(item.split("=", 1) for item in args.source)
     result = run(args.reference, sources, args.lag, args.output, args.loss)
