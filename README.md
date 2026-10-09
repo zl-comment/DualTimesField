@@ -472,6 +472,30 @@ python -m forecasting.train \
   --region NSW1 --seed 2027
 ```
 
+### XGBoost base with a dual-field residual
+
+An `external_base` block replaces the linear base with fixed forecasts of
+another model, to which the dual-field forecast is added as a residual.
+`forecasting/xgboost_base.py` builds them from the configuration that will be
+trained: the multi-quantile XGBoost of `forecasting.baselines` forecasts the
+validation and test origins, and the training origins are forecast out of
+fold (contiguous blocks, purged of overlapping windows), so the residuals the
+fields learn from match those at test time. `model.base_inputs: true` also
+feeds the base forecasts to the DGF heads and the fusion gate, and
+`model.field_point: false` keeps XGBoost's point forecast and corrects only
+its quantiles. `model.head_input: raw_history` gives the stacking control.
+
+```bash
+python -m forecasting.xgboost_base \
+  --config configs/aemo_forecast_xgb_base_tails.yaml --region NSW1
+python -m forecasting.train \
+  --config configs/aemo_forecast_xgb_base_tails.yaml --region NSW1
+```
+
+`scripts/run_xgboost_base_fields.sh` runs the quarterly-refit experiment; the
+design and the success criteria are in
+[`logs/forecasting/PLAN_XGBOOST_BASE_FIELDS.md`](logs/forecasting/PLAN_XGBOOST_BASE_FIELDS.md).
+
 ### Reconstruction (9 long-horizon benchmarks, mean over 5 seeds)
 
 <p align="center">
