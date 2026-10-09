@@ -531,8 +531,8 @@ def figure_cases() -> dict:
 
 
 def figure_framework() -> None:
-    """Vector architecture; keep the standalone drawing and full builder aligned."""
-    from paper.draw_framework import save_framework
+    """Central architecture and rounded mechanism callouts with real signals."""
+    from paper.draw_framework_timemixer import save_framework
 
     save_framework(FIGURES)
 
