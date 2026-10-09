@@ -1,0 +1,68 @@
+{
+  "reference": "C_nofields",
+  "lag": 48,
+  "loss": "per-origin crps_spike over the event hours of the horizon, seed-averaged quantiles",
+  "seeds": {
+    "C_nofields": 3,
+    "A_final_fields": 3,
+    "XGBoost": 3
+  },
+  "comparisons": {
+    "A_final_fields": {
+      "NSW1": {
+        "mean_difference": 64.39508258639853,
+        "statistic": 4.856592035690664,
+        "p_value": 1.1942328655748995e-06,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": 6.560917544854021,
+        "statistic": 1.511488730732475,
+        "p_value": 0.1306639776536981,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -0.6185114114442472,
+        "statistic": -0.7934732638074602,
+        "p_value": 0.42750214039388684,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": 29.678410333921725,
+        "statistic": 4.197179959474356,
+        "p_value": 2.702591782241332e-05
+      }
+    },
+    "XGBoost": {
+      "NSW1": {
+        "mean_difference": 39.07241494122588,
+        "statistic": 3.320144459123374,
+        "p_value": 0.0008997087909337403,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": 44.544693862424424,
+        "statistic": 2.965922782571614,
+        "p_value": 0.0030177624725620253,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -9.459677496012686,
+        "statistic": -2.0339098689159893,
+        "p_value": 0.041960683748176915,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": 33.93223083808465,
+        "statistic": 3.5211291342207782,
+        "p_value": 0.0004297132957470135
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "reference": "C_nofields",
+  "lag": 48,
+  "loss": "per-origin CRPS~ over 24 hours, seed-averaged quantiles",
+  "seeds": {
+    "C_nofields": 3,
+    "A_final_fields": 3,
+    "XGBoost": 3
+  },
+  "comparisons": {
+    "A_final_fields": {
+      "NSW1": {
+        "mean_difference": 0.4895470125787818,
+        "statistic": 1.683164478567057,
+        "p_value": 0.09234325515989758,
+        "reference_mae": 31.766671971966268,
+        "other_mae": 31.277124959387486
+      },
+      "QLD1": {
+        "mean_difference": 0.0037493424325103406,
+        "statistic": 0.035638006070745104,
+        "p_value": 0.9715710030964217,
+        "reference_mae": 25.30020754022264,
+        "other_mae": 25.296458197790134
+      },
+      "TAS1": {
+        "mean_difference": -0.035666036234917584,
+        "statistic": -1.039349205742822,
+        "p_value": 0.2986423580978959,
+        "reference_mae": 15.30913124386565,
+        "other_mae": 15.344797280100565
+      },
+      "three_region_mean": {
+        "mean_difference": 0.15254343959212482,
+        "statistic": 1.3933879710906507,
+        "p_value": 0.16350250123911536
+      }
+    },
+    "XGBoost": {
+      "NSW1": {
+        "mean_difference": 1.3786423610512806,
+        "statistic": 4.586319652420305,
+        "p_value": 4.511277389065759e-06,
+        "reference_mae": 31.766671971966268,
+        "other_mae": 30.38802961091499
+      },
+      "QLD1": {
+        "mean_difference": 2.4772218575059877,
+        "statistic": 5.938062184048484,
+        "p_value": 2.8841065734194775e-09,
+        "reference_mae": 25.30020754022264,
+        "other_mae": 22.822985682716656
+      },
+      "TAS1": {
+        "mean_difference": -0.06735358917673487,
+        "statistic": -0.6336109353777853,
+        "p_value": 0.5263347624669256,
+        "reference_mae": 15.30913124386565,
+        "other_mae": 15.376484833042383
+      },
+      "three_region_mean": {
+        "mean_difference": 1.2628368764601778,
+        "statistic": 5.992304935878734,
+        "p_value": 2.0688752244924702e-09
+      }
+    }
+  }
+}

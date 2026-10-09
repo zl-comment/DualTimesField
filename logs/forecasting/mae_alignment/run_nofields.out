@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 184, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 178, in main
+    collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 88, in collect
+    with np.load(static_npz_dir / f"{region}.npz") as archive:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/pd_calibrator/NSW1.npz'

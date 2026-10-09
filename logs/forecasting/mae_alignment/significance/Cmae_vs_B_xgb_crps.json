@@ -1,0 +1,68 @@
+{
+  "reference": "C_mae",
+  "lag": 48,
+  "loss": "per-origin CRPS~ over 24 hours, seed-averaged quantiles",
+  "seeds": {
+    "C_mae": 3,
+    "B_fields_mae": 3,
+    "XGBoost": 3
+  },
+  "comparisons": {
+    "B_fields_mae": {
+      "NSW1": {
+        "mean_difference": 0.6464173515978587,
+        "statistic": 2.64849924678599,
+        "p_value": 0.00808500294026304,
+        "reference_mae": 31.86464375989841,
+        "other_mae": 31.218226408300545
+      },
+      "QLD1": {
+        "mean_difference": -0.07020821565909674,
+        "statistic": -1.0058941721822443,
+        "p_value": 0.3144664799567761,
+        "reference_mae": 25.291096631341265,
+        "other_mae": 25.361304847000362
+      },
+      "TAS1": {
+        "mean_difference": -0.08859242493476457,
+        "statistic": -3.092588329251823,
+        "p_value": 0.0019841917478306344,
+        "reference_mae": 15.27732619866951,
+        "other_mae": 15.365918623604275
+      },
+      "three_region_mean": {
+        "mean_difference": 0.16253890366799914,
+        "statistic": 1.7542770233350238,
+        "p_value": 0.07938305083874586
+      }
+    },
+    "XGBoost": {
+      "NSW1": {
+        "mean_difference": 1.4766141489834188,
+        "statistic": 5.104774454950187,
+        "p_value": 3.3118928489965496e-07,
+        "reference_mae": 31.86464375989841,
+        "other_mae": 30.38802961091499
+      },
+      "QLD1": {
+        "mean_difference": 2.4681109486246076,
+        "statistic": 5.462940862357629,
+        "p_value": 4.683106460345473e-08,
+        "reference_mae": 25.291096631341265,
+        "other_mae": 22.822985682716656
+      },
+      "TAS1": {
+        "mean_difference": -0.09915863437287359,
+        "statistic": -0.9396560903909726,
+        "p_value": 0.3473939950758383,
+        "reference_mae": 15.27732619866951,
+        "other_mae": 15.376484833042383
+      },
+      "three_region_mean": {
+        "mean_difference": 1.281855487745051,
+        "statistic": 5.873953203002408,
+        "p_value": 4.255235400599405e-09
+      }
+    }
+  }
+}

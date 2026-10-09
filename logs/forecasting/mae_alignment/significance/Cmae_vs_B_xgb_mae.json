@@ -1,0 +1,68 @@
+{
+  "reference": "C_mae",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "C_mae": 3,
+    "B_fields_mae": 3,
+    "XGBoost": 3
+  },
+  "comparisons": {
+    "B_fields_mae": {
+      "NSW1": {
+        "mean_difference": -0.4178343640562285,
+        "statistic": -3.5010355199199634,
+        "p_value": 0.00046345406903726947,
+        "reference_mae": 43.44974596111711,
+        "other_mae": 43.867580325173336
+      },
+      "QLD1": {
+        "mean_difference": -0.5732795411957983,
+        "statistic": -6.973751503943424,
+        "p_value": 3.085989801067961e-12,
+        "reference_mae": 37.56290714672876,
+        "other_mae": 38.13618668792456
+      },
+      "TAS1": {
+        "mean_difference": 0.13740781864848028,
+        "statistic": 1.7233260888431237,
+        "p_value": 0.0848295724750274,
+        "reference_mae": 27.21329377498183,
+        "other_mae": 27.075885956333348
+      },
+      "three_region_mean": {
+        "mean_difference": -0.2845686955345155,
+        "statistic": -4.71595701419382,
+        "p_value": 2.4057722787630665e-06
+      }
+    },
+    "XGBoost": {
+      "NSW1": {
+        "mean_difference": 0.11186740633577806,
+        "statistic": 0.667367005876246,
+        "p_value": 0.5045377356409524,
+        "reference_mae": 43.44974596111711,
+        "other_mae": 43.337878554781334
+      },
+      "QLD1": {
+        "mean_difference": 1.089066904882937,
+        "statistic": 4.866522714333618,
+        "p_value": 1.13578875196844e-06,
+        "reference_mae": 37.56290714672876,
+        "other_mae": 36.47384024184583
+      },
+      "TAS1": {
+        "mean_difference": 0.4581192837597397,
+        "statistic": 2.496037650590761,
+        "p_value": 0.012558927060065495,
+        "reference_mae": 27.21329377498183,
+        "other_mae": 26.755174491222085
+      },
+      "three_region_mean": {
+        "mean_difference": 0.5530178649928182,
+        "statistic": 4.704805102575935,
+        "p_value": 2.541085881193104e-06
+      }
+    }
+  }
+}
