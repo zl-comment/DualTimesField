@@ -1,0 +1,126 @@
+{
+  "reference": "xgb_base_tails",
+  "lag": 48,
+  "loss": "per-origin crps_spike over the event hours of the horizon, seed-averaged quantiles",
+  "seeds": {
+    "xgb_base_fields": 3,
+    "xgb_base_tails": 3,
+    "xgb_base_raw": 3,
+    "xgb_base_raw_tails": 3,
+    "xgboost": 3
+  },
+  "comparisons": {
+    "xgb_base_fields": {
+      "NSW1": {
+        "mean_difference": -0.6916969684885677,
+        "statistic": -0.40867258313538357,
+        "p_value": 0.682779956611098,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": -2.8296860981303356,
+        "statistic": -4.650966808262016,
+        "p_value": 3.3038250504269678e-06,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -1.0010090436410712,
+        "statistic": -0.38108608032471974,
+        "p_value": 0.7031393758004251,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": -1.1748559690368023,
+        "statistic": -1.4491675466101226,
+        "p_value": 0.14729079824671623
+      }
+    },
+    "xgb_base_raw": {
+      "NSW1": {
+        "mean_difference": -1.8166432762945688,
+        "statistic": -0.976268803910594,
+        "p_value": 0.32893127500783015,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": -3.4284966772823378,
+        "statistic": -5.225864649125822,
+        "p_value": 1.7334313234142317e-07,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -2.2922207851162133,
+        "statistic": -0.843734613357862,
+        "p_value": 0.3988177209052791,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": -2.149571928008208,
+        "statistic": -2.4097725053633856,
+        "p_value": 0.015962470391062737
+      }
+    },
+    "xgb_base_raw_tails": {
+      "NSW1": {
+        "mean_difference": 1.326298127601,
+        "statistic": 2.6070213399451396,
+        "p_value": 0.009133366795392167,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": -0.025159439553892163,
+        "statistic": -0.07293018042200805,
+        "p_value": 0.9418616773807537,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -1.356263526752312,
+        "statistic": -2.4933687392933566,
+        "p_value": 0.012653736036860616,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": 0.3698474261197162,
+        "statistic": 1.1683194165246633,
+        "p_value": 0.24267794617967875
+      }
+    },
+    "xgboost": {
+      "NSW1": {
+        "mean_difference": -29.599378206781086,
+        "statistic": -9.675775192109006,
+        "p_value": 3.821841564535094e-22,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": -15.466427376113655,
+        "statistic": -9.591852399994565,
+        "p_value": 8.651752706478823e-22,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": -24.6488814653884,
+        "statistic": -3.875195330259414,
+        "p_value": 0.00010653920391562925,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": -20.162950769638723,
+        "statistic": -10.99277510486086,
+        "p_value": 4.139976113653894e-28
+      }
+    }
+  }
+}

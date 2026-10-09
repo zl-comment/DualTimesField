@@ -1,0 +1,33 @@
+/root/workspace/Code/DualTimesField/.venv/lib/python3.11/site-packages/xgboost/core.py:751: UserWarning: [08:51:14] WARNING: /__w/xgboost/xgboost/src/common/error_msg.cc:62: Falling back to prediction using DMatrix due to mismatched devices. This might lead to higher memory usage and slower performance. XGBoost is running on: cuda:0, while the input data is on: cpu.
+Potential solutions:
+- Use a data structure that matches the device ordinal in the booster.
+- Set the device for booster before call to inplace_predict.
+
+This warning will only be shown once.
+
+  return func(**kwargs)
+TAS1 horizon 1: 168 rounds, 499 s
+TAS1 horizon 2: 161 rounds, 976 s
+TAS1 horizon 3: 84 rounds, 1144 s
+TAS1 horizon 4: 184 rounds, 1628 s
+TAS1 horizon 5: 106 rounds, 1873 s
+TAS1 horizon 6: 68 rounds, 2202 s
+TAS1 horizon 7: 66 rounds, 2560 s
+TAS1 horizon 8: 55 rounds, 2859 s
+TAS1 horizon 9: 55 rounds, 3162 s
+TAS1 horizon 10: 56 rounds, 3455 s
+TAS1 horizon 11: 66 rounds, 3727 s
+TAS1 horizon 12: 59 rounds, 3977 s
+TAS1 horizon 13: 55 rounds, 4252 s
+TAS1 horizon 14: 56 rounds, 4529 s
+TAS1 horizon 15: 58 rounds, 4821 s
+TAS1 horizon 16: 56 rounds, 5099 s
+TAS1 horizon 17: 68 rounds, 5442 s
+TAS1 horizon 18: 99 rounds, 5819 s
+TAS1 horizon 19: 69 rounds, 6090 s
+TAS1 horizon 20: 68 rounds, 6449 s
+TAS1 horizon 21: 63 rounds, 6772 s
+TAS1 horizon 22: 67 rounds, 7124 s
+TAS1 horizon 23: 70 rounds, 7398 s
+TAS1 horizon 24: 67 rounds, 7670 s
+xgboost base TAS1: MAE train (out of fold) 23.11, validation 55.03, test 23.03; 7682.2 s

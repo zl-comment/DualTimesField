@@ -1,0 +1,356 @@
+collected xgb_base_fields NSW1: 17521 origins, MAE 45.04
+collected xgb_base_fields QLD1: 17521 origins, MAE 40.16
+collected xgb_base_fields TAS1: 17521 origins, MAE 27.24
+collected xgb_base_tails NSW1: 17521 origins, MAE 43.35
+collected xgb_base_tails QLD1: 17521 origins, MAE 36.46
+collected xgb_base_tails TAS1: 17521 origins, MAE 26.78
+collected xgb_base_raw NSW1: 17521 origins, MAE 44.71
+collected xgb_base_raw QLD1: 17521 origins, MAE 39.20
+collected xgb_base_raw TAS1: 17521 origins, MAE 27.26
+collected xgb_base_raw_tails NSW1: 17521 origins, MAE 43.35
+collected xgb_base_raw_tails QLD1: 17521 origins, MAE 36.46
+collected xgb_base_raw_tails TAS1: 17521 origins, MAE 26.78
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 190, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 184, in main
+    collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 94, in collect
+    with np.load(static_npz_dir / f"{region}.npz") as archive:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/capped650_pd_linear_base/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 190, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 184, in main
+    collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 94, in collect
+    with np.load(static_npz_dir / f"{region}.npz") as archive:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/capped650_pd_linear_base/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 190, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 184, in main
+    collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 94, in collect
+    with np.load(static_npz_dir / f"{region}.npz") as archive:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/capped650_pd_linear_base/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 190, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 184, in main
+    collect(args.name, args.static_npz_dir, args.output_dir, args.metrics_dir, args.device)
+  File "/root/workspace/Code/DualTimesField/forecasting/rolling.py", line 94, in collect
+    with np.load(static_npz_dir / f"{region}.npz") as archive:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/capped650_pd_linear_base/NSW1.npz'
+/root/workspace/Code/DualTimesField/forecasting/significance.py:101: RuntimeWarning: invalid value encountered in scalar divide
+  statistic = differential.mean() / math.sqrt(variance / n)
+xgb_base_tails - xgb_base_fields: pooled -1.952 (DM -9.38, p=0.0000) | NSW1:-1.69(p=0.000) QLD1:-3.70(p=0.000) TAS1:-0.46(p=0.022)
+xgb_base_tails - xgb_base_raw: pooled -1.527 (DM -8.40, p=0.0000) | NSW1:-1.36(p=0.000) QLD1:-2.74(p=0.000) TAS1:-0.48(p=0.025)
+xgb_base_tails - xgb_base_raw_tails: pooled +0.000 (DM +nan, p=nan) | NSW1:+0.00(p=nan) QLD1:+0.00(p=nan) TAS1:+0.00(p=nan)
+xgb_base_tails - xgboost: pooled +0.007 (DM +0.70, p=0.4859) | NSW1:+0.01(p=0.549) QLD1:-0.02(p=0.297) TAS1:+0.02(p=0.028)
+xgb_base_fields - xgb_base_tails: pooled +1.952 (DM +9.38, p=0.0000) | NSW1:+1.69(p=0.000) QLD1:+3.70(p=0.000) TAS1:+0.46(p=0.022)
+xgb_base_fields - xgb_base_raw: pooled +0.425 (DM +7.39, p=0.0000) | NSW1:+0.32(p=0.005) QLD1:+0.97(p=0.000) TAS1:-0.02(p=0.728)
+xgb_base_fields - xgb_base_raw_tails: pooled +1.952 (DM +9.38, p=0.0000) | NSW1:+1.69(p=0.000) QLD1:+3.70(p=0.000) TAS1:+0.46(p=0.022)
+xgb_base_fields - xgboost: pooled +1.959 (DM +9.44, p=0.0000) | NSW1:+1.70(p=0.000) QLD1:+3.69(p=0.000) TAS1:+0.49(p=0.016)
+xgb_base_tails - xgb_base_fields: pooled +0.028 (DM +0.24, p=0.8080) | NSW1:-0.02(p=0.936) QLD1:+0.32(p=0.106) TAS1:-0.23(p=0.000)
+xgb_base_tails - xgb_base_raw: pooled +0.223 (DM +1.97, p=0.0488) | NSW1:+0.10(p=0.614) QLD1:+0.65(p=0.001) TAS1:-0.08(p=0.018)
+xgb_base_tails - xgb_base_raw_tails: pooled +0.109 (DM +2.51, p=0.0120) | NSW1:-0.13(p=0.120) QLD1:+0.46(p=0.000) TAS1:+0.00(p=0.764)
+xgb_base_tails - xgboost: pooled +0.598 (DM +2.97, p=0.0030) | NSW1:+0.14(p=0.715) QLD1:+1.51(p=0.000) TAS1:+0.15(p=0.038)
+xgb_base_fields - xgb_base_tails: pooled -0.028 (DM -0.24, p=0.8080) | NSW1:+0.02(p=0.936) QLD1:-0.32(p=0.106) TAS1:+0.23(p=0.000)
+xgb_base_fields - xgb_base_raw: pooled +0.196 (DM +7.47, p=0.0000) | NSW1:+0.12(p=0.010) QLD1:+0.33(p=0.000) TAS1:+0.14(p=0.000)
+xgb_base_fields - xgb_base_raw_tails: pooled +0.082 (DM +0.94, p=0.3496) | NSW1:-0.12(p=0.380) QLD1:+0.13(p=0.462) TAS1:+0.23(p=0.000)
+xgb_base_fields - xgboost: pooled +0.570 (DM +5.48, p=0.0000) | NSW1:+0.15(p=0.438) QLD1:+1.18(p=0.000) TAS1:+0.38(p=0.000)
+xgb_base_tails - xgb_base_fields: pooled -0.327 (DM -3.52, p=0.0004) | NSW1:-0.24(p=0.051) QLD1:-0.19(p=0.005) TAS1:-0.79(p=0.000)
+xgb_base_tails - xgb_base_raw: pooled -0.002 (DM -0.02, p=0.9824) | NSW1:-0.07(p=0.633) QLD1:+0.02(p=0.808) TAS1:-0.33(p=0.040)
+xgb_base_tails - xgb_base_raw_tails: pooled +0.245 (DM +3.44, p=0.0006) | NSW1:+0.18(p=0.072) QLD1:+0.16(p=0.001) TAS1:+0.17(p=0.126)
+xgb_base_tails - xgboost: pooled -2.663 (DM -12.07, p=0.0000) | NSW1:-4.56(p=0.000) QLD1:-0.96(p=0.000) TAS1:-3.36(p=0.000)
+xgb_base_fields - xgb_base_tails: pooled +0.327 (DM +3.52, p=0.0004) | NSW1:+0.24(p=0.051) QLD1:+0.19(p=0.005) TAS1:+0.79(p=0.000)
+xgb_base_fields - xgb_base_raw: pooled +0.324 (DM +5.37, p=0.0000) | NSW1:+0.17(p=0.033) QLD1:+0.22(p=0.000) TAS1:+0.46(p=0.000)
+xgb_base_fields - xgb_base_raw_tails: pooled +0.572 (DM +6.03, p=0.0000) | NSW1:+0.42(p=0.000) QLD1:+0.35(p=0.000) TAS1:+0.96(p=0.000)
+xgb_base_fields - xgboost: pooled -2.336 (DM -10.21, p=0.0000) | NSW1:-4.32(p=0.000) QLD1:-0.76(p=0.003) TAS1:-2.57(p=0.000)
+xgb_base_tails - xgb_base_fields: pooled +0.029 (DM +0.37, p=0.7083) | NSW1:+0.06(p=0.569) QLD1:+0.05(p=0.304) TAS1:-0.27(p=0.041)
+xgb_base_tails - xgb_base_raw: pooled +0.234 (DM +2.16, p=0.0306) | NSW1:+0.11(p=0.458) QLD1:+0.17(p=0.022) TAS1:+0.14(p=0.318)
+xgb_base_tails - xgb_base_raw_tails: pooled +0.183 (DM +2.17, p=0.0300) | NSW1:+0.10(p=0.414) QLD1:+0.04(p=0.182) TAS1:+0.31(p=0.009)
+xgb_base_tails - xgboost: pooled -2.994 (DM -10.49, p=0.0000) | NSW1:-4.29(p=0.000) QLD1:-1.19(p=0.000) TAS1:-3.60(p=0.000)
+xgb_base_fields - xgb_base_tails: pooled -0.029 (DM -0.37, p=0.7083) | NSW1:-0.06(p=0.569) QLD1:-0.05(p=0.304) TAS1:+0.27(p=0.041)
+xgb_base_fields - xgb_base_raw: pooled +0.205 (DM +3.15, p=0.0016) | NSW1:+0.05(p=0.569) QLD1:+0.12(p=0.003) TAS1:+0.42(p=0.000)
+xgb_base_fields - xgb_base_raw_tails: pooled +0.155 (DM +1.69, p=0.0909) | NSW1:+0.04(p=0.763) QLD1:-0.02(p=0.795) TAS1:+0.59(p=0.000)
+xgb_base_fields - xgboost: pooled -3.023 (DM -9.74, p=0.0000) | NSW1:-4.35(p=0.000) QLD1:-1.24(p=0.000) TAS1:-3.33(p=0.000)
+xgb_base_tails - xgb_base_fields: pooled -15.934 (DM -3.39, p=0.0007) | NSW1:-21.63(p=0.002) QLD1:-19.70(p=0.001) TAS1:+0.15(p=0.946)
+xgb_base_tails - xgb_base_raw: pooled -15.105 (DM -3.06, p=0.0022) | NSW1:-18.18(p=0.018) QLD1:-18.77(p=0.001) TAS1:-1.33(p=0.484)
+xgb_base_tails - xgb_base_raw_tails: pooled -6.479 (DM -3.13, p=0.0017) | NSW1:-11.79(p=0.001) QLD1:-4.32(p=0.010) TAS1:-0.92(p=0.010)
+xgb_base_tails - xgboost: pooled -40.467 (DM -5.27, p=0.0000) | NSW1:-63.06(p=0.000) QLD1:-35.61(p=0.000) TAS1:-16.62(p=0.000)
+xgb_base_fields - xgb_base_tails: pooled +15.934 (DM +3.39, p=0.0007) | NSW1:+21.63(p=0.002) QLD1:+19.70(p=0.001) TAS1:-0.15(p=0.946)
+xgb_base_fields - xgb_base_raw: pooled +0.830 (DM +0.86, p=0.3873) | NSW1:+3.46(p=0.086) QLD1:+0.93(p=0.230) TAS1:-1.48(p=0.026)
+xgb_base_fields - xgb_base_raw_tails: pooled +9.456 (DM +2.90, p=0.0037) | NSW1:+9.84(p=0.025) QLD1:+15.38(p=0.002) TAS1:-1.07(p=0.641)
+xgb_base_fields - xgboost: pooled -24.533 (DM -7.37, p=0.0000) | NSW1:-41.43(p=0.000) QLD1:-15.91(p=0.000) TAS1:-16.77(p=0.000)
+xgb_base_tails - xgb_base_fields: pooled -18.206 (DM -2.92, p=0.0035) | NSW1:-24.86(p=0.006) QLD1:-23.37(p=0.006) TAS1:+1.06(p=0.594)
+xgb_base_tails - xgb_base_raw: pooled -16.207 (DM -2.43, p=0.0151) | NSW1:-18.95(p=0.066) QLD1:-21.62(p=0.010) TAS1:+0.47(p=0.772)
+xgb_base_tails - xgb_base_raw_tails: pooled -6.825 (DM -2.59, p=0.0095) | NSW1:-14.70(p=0.002) QLD1:-2.97(p=0.131) TAS1:-0.57(p=0.136)
+xgb_base_tails - xgboost: pooled -47.741 (DM -4.42, p=0.0000) | NSW1:-78.51(p=0.000) QLD1:-40.81(p=0.001) TAS1:-13.93(p=0.002)
+xgb_base_fields - xgb_base_tails: pooled +18.206 (DM +2.92, p=0.0035) | NSW1:+24.86(p=0.006) QLD1:+23.37(p=0.006) TAS1:-1.06(p=0.594)
+xgb_base_fields - xgb_base_raw: pooled +1.999 (DM +1.34, p=0.1806) | NSW1:+5.91(p=0.059) QLD1:+1.75(p=0.149) TAS1:-0.60(p=0.401)
+xgb_base_fields - xgb_base_raw_tails: pooled +11.380 (DM +2.52, p=0.0117) | NSW1:+10.15(p=0.079) QLD1:+20.40(p=0.007) TAS1:-1.63(p=0.416)
+xgb_base_fields - xgboost: pooled -29.535 (DM -5.76, p=0.0000) | NSW1:-53.65(p=0.000) QLD1:-17.44(p=0.000) TAS1:-14.99(p=0.000)
+| Model | CRPS~ | CRPS~ <0 | CRPS~ 0-100 | CRPS~ 100-300 | CRPS~ >300 | q95 pinball, spikes | q05 pinball, negative | spike hit | spike false alarm | negative hit | negative false alarm | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| xgb_base_fields | 23.43 | 13.59 | 9.81 | 19.08 | 761.77 | 605.9 | 3.88 | 89.1% | 11.6% | 97.2% | 25.4% | 95.4% |
+| xgb_base_tails | 23.46 | 13.26 | 9.66 | 20.72 | 740.72 | 580.3 | 3.78 | 89.2% | 12.6% | 97.3% | 24.1% | 95.0% |
+| xgb_base_raw | 23.24 | 13.36 | 9.62 | 19.00 | 760.32 | 602.6 | 3.75 | 89.2% | 11.5% | 97.4% | 24.5% | 95.5% |
+| xgb_base_raw_tails | 23.35 | 13.16 | 9.54 | 20.26 | 748.16 | 588.8 | 3.68 | 89.1% | 12.3% | 97.4% | 23.5% | 95.1% |
+| xgboost | 22.86 | 15.96 | 8.22 | 18.45 | 790.55 | 640.3 | 6.13 | 85.1% | 8.5% | 91.7% | 10.6% | 87.7% |
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 162, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 150, in main
+    result = run(args.reference, sources, args.lag, args.output, args.loss)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 111, in run
+    loaded[name][region] = _load(pattern, region, use_naive=name == "naive", loss=loss)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/significance.py", line 78, in _load
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/root/workspace/Code/DualTimesField/forecasting/tail_metrics.py", line 106, in <module>
+    main()
+  File "/root/workspace/Code/DualTimesField/forecasting/tail_metrics.py", line 81, in main
+    quantile, actual = _quantiles(pattern, region)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/Code/DualTimesField/forecasting/tail_metrics.py", line 41, in _quantiles
+    with np.load(path) as archive:
+         ^^^^^^^^^^^^^
+  File "/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/forecasting/significance_inputs/rolling_capped650_xgb_base_fields/NSW1.npz'

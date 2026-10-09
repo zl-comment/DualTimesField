@@ -1,6 +1,6 @@
 # Plan: XGBoost base with a dual-field residual
 
-Status: implemented, not yet run. Branch `feature/xgboost-base-fields`, from
+Status: run (2026-10-09); results at the end. Branch `feature/xgboost-base-fields`, from
 `main` (`5ff4853`).
 
 ## Why
@@ -119,3 +119,40 @@ linear base.
 The 2023-2024 test period has guided many design choices. Once the final model
 is fixed, it and the baselines should be scored once on 2025, which no
 decision has seen.
+
+## Results (run 2026-10-09)
+
+All 48 cross-fitted bases and 576 residual refits were completed. Raw prices unless noted; three seeds for the
+residual model, pooled Diebold-Mariano over the three regions (first minus second, negative favours the first;
+`logs/forecasting/significance/{raw,capped650}_xgb_base_*`, `logs/forecasting/xgb_base/`).
+
+| Variant | raw MAE | raw CRPS~ | capped MAE | capped CRPS~ |
+|---|---:|---:|---:|---:|
+| XGBoost (archived baseline) | 35.52 | 23.11 | 24.54 | 13.10 |
+| `xgb_base_tails` (XGBoost point, fields tail correction) | 35.53 | 23.87 | 24.58 | 14.11 |
+| `xgb_base_raw_tails` (control) | 35.53 | 23.75 | 24.58 | 13.75 |
+| `xgb_base_fields` (point and quantiles corrected) | 37.48 | 23.87 | 27.02 | 13.78 |
+| `xgb_base_raw` (control) | 37.06 | 23.60 | 26.08 | 13.41 |
+
+Check of the base: `xgb_base_tails` MAE equals XGBoost's (DM difference +0.007, p=0.49).
+
+| Pre-registered criterion | raw | capped650 | Met? |
+|---|---|---|---|
+| tails CRPS~ below XGBoost | +0.60 (p=0.003) | +0.89 (p<0.001) | **No** (worse) |
+| tails CRPS~ below `raw_tails` | +0.11 (p=0.012) | +0.32 (p<0.001) | **No** (worse) |
+| negative-hour CRPS~ / q05 below XGBoost | -2.66 / -2.99 (p<0.001) | -2.65 / -2.67 (p<0.001) | Yes |
+| negative-hour CRPS~ / q05 below `raw_tails` | +0.25 / +0.18 (p=0.001 / 0.03) | +0.06 / +0.08 (p=0.30 / 0.22) | **No** |
+| fields MAE below XGBoost | +1.96 (p<0.001) | +2.48 (p<0.001) | **No** (worse) |
+| fields MAE below `raw` | +0.43 (p<0.001) | +0.94 (p<0.001) | **No** (worse) |
+
+Not pre-registered (exploratory): spike-hour (>300) CRPS~ of `xgb_base_tails` is below XGBoost by 40.5 (raw) and
+20.2 (capped), and below `raw_tails` by 6.5 (raw, p=0.002) but not under capping (+0.37, p=0.24).
+
+Reading: a learned residual on XGBoost's quantiles improves the tails (negative and spike hours) against XGBoost
+itself, but costs overall CRPS~ and the point forecast; the fields do not beat the raw-history control on any
+pre-registered criterion, so the tail gain is stacking, not the decomposition. By the plan's own rule, the
+decomposition's tail advantage holds only on a linear base (and there only for spike hours).
+
+Run notes: bases of quarters 5-7 (some) were built with the CPU XGBoost (`--device cpu`), the rest on the GPU;
+the capped650 collection used `rolling_capped650_pd_linear_base` as the origin reference because the default
+`capped650_pd_linear_base` does not exist in this checkout. The 2025 hold-out has not been used.

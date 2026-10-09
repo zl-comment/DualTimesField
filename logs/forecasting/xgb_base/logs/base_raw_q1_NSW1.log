@@ -1,0 +1,33 @@
+/root/workspace/Code/DualTimesField/.venv/lib/python3.11/site-packages/xgboost/core.py:751: UserWarning: [08:50:59] WARNING: /__w/xgboost/xgboost/src/common/error_msg.cc:62: Falling back to prediction using DMatrix due to mismatched devices. This might lead to higher memory usage and slower performance. XGBoost is running on: cuda:0, while the input data is on: cpu.
+Potential solutions:
+- Use a data structure that matches the device ordinal in the booster.
+- Set the device for booster before call to inplace_predict.
+
+This warning will only be shown once.
+
+  return func(**kwargs)
+NSW1 horizon 1: 150 rounds, 444 s
+NSW1 horizon 2: 149 rounds, 888 s
+NSW1 horizon 3: 123 rounds, 1268 s
+NSW1 horizon 4: 210 rounds, 1838 s
+NSW1 horizon 5: 143 rounds, 2335 s
+NSW1 horizon 6: 121 rounds, 2687 s
+NSW1 horizon 7: 234 rounds, 3311 s
+NSW1 horizon 8: 132 rounds, 3647 s
+NSW1 horizon 9: 295 rounds, 4658 s
+NSW1 horizon 10: 180 rounds, 5093 s
+NSW1 horizon 11: 208 rounds, 5632 s
+NSW1 horizon 12: 246 rounds, 6735 s
+NSW1 horizon 13: 204 rounds, 7681 s
+NSW1 horizon 14: 132 rounds, 8033 s
+NSW1 horizon 15: 235 rounds, 8837 s
+NSW1 horizon 16: 217 rounds, 9576 s
+NSW1 horizon 17: 200 rounds, 10187 s
+NSW1 horizon 18: 224 rounds, 10841 s
+NSW1 horizon 19: 119 rounds, 11081 s
+NSW1 horizon 20: 266 rounds, 11852 s
+NSW1 horizon 21: 148 rounds, 12099 s
+NSW1 horizon 22: 144 rounds, 12331 s
+NSW1 horizon 23: 259 rounds, 12810 s
+NSW1 horizon 24: 133 rounds, 13005 s
+xgboost base NSW1: MAE train (out of fold) 23.06, validation 25.15, test 38.60; 13016.6 s
