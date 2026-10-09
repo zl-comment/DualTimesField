@@ -16,7 +16,7 @@ PNG; tables are LaTeX fragments for `booktabs`.
 ## Manuscript
 
 `manuscript/` holds the Applied Energy manuscript (`main.tex`, Elsevier
-`elsarticle` class and `elsarticle-num-names` style from CTAN, verified
+`elsarticle` class and `elsarticle-num-names` style from CTAN, audited
 `references.bib`) with copies of the figures and tables it uses. Build from
 `paper/manuscript/`:
 
@@ -25,8 +25,18 @@ pdflatex main && bibtex main && pdflatex main && pdflatex main
 ```
 
 Author details, the generative-AI declaration, and the code-availability
-statement are placeholders to complete before submission. References with a
-DOI were taken from Crossref; the others are checked against arXiv.
+statement are placeholders to complete before submission. The current title is
+**Dual-Field Electricity Price Forecasting with Predispatch**. Source-by-source
+reference checks, corrections and remaining full-text limits are recorded in
+[`REFERENCE_AUDIT.md`](REFERENCE_AUDIT.md).
+
+The manuscript framework figure is `figures/framework_lanes.pdf`, a vector
+figure in a lane layout with no connecting wires, drawn by
+`PYTHONPATH=. .venv/bin/python paper/draw_framework_lanes.py`. Its thumbnails are
+recorded data and model outputs for one QLD1 test day, so the script needs the
+quarterly-refit checkpoints. The earlier image-model version and its prompts
+are kept in `figures/ai_generated` and `draw_framework.py` but are not used in
+the manuscript.
 
 ## LaTeX components
 
@@ -61,20 +71,16 @@ reconstruction. Transplanted into a forecaster, the DGF collapses and the CTF
 absorbs the spikes; detecting events explicitly (largest departures from the
 window median with non-maximum suppression) separates them again.
 
-Separating the fields is not enough to forecast better. On a single fit to
-2015-2021, a linear regression on the same inputs beats the dual-field model:
-reconstruction adds no information about the future, and the fields overfit
-the training-period price level, which shifts in 2022-2024. Two changes,
-standard in electricity-price forecasting practice, reverse this. Refitting
-every test quarter removes most of the regime shift, and AEMO's predispatch
-(the market operator's own dispatch simulation with current offers) adds
-information no other input carries. In that setting the dual fields, added as a residual to a
-linear base, improve both point and interval accuracy over the same base, and
-the model beats PatchTST, DLinear, and a linear model on MAE. A diagnosis of
-the remaining gap to XGBoost found over-extrapolated negative prices, which a
-per-hour calibrator and a validation-chosen price floor reduce. XGBoost stays
-best on mean MAE; the dual-field model is best in the negative-price lower
-tail and, on capped prices, on spike hours.
+On a single fit to 2015-2021, adding the fields worsens the same base's MAE
+but improves its CRPS. Quarterly refits and AEMO predispatch give pooled gains
+in both metrics, although adding the fields still worsens raw-price MAE in
+QLD1. The final model includes a per-hour calibrator and a validation-selected
+lower bound, and beats PatchTST, DLinear and a linear baseline on MAE.
+XGBoost retains the best overall MAE and CRPS. The final model has the lowest
+negative-price scores among the main-table models, but the calibrator without
+the lower bound has still better negative-price scores. The bound trades some
+tail accuracy for better overall MAE. These are rolling hourly 24-hour forecasts,
+not fixed-origin day-ahead auction forecasts.
 
 ## Key numbers (main setting, three seeds)
 
@@ -93,10 +99,11 @@ tail and, on capped prices, on spike hours.
 |---|---|---|
 | `figures/architecture.pdf` | Model structure | See `fig_architecture.tex` |
 | `figures/settings.pdf` | Mean MAE of every model across static split, quarterly refit, and quarterly refit with predispatch | The dual fields fall behind a linear model on the static split and pull ahead of every model except XGBoost with recalibration and predispatch |
-| `figures/framework.pdf` | Overview with data thumbnails from one QLD1 test day | Main overview figure of the manuscript |
+| `figures/framework_lanes.pdf` | Lane-layout overview: inputs, four additive terms, bounded forecast, quarterly refits; thumbnails from one QLD1 test day | Main overview figure; source `draw_framework_lanes.py` |
+| `figures/framework.pdf` | Earlier image-model schematic (not used in the manuscript) | `draw_framework.py`, `figures/ai_generated` |
 | `figures/cases.pdf` | Two test days chosen by fixed rules: deepest negative-price day (QLD1), predispatch phantom spike (NSW1) | Forecast stage by stage: base, + fields, + calibrator, + floor |
 | `figures/same_data_comparison.pdf` | Per-region MAE in the main setting, raw and capped | Same splits, inputs, refits, and scoring; three seeds each |
-| `figures/field_separation.pdf` | Transplanted Gabor DGF vs detected-event DGF (supplementary) | With detected events, the event field carries 28-33% of spike-hour prices, against -0.04 to 0.00 before |
+| `figures/field_separation.pdf` | Transplanted Gabor DGF vs detected-event DGF (supplementary) | Event-to-price mean ratio in standardized asinh space on historical spike positions: 0.28-0.33 versus -0.04 to 0.00; not a monetary share |
 | `figures/ablation_ladder.pdf` | Development on the static split (supplementary) | Each step changes one component |
 
 ## Tables
@@ -117,8 +124,13 @@ tail and, on capped prices, on spike hours.
   capped) and CRPS; the gap is mostly QLD1 and the 100-300 AUD/MWh band.
 - On raw prices, ours does not beat PatchTST, DLinear, or the linear model
   on CRPS (differences not significant); on capped prices it does.
-- The fields help only with recalibration and predispatch; on the static
-  split they cost 0.9 MAE against the same linear base.
+- On the static split the fields cost 0.9 MAE against the same base but improve
+  CRPS. With refits and predispatch, pooled MAE improves, while raw QLD1 MAE
+  worsens by 0.42 before the calibrator and bound are added.
+- The hard event-activity penalty has no training gradient; it contributes to
+  the recorded objective and checkpoint selection, not parameter updates.
+- Main-table scores average seed scores. CRPS tests and tail tables score
+  seed-averaged quantiles; their differences are not directly interchangeable.
 - The price floor is a post-hoc clip whose level is chosen per refit and
   region on validation data; the interconnector solution adds nothing beyond
   predispatch.

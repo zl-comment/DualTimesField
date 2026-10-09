@@ -383,7 +383,7 @@ def figure_mechanism(data: dict) -> dict:
                         ha="center", fontsize=6.5, color=INK)
     bottom.axhline(0, color=CONTEXT, lw=0.8)
     bottom.set_xticks(x, [r[:-1] for r in REGIONS])
-    bottom.set_title("Share of past spike hours (price > 300 AUD/MWh) carried by the event field, test split",
+    bottom.set_title("Event / price mean in standardized asinh space, on past spike hours (>300 AUD/MWh)",
                      loc="left", color=INK)
     bottom.grid(axis="x", visible=False)
     bottom.set_ylim(-0.1, 0.5)
@@ -531,147 +531,10 @@ def figure_cases() -> dict:
 
 
 def figure_framework() -> None:
-    """Overview in the style of ML venues: data thumbnails along the pipeline (QLD case window)."""
-    import pandas as pd
-    from matplotlib.patches import FancyBboxPatch
-    from forecasting.datasets import build_region_datasets
-    from forecasting.rolling import QUARTERS, quarter_config_path
-    from forecasting.train import move_inputs
+    """Central architecture and rounded mechanism callouts with real signals."""
+    from paper.draw_framework_timemixer import save_framework
 
-    region, origin = "QLD1", _case_origins()["QLD1"]
-    day = pd.to_datetime(origin, unit="s") + pd.Timedelta(hours=10)
-    k = int(np.searchsorted(QUARTERS, day, side="right") - 1)
-    config_path = ROOT / quarter_config_path("pd_calibrator", k)
-    dataset = build_region_datasets(config_path, region)["test"]
-    index = int(np.flatnonzero(dataset.delivery_unix_seconds[np.asarray(dataset.origin_indices)] == origin)[0])
-    sample = dataset[index]
-    batch = {key: (value[None] if torch.is_tensor(value) else value) for key, value in sample.items()}
-    model = _load_model(str(config_path.relative_to(ROOT)),
-                        ROOT / f"outputs/forecasting/rolling/pd_calibrator/q{k}/{region}/best_model.pt", torch.device("cpu"))
-    *inputs, _ = move_inputs(batch, torch.device("cpu"))
-    with torch.no_grad():
-        out = model(*inputs)
-    history = sample["history_values"][:, 0].numpy()
-    events = out["event_signal"][0, :, 0].numpy()
-    trend = out["ctf_signal"][0, :, 0].numpy()
-    stages = _stages(region, origin)
-    raw = np.asarray(dataset.target_values_raw)
-    start = int(dataset.origin_indices[index])
-    actual = raw[start:start + 24]
-    past = raw[start - 72:start]
-    with np.load(ROOT / "data/aemo_exogenous/qld1_predispatch.npz") as a:
-        pdp = a["predispatch_rrp"][int(np.searchsorted(a["forecast_origin_unix"], origin))]
-    with np.load(ROOT / "data/aemo_exogenous/qld1_pdpasa.npz") as a:
-        row = int(np.searchsorted(a["forecast_origin_unix"], origin))
-        net_load = a["demand50_mw"][row] - a["uigf_mw"][row]
-
-    fig = plt.figure(figsize=(7.0, 3.55))
-    canvas = fig.add_axes((0, 0, 1, 1))
-    canvas.set_xlim(0, 1)
-    canvas.set_ylim(0, 1)
-    canvas.axis("off")
-
-    def panel(x, y, w, h, title, face, edge):
-        canvas.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.004,rounding_size=0.012",
-                                        facecolor=face, edgecolor=edge, linewidth=0.8))
-        canvas.text(x + 0.008, y + h - 0.012, title, ha="left", va="top", fontsize=7, color=INK, weight="bold")
-
-    def thumb(x, y, w, h, label):
-        ax = fig.add_axes((x, y, w, h))
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.grid(False)
-        for side in ("left", "bottom"):
-            ax.spines[side].set_color(CONTEXT)
-            ax.spines[side].set_linewidth(0.6)
-        ax.set_title(label, fontsize=5.8, color=MUTED, loc="left", pad=1.5)
-        return ax
-
-    def block(x, y, w, h, title, subtitle, face, edge):
-        canvas.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.003,rounding_size=0.008",
-                                        facecolor=face, edgecolor=edge, linewidth=0.8))
-        canvas.text(x + w / 2, y + h * 0.63, title, ha="center", va="center", fontsize=6.4, color=INK, weight="bold")
-        canvas.text(x + w / 2, y + h * 0.27, subtitle, ha="center", va="center", fontsize=5.4, color=MUTED)
-
-    def arrow(start, end, color="#888780"):
-        canvas.annotate("", xy=end, xytext=start, xycoords="axes fraction",
-                        arrowprops=dict(arrowstyle="-|>", color=color, lw=0.8, mutation_scale=7, shrinkA=0, shrinkB=0))
-
-    top, bottom = 0.95, 0.20
-    # (a) Inputs
-    panel(0.008, bottom, 0.215, top - bottom, "(a) Inputs at origin $t$", "#f6f5f0", "#c9c7bd")
-    ax = thumb(0.03, 0.66, 0.175, 0.13, "72-h price history")
-    ax.plot(np.arange(-72, 0), past, color=INK, lw=0.8)
-    ax.axhline(0, color=CONTEXT, lw=0.4)
-    ax = thumb(0.03, 0.45, 0.175, 0.13, "AEMO predispatch price, next 24 h")
-    ax.plot(np.arange(24), pdp, color=MUTED, lw=0.9, ls="--")
-    ax.axhline(0, color=CONTEXT, lw=0.4)
-    ax = thumb(0.03, 0.24, 0.175, 0.13, "PD PASA net load, next 24 h")
-    ax.plot(np.arange(24), net_load, color=MUTED, lw=0.9)
-    # (b) Dual-field decomposition
-    panel(0.245, bottom, 0.235, top - bottom, "(b) Dual-field decomposition", "#fbf3ee", "#efc3ad")
-    ax = thumb(0.265, 0.66, 0.195, 0.13, "detected events $\\to$ DGF")
-    ax.plot(np.arange(-72, 0), history, color=CONTEXT, lw=0.8)
-    ax.plot(np.arange(-72, 0), events, color=ORANGE, lw=1.0)
-    ax = thumb(0.265, 0.45, 0.195, 0.13, "remainder $\\to$ CTF (trend)")
-    ax.plot(np.arange(-72, 0), history - events, color=CONTEXT, lw=0.8)
-    ax.plot(np.arange(-72, 0), trend, color=BLUE, lw=1.0)
-    block(0.265, 0.25, 0.09, 0.11, "DGF heads", "events, scarcity", "#fdeee7", ORANGE)
-    block(0.37, 0.25, 0.09, 0.11, "CTF heads", "level, net load", "#e6f1fb", BLUE)
-    # (c) Known-input terms and fusion
-    panel(0.502, bottom, 0.20, top - bottom, "(c) Base, calibrator, fusion", "#eef7f3", "#a9dcc6")
-    block(0.517, 0.56, 0.082, 0.17, "Linear\nbase", "all inputs", "#e8f6f0", AQUA)
-    block(0.607, 0.56, 0.082, 0.17, "Cali-\nbrator", "per-hour MLP", "#ffffff", "#888780")
-    block(0.517, 0.26, 0.172, 0.15, "Fusion", "base + CTF + sin$^2\\theta\\cdot$DGF + cal.", "#ffffff", "#888780")
-    # (d) Output
-    panel(0.724, bottom, 0.268, top - bottom, "(d) Floor and forecast", "#f6f5f0", "#c9c7bd")
-    ax = thumb(0.75, 0.27, 0.22, 0.52, "24-h forecast (QLD, %s)" % day.strftime("%d %b %Y"))
-    hours = np.arange(24)
-    ax.fill_between(hours, stages["q05"], stages["q95"], color=BLUE, alpha=0.18, lw=0, label="90% interval")
-    ax.plot(hours, stages["final"], color=BLUE, lw=1.2, label="forecast")
-    ax.plot(hours, actual, color=INK, lw=0.9, label="actual")
-    if stages["floor"] is not None:
-        ax.axhline(stages["floor"], color=ORANGE, lw=0.7, ls=":")
-        ax.text(23, stages["floor"], "price floor", fontsize=5.2, color=ORANGE, ha="right", va="top")
-    ax.axhline(0, color=CONTEXT, lw=0.4)
-    ax.legend(frameon=False, fontsize=5.2, loc="upper left", handlelength=1.4)
-
-    def route(points, color="#888780"):
-        xs, ys = zip(*points)
-        canvas.plot(xs[:-1], ys[:-1], color=color, lw=0.8, solid_capstyle="butt")
-        arrow(points[-2], points[-1], color)
-
-    # history -> decomposition
-    arrow((0.223, 0.725), (0.245, 0.725))
-    # decomposition -> field heads
-    arrow((0.3125, 0.45), (0.3125, 0.36))
-    arrow((0.415, 0.45), (0.415, 0.36))
-    # known inputs: bus above the panels into (c)
-    route([(0.115, 0.95), (0.115, 0.975), (0.491, 0.975), (0.491, 0.80), (0.648, 0.80), (0.648, 0.73)])
-    canvas.text(0.36, 0.982, "known inputs: predispatch, PD PASA, gas, calendar, history", ha="center", va="bottom",
-                fontsize=5.6, color=MUTED)
-    route([(0.558, 0.80), (0.558, 0.73)])
-    # field heads: bus below the heads into fusion
-    canvas.plot([0.31, 0.31, 0.49, 0.49], [0.25, 0.225, 0.225, 0.335], color="#888780", lw=0.8)
-    canvas.plot([0.415, 0.415], [0.25, 0.225], color="#888780", lw=0.8)
-    arrow((0.49, 0.335), (0.517, 0.335))
-    # base, calibrator -> fusion; fusion -> forecast
-    arrow((0.558, 0.56), (0.558, 0.41))
-    arrow((0.648, 0.56), (0.648, 0.41))
-    arrow((0.689, 0.335), (0.75, 0.45))
-    # Quarterly recalibration timeline
-    y = 0.075
-    canvas.text(0.008, 0.155, "(e) Refit before every test quarter $k$ (2023Q1-2024Q4)", fontsize=7, color=INK,
-                weight="bold", va="center")
-    segments = [(0.03, 0.70, "train: 2015 to three months before quarter $k$", "#e6f1fb", BLUE),
-                (0.70, 0.80, "validate", "#fdeee7", ORANGE),
-                (0.80, 0.90, "test $k$", "#e8f6f0", AQUA)]
-    for x0, x1, label, face, edge in segments:
-        canvas.add_patch(FancyBboxPatch((x0, y - 0.022), x1 - x0 - 0.004, 0.044, boxstyle="round,pad=0,rounding_size=0.006",
-                                        facecolor=face, edgecolor=edge, linewidth=0.7))
-        canvas.text((x0 + x1) / 2, y, label, ha="center", va="center", fontsize=5.8, color=INK)
-    canvas.text(0.95, y, "$k{+}1$ $\\to$", ha="center", va="center", fontsize=6.2, color=MUTED)
-    _save(fig, "framework")
+    save_framework(FIGURES)
 
 
 def _save(fig, name: str) -> None:

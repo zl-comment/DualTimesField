@@ -1,4 +1,4 @@
-\begin{thebibliography}{32}
+\begin{thebibliography}{33}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\href}[2]{#2}
@@ -37,7 +37,7 @@
   {Auto-Correlation} for long-term series forecasting},
 \newblock in: \bibinfo{booktitle}{Advances in Neural Information Processing
   Systems}, volume~\bibinfo{volume}{34}, \bibinfo{year}{2021}. \URLprefix
-  \url{https://arxiv.org/abs/2106.13008}.
+  \url{https://proceedings.neurips.cc/paper_files/paper/2021/hash/bcc0d400288793e8bdcd7c19a8ac0c2b-Abstract.html}.
 %Type = Inproceedings
 \bibitem[{Oreshkin et~al.(2020)Oreshkin, Carpov, Chapados, and
   Bengio}]{oreshkin2020nbeats}
@@ -47,7 +47,7 @@
   interpretable time series forecasting},
 \newblock in: \bibinfo{booktitle}{International Conference on Learning
   Representations (ICLR)}, \bibinfo{year}{2020}. \URLprefix
-  \url{https://arxiv.org/abs/1905.10437}.
+  \url{https://iclr.cc/virtual_2020/poster_r1ecqn4YwB.html}.
 %Type = Article
 \bibitem[{Zeng et~al.(2023)Zeng, Chen, Zhang, and Xu}]{zeng2023transformers}
 \bibinfo{author}{A.~Zeng}, \bibinfo{author}{M.~Chen},
@@ -65,9 +65,11 @@
 \newblock \bibinfo{title}{{DualTimesField}: Rethinking time series as
   continuous-time trends and events},
 \newblock in: \bibinfo{booktitle}{Proceedings of the 43rd International
-  Conference on Machine Learning (ICML)}, Proceedings of Machine Learning
-  Research, \bibinfo{publisher}{PMLR}, \bibinfo{address}{Seoul, South Korea},
-  \bibinfo{year}{2026}.
+  Conference on Machine Learning (ICML)}, volume \bibinfo{volume}{306} of
+  \textit{\bibinfo{series}{Proceedings of Machine Learning Research}},
+  \bibinfo{publisher}{PMLR}, \bibinfo{year}{2026}, pp.
+  \bibinfo{pages}{156544--156566}. \URLprefix
+  \url{https://proceedings.mlr.press/v306/zhang26co.html}.
 %Type = Inproceedings
 \bibitem[{Sitzmann et~al.(2020)Sitzmann, Martel, Bergman, Lindell, and
   Wetzstein}]{sitzmann2020implicit}
@@ -78,7 +80,7 @@
   activation functions},
 \newblock in: \bibinfo{booktitle}{Advances in Neural Information Processing
   Systems}, volume~\bibinfo{volume}{33}, \bibinfo{year}{2020}. \URLprefix
-  \url{https://arxiv.org/abs/2006.09661}.
+  \url{https://proceedings.neurips.cc/paper_files/paper/2020/hash/53c04118df112c13a8c34b38343b9c10-Abstract.html}.
 %Type = Inproceedings
 \bibitem[{Tancik et~al.(2020)Tancik, Srinivasan, Mildenhall, Fridovich-Keil,
   Raghavan, Singhal, Ramamoorthi, Barron, and Ng}]{tancik2020fourier}
@@ -91,7 +93,7 @@
   functions in low dimensional domains},
 \newblock in: \bibinfo{booktitle}{Advances in Neural Information Processing
   Systems}, volume~\bibinfo{volume}{33}, \bibinfo{year}{2020}. \URLprefix
-  \url{https://arxiv.org/abs/2006.10739}.
+  \url{https://proceedings.neurips.cc/paper_files/paper/2020/hash/55053683268957697aa39fba6f231c68-Abstract.html}.
 %Type = Article
 \bibitem[{Lago et~al.(2021)Lago, Marcjasz, De~Schutter, and
   Weron}]{lago2021forecasting}
@@ -185,7 +187,7 @@
   for time series forecasting},
 \newblock in: \bibinfo{booktitle}{The Twelfth International Conference on
   Learning Representations (ICLR)}, \bibinfo{year}{2024}. \URLprefix
-  \url{https://arxiv.org/abs/2310.06625}.
+  \url{https://proceedings.iclr.cc/paper_files/paper/2024/hash/2ea18fdc667e0ef2ad82b2b4d65147ad-Abstract-Conference.html}.
 %Type = Article
 \bibitem[{Hochreiter and Schmidhuber(1997)}]{hochreiter1997long}
 \bibinfo{author}{S.~Hochreiter}, \bibinfo{author}{J.~Schmidhuber},
@@ -194,9 +196,9 @@
   (\bibinfo{year}{1997}) \bibinfo{pages}{1735–1780}.
   \DOIprefix\doi{10.1162/neco.1997.9.8.1735}.
 %Type = Inproceedings
-\bibitem[{Cho et~al.(2014)Cho, van Merrienboer, Gulcehre, Bahdanau, Bougares,
-  Schwenk, and Bengio}]{cho2014learning}
-\bibinfo{author}{K.~Cho}, \bibinfo{author}{B.~van Merrienboer},
+\bibitem[{Cho et~al.(2014)Cho, van Merri{\"e}nboer, Gulcehre, Bahdanau,
+  Bougares, Schwenk, and Bengio}]{cho2014learning}
+\bibinfo{author}{K.~Cho}, \bibinfo{author}{B.~van Merri{\"e}nboer},
   \bibinfo{author}{C.~Gulcehre}, \bibinfo{author}{D.~Bahdanau},
   \bibinfo{author}{F.~Bougares}, \bibinfo{author}{H.~Schwenk},
   \bibinfo{author}{Y.~Bengio},
@@ -219,7 +221,7 @@
   \DOIprefix\doi{10.1016/j.ijforecast.2019.07.001}.
 %Type = Article
 \bibitem[{Zhang(2003)}]{zhang2003time}
-\bibinfo{author}{G.~Zhang},
+\bibinfo{author}{G.~P. Zhang},
 \newblock \bibinfo{title}{Time series forecasting using a hybrid {ARIMA} and
   neural network model},
 \newblock \bibinfo{journal}{Neurocomputing} \bibinfo{volume}{50}
@@ -243,38 +245,50 @@
   learning on typical tabular data?},
 \newblock in: \bibinfo{booktitle}{Advances in Neural Information Processing
   Systems, Datasets and Benchmarks Track}, volume~\bibinfo{volume}{35},
-  \bibinfo{year}{2022}. \URLprefix \url{https://arxiv.org/abs/2207.08815}.
+  \bibinfo{year}{2022}. \URLprefix
+  \url{https://proceedings.neurips.cc/paper_files/paper/2022/hash/0378c7692da36807bdec87ab043cdadc-Abstract-Datasets_and_Benchmarks.html}.
+  \DOIprefix\doi{10.52202/068431-0037}.
 %Type = Misc
 \bibitem[{{Australian Energy Market
-  Operator}(2025{\natexlab{a}})}]{aemo2025priceanddemand}
+  Operator}(nd{\natexlab{a}})}]{aemo2025priceanddemand}
 \bibinfo{author}{{Australian Energy Market Operator}},
   \bibinfo{title}{Aggregated price and demand data},
-  \bibinfo{howpublished}{\url{https://www.aemo.com.au/aemo/data/nem/priceanddemand/}},
-  \bibinfo{year}{2025}{\natexlab{a}}. \bibinfo{note}{Monthly files
-  PRICE\_AND\_DEMAND\_YYYYMM\_REGION.csv, 2015--2024}.
+  \bibinfo{howpublished}{\url{https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem/aggregated-data}},
+  \bibinfo{year}{n.d.}{\natexlab{a}}. \bibinfo{note}{Monthly PRICE\_AND\_DEMAND
+  files, 2015--2024. Accessed 8 October 2026}.
 %Type = Misc
 \bibitem[{{Australian Energy Market
-  Operator}(2025{\natexlab{b}})}]{aemo2025mmsdm}
+  Operator}(nd{\natexlab{b}})}]{aemo2025mmsdm}
 \bibinfo{author}{{Australian Energy Market Operator}}, \bibinfo{title}{{MMS}
   data model monthly archive ({MMSDM})},
   \bibinfo{howpublished}{\url{https://www.nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/}},
-  \bibinfo{year}{2025}{\natexlab{b}}. \bibinfo{note}{Tables PREDISPATCHPRICE,
+  \bibinfo{year}{n.d.}{\natexlab{b}}. \bibinfo{note}{Tables PREDISPATCHPRICE,
   PREDISPATCHREGIONSUM, PREDISPATCHINTERCONNECTORRES (PREDISP\_ALL\_DATA),
-  PDPASA\_REGIONSOLUTION and STPASA\_REGIONSOLUTION, 2015--2024}.
+  PDPASA\_REGIONSOLUTION and STPASA\_REGIONSOLUTION, 2015--2024. Accessed 8
+  October 2026}.
 %Type = Misc
-\bibitem[{{Australian Energy Market
-  Operator}(2025{\natexlab{c}})}]{aemo2025dwgm}
+\bibitem[{{Australian Energy Market Operator}(nd{\natexlab{c}})}]{aemo2025dwgm}
 \bibinfo{author}{{Australian Energy Market Operator}},
   \bibinfo{title}{{Victorian Declared Wholesale Gas Market}: wholesale price
   and withdrawals},
   \bibinfo{howpublished}{\url{https://www.aemo.com.au/energy-systems/gas/declared-wholesale-gas-market-dwgm/data-dwgm/vic-wholesale-price-withdrawals}},
-  \bibinfo{year}{2025}{\natexlab{c}}.
+  \bibinfo{year}{n.d.}{\natexlab{c}}. \bibinfo{note}{Accessed 8 October 2026}.
+%Type = Techreport
+\bibitem[{{Australian Energy Market Operator}(2026)}]{aemo2026predispatch}
+\bibinfo{author}{{Australian Energy Market Operator}},
+  \bibinfo{title}{Pre-dispatch procedure}, \bibinfo{type}{Technical Report}
+  \bibinfo{number}{SO\_OP\_3704}, Australian Energy Market Operator,
+  \bibinfo{year}{2026}. \URLprefix
+  \url{https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3704-predispatch.pdf},
+  \bibinfo{note}{version 19, effective 1 April 2026, Section 2.1. Accessed 8
+  October 2026}.
 %Type = Article
 \bibitem[{Koenker and Bassett(1978)}]{koenker1978regression}
-\bibinfo{author}{R.~Koenker}, \bibinfo{author}{G.~Bassett},
+\bibinfo{author}{R.~Koenker}, \bibinfo{author}{G.~Bassett, Jr.},
 \newblock \bibinfo{title}{Regression quantiles},
 \newblock \bibinfo{journal}{Econometrica} \bibinfo{volume}{46}
-  (\bibinfo{year}{1978}) \bibinfo{pages}{33}. \DOIprefix\doi{10.2307/1913643}.
+  (\bibinfo{year}{1978}) \bibinfo{pages}{33--50}.
+  \DOIprefix\doi{10.2307/1913643}.
 %Type = Article
 \bibitem[{Gneiting and Raftery(2007)}]{gneiting2007strictly}
 \bibinfo{author}{T.~Gneiting}, \bibinfo{author}{A.~E. Raftery},
@@ -296,7 +310,8 @@
 \newblock \bibinfo{title}{A simple, positive semi-definite, heteroskedasticity
   and autocorrelation consistent covariance matrix},
 \newblock \bibinfo{journal}{Econometrica} \bibinfo{volume}{55}
-  (\bibinfo{year}{1987}) \bibinfo{pages}{703}. \DOIprefix\doi{10.2307/1913610}.
+  (\bibinfo{year}{1987}) \bibinfo{pages}{703--708}.
+  \DOIprefix\doi{10.2307/1913610}.
 %Type = Article
 \bibitem[{Tashman(2000)}]{tashman2000out}
 \bibinfo{author}{L.~J. Tashman},
