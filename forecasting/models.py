@@ -510,6 +510,8 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_heads: bool = True,
         field_point: bool = True,
         calibrator_hidden: int = 0,
+        external_base: bool = False,
+        base_inputs: bool = False,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -612,6 +614,14 @@ class DualFieldLinearForecaster(nn.Module):
         if event_echo:
             # Echo features reach the DGF heads and the gate, like the scarcity inputs.
             dgf_exogenous_dim += forecast_horizon * 2 * len(self.echo_lags)
+        if base_inputs and not external_base:
+            raise ValueError("base_inputs needs external_base")
+        self.base_inputs = base_inputs
+        if base_inputs:
+            # The external base's point and quantiles (point target space)
+            # reach the DGF heads and the gate, so the correction can depend
+            # on what the base forecasts.
+            dgf_exogenous_dim += forecast_horizon * (1 + len(self.quantiles))
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -731,12 +741,18 @@ class DualFieldLinearForecaster(nn.Module):
         # inputs (the inputs of the linear_mse baseline), to which the dual-field
         # forecast is added as a residual.  Created last so that every other
         # parameter keeps its initialization.
-        if not field_forecast and not linear_base:
-            raise ValueError("field_forecast=False needs linear_base")
+        # External base: fixed forecasts of another model (forecasting.xgboost_base),
+        # passed with each batch, take the place of the linear base.
+        if linear_base and external_base:
+            raise ValueError("linear_base and external_base are exclusive")
+        self.external_base = external_base
+        has_base = linear_base or external_base
+        if not field_forecast and not has_base:
+            raise ValueError("field_forecast=False needs a base")
         if field_normalization not in {"none", "window"}:
             raise ValueError("field_normalization must be 'none' or 'window'")
-        if field_normalization == "window" and not linear_base:
-            raise ValueError("window-normalized fields need the linear base for the level")
+        if field_normalization == "window" and not has_base:
+            raise ValueError("window-normalized fields need a base for the level")
         # "window": the fields see each window's history normalized by its own
         # mean and standard deviation, and their forecast is a residual in
         # window units, rescaled by the window's price scale; the linear base
@@ -746,8 +762,8 @@ class DualFieldLinearForecaster(nn.Module):
         self.ctf_heads = ctf_heads
         # field_point=False: the fields add to the quantiles only and the
         # point forecast is the linear base's.
-        if not field_point and not linear_base:
-            raise ValueError("field_point=False needs linear_base")
+        if not field_point and not has_base:
+            raise ValueError("field_point=False needs a base")
         self.field_point = field_point
         self.linear_base = linear_base
         self.field_forecast = field_forecast
@@ -814,6 +830,7 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_exogenous: torch.Tensor | None = None,
         quantile_exogenous: torch.Tensor | None = None,
         echo_features: torch.Tensor | None = None,
+        base_features: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -823,6 +840,8 @@ class DualFieldLinearForecaster(nn.Module):
             dgf_extra = [future_exogenous.flatten(start_dim=1)]
         if echo_features is not None:
             dgf_extra.append(echo_features.flatten(start_dim=1))
+        if base_features is not None:
+            dgf_extra.append(base_features.flatten(start_dim=1))
         gate_features = torch.cat(
             [ctf_flat, event_flat, calendar_flat, *dgf_extra], dim=1
         )
@@ -940,6 +959,9 @@ class DualFieldLinearForecaster(nn.Module):
         origin_context: torch.Tensor | None = None,
         ctf_exogenous: torch.Tensor | None = None,
         quantile_exogenous: torch.Tensor | None = None,
+        base_point: torch.Tensor | None = None,
+        base_quantile: torch.Tensor | None = None,
+        base_features: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         if history_values.shape[1:] != (self.input_length, self.num_variables):
             raise ValueError(
@@ -989,6 +1011,19 @@ class DualFieldLinearForecaster(nn.Module):
                 raise ValueError(f"quantile_exogenous must have shape {expected}")
         elif quantile_exogenous is not None:
             raise ValueError("quantile_exogenous was provided but the model has no quantile exogenous inputs")
+        if self.external_base:
+            batch = history_values.shape[0]
+            expected = {
+                "base_point": (batch, self.forecast_horizon, 1),
+                "base_quantile": (batch, self.forecast_horizon, len(self.quantiles)),
+                "base_features": (batch, self.forecast_horizon, 1 + len(self.quantiles)),
+            }
+            for name, value in (("base_point", base_point), ("base_quantile", base_quantile),
+                                ("base_features", base_features)):
+                if value is None or value.shape != expected[name]:
+                    raise ValueError(f"{name} must have shape {expected[name]}")
+        elif base_point is not None or base_quantile is not None:
+            raise ValueError("base forecasts were provided but the model has no external base")
 
         raw_history = history_values
         field_scale = None
@@ -1050,6 +1085,7 @@ class DualFieldLinearForecaster(nn.Module):
                 ctf_exogenous,
                 quantile_exogenous,
                 echo_features,
+                base_features if self.base_inputs else None,
             )
             if echo_features is not None:
                 forecasts["event_echo"] = echo_features
@@ -1058,17 +1094,18 @@ class DualFieldLinearForecaster(nn.Module):
                 forecasts["point_forecast"] = forecasts["point_forecast"] * price_scale
                 forecasts["quantile_forecast"] = forecasts["quantile_forecast"] * price_scale
 
-        if self.linear_base:
-            parts = [raw_history, future_calendar, future_exogenous, ctf_exogenous]
-            base_features = torch.cat(
-                [part.flatten(start_dim=1) for part in parts if part is not None]
-                + ([origin_context] if origin_context is not None else []),
-                dim=1,
-            )
-            base_point = self.base_point_head(base_features).unsqueeze(-1)
-            base_quantile = self.base_quantile_head(base_features).view(
-                -1, self.forecast_horizon, len(self.quantiles)
-            )
+        if self.linear_base or self.external_base:
+            if self.linear_base:
+                parts = [raw_history, future_calendar, future_exogenous, ctf_exogenous]
+                linear_features = torch.cat(
+                    [part.flatten(start_dim=1) for part in parts if part is not None]
+                    + ([origin_context] if origin_context is not None else []),
+                    dim=1,
+                )
+                base_point = self.base_point_head(linear_features).unsqueeze(-1)
+                base_quantile = self.base_quantile_head(linear_features).view(
+                    -1, self.forecast_horizon, len(self.quantiles)
+                )
             forecasts["base_point"] = base_point
             if self.field_forecast:
                 forecasts["field_point"] = forecasts["point_forecast"]
@@ -1077,8 +1114,8 @@ class DualFieldLinearForecaster(nn.Module):
                 )
                 base_quantile = base_quantile + forecasts["quantile_forecast"]
             else:
-                # Control: the linear base alone, trained in the dual-field
-                # pipeline; the fields are still fitted by the decomposition loss.
+                # Control: the base alone, in the dual-field pipeline; the
+                # fields are still fitted by the decomposition loss.
                 forecasts["point_forecast"] = base_point
             forecasts["quantile_forecast"] = torch.sort(base_quantile, dim=-1).values
 

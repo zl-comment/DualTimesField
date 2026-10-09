@@ -1,3 +1,5 @@
+import hashlib
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Mapping, Sequence
@@ -38,6 +40,31 @@ class PriceTransform:
 
 # Forecast blocks appended to the future exogenous inputs, in this order.
 APPENDED_FUTURE_BLOCKS = ("predispatch_exogenous", "interconnector_exogenous")
+
+
+# Configuration blocks that determine the inputs and splits of the external
+# base model (forecasting.xgboost_base).
+EXTERNAL_BASE_INPUT_BLOCKS = (
+    "data",
+    "forecast_protocol",
+    "origin_context",
+    "future_exogenous",
+    "ctf_exogenous",
+    *APPENDED_FUTURE_BLOCKS,
+)
+
+
+def external_base_fingerprint(config: Mapping) -> str:
+    """Hash of the settings an external base forecast depends on.
+
+    A base built from one configuration may be read by another only if their
+    data, splits, and the inputs of the base model agree. ``quantile_target``
+    only changes the dual-field loss, so it is left out.
+    """
+    blocks = {block: config.get(block) for block in EXTERNAL_BASE_INPUT_BLOCKS}
+    blocks["data"] = {key: value for key, value in blocks["data"].items() if key != "quantile_target"}
+    text = json.dumps(blocks, sort_keys=True, default=str)
+    return hashlib.sha256(text.encode()).hexdigest()[:16]
 
 
 def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
@@ -381,6 +408,13 @@ class AEMOForecastDataset(Dataset):
                 self.quantile_exogenous_standardizer,
                 self.quantile_exogenous_by_origin,
             ) = self._load_forecast_exogenous(frame, config, region, "quantile_exogenous")
+        # Forecasts of a fixed external base model (forecasting.xgboost_base),
+        # to which the dual-field forecast is added as a residual.
+        self.base_point_by_origin: dict[int, np.ndarray] = {}
+        self.base_quantile_by_origin: dict[int, np.ndarray] = {}
+        self.base_features_by_origin: dict[int, np.ndarray] = {}
+        if config.get("external_base", {}).get("enabled", False):
+            self._load_external_base(config, region)
 
     def _load_forecast_exogenous(
         self,
@@ -506,6 +540,60 @@ class AEMOForecastDataset(Dataset):
         }
         return feature_names, standardizer, by_origin
 
+    def _to_target_space(self, prices: np.ndarray) -> np.ndarray:
+        return (
+            (
+                self.price_transform.forward(prices.astype(np.float64))
+                - self.history_standardizer.mean[self.target_index]
+            )
+            / self.history_standardizer.std[self.target_index]
+        ).astype(np.float32)
+
+    def _load_external_base(self, config: Mapping, region: str) -> None:
+        base_config = config["external_base"]
+        path = Path(config["project_root"]) / base_config["directory"] / f"{region}.npz"
+        with np.load(path) as archive:
+            fingerprint = str(archive["config_fingerprint"])
+            levels = archive["quantiles"].astype(np.float64)
+            origins = archive["forecast_origin_unix"].astype(np.int64)
+            point = archive["point"].astype(np.float64)
+            quantile = archive["quantile"].astype(np.float64)
+        if fingerprint != external_base_fingerprint(config):
+            raise ValueError(
+                f"{path} was built from a configuration with other data, splits, or base inputs"
+            )
+        if not np.allclose(levels, config["model"]["quantiles"]):
+            raise ValueError(f"{path} has quantile levels {levels.tolist()}")
+        if point.shape != (len(origins), self.output_hours):
+            raise ValueError(f"{path}: point must have shape [N, {self.output_hours}]")
+        origin_to_row = {int(origin): index for index, origin in enumerate(origins)}
+        required = self.delivery_unix_seconds[self.origin_indices]
+        missing = [int(origin) for origin in required if int(origin) not in origin_to_row]
+        if missing:
+            first = pd.to_datetime(missing[0], unit="s", utc=True)
+            raise ValueError(
+                f"Missing {len(missing)} external base origins for {region}/{self.split}; "
+                f"first missing origin is {first}"
+            )
+        rows = np.asarray([origin_to_row[int(origin)] for origin in required])
+        point, quantile = point[rows], quantile[rows]
+        # The point is added in the point target space and the quantiles in
+        # the quantile target space; the features are both in the bounded
+        # point target space.
+        point_target = self._to_target_space(point)
+        quantile_target = (
+            self.quantile_standardizer.transform(quantile)
+            if self.quantile_standardizer is not None
+            else self._to_target_space(quantile)
+        )
+        features = np.concatenate(
+            [point_target[..., None], self._to_target_space(quantile)], axis=-1
+        )
+        for index, origin in enumerate(required):
+            self.base_point_by_origin[int(origin)] = point_target[index, :, None]
+            self.base_quantile_by_origin[int(origin)] = quantile_target[index]
+            self.base_features_by_origin[int(origin)] = features[index]
+
     def denormalize_target(self, values: torch.Tensor) -> torch.Tensor:
         restored = (
             values * self.history_standardizer.std[self.target_index]
@@ -566,6 +654,10 @@ class AEMOForecastDataset(Dataset):
             sample["quantile_exogenous"] = torch.from_numpy(
                 self.quantile_exogenous_by_origin[origin].copy()
             )
+        if self.base_point_by_origin:
+            sample["base_point"] = torch.from_numpy(self.base_point_by_origin[origin].copy())
+            sample["base_quantile"] = torch.from_numpy(self.base_quantile_by_origin[origin].copy())
+            sample["base_features"] = torch.from_numpy(self.base_features_by_origin[origin].copy())
         return sample
 
 
@@ -573,7 +665,13 @@ def build_region_datasets(
     config_path: Path | str,
     region: str,
 ) -> Dict[str, AEMOForecastDataset]:
-    config = load_forecast_config(config_path)
+    return build_region_datasets_from_config(load_forecast_config(config_path), region)
+
+
+def build_region_datasets_from_config(
+    config: Mapping,
+    region: str,
+) -> Dict[str, AEMOForecastDataset]:
     frame = _load_region_frame(config, region)
     return {
         split: AEMOForecastDataset(frame, config, region, split)

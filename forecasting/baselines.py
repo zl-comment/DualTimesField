@@ -233,9 +233,28 @@ def _neural_run(kind: str, datasets: dict, seed: int, device: torch.device, epoc
     }
 
 
-def _xgboost_run(datasets: dict, seed: int, device: torch.device) -> dict:
+def xgboost_regressor(seed: int, device: torch.device, **overrides):
+    """The multi-quantile XGBoost of the baseline; ``overrides`` replace its settings."""
     import xgboost
 
+    settings = dict(
+        objective="reg:quantileerror",
+        quantile_alpha=np.asarray(QUANTILES),
+        tree_method="hist",
+        device="cuda" if device.type == "cuda" else "cpu",
+        n_estimators=2000,
+        learning_rate=0.05,
+        max_depth=6,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        early_stopping_rounds=50,
+        random_state=seed,
+    )
+    settings.update(overrides)
+    return xgboost.XGBRegressor(**settings)
+
+
+def _xgboost_run(datasets: dict, seed: int, device: torch.device) -> dict:
     (x_train, c_train, y_train) = _features(datasets["train"], True)
     (x_val, c_val, y_val) = _features(datasets["validation"], True)
     (x_test, c_test, _) = _features(datasets["test"], True)
@@ -244,19 +263,7 @@ def _xgboost_run(datasets: dict, seed: int, device: torch.device) -> dict:
     quantile = np.zeros((x_test.shape[0], horizon, len(QUANTILES)))
     rounds = []
     for h in range(horizon):
-        model = xgboost.XGBRegressor(
-            objective="reg:quantileerror",
-            quantile_alpha=np.asarray(QUANTILES),
-            tree_method="hist",
-            device="cuda" if device.type == "cuda" else "cpu",
-            n_estimators=2000,
-            learning_rate=0.05,
-            max_depth=6,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            early_stopping_rounds=50,
-            random_state=seed,
-        )
+        model = xgboost_regressor(seed, device)
         model.fit(
             np.hstack([x_train, c_train[:, h]]), y_train[:, h],
             eval_set=[(np.hstack([x_val, c_val[:, h]]), y_val[:, h])],

@@ -143,6 +143,8 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         ctf_heads=bool(model_config.get("ctf_heads", True)),
         field_point=bool(model_config.get("field_point", True)),
         calibrator_hidden=int(model_config.get("calibrator_hidden", 0)),
+        external_base=bool(config.get("external_base", {}).get("enabled", False)),
+        base_inputs=bool(model_config.get("base_inputs", False)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
@@ -264,6 +266,9 @@ def move_inputs(batch: Mapping, device: torch.device) -> tuple:
         batch["origin_context"].to(device) if "origin_context" in batch else None,
         batch["ctf_exogenous"].to(device) if "ctf_exogenous" in batch else None,
         batch["quantile_exogenous"].to(device) if "quantile_exogenous" in batch else None,
+        batch["base_point"].to(device) if "base_point" in batch else None,
+        batch["base_quantile"].to(device) if "base_quantile" in batch else None,
+        batch["base_features"].to(device) if "base_features" in batch else None,
         batch["target_price"].to(device),
     )
 
