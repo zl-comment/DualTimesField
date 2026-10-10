@@ -122,8 +122,11 @@ def main() -> None:
     parser.add_argument("--singles", nargs="*", default=[], help="members that stand alone in the ensembles")
     parser.add_argument("--ensembles", nargs="+", required=True, help="name=member1+member2 (family names allowed)")
     parser.add_argument("--quarters", type=int, default=QUARTERS)
+    parser.add_argument("--root", type=Path, default=ROOT, help="directory of the member outputs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    global ROOT
+    ROOT = args.root
     data = {m: {r: load_member(m, r, args.quarters) for r in REGIONS} for m in args.members}
     chosen, report = {}, {"validation_mae": {m: validation_mae(m, data) for m in args.members}, "chosen": {}}
     for pool in args.pools:
@@ -140,7 +143,7 @@ def main() -> None:
     for spec in args.ensembles:
         name, parts = spec.split("=")
         members = [resolve(p) for p in parts.split("+")]
-        result = evaluate(members, data, step=0.1 if len(members) > 2 else 0.05)
+        result = evaluate(members, data, step=0.1 if len(members) > 2 else 0.05, refits=args.quarters)
         entry = {"members": members, "weights_per_refit": result["weights"]}
         for kind in ("equal", "weighted"):
             entry[kind] = test_mae(result[kind], data, members[0])
