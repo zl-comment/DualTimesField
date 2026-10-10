@@ -172,6 +172,8 @@ _DERIVED_FORECAST_FEATURES = {
     "net_load_mw": lambda archive: archive["demand50_mw"] - archive["uigf_mw"],
     # Width of the 10%-90% probability-of-exceedance demand band.
     "demand_spread_mw": lambda archive: archive["demand10_mw"] - archive["demand90_mw"],
+    # Capacity available beyond the median demand: the supply margin.
+    "reserve_margin_mw": lambda archive: archive["available_capacity_mw"] - archive["demand50_mw"],
 }
 
 
@@ -289,6 +291,7 @@ class AEMOForecastDataset(Dataset):
         self.input_hours = protocol["input_hours"]
         self.output_hours = protocol["output_hours"]
         self.history_feature_names = tuple(data_config["history_columns"])
+        self.delivery_unix_seconds = _to_unix_seconds(frame[data_config["delivery_column"]])
         self.calendar_feature_names = tuple(protocol["calendar_features"])
         split_values = frame[data_config["split_column"]].to_numpy()
         train_mask = split_values == "train"
@@ -301,6 +304,17 @@ class AEMOForecastDataset(Dataset):
         raw_history[:, self.target_index] = self.price_transform.forward(
             raw_history[:, self.target_index]
         )
+        driver_config = config.get("history_drivers", {})
+        if driver_config.get("enabled", False):
+            # Driver channels (e.g. PD PASA spare capacity and net load) appended to
+            # the price and demand history: for each past hour, the value its own
+            # run forecast (lead 0), published by that hour, so nothing after the
+            # origin enters a window.
+            driver_names, driver_values = self._load_history_drivers(
+                driver_config, config["project_root"], region, train_mask
+            )
+            raw_history = np.concatenate([raw_history, driver_values], axis=1)
+            self.history_feature_names += driver_names
         self.history_standardizer = _fit_standardizer(raw_history[train_mask])
         self.history_values = self.history_standardizer.transform(raw_history)
         raw_target = frame[data_config["target_column"]].to_numpy(dtype=np.float32)
@@ -381,6 +395,29 @@ class AEMOForecastDataset(Dataset):
                 self.quantile_exogenous_standardizer,
                 self.quantile_exogenous_by_origin,
             ) = self._load_forecast_exogenous(frame, config, region, "quantile_exogenous")
+
+    def _load_history_drivers(
+        self, driver_config: Mapping, project_root: str, region: str, train_mask: np.ndarray
+    ) -> tuple[tuple[str, ...], np.ndarray]:
+        names = tuple(driver_config["features"])
+        path = Path(project_root) / driver_config["region_files"][region]
+        with np.load(path) as archive:
+            origins = archive["forecast_origin_unix"].astype(np.int64)
+            values = np.stack([_forecast_feature(archive, n)[:, 0] for n in names], axis=-1)
+            last_changed = archive["source_last_changed_unix"].astype(np.int64)
+            runs = archive["source_run_unix"].astype(np.int64)
+        if np.any(last_changed > origins) or np.any(runs > origins):
+            raise ValueError(f"Future information leakage in history drivers for {region}")
+        position = pd.Series(np.arange(len(origins)), index=origins).reindex(self.delivery_unix_seconds)
+        found = ~position.isna().to_numpy()
+        series = np.full((len(self.delivery_unix_seconds), len(names)), np.nan)
+        series[found] = values[position.to_numpy()[found].astype(int)]
+        # Hours without a run carry the last value forward (never backward), and any
+        # leading gap takes the training mean.
+        series = pd.DataFrame(series).ffill().to_numpy()
+        fill = np.nanmean(series[train_mask], axis=0)
+        series = np.where(np.isnan(series), fill, series)
+        return names, series
 
     def _load_forecast_exogenous(
         self,

@@ -339,6 +339,53 @@ class DetectedEventField(nn.Module):
     echo = AdaptiveEventField.echo
 
 
+class DriverEventField(DetectedEventField):
+    """Events detected in driver channels rather than in the price.
+
+    A price spike is a result; its causes are slow variables (spare capacity,
+    net load, supply margin) whose sudden departures push the system up the
+    supply stack. For each channel in ``event_channels`` the ``num_events``
+    largest departures from the window median become Gaussian bumps in that
+    channel, soft-thresholded by a per-channel learned level. Channels not
+    listed (price, demand) carry no events, so the CTF reconstructs them.
+    """
+
+    def __init__(self, num_variables: int, event_channels, events_per_channel: int = 3,
+                 min_separation: int = 3, learn_threshold: bool = True, baseline: str = "median"):
+        super().__init__(num_variables, num_events=events_per_channel, min_separation=min_separation,
+                         learn_threshold=learn_threshold, baseline=baseline)
+        self.event_channels = tuple(int(c) for c in event_channels)
+        if not self.event_channels or max(self.event_channels) >= num_variables:
+            raise ValueError("event_channels must index existing history channels")
+        self.raw_threshold = nn.Parameter(
+            torch.full((len(self.event_channels),), math.log(math.expm1(0.5))), requires_grad=learn_threshold
+        )
+
+    def extract_events(self, x: torch.Tensor, t: torch.Tensor, sigma_addition: float = 0.0):
+        batch, steps, variables = x.shape
+        width = nn.functional.softplus(self.raw_width) + 0.25
+        index = torch.arange(steps, device=x.device, dtype=x.dtype)
+        count = len(self.event_channels) * self.num_events
+        amplitude = x.new_zeros(batch, count, variables)
+        centres = []
+        for order, channel in enumerate(self.event_channels):
+            positions, values = self.detect(x[..., channel])
+            threshold = (
+                nn.functional.softplus(self.raw_threshold[order]) if self.learn_threshold else x.new_zeros(())
+            )
+            block = slice(order * self.num_events, (order + 1) * self.num_events)
+            amplitude[:, block, channel] = torch.sign(values) * torch.relu(values.abs() - threshold)
+            centres.append(positions.to(x.dtype))
+        centres = torch.cat(centres, dim=1)
+        bumps = torch.exp(-((index.view(1, 1, -1) - centres.unsqueeze(-1)) ** 2) / (2 * width ** 2))
+        event_signal = torch.einsum("bkt,bkd->btd", bumps, amplitude)
+        gate = (amplitude.abs().sum(dim=-1) != 0).to(x.dtype)
+        self.last_centres = centres
+        self.last_widths = torch.full_like(centres, 1.0) * (nn.functional.softplus(self.raw_echo_width) + 0.25)
+        self.last_amplitudes = amplitude
+        return event_signal, amplitude, gate
+
+
 class FutureEventField(nn.Module):
     """Two-sided event process over the forecast horizon.
 
@@ -510,6 +557,9 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_heads: bool = True,
         field_point: bool = True,
         calibrator_hidden: int = 0,
+        event_channels: Sequence[int] | None = None,
+        events_per_channel: int = 3,
+        price_state: bool = False,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -612,6 +662,12 @@ class DualFieldLinearForecaster(nn.Module):
         if event_echo:
             # Echo features reach the DGF heads and the gate, like the scarcity inputs.
             dgf_exogenous_dim += forecast_horizon * 2 * len(self.echo_lags)
+        # Recent price state (last value, 24-hour maximum and mean, 72-hour maximum of the
+        # price channel): how persistent the unobserved regime is, given to the DGF heads
+        # and gate as context. It is not decomposed into events.
+        self.price_state = price_state
+        if price_state:
+            dgf_exogenous_dim += 4
 
         self.dual_field = DualTimesField(
             num_variables=num_variables,
@@ -713,13 +769,23 @@ class DualFieldLinearForecaster(nn.Module):
         if dgf_type == "adaptive":
             self.dual_field.dgf = AdaptiveEventField(num_variables, num_atoms)
         elif dgf_type == "detected":
-            self.dual_field.dgf = DetectedEventField(
-                num_variables,
-                num_events=detected_events,
-                min_separation=detected_min_separation,
-                learn_threshold=detected_learn_threshold,
-                baseline=detected_baseline,
-            )
+            if event_channels is not None:
+                self.dual_field.dgf = DriverEventField(
+                    num_variables,
+                    event_channels,
+                    events_per_channel=events_per_channel,
+                    min_separation=detected_min_separation,
+                    learn_threshold=detected_learn_threshold,
+                    baseline=detected_baseline,
+                )
+            else:
+                self.dual_field.dgf = DetectedEventField(
+                    num_variables,
+                    num_events=detected_events,
+                    min_separation=detected_min_separation,
+                    learn_threshold=detected_learn_threshold,
+                    baseline=detected_baseline,
+                )
         self.echo_modulator = None
         if event_echo and echo_modulation:
             # Per forecast hour, spike and trough echo strengths from the hour's
@@ -814,6 +880,7 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_exogenous: torch.Tensor | None = None,
         quantile_exogenous: torch.Tensor | None = None,
         echo_features: torch.Tensor | None = None,
+        state_features: torch.Tensor | None = None,
     ) -> Dict[str, torch.Tensor]:
         ctf_flat = ctf_signal.flatten(start_dim=1)
         event_flat = event_signal.flatten(start_dim=1)
@@ -823,6 +890,8 @@ class DualFieldLinearForecaster(nn.Module):
             dgf_extra = [future_exogenous.flatten(start_dim=1)]
         if echo_features is not None:
             dgf_extra.append(echo_features.flatten(start_dim=1))
+        if state_features is not None:
+            dgf_extra.append(state_features)
         gate_features = torch.cat(
             [ctf_flat, event_flat, calendar_flat, *dgf_extra], dim=1
         )
@@ -1011,6 +1080,13 @@ class DualFieldLinearForecaster(nn.Module):
         event_signal, amplitude, gate = self.dual_field.dgf.extract_events(
             event_source, history_time, sigma_addition
         )
+        state_features = None
+        if self.price_state:
+            price = raw_history[..., 0]
+            state_features = torch.stack(
+                [price[:, -1], price[:, -24:].max(dim=1).values, price[:, -24:].mean(dim=1),
+                 price.max(dim=1).values], dim=-1,
+            )
         echo_features = None
         if self.event_echo:
             echo = self.dual_field.dgf.echo(self.input_length, self.forecast_horizon, self.echo_lags)
@@ -1050,6 +1126,7 @@ class DualFieldLinearForecaster(nn.Module):
                 ctf_exogenous,
                 quantile_exogenous,
                 echo_features,
+                state_features,
             )
             if echo_features is not None:
                 forecasts["event_echo"] = echo_features

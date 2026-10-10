@@ -143,6 +143,9 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
         ctf_heads=bool(model_config.get("ctf_heads", True)),
         field_point=bool(model_config.get("field_point", True)),
         calibrator_hidden=int(model_config.get("calibrator_hidden", 0)),
+        event_channels=model_config.get("event_channels"),
+        events_per_channel=int(model_config.get("events_per_channel", 3)),
+        price_state=bool(model_config.get("price_state", False)),
         quantile_exogenous_dim=(
             len(config["quantile_exogenous"]["features"])
             * len(config["quantile_exogenous"].get("shortfall_below_train_quantiles") or [None])
