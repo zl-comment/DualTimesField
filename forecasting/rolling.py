@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +40,11 @@ QUARTERS = pd.date_range("2023-01-01", "2025-01-01", freq="QS")  # 9 edges, 8 qu
 TRAIN_START = "2015-01-01 00:00:00"
 TEST_END = pd.Timestamp("2025-01-01")
 VALIDATION_MONTHS = 3
+if os.environ.get("ROLLING_PERIOD") == "holdout":
+    # Held-out period: six full quarters of 2025-2026 and the two months of 2026Q3 archived so far.
+    QUARTERS = pd.DatetimeIndex(["2025-01-01", "2025-04-01", "2025-07-01", "2025-10-01",
+                                 "2026-01-01", "2026-04-01", "2026-07-01", "2026-09-01"])
+    TEST_END = pd.Timestamp("2026-09-01")
 
 
 def _stamp(value: pd.Timestamp) -> str:

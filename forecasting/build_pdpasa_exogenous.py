@@ -390,7 +390,7 @@ def _write_region(
     }
 
 
-def build_dataset(start_year: int, end_year: int, output_dir: Path, cache_dir: Path) -> None:
+def build_dataset(start_year: int, end_year: int, output_dir: Path, cache_dir: Path, end_month: int = 12) -> None:
     start = datetime(start_year, 1, 1, tzinfo=AEST)
     # AEMO stores the midnight run at a year boundary in the preceding
     # December archive.  Retain that one extra origin so independently built
@@ -401,7 +401,8 @@ def build_dataset(start_year: int, end_year: int, output_dir: Path, cache_dir: P
         region: {} for region in REGIONS
     }
     for year in range(start_year, end_year + 1):
-        for month in range(1, 13):
+        # end_month stops the last year at the latest archived month (a partial year)
+        for month in range(1, (end_month if year == end_year else 12) + 1):
             pd_url = _discover_archive(year, month, "PDPASA_REGIONSOLUTION")
             pd_archive = cache_dir / (
                 f"{year}-{month:02d}-{Path(urllib.parse.urlparse(pd_url).path).name}"
@@ -468,6 +469,7 @@ def main() -> None:
     parser.add_argument("command", nargs="?", choices=("build", "merge"), default="build")
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2024)
+    parser.add_argument("--end-month", type=int, default=12, help="last month of the end year to build")
     parser.add_argument("--output-dir", type=Path, default=Path("data/aemo_exogenous"))
     parser.add_argument("--cache-dir", type=Path, default=Path("data/aemo_exogenous/raw"))
     parser.add_argument(
@@ -480,7 +482,7 @@ def main() -> None:
     if args.command == "merge":
         merge_yearly(args.shard_root, args.start_year, args.end_year, args.output_dir)
     else:
-        build_dataset(args.start_year, args.end_year, args.output_dir, args.cache_dir)
+        build_dataset(args.start_year, args.end_year, args.output_dir, args.cache_dir, args.end_month)
 
 
 if __name__ == "__main__":

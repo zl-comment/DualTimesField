@@ -42,9 +42,11 @@ def _floor(values: np.ndarray, level: float | None) -> np.ndarray:
     return values if level is None else np.maximum(values, level)
 
 
-def run(name: str, region: str, device_name: str) -> dict:
+def run(name: str, region: str, device_name: str, checkpoint_name: str = "best_model.pt") -> dict:
     device = resolve_device(device_name)
-    test_parts = {"point": [], "quantile": [], "actual": [], "naive": [], "origin": []}
+    test_parts = {"point": [], "quantile": [], "actual": [], "naive": [], "origin": [], "point_unfloored": [], "quantile_unfloored": []}
+    # The floored validation forecasts of every refit, so that ensemble weights can be learned without the test period.
+    val_parts = {"point": [], "quantile": [], "actual": [], "origin": [], "refit": []}
     choices = []
     for k in range(len(QUARTERS) - 1):
         config_path = quarter_config_path(name, k)
@@ -58,7 +60,7 @@ def run(name: str, region: str, device_name: str) -> dict:
         predictions = {"validation": [], "test": []}
         for seed in SEEDS:
             model = build_model(config).to(device)
-            checkpoint = torch.load(_checkpoint(config, seed, region), map_location=device, weights_only=False)
+            checkpoint = torch.load(_checkpoint(config, seed, region).with_name(checkpoint_name), map_location=device, weights_only=False)
             model.load_state_dict(checkpoint["model_state"])
             model.set_epoch(checkpoint.get("model_epoch", checkpoint["best_epoch"]))
             for split in predictions:
@@ -76,10 +78,19 @@ def run(name: str, region: str, device_name: str) -> dict:
             "validation_mae": {str(q): float(v) for q, v in point_scores.items()},
             "validation_crps": {str(q): float(v) for q, v in quantile_scores.items()},
         })
+        validation = datasets["validation"]
+        val_parts["origin"].append(validation.delivery_unix_seconds[np.asarray(validation.origin_indices)])
+        val_parts["actual"].append(validation_actual)
+        val_parts["point"].append(np.stack([_floor(p["point"], levels[point_choice]) for p in predictions["validation"]]))
+        val_parts["quantile"].append(np.stack([np.sort(_floor(p["quantile"], levels[quantile_choice]), axis=-1)
+                                               for p in predictions["validation"]]))
+        val_parts["refit"].append(np.full(len(validation_actual), k))
         test = datasets["test"]
         test_parts["origin"].append(test.delivery_unix_seconds[np.asarray(test.origin_indices)])
         test_parts["actual"].append(predictions["test"][0]["actual"])
         test_parts["naive"].append(predictions["test"][0]["naive"])
+        test_parts["point_unfloored"].append(np.stack([p["point"] for p in predictions["test"]]))
+        test_parts["quantile_unfloored"].append(np.stack([np.sort(p["quantile"], axis=-1) for p in predictions["test"]]))
         test_parts["point"].append(np.stack([_floor(p["point"], levels[point_choice]) for p in predictions["test"]]))
         test_parts["quantile"].append(np.stack([np.sort(_floor(p["quantile"], levels[quantile_choice]), axis=-1)
                                                 for p in predictions["test"]]))
@@ -88,10 +99,17 @@ def run(name: str, region: str, device_name: str) -> dict:
     return {
         "point": np.concatenate(test_parts["point"], axis=1),
         "quantile": np.concatenate(test_parts["quantile"], axis=1),
+        "point_unfloored": np.concatenate(test_parts["point_unfloored"], axis=1),
+        "quantile_unfloored": np.concatenate(test_parts["quantile_unfloored"], axis=1),
         "actual": np.concatenate(test_parts["actual"]),
         "naive": np.concatenate(test_parts["naive"]),
         "origin_unix": np.concatenate(test_parts["origin"]),
         "choices": choices,
+        "val_point": np.concatenate(val_parts["point"], axis=1),
+        "val_quantile": np.concatenate(val_parts["quantile"], axis=1),
+        "val_actual": np.concatenate(val_parts["actual"]),
+        "val_origin_unix": np.concatenate(val_parts["origin"]),
+        "val_refit": np.concatenate(val_parts["refit"]),
     }
 
 
@@ -103,8 +121,11 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--metrics-dir", required=True, type=Path)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--checkpoint", default="best_model.pt",
+                        help="checkpoint file of each refit (best_model.pt selects on total validation loss, "
+                             "best_mae_model.pt on validation MAE)")
     args = parser.parse_args()
-    result = run(args.name, args.region, args.device)
+    result = run(args.name, args.region, args.device, args.checkpoint)
     with np.load(args.static_npz_dir / f"{args.region}.npz") as archive:
         if not np.array_equal(archive["origin_unix"], result["origin_unix"]):
             raise ValueError("stitched origins do not match the static test split")
@@ -116,7 +137,11 @@ def main() -> None:
         )
         path = args.metrics_dir / f"seed{seed}" / f"{args.region}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({"region": args.region, "floor": args.name, "test": {"model": metrics}}, indent=2))
+        unfloored = point_metrics(result["point_unfloored"][index], result["actual"]) | probabilistic_metrics(
+            result["quantile_unfloored"][index], result["actual"], list(LEVELS)
+        )
+        path.write_text(json.dumps({"region": args.region, "floor": args.name, "checkpoint": args.checkpoint,
+                                    "test": {"model": metrics}, "unfloored": {"model": unfloored}}, indent=2))
     (args.metrics_dir / f"choices_{args.region}.json").write_text(json.dumps(result["choices"], indent=2))
     print(f"{args.region}: test MAE {np.mean([np.abs(p - result['actual']).mean() for p in result['point']]):.2f}", flush=True)
 

@@ -1,0 +1,37 @@
+read 2024-11: 239529 rows
+read 2024-12: 247752 rows
+read 2025-01: 247752 rows
+read 2025-02: 223776 rows
+read 2025-03: 247752 rows
+read 2025-04: 239760 rows
+read 2025-05: 247752 rows
+read 2025-06: 239760 rows
+read 2025-07: 247752 rows
+read 2025-08: 247752 rows
+read 2025-09: 239760 rows
+read 2025-10: 247752 rows
+read 2025-11: 239760 rows
+read 2025-12: 247752 rows
+read 2026-01: 247752 rows
+read 2026-02: 223776 rows
+read 2026-03: 247752 rows
+read 2026-04: 239760 rows
+read 2026-05: 247752 rows
+read 2026-06: 239760 rows
+read 2026-07: 247752 rows
+read 2026-08: 247752 rows
+/root/workspace/Code/DualTimesField/forecasting/build_predispatch_exogenous.py:227: RuntimeWarning: Mean of empty slice
+  hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(columns)), axis=2)
+/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_nanfunctions_impl.py:1213: RuntimeWarning: Mean of empty slice
+  return np.nanmean(a, axis, out=out, keepdims=keepdims)
+NSW1 {'origins': 16055, 'dropped_origins': 0, 'stale_origins_filled': 0, 'duplicate_rows_dropped': 0, 'covered_hours_share': 0.9374961071317347, 'first_origin': '2024-11-01 05:00:00', 'last_origin': '2026-09-01 03:00:00'}
+/root/workspace/Code/DualTimesField/forecasting/build_predispatch_exogenous.py:227: RuntimeWarning: Mean of empty slice
+  hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(columns)), axis=2)
+/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_nanfunctions_impl.py:1213: RuntimeWarning: Mean of empty slice
+  return np.nanmean(a, axis, out=out, keepdims=keepdims)
+QLD1 {'origins': 16055, 'dropped_origins': 0, 'stale_origins_filled': 0, 'duplicate_rows_dropped': 0, 'covered_hours_share': 0.9374961071317347, 'first_origin': '2024-11-01 05:00:00', 'last_origin': '2026-09-01 03:00:00'}
+/root/workspace/Code/DualTimesField/forecasting/build_predispatch_exogenous.py:227: RuntimeWarning: Mean of empty slice
+  hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(columns)), axis=2)
+/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/lib/_nanfunctions_impl.py:1213: RuntimeWarning: Mean of empty slice
+  return np.nanmean(a, axis, out=out, keepdims=keepdims)
+TAS1 {'origins': 16055, 'dropped_origins': 0, 'stale_origins_filled': 0, 'duplicate_rows_dropped': 0, 'covered_hours_share': 0.9374961071317347, 'first_origin': '2024-11-01 05:00:00', 'last_origin': '2026-09-01 03:00:00'}
