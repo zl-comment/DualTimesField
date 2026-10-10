@@ -98,3 +98,39 @@ The driver history channels alone add nothing: `base_drivers` (36.12 MAE, 25.48 
 
 Run notes: `price_floor --checkpoint` is taken from `feature/mae-aligned-selection`; the first floor run failed
 without it and was rerun. 2025 has not been used.
+
+## Results (run 2026-10-10)
+
+All 360 refits were trained (5 variants x 8 quarters x 3 regions x 3 seeds); price floor and Diebold-Mariano tests
+follow `scripts/run_driver_space.sh` (the floor step was rerun by hand after taking `--checkpoint` from
+`feature/mae-aligned-selection`). Raw prices, three-region means. `logs/forecasting/driver_space/`.
+
+| Variant (validation-MAE checkpoint + floor) | MAE | CRPS~ |
+|---|---:|---:|
+| `ds_events` (events in drivers) | 36.84 | 26.20 |
+| `ds_raw` (same inputs, no decomposition) | 36.72 | 25.96 |
+| `ps_drivers` (events in price) | 36.70 | 26.09 |
+| `ds_nostate` | 36.68 | 26.14 |
+| `base_drivers` (no fields) | 36.12 | 25.48 |
+| C-mae (no fields, no driver channels) | 36.08 | 24.90 |
+| XGBoost | 35.52 | 23.11 |
+
+Pooled DM, `ds_events` minus the other (negative favours `ds_events`; p in brackets), validation-MAE checkpoint:
+
+| Criterion | MAE | CRPS~ | spike-hour CRPS~ | Met? |
+|---|---|---|---|---|
+| vs `ds_raw` (beyond the same inputs) | +0.12 (0.008) | +0.18 (0.001) | +7.4 (0.017) | **No**, worse |
+| vs `ps_drivers` (driver space) | +0.15 (<0.001) | +0.06 (0.014) | +0.8 (0.51) | **No**, worse |
+| vs `base_drivers` (any fields) | +0.72 (<0.001) | +0.05 (0.59) | -25.4 (<0.001) | **No** on MAE |
+| vs `ds_nostate` (price state) | +0.16 (<0.001) | +0.04 (0.16) | +0.4 (0.75) | **No** |
+| vs C-mae | +0.77 (<0.001) | +0.47 (<0.001) | -12.3 (0.004) | MAE worse |
+| vs XGBoost | +1.32 (<0.001) | +1.75 (<0.001) | +32.3 (0.001) | worse |
+
+The total-loss checkpoint gives the same picture (MAE: `ds_events` vs `ds_raw` -0.01 (0.93); vs `base_drivers`
++0.61 (<0.001)).
+
+Reading: detecting events in the drivers does not beat feeding the same channels without decomposition, nor events
+detected in the price, so by the plan's rule the decomposition has no independent value on this information. The
+driver channels themselves add nothing for MAE to the linear base (`base_drivers` 36.12 against C-mae 36.08), and
+the price-state summary adds nothing. The only consistent edge of any field variant is spike-hour CRPS~ against a
+model with no fields (-25), which the raw-history control reaches too. The 2025 hold-out has not been used.
