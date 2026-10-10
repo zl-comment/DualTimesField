@@ -1,0 +1,39 @@
+{
+  "reference": "probe",
+  "lag": 48,
+  "loss": "per-origin CRPS~ over 24 hours, seed-averaged quantiles",
+  "seeds": {
+    "probe": 1,
+    "xgboost_seed2026": 1
+  },
+  "comparisons": {
+    "xgboost_seed2026": {
+      "NSW1": {
+        "mean_difference": -0.1334631203709836,
+        "statistic": -2.137716440165746,
+        "p_value": 0.032539764374742236,
+        "reference_mae": 30.54693775052199,
+        "other_mae": 30.680400870892974
+      },
+      "QLD1": {
+        "mean_difference": 0.03150879492839509,
+        "statistic": 0.86272361857715,
+        "p_value": 0.3882894433525794,
+        "reference_mae": 23.186956368235272,
+        "other_mae": 23.155447573306876
+      },
+      "TAS1": {
+        "mean_difference": 0.035627722359416934,
+        "statistic": 1.1841504800562865,
+        "p_value": 0.23635350056016058,
+        "reference_mae": 15.554540164139338,
+        "other_mae": 15.518912441779918
+      },
+      "three_region_mean": {
+        "mean_difference": -0.02210886769439052,
+        "statistic": -0.8134441323200032,
+        "p_value": 0.4159634651854608
+      }
+    }
+  }
+}

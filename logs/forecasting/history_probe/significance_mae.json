@@ -1,0 +1,39 @@
+{
+  "reference": "probe",
+  "lag": 48,
+  "loss": "per-origin mean absolute error over 24 hours",
+  "seeds": {
+    "probe": 1,
+    "xgboost_seed2026": 1
+  },
+  "comparisons": {
+    "xgboost_seed2026": {
+      "NSW1": {
+        "mean_difference": -0.1511241002128544,
+        "statistic": -2.053451440992623,
+        "p_value": 0.04002881465133921,
+        "reference_mae": 43.22912276656742,
+        "other_mae": 43.380246866780276
+      },
+      "QLD1": {
+        "mean_difference": -0.08487830755408633,
+        "statistic": -2.213628303621587,
+        "p_value": 0.026854358644025578,
+        "reference_mae": 36.38519415394233,
+        "other_mae": 36.47007246149642
+      },
+      "TAS1": {
+        "mean_difference": -0.026782943259742703,
+        "statistic": -1.3772570210950488,
+        "p_value": 0.16843279804218922,
+        "reference_mae": 26.77198848079028,
+        "other_mae": 26.798771424050027
+      },
+      "three_region_mean": {
+        "mean_difference": -0.08759511700889448,
+        "statistic": -2.7487779091507534,
+        "p_value": 0.005981790174027041
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "reference": "probe",
+  "lag": 48,
+  "loss": "per-origin crps_negative over the event hours of the horizon, seed-averaged quantiles",
+  "seeds": {
+    "probe": 1,
+    "xgboost_seed2026": 1
+  },
+  "comparisons": {
+    "xgboost_seed2026": {
+      "NSW1": {
+        "mean_difference": 0.02411273787231871,
+        "statistic": 0.35904770460161933,
+        "p_value": 0.7195594022394332,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "QLD1": {
+        "mean_difference": -0.039357002014502734,
+        "statistic": -1.2247754366069181,
+        "p_value": 0.2206598422898275,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "TAS1": {
+        "mean_difference": 0.08431346068102596,
+        "statistic": 1.979501521101845,
+        "p_value": 0.04775956855283547,
+        "reference_mae": NaN,
+        "other_mae": NaN
+      },
+      "three_region_mean": {
+        "mean_difference": -0.028776844154067796,
+        "statistic": -0.9359076700380092,
+        "p_value": 0.3493207277654008
+      }
+    }
+  }
+}

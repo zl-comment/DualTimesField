@@ -1,0 +1,38 @@
+/root/workspace/Code/DualTimesField/forecasting/history_probe.py:64: RuntimeWarning: Mean of empty slice
+  shared[row] = [np.nanmean(error[i - 3:i]), np.nanmean(error[i - 6:i]), np.nanmean(window),
+/root/workspace/Code/DualTimesField/forecasting/history_probe.py:65: RuntimeWarning: Mean of empty slice
+  np.nanmean(np.abs(window)), np.nanmax(np.abs(window))]
+/root/workspace/Code/DualTimesField/forecasting/history_probe.py:65: RuntimeWarning: All-NaN slice encountered
+  np.nanmean(np.abs(window)), np.nanmax(np.abs(window))]
+/root/workspace/Code/DualTimesField/.venv/lib/python3.11/site-packages/xgboost/core.py:751: UserWarning: [08:05:13] WARNING: /__w/xgboost/xgboost/src/common/error_msg.cc:62: Falling back to prediction using DMatrix due to mismatched devices. This might lead to higher memory usage and slower performance. XGBoost is running on: cuda:0, while the input data is on: cpu.
+Potential solutions:
+- Use a data structure that matches the device ordinal in the booster.
+- Set the device for booster before call to inplace_predict.
+
+This warning will only be shown once.
+
+  return func(**kwargs)
+TAS1 horizon 1: 158 rounds
+TAS1 horizon 2: 130 rounds
+TAS1 horizon 3: 133 rounds
+TAS1 horizon 4: 83 rounds
+TAS1 horizon 5: 81 rounds
+TAS1 horizon 6: 88 rounds
+TAS1 horizon 7: 132 rounds
+TAS1 horizon 8: 78 rounds
+TAS1 horizon 9: 106 rounds
+TAS1 horizon 10: 86 rounds
+TAS1 horizon 11: 98 rounds
+TAS1 horizon 12: 144 rounds
+TAS1 horizon 13: 128 rounds
+TAS1 horizon 14: 133 rounds
+TAS1 horizon 15: 102 rounds
+TAS1 horizon 16: 124 rounds
+TAS1 horizon 17: 97 rounds
+TAS1 horizon 18: 86 rounds
+TAS1 horizon 19: 77 rounds
+TAS1 horizon 20: 81 rounds
+TAS1 horizon 21: 95 rounds
+TAS1 horizon 22: 93 rounds
+TAS1 horizon 23: 85 rounds
+TAS1 horizon 24: 102 rounds
