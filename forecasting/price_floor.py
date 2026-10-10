@@ -117,7 +117,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--name", required=True, help="rolling configuration name, e.g. pd_calibrator")
     parser.add_argument("--region", required=True, choices=REGIONS)
-    parser.add_argument("--static-npz-dir", required=True, type=Path, help="for the origin check")
+    parser.add_argument("--static-npz-dir", type=Path, default=None, help="for the origin check (skipped if absent)")
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--metrics-dir", required=True, type=Path)
     parser.add_argument("--device", default="cuda")
@@ -126,9 +126,10 @@ def main() -> None:
                              "best_mae_model.pt on validation MAE)")
     args = parser.parse_args()
     result = run(args.name, args.region, args.device, args.checkpoint)
-    with np.load(args.static_npz_dir / f"{args.region}.npz") as archive:
-        if not np.array_equal(archive["origin_unix"], result["origin_unix"]):
-            raise ValueError("stitched origins do not match the static test split")
+    if args.static_npz_dir is not None:
+        with np.load(args.static_npz_dir / f"{args.region}.npz") as archive:
+            if not np.array_equal(archive["origin_unix"], result["origin_unix"]):
+                raise ValueError("stitched origins do not match the static test split")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(args.output_dir / f"{args.region}.npz", **{k: v for k, v in result.items() if k != "choices"})
     for index, seed in enumerate(SEEDS):

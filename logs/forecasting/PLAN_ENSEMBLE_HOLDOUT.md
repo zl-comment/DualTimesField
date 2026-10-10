@@ -136,3 +136,30 @@ better than a no-field one (C-mae) in any ensemble (differences of 0.03-0.04, in
 earlier "diversity from the fields" reading stays unsupported. XGBoost variants with the absolute-error objective
 (`l1`, `profile_l1`) and the tuned neural variants are still running, so that the loss function is not credited to
 the algorithm.
+
+## Frozen before the held-out scoring (2026-10-10, no held-out score exists yet)
+
+Development results of every member of plan 1 (three-region mean MAE on 2023-2024; tree members seed 2026, neural members the
+average of three seeds). Validation MAE in brackets.
+
+| Family | variants (test MAE) | chosen on 2023-2024 |
+|---|---|---|
+| XGBoost | default 35.55 (34.42), profile 35.34, reg 35.67 (34.18), profile_reg 35.20, l1 35.43, profile_l1 **35.04** | `profile_l1` |
+| LightGBM | default 35.24, profile 34.84, reg 35.25 (33.97), profile_reg **34.75** | `profile_reg` |
+| neural, no fields | default 35.69, v1 **35.61**, v2 35.94, v3 35.67 | `nn_c_mae_v1` |
+| neural, with fields | default **35.74**, v1 35.81, v2 35.93, v3 35.75 | `nn_dual_b` (default) |
+
+The absolute-error objective helps XGBoost too (35.55 to 35.43 on the default features, 35.34 to 35.04 with the profile features), so
+part of LightGBM's advantage over the baseline is the loss, part the algorithm (34.75 against 35.04 with the same features and loss
+family). Tuning the neural members changes the MAE by less than 0.35 either way.
+
+Equal-weight ensembles on 2023-2024 (members chosen as above; development numbers, optimistic): LightGBM alone 34.75;
+XGBoost + LightGBM 34.75; + C 34.55; + B 34.55; + C + B 34.61. Against LightGBM alone the three-member ensembles are 0.20 lower
+(week-block 95% interval [-0.28, -0.13]); B and C are equal (34.552 and 34.548). Criterion 1 of plan 1 (at least 0.3 lower than
+the best single member) is **not met on the development period**.
+
+To be scored once on 2025-01 to 2025-07 (5,040 origins per region; quarterly refits; same code):
+`xgb_default` (the baseline), `xgb_profile_l1`, `lgbm_profile_reg`, `nn_c_mae_v1`, `nn_dual_b`; equal-weight ensembles
+{xgb_profile_l1, lgbm_profile_reg}, {+ nn_c_mae_v1}, {+ nn_dual_b}, {+ both}. Weights learned per refit on the validation quarter are
+reported next to equal weights. Held-out criteria: the best ensemble beats `lgbm_profile_reg` and `xgb_default` in MAE with
+p < 0.05 and the same sign as in 2023-2024; the field contrast is {+ nn_dual_b} against {+ nn_c_mae_v1}. All outcomes are reported.

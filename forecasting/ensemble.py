@@ -125,8 +125,7 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=ROOT, help="directory of the member outputs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    global ROOT
-    ROOT = args.root
+    globals()["ROOT"] = args.root
     data = {m: {r: load_member(m, r, args.quarters) for r in REGIONS} for m in args.members}
     chosen, report = {}, {"validation_mae": {m: validation_mae(m, data) for m in args.members}, "chosen": {}}
     for pool in args.pools:
