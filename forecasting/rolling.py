@@ -41,10 +41,10 @@ TRAIN_START = "2015-01-01 00:00:00"
 TEST_END = pd.Timestamp("2025-01-01")
 VALIDATION_MONTHS = 3
 if os.environ.get("ROLLING_PERIOD") == "holdout":
-    # Held-out period: six full quarters of 2025-2026 and the two months of 2026Q3 archived so far.
-    QUARTERS = pd.DatetimeIndex(["2025-01-01", "2025-04-01", "2025-07-01", "2025-10-01",
-                                 "2026-01-01", "2026-04-01", "2026-07-01", "2026-09-01"])
-    TEST_END = pd.Timestamp("2026-09-01")
+    # Held-out period 2025-01 to 2025-07: AEMO stopped the OUTAGE_LRC PD PASA run type after July 2025, so the
+    # pipeline of the main period is only intact up to then (see logs/forecasting/holdout_data/README.md).
+    QUARTERS = pd.DatetimeIndex(["2025-01-01", "2025-04-01", "2025-07-01", "2025-07-30"])
+    TEST_END = pd.Timestamp("2025-07-31")
 
 
 def _stamp(value: pd.Timestamp) -> str:
