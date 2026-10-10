@@ -10,7 +10,9 @@ configurations so that hyperparameters and features can be compared with an equa
                168 h mean), so a forecast hour sees the hours around it;
 * ``reg``      default features with stronger regularization (depth 5, minimum child weight 10, lambda 5,
                column sampling 0.5, row sampling 0.7, learning rate 0.03, up to 3000 rounds);
-* ``profile_reg`` both.
+* ``profile_reg`` both;
+* ``l1`` and ``profile_l1``: the objective is the absolute error (``reg:absoluteerror``, early stopping on it) instead of the
+  multi-quantile loss, as LightGBM's L1 member does; only the point forecast is meaningful, the stored quantiles repeat it.
 
 The validation and test forecasts of one refit are written, so a configuration can be chosen by validation MAE and
 ensemble weights learned on the validation quarter, never on the test quarter.
@@ -78,11 +80,17 @@ def run(config: Path, region: str, variant: str, seed: int, device: str) -> dict
                          device=device, n_estimators=2000, learning_rate=0.05, max_depth=6, subsample=0.8,
                          colsample_bytree=0.8, early_stopping_rounds=50, random_state=seed)
         arguments.update(spec["params"])
+        if spec.get("l1"):
+            arguments.update(objective="reg:absoluteerror")
+            arguments.pop("quantile_alpha")
         model = xgboost.XGBRegressor(**arguments)
         model.fit(np.hstack([x_train, c_train[:, h]]), y_train[:, h],
                   eval_set=[(np.hstack([x_val, c_val[:, h]]), y_val[:, h])], verbose=False)
-        out["val_quantile"][:, h] = np.sort(model.predict(np.hstack([x_val, c_val[:, h]])), axis=-1)
-        out["test_quantile"][:, h] = np.sort(model.predict(np.hstack([x_test, c_test[:, h]])), axis=-1)
+        val_pred, test_pred = model.predict(np.hstack([x_val, c_val[:, h]])), model.predict(np.hstack([x_test, c_test[:, h]]))
+        if spec.get("l1"):
+            val_pred, test_pred = np.repeat(val_pred[:, None], len(QUANTILES), 1), np.repeat(test_pred[:, None], len(QUANTILES), 1)
+        out["val_quantile"][:, h] = np.sort(val_pred, axis=-1)
+        out["test_quantile"][:, h] = np.sort(test_pred, axis=-1)
         rounds.append(int(model.best_iteration) + 1)
         print(f"{region} {variant} horizon {h + 1}: {rounds[-1]} rounds", flush=True)
     median = QUANTILES.index(0.5)

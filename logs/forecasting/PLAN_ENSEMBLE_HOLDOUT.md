@@ -95,3 +95,44 @@ pooled DM p < 0.05, on 2023-2024 and, once frozen, on the held-out period.
 
 All numbers on the 2023-2024 period are development results. A claim goes into a paper only with its held-out
 number. Seeds, tuning budgets and the validation rule are stated with every table.
+
+## Interim development results for plan 1 (2023-2024, seed 2026 for the tree members; neural members are 3-seed forecasts)
+
+Three-region mean test MAE, raw prices, quarterly refits, `logs/forecasting/members/ensemble_dev/`.
+
+| Member | default | profile | reg | profile_reg |
+|---|---:|---:|---:|---:|
+| XGBoost (multi-quantile loss, median) | 35.55 | 35.34 | 35.67 | 35.20 |
+| LightGBM (L1 loss) | 35.24 | 34.84 | 35.25 | **34.75** |
+| neural, no fields (C-mae) / with fields (B) | 35.69 / 35.74 | | | |
+
+Validation MAE of the same variants (mean of the validation quarters): XGBoost 34.42 / 35.07 / **34.18** / 34.97;
+LightGBM 34.29 / 34.47 / **33.97** / 34.33.
+
+**Deviation from the rule written above, made before any held-out score exists.** The rule "choose the configuration by
+validation MAE" picks `reg` for both families, and `reg` is the worst or near-worst variant on the test period: the
+validation quarter is also the early-stopping set, so configurations that train longer look better on it than they are
+(selection on a score the model already optimized). The configuration for the held-out period is therefore chosen on
+the 2023-2024 realized MAE, which is the development period (the held-out period stays untouched). Development
+numbers selected this way are optimistic and are reported as such; only the held-out numbers count.
+Both rules are reported:
+
+| Ensemble (equal weights) | validation-chosen members | MAE | development-chosen members | MAE |
+|---|---|---:|---|---:|
+| best LightGBM alone | `lgbm_reg` | 35.25 | `lgbm_profile_reg` | 34.75 |
+| XGBoost + LightGBM | `xgb_reg`, `lgbm_reg` | 35.33 | `xgb_profile_reg`, `lgbm_profile_reg` | 34.85 |
+| + neural without fields | + C-mae | 34.93 | + C-mae | 34.64 |
+| + neural with fields | + B | 34.89 | + B | **34.61** |
+| all four | | 34.88 | | 34.67 |
+
+Against the best member of the same set, the ensembles with a neural member are 0.37 lower (validation-chosen, week-block 95%
+interval [-0.49, -0.26]) or 0.08-0.14 lower (development-chosen; intervals [-0.18,-0.03] to [-0.19,+0.04]). Fitting weights
+on the validation quarter changes the MAE by less than 0.05 against equal weights.
+
+Reading: (i) the largest gain comes from the choice of mature algorithm, objective and features (LightGBM with the L1
+loss and the 24-hour profile features, 34.75 alone, against 35.55 for the XGBoost baseline), not from the ensemble;
+(ii) once the best member is strong, adding other families helps by 0.1 or less; (iii) a dual-field member (B) is not
+better than a no-field one (C-mae) in any ensemble (differences of 0.03-0.04, intervals including zero), so the
+earlier "diversity from the fields" reading stays unsupported. XGBoost variants with the absolute-error objective
+(`l1`, `profile_l1`) and the tuned neural variants are still running, so that the loss function is not credited to
+the algorithm.
