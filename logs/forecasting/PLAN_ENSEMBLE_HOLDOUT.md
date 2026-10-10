@@ -163,3 +163,43 @@ To be scored once on 2025-01 to 2025-07 (5,040 origins per region; quarterly ref
 {xgb_profile_l1, lgbm_profile_reg}, {+ nn_c_mae_v1}, {+ nn_dual_b}, {+ both}. Weights learned per refit on the validation quarter are
 reported next to equal weights. Held-out criteria: the best ensemble beats `lgbm_profile_reg` and `xgb_default` in MAE with
 p < 0.05 and the same sign as in 2023-2024; the field contrast is {+ nn_dual_b} against {+ nn_c_mae_v1}. All outcomes are reported.
+
+## Held-out results, 2025-01-01 to 2025-07-29 (scored once, 2026-10-10)
+
+5,040 origins per region, three refits (2025Q1, 2025Q2, July), raw prices, the members frozen above, neural members the
+average of three seeds. `logs/forecasting/members_hold/ensemble/holdout_report.json`. Pooled Diebold-Mariano / week-block
+bootstrap over the three-region mean loss per origin; differences are first minus second.
+
+| | NSW1 | QLD1 | TAS1 | mean MAE |
+|---|---:|---:|---:|---:|
+| XGBoost, default (the baseline) | 49.28 | 35.62 | 33.57 | 39.49 |
+| XGBoost, profile features, L1 loss | 48.72 | 35.24 | 32.57 | 38.84 |
+| LightGBM, profile features, regularized, L1 | 48.47 | 35.00 | 32.21 | **38.56** |
+| neural, no fields (`nn_c_mae_v1`) | 47.85 | 36.23 | 35.64 | 39.91 |
+| neural, with fields (`nn_dual_b`) | 48.07 | 36.07 | 35.46 | 39.87 |
+| ensemble XGBoost + LightGBM | 48.50 | 35.00 | 32.25 | 38.58 |
+| ensemble + neural no fields | 47.78 | 34.59 | 32.18 | **38.18** |
+| ensemble + neural with fields | 47.78 | 34.74 | 32.07 | 38.20 |
+| ensemble + both neural | 47.59 | 34.73 | 32.58 | 38.30 |
+
+| Ensemble (equal weights) against | `xgb_default` | `lgbm_profile_reg` | `xgb_profile_l1` |
+|---|---|---|---|
+| XGBoost + LightGBM | -0.91 (p<0.001) | +0.02 (p=0.17) | -0.26 (p<0.001) |
+| + neural no fields | -1.31 (p<0.001; [-1.87,-0.89]) | -0.38 (p=0.023; [-0.75,-0.10]) | -0.66 (p<0.001) |
+| + neural with fields | -1.29 (p<0.001) | -0.36 (p=0.010; [-0.68,-0.10]) | -0.65 (p<0.001) |
+| + both neural | -1.20 (p<0.001) | -0.27 (p=0.24; [-0.76,+0.12]) | -0.55 (p=0.021) |
+
+Field contrast (+ neural with fields minus + neural no fields): +0.016 (p=0.74, interval [-0.08, +0.11]).
+Weights fitted on each refit's validation quarter give 38.12 to 38.17 for the three-neural-member ensembles, 0.03-0.07 below
+equal weights (not tested).
+
+Criteria registered above: (1) the best ensemble beats `lgbm_profile_reg` and `xgb_default` with p < 0.05 and the same sign as in
+2023-2024: **met** (-0.38, p=0.023; -1.31, p<0.001). The 0.3 margin of plan 1 criterion 1, not met in development (0.20), is met here
+(0.38, interval [-0.75,-0.10]). (2) The dual-field member adds nothing over the no-field member: +0.016, p=0.74. (3) Validation weights do
+not do worse than equal weights: met.
+
+Reading and limits. The held-out period is seven months (three refits), a single regime window; the intervals on the ensemble margin are
+wide ([-0.75,-0.10]). The gain over the XGBoost baseline (-1.3, 3.3%) is mostly the choice of a tuned L1 gradient-boosting member
+(-0.93 for LightGBM alone) plus about 0.4 from adding the neural family; the neural members alone are 0.4 worse than the
+trees on the held-out period (better on NSW1, worse on QLD1 and TAS1). The dual field is not shown to matter. PD PASA after July
+2025 is not comparable (see `logs/forecasting/holdout_data/README.md`), so the later months are untested.

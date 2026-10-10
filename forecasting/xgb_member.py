@@ -44,6 +44,8 @@ VARIANTS = {
     "profile_reg": dict(profile=True, params=dict(max_depth=5, min_child_weight=10, reg_lambda=5.0,
                                                   colsample_bytree=0.5, subsample=0.7, learning_rate=0.03,
                                                   n_estimators=3000)),
+    "l1": dict(profile=False, l1=True, params={}),
+    "profile_l1": dict(profile=True, l1=True, params={}),
 }
 
 
