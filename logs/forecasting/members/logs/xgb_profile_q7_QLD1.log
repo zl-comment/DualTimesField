@@ -1,0 +1,36 @@
+/root/workspace/Code/DualTimesField/forecasting/xgb_member.py:59: RuntimeWarning: Mean of empty slice
+  summary[row] = [day.max(), day.mean(), (day > 300).sum(), three_days.max(), week.mean()]
+/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+/root/workspace/Code/DualTimesField/.venv/lib/python3.11/site-packages/xgboost/core.py:751: UserWarning: [10:43:36] WARNING: /__w/xgboost/xgboost/src/common/error_msg.cc:62: Falling back to prediction using DMatrix due to mismatched devices. This might lead to higher memory usage and slower performance. XGBoost is running on: cuda:0, while the input data is on: cpu.
+Potential solutions:
+- Use a data structure that matches the device ordinal in the booster.
+- Set the device for booster before call to inplace_predict.
+
+This warning will only be shown once.
+
+  return func(**kwargs)
+QLD1 profile horizon 1: 294 rounds
+QLD1 profile horizon 2: 207 rounds
+QLD1 profile horizon 3: 205 rounds
+QLD1 profile horizon 4: 146 rounds
+QLD1 profile horizon 5: 125 rounds
+QLD1 profile horizon 6: 156 rounds
+QLD1 profile horizon 7: 262 rounds
+QLD1 profile horizon 8: 231 rounds
+QLD1 profile horizon 9: 194 rounds
+QLD1 profile horizon 10: 222 rounds
+QLD1 profile horizon 11: 249 rounds
+QLD1 profile horizon 12: 155 rounds
+QLD1 profile horizon 13: 154 rounds
+QLD1 profile horizon 14: 196 rounds
+QLD1 profile horizon 15: 130 rounds
+QLD1 profile horizon 16: 149 rounds
+QLD1 profile horizon 17: 205 rounds
+QLD1 profile horizon 18: 170 rounds
+QLD1 profile horizon 19: 197 rounds
+QLD1 profile horizon 20: 153 rounds
+QLD1 profile horizon 21: 205 rounds
+QLD1 profile horizon 22: 227 rounds
+QLD1 profile horizon 23: 174 rounds
+QLD1 profile horizon 24: 183 rounds

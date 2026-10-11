@@ -1,0 +1,36 @@
+/root/workspace/Code/DualTimesField/forecasting/xgb_member.py:63: RuntimeWarning: Mean of empty slice
+  summary[row] = [day.max(), day.mean(), (day > 300).sum(), three_days.max(), week.mean()]
+/root/anaconda3/envs/reranker/lib/python3.11/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+/root/workspace/Code/DualTimesField/.venv/lib/python3.11/site-packages/xgboost/core.py:751: UserWarning: [16:26:46] WARNING: /__w/xgboost/xgboost/src/common/error_msg.cc:62: Falling back to prediction using DMatrix due to mismatched devices. This might lead to higher memory usage and slower performance. XGBoost is running on: cuda:0, while the input data is on: cpu.
+Potential solutions:
+- Use a data structure that matches the device ordinal in the booster.
+- Set the device for booster before call to inplace_predict.
+
+This warning will only be shown once.
+
+  return func(**kwargs)
+TAS1 profile_l1 horizon 1: 686 rounds
+TAS1 profile_l1 horizon 2: 319 rounds
+TAS1 profile_l1 horizon 3: 450 rounds
+TAS1 profile_l1 horizon 4: 416 rounds
+TAS1 profile_l1 horizon 5: 117 rounds
+TAS1 profile_l1 horizon 6: 490 rounds
+TAS1 profile_l1 horizon 7: 539 rounds
+TAS1 profile_l1 horizon 8: 276 rounds
+TAS1 profile_l1 horizon 9: 464 rounds
+TAS1 profile_l1 horizon 10: 253 rounds
+TAS1 profile_l1 horizon 11: 418 rounds
+TAS1 profile_l1 horizon 12: 692 rounds
+TAS1 profile_l1 horizon 13: 358 rounds
+TAS1 profile_l1 horizon 14: 692 rounds
+TAS1 profile_l1 horizon 15: 472 rounds
+TAS1 profile_l1 horizon 16: 410 rounds
+TAS1 profile_l1 horizon 17: 399 rounds
+TAS1 profile_l1 horizon 18: 414 rounds
+TAS1 profile_l1 horizon 19: 518 rounds
+TAS1 profile_l1 horizon 20: 537 rounds
+TAS1 profile_l1 horizon 21: 591 rounds
+TAS1 profile_l1 horizon 22: 620 rounds
+TAS1 profile_l1 horizon 23: 487 rounds
+TAS1 profile_l1 horizon 24: 800 rounds
