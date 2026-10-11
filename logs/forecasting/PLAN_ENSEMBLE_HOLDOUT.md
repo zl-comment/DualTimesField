@@ -203,3 +203,64 @@ wide ([-0.75,-0.10]). The gain over the XGBoost baseline (-1.3, 3.3%) is mostly 
 (-0.93 for LightGBM alone) plus about 0.4 from adding the neural family; the neural members alone are 0.4 worse than the
 trees on the held-out period (better on NSW1, worse on QLD1 and TAS1). The dual field is not shown to matter. PD PASA after July
 2025 is not comparable (see `logs/forecasting/holdout_data/README.md`), so the later months are untested.
+
+## Plan 3 results: tail scores and battery value (2026-10-11)
+
+`forecasting/tail_value.py`, `logs/forecasting/tail_value/tail_value_{dev,hold}.json`. Development = 2023-2024 (729 usable midnight origins per region);
+held-out = 2025-01 to 2025-07 (208). Quantile-capable forecasters only for the tail scores (quantile levels 0.05-0.95 are stored, so q99 and exceedance
+probabilities are not available; LightGBM and the L1 XGBoost give a median only). Battery: one battery at 1 MW, 1/2/4 MWh, round trip 0.9,
+daily LP on the 24 forecast hourly prices of the midnight origin, settled at realized hourly prices; shares are of the perfect-foresight revenue.
+Differences are first minus second, week-block bootstrap 95% intervals.
+
+Tail scores (pinball loss, lower is better; mean over regions):
+
+| Development | q90 all | q95 all | q90 spike | q95 spike | q90 negative | q95 negative | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| XGBoost default | 16.17 | 13.47 | 649 | 595 | 7.15 | 4.71 | 0.877 |
+| neural, no fields | 17.08 | 14.73 | 670 | 668 | 6.79 | 4.42 | 0.909 |
+| neural, with fields | 16.75 | 14.17 | 648 | 630 | 6.50 | 4.57 | 0.918 |
+| XGBoost + fields tail correction | 16.20 | 13.69 | 610 | 551 | 7.02 | 5.12 | 0.950 |
+| XGBoost + raw-history correction | 16.21 | 13.67 | 618 | 557 | 6.94 | 5.05 | 0.951 |
+
+| Held-out | q90 all | q95 all | q90 spike | q95 spike | q90 negative | q95 negative | coverage |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| XGBoost default | 19.42 | 16.60 | 769 | 696 | 8.06 | 5.23 | 0.887 |
+| neural, no fields | 19.94 | 17.36 | 761 | 740 | 7.31 | 4.67 | 0.935 |
+| neural, with fields | 20.07 | 17.57 | 767 | 741 | 7.25 | 4.89 | 0.945 |
+
+Field contrast (neural with fields minus without; negative favours the fields):
+
+| | q90 all | q95 all | q90 spike | q95 spike | q90 negative | q95 negative |
+|---|---|---|---|---|---|---|
+| development | -0.33 [-0.53,-0.15] | -0.55 [-0.91,-0.23] | -28 [-40,-18] | -47 [-69,-26] | -0.30 [-0.40,-0.19] | +0.22 [0.14,0.30] |
+| held-out | +0.13 [-0.12,+0.44] | +0.21 [-0.23,+0.92] | +5 [-12,+17] | -7 [-51,+32] | -0.21 [-0.41,-0.04] | +0.21 [+0.05,+0.37] |
+
+On development, the XGBoost base with fields correction against the raw-history correction: spike q90 -9.5 [-15,-4.7], q95 -7.3 [-13,-2.2], negative q90 +0.08, q95 +0.07 (both intervals above
+zero); XGBoost with fields correction against plain XGBoost: spike q90 -45 [-63,-30], q95 -53 [-76,-32], negative q95 +0.40.
+
+Battery (share of perfect-foresight revenue, 2 MWh; daily revenue in AUD):
+
+| | development share | held-out share |
+|---|---:|---:|
+| XGBoost default | 0.647 (464) | 0.720 (490) |
+| LightGBM tuned | 0.667 (478) | 0.769 (520) |
+| neural no fields / with fields | 0.668 / 0.665 | 0.739 / 0.708 |
+| ensemble XGBoost + LightGBM + neural no fields | 0.674 (482) | 0.756 (515) |
+| ensemble with neural with fields | 0.676 (484) | 0.740 (513) |
+| yesterday's prices | 0.510 (387) | 0.622 (441) |
+| perfect foresight | 1.000 (652) | 1.000 (663) |
+
+Revenue differences, 2 MWh (daily AUD, relative to the second): tuned LightGBM against XGBoost default +14.0 [4.9,26.4] (+3.0%) in development,
++29.5 [9.9,59.4] (+6.0%) held-out; ensemble (no-field neural) against XGBoost default +17.8 [11.0,26.6] (+3.8%) and +25.3 [-7.9,65.4] (+5.2%); with fields
+against without, in the ensemble: +1.7 [-4.7,11.6] and -1.9 [-33,25]; neural alone +3.9 [-8,19] and -10.9 [-47,17]. Every forecaster beats
+yesterday's prices by 10-21%.
+
+Criterion registered for plan 3 (a field variant or ensemble beats its no-field counterpart in tail scores or revenue with intervals excluding zero):
+met in development for the tail scores (all-hour and spike-hour q90/q95), **not reproduced on the held-out period** (intervals include zero; fewer spike hours
+there), and never met for revenue. Negative-price hours: q90 is better with fields in both periods, q95 worse in both (a trade of one tail for the other).
+
+Reading and limits: the tuned tree models and the ensembles give about 3-6% more battery revenue than the XGBoost baseline, in line with their lower MAE;
+the dual field does not change revenue. The field variant's development advantage in the spike-hour quantiles is the last visible edge of the dual field,
+and it does not survive the held-out period. Limits: hourly prices (not five-minute settlement), a deliberately simple storage model without degradation,
+single battery price-taker, seed-averaged forecasts, 208 held-out days (the revenue intervals are wide), spike events are few, and `xgb_base_tails` has seed
+2026 only (not comparable with seed-averaged forecasters on the point forecast, which is why its revenue is lower).
