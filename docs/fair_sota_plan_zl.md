@@ -1,9 +1,9 @@
 # 公平对比与 SOTA 检验实验计划（fair-sota-plan）
 
 - 作者：zl
-- 分支：`exp/fair-sota-plan-zl`
+- 分支：`diag/full-underperformance-zl`（在诊断提交 `32223a8` 之上增补；公平计划初版见 `exp/fair-sota-plan-zl` @ `6f669b5`）
 - 基线：`origin/zl/forecasting-exploration-plan` @ `ca70146`（仓库中最新的目标分支，见 §0）
-- 状态：**计划文档，尚未执行任何新实验。** 文中凡未标明“已有证据”的数字、排名、收益均不是结果。
+- 状态：**计划文档，尚未执行任何新实验。** 文中凡未标明“已有证据”的数字、排名、收益均不是结果。§8.3 的 E1–E8 全部为**预注册的待执行实验，均未执行**；其中所有阈值是“预注册判据”（拟定、待 R-P0 评审冻结），不是已有结果。
 - 目标：**争取并检验**在 NSW1/QLD1/TAS1 上能否得到可靠的 SOTA。不预设、不承诺会达到 SOTA；若证据不支持，则如实报告“不支持”。
 
 ## 0. 仓库与分支核验记录
@@ -62,9 +62,31 @@ README 已自述的限制（不再重复隐瞒）：测试期 2023–2024 与 20
 | D14 | 概率后处理：已有 floor/PD calibrator，但无共形（CP）、IDR 等规范的点→概率后处理对照 | 已证实 | 概率预测后处理 | 加 LEAR+CP、XGBoost+CP（滚动一年校准窗口，与论文一致）；用本数据的验证段做校准 | 覆盖率、区间宽度、CRPS~ |
 | D15 | “full”的收益来源不清：no_fields 的 MAE 与 full 差 1.095（显著），但 raw_history、no_tail 差别很小；加 ensemble 后 fields 无增益（`feature/ensemble-holdout-plan` 记录，非本分支，见 §11） | 部分证实 | 模型容量/预训练适配 | 容量对齐的普通网络对照；参数量与耗时入表 | 见 §8 |
 
-### 1.3 根因诊断（取代上表中“仅为怀疑/待审计”的表述）
+### 1.3 根因诊断与证据等级（来源：[`docs/full_underperformance_diagnosis_zl.md`](full_underperformance_diagnosis_zl.md)）
 
-上表 D1–D15 是缺陷与怀疑清单，**不是**对 Full 落后 XGBoost 的根因结论。根因诊断见 [`docs/full_underperformance_diagnosis_zl.md`](full_underperformance_diagnosis_zl.md)（分支 `diag/full-underperformance-zl`）：基于已有产物的误差分解给出落后的位置（普通价格区间的精度；TAS1 贡献 80% 的 MAE 差距、NSW1 贡献 78% 的 CRPS~ 差距），并把 Full 自身问题、XGBoost 协议优势、其他神经基线的实现缺陷分开，逐项标注 Confirmed / Strong evidence / Hypothesis。该报告同时列出无法在本机完成的诊断及所需最小实验（如 `test.npz` 重评分）。下文各步骤中涉及 Full 的优先级应以该诊断为准。
+上表 D1–D15 是缺陷与怀疑清单，**不是**对 Full 落后 XGBoost 的根因结论。根因诊断基于已有产物（冻结运行 `exploration_20261011` 汇总报告 + 代码审计，未重新训练任何模型），数字与等级以诊断报告为准，本节仅同步结论，二者不得出现不一致。差值符号一律 Full − XGBoost，正 = Full 更差。
+
+**Confirmed（已由已有产物/代码证实）**
+
+| 事实 | 数字/依据 |
+|---|---|
+| 宏 MAE 差距 | +0.955（Full 38.923 vs XGBoost 37.968）；TAS1 贡献 +2.289（80%），NSW1 +0.522（18%），QLD1 +0.054（2%） |
+| 宏 CRPS~ 差距 | +0.409（25.936 vs 25.527）；NSW1 +0.956（78%），TAS1 +0.491（40%），QLD1 −0.219（−18%，Full 更好）；**宏 CRPS~ 的 168h block bootstrap 区间含 0（Holm p=1），CRPS~ 落后证据不足** |
+| 差距位置：普通价格 | 缺口来自事后价格 0–300：0–100 贡献 MAE +0.830、100–300 +0.800；spike（>300）为 −0.702、negative +0.027（Full 在这两段更好或持平）。区间按事后价格划分，是恒等式分解，不是可提前识别的状态 |
+| 差距位置：horizon | 近端更差，horizon 1 的 MAE 差 +2.235、CRPS~ 差 +1.140，约为平均 2.3 倍；horizon 22–24 接近 0 |
+| 稳健性 | 四个半年的 MAE 差距均为正；72 个 region×月中 51 个 Full 更差；不是 seed 运气，也不是少数月份 |
+| Full 设计错位的**存在性** | point head 在 asinh+标准化空间用 MSE（`losses.py`）；MAE 在原始价格空间由该 point head 评估（`train.py::evaluate`）；checkpoint 由验证 CRPS~ 选（`primary_selection: crps`）；XGBoost 以原始价格 q50（`reg:quantileerror`）为点预测 |
+| 代码审计 | Full 与 XGBoost 数据/origin/actual/切分一致；scaler/asinh 只用训练段；未发现泄漏或实现缺陷（README 已声明的外生可用时点元数据代理除外） |
+| 后处理非根因 | `full+floor` 相对 `full`：MAE +0.045、CRPS~ +0.065，更差；Full 的整体覆盖已接近名义值 |
+| tail 加权非差距根因 | `no_tail` 相对 XGBoost：MAE 差 +0.969（≈Full 的 +0.955），CRPS~ 差 +0.738（比 Full 的 +0.409 更差）；tail 加权净作用是把 CRPS~ 从普通区间移到尾部，净收益为正（Holm 后不显著）。**不得再把资源优先投向 tail/floor/后处理方向**；仅 E6 做验证集内的权重选择 |
+
+**Strong evidence**：Full 在 linear→XGBoost 的 MAE 差距中已追回 74%，剩余差距在普通区间（定位）；同族早期 27 条曲线显示验证 MAE 最优 epoch ≤5 的占 20/27（仅对**同族早期运行**；对冻结运行为 Hypothesis）。
+
+**Hypothesis（待 §8.3 检验，不得写成因果）**：
+- 点预测错位对 +0.955 MAE 差距的**贡献量尚未量化**——不得写成已证实的因果；因为冻结运行逐 origin 预测文件（`test.npz`/`validation.npz`）不在仓库也不在本机。
+- `year_standardized` 线性外推（诊断 C）；优化/验证不稳定与 checkpoint 噪声（D，冻结运行层面）；线性头容量/外生利用方式（E/F）；decomposition 损失稀释（G）；XGBoost 协议优势（24 horizon 分别拟合与早停，J）的贡献量。
+
+**与 Full 根因无关的问题**：PatchTST RevIN/目标空间缺陷、神经基线固定 lr/30 epoch（D1/D2）；它们不能解释也不能掩盖 Full 与 XGBoost 的差距。
 
 注意：D1–D3 修复后，PatchTST/GateTS/DLinear 的成绩可能显著变化，也可能 XGBoost 依然领先。**修复后的结果未知**，不得预设。
 
@@ -206,6 +228,30 @@ XGBoost、full 及其消融、linear、DLinear、PatchTST（修复后）、GateT
 
 另有“容量对齐”对照：参数量相近的普通 MLP/Transformer，防止收益来自规模。
 
+### 8.3 Full 根因预注册实验矩阵（E1–E8，均未执行）
+
+来源：诊断报告 §6/§8。**本节所有实验均尚未运行，不含任何结果；表中“支持/排除判据”均为预注册判据（拟定值，R-P0 评审冻结前可改，冻结后不得改），不是已有结果。** 每个实验只改一个因素，其余完全不变（含 origin、数据 hash、seed、验证集、早停规则）；点预测口径均同时保存 `point_head` 与 `point_q50`（§9）。
+
+共同规则：
+- 基线格 = 同地区、同 seed、同 commit 的未修改 Full（用同一代码重跑，或用冻结运行预测；两者不得混用）。
+- 所有选择（checkpoint、候选取值）只读验证集 2022；测试集 2023–2024 每个配置只生成一次，且已被反复查看，**所有结论标“探索性，非盲测”**。
+- 预先固定诊断切片（所有实验必报）：TAS1 MAE、NSW1 CRPS~、价格区间 0–100、100–300、horizon 1、horizon 22–24；另报宏平均、spike/negative 切片（用于确认没有以尾部换普通区间）。
+- 差值符号：实验 − 基线，负 = 改善。区间 = 配对 168 小时 block bootstrap 95%（§7）。
+- 单 seed 单地区只用于**筛选**：已知 TAS1 Full 的 3-seed MAE 极差为 1.70（30.377–32.076），大于宏 MAE 差距 0.955，所以单 seed 的改善**不能**单独作为支持证据，只能决定是否进入 3-seed 复验（R-P3）。
+
+| 编号 | 机制假设 | 唯一改动 | 输入要求 | 主要指标/切片 | 预注册支持判据 | 预注册排除/降级判据 | 后续动作 |
+|---|---|---|---|---|---|---|---|
+| E1 零训练重评分 | 点预测口径错位 | 无（仅重评分）：Full `point` vs `quantile[...,2]`（q50） | 冻结运行 `test.npz`/`validation.npz`（含 `point`、`quantile`、`origin_unix`、`actual`），hash 与诊断所用报告对齐 | 宏/各地区 MAE、CRPS~，及固定切片 | q50 相对 point head 宏 MAE 改善 ≥0.5（取自诊断报告建议，约为宏差距的一半），且改善主要落在 TAS1 与 0–300 区间 → 支持错位为主因 | 改善 <0.5 且区间含 0 → 降级为次要因素，转 E4/E8；仅在尾部改善 → 不支持 | 支持：E2/E3 优先；排除：E4/E8 提前 |
+| E2 checkpoint 选择 | 按验证 CRPS~ 选 checkpoint 对 MAE 不利且噪声大 | 选择指标：验证 CRPS~ → 验证 MAE（q50）；可加“MAE+CRPS~ 综合”作第三臂（同一因素的取值） | 与 E3 相同设置；TAS1、单 seed 起步；之后 NSW1 | 测试 MAE（TAS1）、CRPS~（NSW1） | 测试 MAE 改善 ≥0.5 且 CRPS~ 恶化 ≤0.1（拟定）→ 进入 R-P3 | 改善 <0.5，或仅 1/3 seed 改善 → 排除（早期 39 个运行中仅 11/39 在测试 MAE 上更好，先验支持度低） | 不支持则不再单独扩展 |
+| E3 point 损失 | asinh 空间 MSE 与原始价格中位数不一致 | point loss：asinh-MSE → 原始价格 L1（或 q50 pinball），其余不变 | 同上 | 测试 MAE（TAS1 与 0–300 切片）；RMSE 作副指标（诊断显示 Full RMSE 反而更好，须报告是否变差） | MAE 改善 ≥0.5 且 RMSE 恶化不超过 1%（拟定）；若 E1 已支持错位，方向应与 E1 一致 | 改善 <0.5 → 排除；MAE 改善但 RMSE/spike 明显恶化 → “部分优势”，限定范围 | 通过则作为候选默认设置进入 R-P3 |
+| E4 `year_standardized` | 线性头在样本外年份（测试 2023–2024 超出训练 2015–2021）外推 | 三臂：原始 / 截断到训练范围 / 移除，其余不变 | TAS1 优先、NSW1 次之；单 seed | 验证与测试 MAE/CRPS~ 的 gap；0–100、100–300 切片；极端负价预测占比（预测 <−100 vs 实际） | 截断或移除使测试 MAE 改善 ≥0.5 或 CRPS~ 改善 ≥0.25（拟定），且验证-测试差距缩小 → 支持外推问题 | 三臂差异在 seed 噪声内（|Δ|<0.3，拟定）→ 排除 | 通过则固定为默认；须在 §6 审计中确认日历特征无未来信息 |
+| E5 优化稳定性 | 验证指标逐 epoch 波动、最佳 epoch 很早 | 平均策略：无 / EMA / 最后 K 个 checkpoint 平均 / 更小学习率（各臂仅聚合或步长不同） | 单地区×3 seed（R-P3） | seed 间 SD、验证 MAE 波动范围、测试 MAE/CRPS~ | seed SD 下降且测试 MAE 或 CRPS~ 改善 ≥0.3（拟定）→ 支持 | 方差不降且均值无改善 → 排除；须先取得冻结运行曲线确认“最佳 epoch ≤5”在冻结配置中成立，否则该项仍只有早期同族证据 | 通过则并入默认训练配方 |
+| E6 tail weight | 当前 0.5 并非已知最优；影响主要在 CRPS~ | `tail_weight` ∈ {0, 0.25, 0.5}，**仅用验证集选** | 单地区单 seed 起，后 3 seed | CRPS~（普通区间与尾部分开）、spike/negative pinball | 验证集上某值使普通区间 CRPS~ 更低且尾部 CRPS~ 恶化 ≤0.2（拟定） | 无一值优于 0.5 → 保持 0.5，关闭该方向 | R-P4 才做；不作为 MAE 修复 |
+| E7 XGBoost 协议公平性 | 24 horizon 分别拟合/早停带来额外自由度 | XGBoost：per-horizon（独立拟合/早停）vs joint-horizon（horizon 作特征、一次早停）；两版本分赛道 | 与 Full 同 origin/特征；3 地区×3 seed | MAE、CRPS~ 变化量 | 协议优势量 =（per-horizon − joint）差值；joint 版使与 Full 的 MAE 差距缩小 ≥0.5（拟定）→ 协议优势显著 | 差值在噪声内 → 协议优势不是主因 | **仅用于判断比较是否公平，不能算 Full 修复**；公平赛道两版都报告 |
+| E8 外生非线性小头 | 线性头对 PD/备用/净负荷响应欠灵活 | 在 `base_point_head` 上加小 MLP/分段线性头；配参数量对齐的容量对照（§8.2） | 在 E1–E5 结论固定之后 | 0–300 区间 MAE（TAS1）、参数量 | MAE 改善 ≥0.5，且同参数量普通网络对照不能同样改善 | 改善来自容量而非外生结构，或 <0.5 → 排除 | 最后晋级；失败则关闭 |
+
+执行优先级与门控见 §12.1.1（R-P0 至 R-P4）。
+
 ## 9. 统一缓存与预测文件 schema
 
 每个（赛道, 模型, 地区, seed, split）一个 `npz`，路径：`outputs/fair_sota/<track>/<model>/<region>/seed<seed>/<split>.npz`。
@@ -243,6 +289,13 @@ T-F 失败记录：模型、地区、seed、阶段、错误摘要、日志路径
 
 T-G 尾部指标与事件计数表。
 
+T-H Full 根因实验决策表（E1–E8；**模板，未填任何数字**；取得原始逐 origin 预测前不得填写 E1 的 q50 重评分数字）：
+
+| 实验编号 | 唯一改动 | 地区 | seed | point 口径 | checkpoint 规则 | 普通区间 MAE（0–100 / 100–300） | 普通区间 CRPS~（0–100 / 100–300） | tail 指标（spike/negative） | 整体 MAE / CRPS~ | 相对 XGBoost 差距（MAE / CRPS~） | 95% 区间（168h block） | 结论等级（Confirmed / Strong evidence / Hypothesis / 排除） | 晋级 / 停止决定 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+预先固定的诊断切片（每行必须同时给出）：TAS1 MAE、NSW1 CRPS~、价格区间 0–100、100–300、horizon 1、horizon 22–24。T-H 每个阈值引用 §8.3 的预注册判据，并注明“判据冻结时间/commit”；判据在看到结果后修改的行一律标为“事后”，不得用于晋级。
+
 ## 11. 外部来源与限制
 
 - 论文 arXiv:2609.00089（Lipiecki & Weron）：九种基础模型变体零样本，对比 LEAR+CP 与 DDNN-JSU，德国/波兰/西班牙，2021–2025，日前市场，上下文 1449 天（表格模型）或更长（Moirai-2 上下文 8736 小时）；结论为只有 TabPFN 族在三个市场上全面显著胜出。**这些结论对欧洲日前市场成立，不能外推到 AEMO 5 分钟/30 分钟实时市场的小时聚合数据上。**
@@ -266,6 +319,19 @@ T-G 尾部指标与事件计数表。
 | P6 消融 | §8 | | 中 | 中 |
 | P7 统计与报告 | bootstrap/Holm/DM/CPA；全部表格 | 表格由脚本生成 | 高 | 小 |
 
+#### 12.1.1 Full 根因门控流程（R-P0 至 R-P4；先于新增大模型与完整矩阵）
+
+下列 R 阶段是对 P3–P5 的前置门控：在 Full 落后 XGBoost 的根因尚未分离之前，不启动新增大模型（TabPFN/Chronos/Moirai/LEAR）和完整 3 地区×3 seed 矩阵，避免盲目扩大模型清单。
+
+| 阶段 | 内容 | 退出标准（预注册） | 阻断条件 |
+|---|---|---|---|
+| R-P0 | 找回/导出冻结运行的 `test.npz`、`validation.npz`、训练曲线及必要 hash（见 §12.5）；核对 origin/actual 与诊断所用报告逐点一致 | 文件齐全，hash/commit/config/地区/seed 已记录；origins/actual 对齐通过 | 缺失 → **不得声称完成根因验证**；E1 及依赖曲线的判断保持 Hypothesis |
+| R-P1 | 先执行 E1 零训练重评分 | 按 §8.3 判据给出 point vs q50 结论并填写 T-H | 无 R-P0 产物则不能执行，不得填数 |
+| R-P2 | E4 与 E2/E3：单因素、单地区、单 seed 最小训练；推荐优先 TAS1（MAE 差距主要来源，80%），并用 NSW1 验证 CRPS~ 问题（CRPS~ 差距主要来源，78%） | 每个实验按 §8.3 判据给出支持/排除；通过者进入 R-P3 | 无授权算力与数据（见 §12.5）则停止并记录 |
+| R-P3 | E5 稳定性与 3 seed 复验（针对 R-P2 通过的改动） | 3 seed 中 ≥2 个方向一致（拟定），均值改善达判据 | 方向不一致 → 不晋级 |
+| R-P4 | E6、E7；E8 最后晋级 | 各自判据 | E8 仅在 E1–E5 结论固定后进行 |
+| 后续门 | 仅当 R-P0–R-P3 完成、Full 修复版（或确认无可修复）已确定后，才启动 P3 调参、新增大模型（TabPFN/Chronos/Moirai/LEAR）和完整 3 地区×3 seed 矩阵（P4） | 门控记录写入 `logs/fair_sota/audit.md` | 未过门不得并行启动 |
+
 **资源约束提示**：上一轮计划使用的 GPU 在实验室服务器上；本任务边界禁止访问实验室科研服务器，因此 P3 以后的算力来源需由用户另行指定，否则只能在本机小规模运行。这是执行前的待决事项。
 
 ### 12.2 停止/晋级标准
@@ -273,6 +339,8 @@ T-G 尾部指标与事件计数表。
 - 模型晋级：通过 §4.3 全部准入标准；
 - 终止：关键组件泄漏审计不通过；或同一设置下两次修复仍不能收敛；
 - 不因结果不好而删除失败配置（失败记录保留）。
+- 根因实验（E1–E8）的晋级/排除只依据 §8.3 预注册判据；判据在看到结果后修改，则该结论标“事后”，不得用于晋级或 SOTA 声明。
+- 通过 E 系列筛选的 Full 修复版，必须在冻结协议下作为**新的候选模型**重新走 §4.3 准入和 §12.3 判定；E 系列的单地区单 seed 结果本身不构成 SOTA 证据。E7（XGBoost 协议）只用于解释比较公平性，不计为 Full 的改进。
 
 ### 12.3 SOTA 判定标准（预先冻结）
 
@@ -283,6 +351,15 @@ T-G 尾部指标与事件计数表。
 5. 与任一强基线相比，MAE 或尾部指标的显著劣化需与 CRPS~ 的收益一起报告；若仅在某尾部或某地区成立，则结论限定为该范围，写“部分优势”，不写“SOTA”。
 6. 若 XGBoost（含公平调参后）仍最强，则结论写“不支持 SOTA”。
 7. 因 2023–2024 与 2025 已被查看，任何结论均须标“探索性，非盲测”。
+
+### 12.5 Full 根因实验的资源与依赖（本机现状与导入要求）
+
+本机（2026-10-12 核验自诊断报告）缺少：(1) 冻结运行的逐 origin 预测文件 `test.npz`/`validation.npz` 和训练曲线（只在原训练机器，README：“model/prediction outputs remain local”）；(2) 实验数据（`../electricity-price-forecasting-research/data/...`、`data/aemo_exogenous/*.npz`）；(3) torch、xgboost、pandas（系统 Python 3.9.6）。因此 E1 与所有训练实验目前都**不可在本机执行**。
+
+- E1 需要从原训练机器**安全导出** `test.npz`/`validation.npz`，由用户（或经用户授权的人）操作后放入本机授权目录（建议 `outputs/fair_sota/imports/`）。**本任务本身不得访问实验室科研服务器。**
+- 导入时必须记录并核验：文件 sha256、产出该运行的 code commit、config（及 config hash）、地区、seed、split、起止时间；核验 `origin_unix` 与 `actual` 与诊断所用报告（`report.json.gz`，sha256 `07ade862…15f9`）逐点一致；缺任何一项，该文件不得用于重评分。
+- 大型产物（npz、checkpoint、曲线原始文件、tuning trial 表）不提交 Git；只提交 hash 清单、meta 摘要和脚本生成的小型报告。
+- 训练类实验（E2–E8）的算力与环境（torch/xgboost/pandas）由用户另行指定（见 §12.1 资源约束提示）；未指定前不得声称实验已完成。
 
 ## 13. 命令模板（计划中，尚未提供对应脚本）
 
@@ -299,5 +376,6 @@ python -m forecasting.fair_sota.report --root outputs/fair_sota --out logs/fair_
 ## 14. 与现有文件的关系
 
 - 沿用：`forecasting/datasets.py`、`rolling.py`、`significance.py`、`exploration_*`；
+- 根因依据：`docs/full_underperformance_diagnosis_zl.md`、`forecasting/analysis/full_vs_xgboost_gap.py`（E1 重评分脚本可参照其价格区间/地区/horizon 分解口径，待实现）；
 - 将新增（计划）：`forecasting/fair_sota/`、`configs/fair_sota/`、`logs/fair_sota/`；
 - 配置草案：`configs/fair_sota/protocol_v1.draft.yaml`（本分支已提交，仅草案，尚未被任何代码读取）。
