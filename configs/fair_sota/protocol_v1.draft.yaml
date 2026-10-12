@@ -1,0 +1,65 @@
+# DRAFT: 公平对比协议 v1（草案）。尚未被任何代码读取；数值为计划值，冻结前须经 P0 评审。
+# 详见 docs/fair_sota_plan_zl.md
+protocol_version: fair-sota-v1-draft
+status: draft_not_frozen
+exploratory_notice: "2023-2024 与 2025 已被查看过；结论仅为探索性复验，非盲测"
+
+matrix:
+  regions: [NSW1, QLD1, TAS1]
+  seeds: [2026, 2027, 2028]
+  require_all_cells: true          # 缺任一格的模型不进榜
+  tracks:
+    T1: {name: hourly_origin, input_hours: 72, horizon_hours: 24, stride_hours: 1}
+    T2: {name: day_ahead_fixed_origin, horizon_hours: 24, origin: "TBD after availability audit"}
+  scopes: [global_single_model, region_specific]   # 分榜，不得拼接
+
+splits:
+  static:
+    train: ["2015-01-01", "2021-12-31"]
+    validation: ["2022-01-01", "2022-12-31"]
+    test: ["2023-01-01", "2024-12-31"]
+    expected_origins_per_region: 17521
+  rolling: {quarters: 8, validation_months: 3, module: forecasting.rolling}
+
+selection:
+  metric: crps_quantile_approx     # 验证集未加权 CRPS~
+  only_on: validation
+  early_stopping: {neural_patience_epochs: 10, tree_patience_rounds: 50}
+  record_hit_epoch_cap: true
+
+tuning:
+  trials_per_model_region: 30      # 计划值；P2 冒烟后按成本确认
+  search_seed: 7
+  seeds_share_best_config: true
+  search_spaces: "configs/fair_sota/search_spaces.yaml (TODO P0)"
+
+quantiles: [0.05, 0.10, 0.50, 0.90, 0.95]
+point_forecast: q50
+price_scoring_space: raw_rrp
+thresholds: {negative: 0.0, spike: 300.0}
+
+pretrained_modes:
+  zero_shot: "no weight update; context only"
+  few_shot: "validation-period samples in context; no weight update"
+  full_shot: "fine-tuned on training split; budget declared"
+
+statistics:
+  bootstrap: {block_hours: 168, sensitivity_block_hours: 24, replicates: 19999, seed: 20261012}
+  multiple_comparison: holm
+  tests: [paired_block_bootstrap, diebold_mariano_newey_west, giacomini_white_cpa_daily]
+  empty_event_policy: report_NA
+
+sota_criteria:
+  primary_metrics: [crps_quantile_approx, mae]
+  primary_test_metric: crps_quantile_approx
+  per_region_not_worse: true
+  macro_better_holm_p: 0.05
+  min_seed_cells_consistent: 8      # of 9
+  forbid_cherry_picking: [seed, region, metric]
+
+candidate_models:
+  existing: [xgboost, full, linear, dlinear, patchtst_fixed, gatets, gatets_adapter]
+  new: [tabpfn, chronos2, moirai2_info_limited, lear_cp, ensemble_validation_weighted]
+  optional: [timesfm25_xreg, mitra_cp, ddnn_jsu_reduced]
+
+admission: [unit_tests, smoke_origin_hash_match, leakage_audit, one_region_validation_fit]

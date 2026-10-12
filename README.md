@@ -577,6 +577,11 @@ predictions = model.predict(sample['times'])
 
 Typical model size: ~35K parameters ($D=7$, $K=16$, $M=16$, $H=64$). Training: 2–5 min for reconstruction (300 epochs, batch 32) and 10–30 min per sample for interpolation (500 epochs) on a single RTX 3090.
 
+## Planning Documents
+
+- [Forecasting exploration plan](docs/forecasting_exploration_plan.md) — frozen protocol of the 2026-10-11 exploration run.
+- [Fair-comparison and SOTA experiment plan](docs/fair_sota_plan_zl.md) — plan only (no new results): protocol defects found in the exploration run, a fair 3-region × 3-seed protocol, new baselines (TabPFN, Chronos-2, LEAR+CP), significance testing, ablations and pre-registered SOTA criteria. Draft config: [`configs/fair_sota/protocol_v1.draft.yaml`](configs/fair_sota/protocol_v1.draft.yaml).
+
 ## 🥳 Citation
 
 If you find this work useful, please cite:
