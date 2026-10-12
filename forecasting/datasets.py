@@ -147,6 +147,14 @@ def _load_region_frame(config: Mapping, region: str) -> pd.DataFrame:
     if missing_columns:
         raise ValueError(f"Missing required columns: {sorted(missing_columns)}")
     frame = _parse_timestamps(frame, config)
+    cutoff = data_config.get("load_end_exclusive")
+    if cutoff is not None:
+        cutoff = pd.Timestamp(cutoff)
+        cutoff = (cutoff.tz_localize(data_config["timezone"])
+                  if cutoff.tzinfo is None else cutoff.tz_convert(data_config["timezone"]))
+        frame = frame.loc[frame[data_config["delivery_column"]].lt(cutoff)].copy()
+        if frame.empty:
+            raise ValueError("No observations precede load_end_exclusive")
     if not frame[data_config["region_column"]].eq(region).all():
         raise ValueError(f"Region column does not contain only {region}")
     numeric_columns = list(dict.fromkeys(data_config["history_columns"] + [data_config["target_column"]]))
@@ -404,6 +412,18 @@ class AEMOForecastDataset(Dataset):
                 else np.zeros_like(source_runs)
             )
             source_last_changed = archive["source_last_changed_unix"].astype(np.int64)
+        # Exclude later forecast vintages before validation or fitting. Reading
+        # an NPZ container is distinct from using its later rows in development.
+        cutoff = config["data"].get("load_end_exclusive")
+        if cutoff is not None:
+            cutoff = pd.Timestamp(cutoff)
+            if cutoff.tzinfo is None:
+                cutoff = cutoff.tz_localize(config["data"]["timezone"])
+            keep = origins < int(cutoff.timestamp())
+            origins, raw_values = origins[keep], raw_values[keep]
+            source_runs = source_runs[keep]
+            source_stpasa_runs = source_stpasa_runs[keep]
+            source_last_changed = source_last_changed[keep]
         if raw_values.shape != (len(origins), self.output_hours, len(feature_names)):
             raise ValueError(
                 f"{block} values for {region} must have shape "

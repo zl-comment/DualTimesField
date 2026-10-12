@@ -1,0 +1,369 @@
+# Initial audit snapshot plus explicitly separated aligned implementation status.
+version: baseline-audit-v1
+audited_on: '2026-10-12'
+execution_enabled: false
+purpose: Source audit and comparison registration; not a training configuration or
+  completed model integration.
+paper: https://arxiv.org/abs/2609.00089v1
+repository_reference_commit: af546fa3b1fd75852075460015810f745fd2fd74
+local_source_sha256:
+  forecasting/general_baselines.py: 68cb18589e005f6a91adb81ed28a774db056fc164fdd3d245d69d6f9f0cf61e0
+  forecasting/exploration_baselines.py: 1b30353e6f35ac2df4fc9d9d41a040e2d42683d5982643a69b2f5ad8573c2a90
+  forecasting/gatets_baseline.py: a29228f177028c5edf1a945b38448b439cc3ec64f58f7eb2642af1ae466da2fd
+  forecasting/datasets.py: 4cc6ec90bd4d84c1b22636e913434cad76dc83c3fd093321880f6b91a7e38d3d
+  forecasting/losses.py: ed4c3c24b287f903e2c2a9e9518e964ab11bb80aedf613ab4d809c08ee7a658f
+  forecasting/train.py: fe6014ee5a7e54bab759306a3247953e5af4199928cd18359c4fb180b06bc36c
+  forecasting/exploration_evaluate.py: 6afa3eb751257a057930410d6f29405a889e46d6e915bb71546e634b83eb0344
+artifact_audit: logs/forecasting/baseline_audit_20261012.json
+sources:
+  postforecasts:
+    repository: https://github.com/lipiecki/PostForecasts.jl
+    commit: 589f9407d375e2272fb731873443f691c0060d85
+    code_license: MIT
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      src/models/cp.jl: d41e7995e70884647b0c52ceec7c231ac7d7272403f1c0911f3a9253e7714aef
+      src/point2quant.jl: 841996f0927b6c3e6d508b6ae21449fd5fc8abbd36f4a002ed9fcfeda282ffe9
+  testforecasts:
+    repository: https://github.com/lipiecki/TestForecasts.jl
+    commit: 7681474b77d5f02526925b5334ed7cd95a6cb92e
+    code_license: not_declared_at_inspected_revision
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      src/dieboldmariano.jl: e4d3f9a963f30f69551379fb7ee5037db4317ca80b24daa3b56337787388631e
+      src/giacominiwhite.jl: f97e789ff1127851deec208373db4928c1d072ec5668c5f3e505fa825d4c4156
+      src/losses.jl: 4c6687bad793d96c739e45188b27fa92cbe9a7aa07c01d26bb1ad6c9d7d3d94d
+  energy_analytics:
+    repository: https://github.com/lipiecki/energy-analytics
+    commit: 8073e6d805aea303ad9cff25d80aeeb35d137764
+    code_license: not_declared_at_inspected_revision
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      notebooks/Shrinkage.ipynb: 95cd8cb24d3b00f68ad404f5c27b2e237bbb7b6263e34a772de216e68db67cd3
+  epftoolbox:
+    repository: https://github.com/jeslago/epftoolbox
+    commit: 47d6e0629f65ebd19d3c12cb5689dbad0c2ea078
+    code_license: Apache-2.0
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      epftoolbox/models/_lear.py: 45a06dd46260d037ba7c2f25c55292613839c70eb5482b03a5aca100beb25834
+  chronos:
+    repository: https://github.com/amazon-science/chronos-forecasting
+    commit: 1224fafa91e1ecd6674f5204066b159e40b5e4a1
+    code_license: Apache-2.0
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      src/chronos/chronos2/pipeline.py: 9fad1e4fb7251471463a40408a32d25d31b23b7afb88069911f095071b9b0599
+  tabpfn:
+    repository: https://github.com/PriorLabs/TabPFN
+    commit: 8eea89ee142a3bdb868ae150baefaaa9d9065b96
+    code_license: Apache-2.0
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      src/tabpfn/regressor.py: 13e641ccfd54154ddddfc182bed86a03bdd42730f467d919a5e785677d5961c6
+      src/tabpfn/model_loading.py: 4d0cbc16ab160fcc61ef774b8a68e586cfb071153854cb4d381bd23c8e296986
+  moirai:
+    repository: https://github.com/SalesforceAIResearch/uni2ts
+    commit: cfd46d4510ed8896f263116f32928eede05b0a75
+    code_license: Apache-2.0
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      src/uni2ts/model/moirai2/forecast.py: 42135e3b84e7e3d0d592ae3b53543fd20ca007e595251e8ec5d067f58d3a070e
+      src/uni2ts/model/moirai2/module.py: 22b6c00302980e09416f884d3e212c28792bfd5519c192de0a5432bee7fbc6a8
+  patchtst:
+    repository: https://github.com/yuqinie98/PatchTST
+    commit: 204c21efe0b39603ad6e2ca640ef5896646ab1a9
+    code_license: Apache-2.0
+    status: source_inspected_not_installed_or_vendored
+    evidence_files:
+      PatchTST_supervised/layers/PatchTST_backbone.py: df67173153787c2356bdfb6491159cd754332ef7382986efe879e1fbea8ebf26
+comparison_contract:
+  regions:
+  - NSW1
+  - QLD1
+  - TAS1
+  seeds:
+  - 2026
+  - 2027
+  - 2028
+  T1:
+    input_hours: 72
+    horizon_hours: 24
+    stride_hours: 1
+    scope: region_specific
+    training_label_pool: frozen_fit_segment
+    static_cp_residual_pool: frozen_prior_oos_calibration_segment
+    future_inputs: origin_asof_vintage_only
+    foundation_cross_origin_learning: false
+  T2:
+    status: separate_specification_pending
+    same_leaderboard_as_T1: false
+    daily_issue_time: null
+  probabilistic_model_point: sorted_q50_in_raw_rrp
+  full_legacy_point_head: historical_diagnostic_only
+  point_only_model: separate_point_panel_declared_L1_estimator_no_fake_quantiles
+  quantiles:
+  - 0.05
+  - 0.1
+  - 0.5
+  - 0.9
+  - 0.95
+  score: 2_equal_weight_mean_pinball_not_exact_CRPS
+  missing_quantile_policy: block_Q_entry_never_silent_clamp_or_extrapolate
+  native_dense_grid_metrics: separate_panel_no_interpolation_of_five_quantiles_as_99_native_outputs
+  hpo: same_declared_trial_ceiling_plus_measured_compute_not_same_numeric_epochs_and_tree_rounds
+  zero_shot: no_gradient_finetuning_record_all_context_and_preprocessing_selection
+  deterministic_seeds: one_fit_reference_no_independent_replication_claim
+  test_status: retrospective_not_blind
+models:
+  full_reference:
+    implementation: forecasting/train.py
+    status: historical_only
+    blockers:
+    - point_head_differs_from_q50
+    - tail_weighted_quantile_target
+    - selection_budget
+    - publication_availability
+    admitted_to_fair_ranking: false
+  xgboost_per_horizon:
+    implementation: forecasting/exploration_baselines.py:run_tree
+    status: retune_required
+    blockers:
+    - selection_budget
+    - publication_availability
+    selection_units: 24
+    admitted_to_fair_ranking: false
+  linear:
+    implementation: forecasting/general_baselines.py:DLinear(decomposition=False)
+    status: retune_required
+    blockers:
+    - selection_budget
+    - publication_availability
+    admitted_to_fair_ranking: false
+  dlinear:
+    implementation: forecasting/general_baselines.py:DLinear
+    status: local_adaptation_requires_reference_check
+    blockers:
+    - official_equivalence_not_verified
+    - selection_budget
+    - publication_availability
+    admitted_to_fair_ranking: false
+  patchtst:
+    implementation: forecasting/general_baselines.py:PatchTST
+    source: patchtst
+    status: repair_required
+    blockers:
+    - asinh_history_revin_raw_target
+    - official_equivalence_not_verified
+    - selection_budget
+    - publication_availability
+    admitted_to_fair_ranking: false
+    architecture_notes:
+    - linear_exogenous_fusion_is_native_model_design_not_input_alignment_failure
+  gatets_adapter:
+    implementation: forecasting/gatets_baseline.py
+    source_commit: a3b821fff6fda3bde8124a79564a8d33df9732f1
+    status: adaptation_retune_required
+    blockers:
+    - selection_budget
+    - publication_availability
+    admitted_to_fair_ranking: false
+    architecture_notes:
+    - linear_exogenous_fusion_is_native_model_design_not_input_alignment_failure
+  gatets_history_only:
+    implementation: forecasting/gatets_baseline.py
+    status: information_ablation_only
+    blockers:
+    - not_same_information_set
+    admitted_to_fair_ranking: false
+  lightgbm:
+    implementation: null
+    legacy_reference: origin/feature/ensemble-holdout-plan:forecasting/lgbm_member.py
+    status: port_required
+    blockers:
+    - legacy_168h_features
+    - legacy_rolling_protocol
+    - point_only_no_native_quantiles
+    admitted_to_fair_ranking: false
+  plain_network:
+    implementation: null
+    status: implementation_required
+    blockers:
+    - legacy_nn_c_is_not_independent_full_free_architecture
+    - match_information_capacity_and_selection
+    admitted_to_fair_ranking: false
+  no_fields:
+    implementation: forecasting/train.py with field_forecast=false
+    status: development_runs_required
+    blockers:
+    - match_information_capacity_and_selection
+    admitted_to_fair_ranking: false
+  lasso_arx72_cp:
+    implementation: null
+    sources:
+    - epftoolbox
+    - postforecasts
+    status: implementation_required
+    track: T1
+    display_name: Lasso-ARX72+CP (LEAR-inspired adaptation)
+    blockers:
+    - must_not_claim_original_LEAR
+    - chronological_oos_calibration
+    - publication_availability
+    admitted_to_fair_ranking: false
+  lear_cp_native:
+    implementation: null
+    sources:
+    - epftoolbox
+    - postforecasts
+    status: paper_track_specification_required
+    track: T2
+    blockers:
+    - day7_lags_exceed_T1_history
+    - paper_CV_differs_from_epftoolbox_LARS
+    - rolling_vs_static
+    - daily_origin_not_frozen
+    - chronological_oos_calibration
+    admitted_to_fair_ranking: false
+  tabpfn2:
+    implementation: null
+    source: tabpfn
+    status: adapter_required
+    weight_repository: Prior-Labs/TabPFN-v2-reg
+    weight_file: tabpfn-v2-regressor.ckpt
+    blockers:
+    - weights_revision_license_and_hash
+    - frozen_training_context_labels
+    - explicit_quantiles_not_default_mean
+    - resource_budget
+    - pretraining_overlap
+    admitted_to_fair_ranking: false
+  tabpfn3:
+    implementation: null
+    source: tabpfn
+    status: adapter_required
+    weight_repository: Prior-Labs/tabpfn_3
+    weight_file: tabpfn-v3-regressor-v3_default.ckpt
+    blockers:
+    - weights_revision_license_and_hash
+    - frozen_training_context_labels
+    - explicit_quantiles_not_default_mean
+    - resource_budget
+    - pretraining_overlap
+    admitted_to_fair_ranking: false
+  chronos2:
+    implementation: null
+    source: chronos
+    status: adapter_required
+    weight_repository: amazon/chronos-2
+    blockers:
+    - weights_revision_license_and_hash
+    - origin_asof_covariate_mapping
+    - native_quantile_grid
+    - disable_cross_learning_between_origins
+    - pretraining_overlap
+    admitted_to_fair_ranking: false
+  moirai2:
+    implementation: null
+    source: moirai
+    status: adapter_and_probability_grid_audit_required
+    weight_repository: Salesforce/moirai-2.0-R-small
+    blockers:
+    - weights_revision_license_and_hash
+    - origin_asof_covariate_mapping
+    - default_grid_lacks_q05_q95
+    - pretraining_overlap
+    admitted_to_fair_ranking: false
+new_required_comparators:
+- lightgbm
+- lasso_arx72_cp
+- tabpfn2
+- tabpfn3
+- chronos2
+- moirai2
+paper_track_required:
+- lear_cp_native
+paper_coverage_gaps_not_in_current_core:
+- DDNN-JSU
+- Mitra+CP
+- TimesFM-2.5
+- Chronos-2-synth
+- Chronos-2-small
+- TabPFN-TS-3
+comparison_pairs:
+- candidate: full_reference
+  reference: xgboost_per_horizon
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: lightgbm
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: plain_network
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: lasso_arx72_cp
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: tabpfn2
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: tabpfn3
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: chronos2
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: moirai2
+  question: same_information_standalone_quality
+- candidate: full_reference
+  reference: no_fields
+  question: field_increment
+- candidate: xgboost_plus_full
+  reference: xgboost_plus_plain_network
+  question: matched_member_increment
+- candidate: xgboost_lightgbm_plus_full
+  reference: xgboost_lightgbm_plus_plain_network
+  question: matched_member_increment
+launch_gates:
+- verified_model_or_explicit_adaptation
+- raw_target_and_revin_compatibility
+- asof_information_and_label_context
+- declared_point_and_quantile_semantics
+- chronological_development_calibration_isolation
+- selection_and_compute_budget_frozen
+- real_data_smoke
+- complete_matrix_or_explicit_failure
+author_code_reuse:
+  postforecasts: Formula reference for symmetric absolute-residual CP, alpha=beta=1
+    interpolation; Julia numeric parity and temporal calibration still required.
+  testforecasts: 'Reference only: DM has no HAC; GW fixed lag1; CRPS assumes equally
+    spaced levels; scalar losses require review. Not the T1 significance engine.'
+  energy_analytics: Teaching reference only, not paper runner or production LEAR implementation.
+  thief: Different paper, excluded from this reproduction claim.
+local_source_sha256_snapshot_scope: Initial read-only audit before the aligned path
+  was implemented; not current working-tree hashes.
+aligned_path:
+  user_boundary: same_samples_labels_same_shared_preprocessing_native_model_internals_same_scoring
+  config: configs/aemo_forecast_aligned_core_v1.yaml
+  runner: forecasting.aligned_runner
+  input_module: forecasting/aligned_inputs.py
+  scoring_module: forecasting/aligned_scoring.py
+  baseline_module: forecasting/aligned_baselines.py
+  implemented_models:
+  - full
+  - no_fields
+  - mlp
+  - linear
+  - dlinear
+  - patchtst
+  - gatets_adapter
+  - xgboost
+  - lightgbm
+  - lasso_arx72_cp
+  foundation_models_status: pending_adapters_and_weights
+  validation_record: logs/forecasting/aligned_boundary_validation_20261012.json
+  quality_ranking_ready: false
+  native_linear_adapter_or_per_horizon_fit_is_alignment_failure: false
+  publication_audit: archive_timestamp_proxies_only
+  old_predictions_and_configs_overwritten: false
+  validation_status: 30_model_region_smoke_cells_passed_81_tests_and_3_subtests

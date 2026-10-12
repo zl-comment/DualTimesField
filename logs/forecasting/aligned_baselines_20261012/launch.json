@@ -1,0 +1,198 @@
+{
+  "recorded_at_utc": "2026-10-12T14:35:19.440380+00:00",
+  "run_id": "aligned_baselines_20261012",
+  "run_root": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012",
+  "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+  "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86",
+  "git_head": "af546fa3b1fd75852075460015810f745fd2fd74",
+  "models": [
+    "full",
+    "xgboost",
+    "lightgbm",
+    "linear",
+    "dlinear",
+    "patchtst",
+    "gatets_adapter",
+    "mlp",
+    "no_fields",
+    "lasso_arx72_cp"
+  ],
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "total_cells": 90,
+  "scope": "aligned_full_data_fixed_configuration_not_hpo_not_blind",
+  "origins": {
+    "NSW1": {
+      "train": 61273,
+      "selection": 4321,
+      "calibration": 4393,
+      "test": 17521
+    },
+    "QLD1": {
+      "train": 61273,
+      "selection": 4321,
+      "calibration": 4393,
+      "test": 17521
+    },
+    "TAS1": {
+      "train": 61273,
+      "selection": 4321,
+      "calibration": 4393,
+      "test": 17521
+    }
+  },
+  "prelaunch_validation": {
+    "pytest_passed": 120,
+    "subtests_passed": 3,
+    "gpu_canary_models": [
+      "full",
+      "xgboost"
+    ],
+    "gpu_canary_origins_per_split": 64
+  },
+  "launch_progress_snapshot": {
+    "run_id": "aligned_baselines_20261012",
+    "updated_at": "2026-10-12T14:35:17.015800+00:00",
+    "controller_pid": 3827129,
+    "total": 90,
+    "completed": [
+      "linear/2026/NSW1",
+      "dlinear/2026/NSW1"
+    ],
+    "failed": [],
+    "running": [
+      {
+        "id": "full/2026/NSW1",
+        "pid": 3827223,
+        "slot": [
+          "gpu",
+          "5"
+        ]
+      },
+      {
+        "id": "xgboost/2026/NSW1",
+        "pid": 3827228,
+        "slot": [
+          "gpu",
+          "6"
+        ]
+      },
+      {
+        "id": "lightgbm/2026/NSW1",
+        "pid": 3827234,
+        "slot": [
+          "cpu",
+          "0"
+        ]
+      },
+      {
+        "id": "patchtst/2026/NSW1",
+        "pid": 3828087,
+        "slot": [
+          "gpu",
+          "7"
+        ]
+      }
+    ],
+    "pending": [
+      "gatets_adapter/2026/NSW1",
+      "mlp/2026/NSW1",
+      "no_fields/2026/NSW1",
+      "lasso_arx72_cp/2026/NSW1",
+      "full/2026/QLD1",
+      "xgboost/2026/QLD1",
+      "lightgbm/2026/QLD1",
+      "linear/2026/QLD1",
+      "dlinear/2026/QLD1",
+      "patchtst/2026/QLD1",
+      "gatets_adapter/2026/QLD1",
+      "mlp/2026/QLD1",
+      "no_fields/2026/QLD1",
+      "lasso_arx72_cp/2026/QLD1",
+      "full/2026/TAS1",
+      "xgboost/2026/TAS1",
+      "lightgbm/2026/TAS1",
+      "linear/2026/TAS1",
+      "dlinear/2026/TAS1",
+      "patchtst/2026/TAS1",
+      "gatets_adapter/2026/TAS1",
+      "mlp/2026/TAS1",
+      "no_fields/2026/TAS1",
+      "lasso_arx72_cp/2026/TAS1",
+      "full/2027/NSW1",
+      "xgboost/2027/NSW1",
+      "lightgbm/2027/NSW1",
+      "linear/2027/NSW1",
+      "dlinear/2027/NSW1",
+      "patchtst/2027/NSW1",
+      "gatets_adapter/2027/NSW1",
+      "mlp/2027/NSW1",
+      "no_fields/2027/NSW1",
+      "lasso_arx72_cp/2027/NSW1",
+      "full/2027/QLD1",
+      "xgboost/2027/QLD1",
+      "lightgbm/2027/QLD1",
+      "linear/2027/QLD1",
+      "dlinear/2027/QLD1",
+      "patchtst/2027/QLD1",
+      "gatets_adapter/2027/QLD1",
+      "mlp/2027/QLD1",
+      "no_fields/2027/QLD1",
+      "lasso_arx72_cp/2027/QLD1",
+      "full/2027/TAS1",
+      "xgboost/2027/TAS1",
+      "lightgbm/2027/TAS1",
+      "linear/2027/TAS1",
+      "dlinear/2027/TAS1",
+      "patchtst/2027/TAS1",
+      "gatets_adapter/2027/TAS1",
+      "mlp/2027/TAS1",
+      "no_fields/2027/TAS1",
+      "lasso_arx72_cp/2027/TAS1",
+      "full/2028/NSW1",
+      "xgboost/2028/NSW1",
+      "lightgbm/2028/NSW1",
+      "linear/2028/NSW1",
+      "dlinear/2028/NSW1",
+      "patchtst/2028/NSW1",
+      "gatets_adapter/2028/NSW1",
+      "mlp/2028/NSW1",
+      "no_fields/2028/NSW1",
+      "lasso_arx72_cp/2028/NSW1",
+      "full/2028/QLD1",
+      "xgboost/2028/QLD1",
+      "lightgbm/2028/QLD1",
+      "linear/2028/QLD1",
+      "dlinear/2028/QLD1",
+      "patchtst/2028/QLD1",
+      "gatets_adapter/2028/QLD1",
+      "mlp/2028/QLD1",
+      "no_fields/2028/QLD1",
+      "lasso_arx72_cp/2028/QLD1",
+      "full/2028/TAS1",
+      "xgboost/2028/TAS1",
+      "lightgbm/2028/TAS1",
+      "linear/2028/TAS1",
+      "dlinear/2028/TAS1",
+      "patchtst/2028/TAS1",
+      "gatets_adapter/2028/TAS1",
+      "mlp/2028/TAS1",
+      "no_fields/2028/TAS1",
+      "lasso_arx72_cp/2028/TAS1"
+    ]
+  },
+  "live_progress_file": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/progress.json",
+  "controller_launch": {
+    "pid": 3827129,
+    "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+    "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+  }
+}

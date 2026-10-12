@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-12",
+  "status": "implemented_shared_boundary_verified",
+  "scope": "integration_smoke_not_tuned_quality_ranking",
+  "user_boundary": [
+    "same_prediction_samples_and_labels",
+    "same_model_external_data_and_preprocessing",
+    "model_internal_methods_unrestricted",
+    "same_raw_price_scoring"
+  ],
+  "source_hash": "7164fc376f79c51fe80fe0ec1d3e5cc7bdf438b922f5de30e4510069e0af46a2",
+  "config": "configs/aemo_forecast_aligned_core_v1.yaml",
+  "config_sha256": "f1020e99fa715acd7b654061535ff86cbdf468f952811f389bf761caef904ec4",
+  "smoke_summary": "outputs/forecasting/aligned_smoke_20261012_v2/summary.json",
+  "smoke_summary_sha256": "afe9dc4e99351eaf40556aab0927467aca71d6ec2ca1d1bdbb89081c87021a62",
+  "seed": 2026,
+  "verified_model_region_cells": 30,
+  "neural_budget": {
+    "epochs": 2,
+    "batch_size": 32,
+    "learning_rate": 0.0003,
+    "patience": 2,
+    "device": "cpu",
+    "selection_metric": "pinball"
+  },
+  "environment": {
+    "python": "3.11.0",
+    "numpy": "2.4.6",
+    "torch": "2.5.1+cu124",
+    "xgboost": "3.2.0",
+    "lightgbm": "4.7.0",
+    "scikit-learn": "1.9.1"
+  },
+  "tests": {
+    "passed": 81,
+    "subtests_passed": 3,
+    "command": ".venv/bin/python -m pytest -q tests/test_aligned_inputs.py tests/test_aligned_scoring.py tests/test_aligned_baselines.py tests/test_aligned_runner.py tests/test_pdpasa_exogenous.py tests/test_exploration_evaluate.py tests/test_gatets_baseline.py"
+  },
+  "review": {
+    "parallel_implementation": [
+      "shared_inputs",
+      "shared_scoring",
+      "new_baselines"
+    ],
+    "cross_review": [
+      "scoring_reviews_inputs_and_runner",
+      "inputs_reviews_baselines",
+      "baselines_reviews_runner"
+    ],
+    "blocking_findings_resolved": [
+      "preprocessing_identity_independent_of_loaded_scoring_split",
+      "raw_output_space_and_unsorted_quantiles_preserved",
+      "separate_lasso_selection_parameters",
+      "target_available_after_delivery_hour_end",
+      "model_quantile_levels_and_price_column_checked",
+      "configured_training_parameters_used",
+      "experiment_identity_and_scaler_checks",
+      "source_stability_checked"
+    ],
+    "final_review": "no_unresolved_blocker_for_implemented_smoke_path"
+  },
+  "limitations": [
+    "No full-size HPO or performance ranking performed.",
+    "External publication times remain archive metadata proxies.",
+    "TabPFN-2/3, Chronos-2 and Moirai-2 remain pending adapters and weights.",
+    "CP formula tested in Python; Julia runtime parity not executed."
+  ],
+  "regions": {
+    "NSW1": {
+      "origins": 64,
+      "horizon_hours": 24,
+      "input_hash": "85c3f7a647d192f96e962516c96a2c4a2be154137949022e94ed8cf0f9170744",
+      "sample_hash": "3d919a475a084a1cbf28f7cd9796bfdf705165a2a964e023a956cb79886e972f",
+      "preprocessing_hash": "90628074c101e07be3bea2614ae6c153d87b5626abd55ca4d4fb8491920766ba",
+      "models": {
+        "full": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/full/screening.npz",
+          "sha256": "f0ea6b74297d975e8f30c5ac96db50eafcdf0175da601d20bedae3da323839a2",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "no_fields": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/no_fields/screening.npz",
+          "sha256": "fb82eedafe180a3bbfc9d6d2b122f1dd56604cf3f658eb7e5ad3e4d8ce8d733a",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "mlp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/mlp/screening.npz",
+          "sha256": "ddedbe36198f76debc24751988ad5e22b1281289a0a3b9dee070e16e3d265bab",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "linear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/linear/screening.npz",
+          "sha256": "bc48ecdbe686f4400e858885cc4f15767f934fd5bf7c0350a5e42b117fc4d9de",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "dlinear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/dlinear/screening.npz",
+          "sha256": "09999853ab148d467cee6130a8319f2315b7a5ac026a018787c1405587674065",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "patchtst": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/patchtst/screening.npz",
+          "sha256": "b20d36860d970ab51deadb4a20c0aa6a8a7733e2dca47e417201618028842b93",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "gatets_adapter": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/gatets_adapter/screening.npz",
+          "sha256": "bad51dcd8c177a90848aeecaa28c75e5093a24d990ae0c0f2391f7a1528d430b",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "xgboost": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/xgboost/screening.npz",
+          "sha256": "ebe00e609753549ec7948a7124d2824f62f8ee0b89667cb7d60f8bf0ce61a2ad",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lightgbm": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/lightgbm/screening.npz",
+          "sha256": "67ab4cbd0b624c82086c01d558824a5ca5139a1cdb248163b70b50cb01b26fe1",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lasso_arx72_cp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/NSW1/lasso_arx72_cp/screening.npz",
+          "sha256": "2cfbec3f1b57b0672ac9bc984567384c358d749008653d2cb03790b0dda7a8a0",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        }
+      }
+    },
+    "QLD1": {
+      "origins": 64,
+      "horizon_hours": 24,
+      "input_hash": "5ce17caf6b1b3eba8a1310651dd83df8179585b2782d77aa169a734c385762a4",
+      "sample_hash": "d1a8f13dc6332f36facaa1b39271604b443c56ded391c2f17872760ed4b168aa",
+      "preprocessing_hash": "4a8561e76ff25d9b66792684005adb2bbd475d084cd801ac59be9867d2c3ed91",
+      "models": {
+        "full": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/full/screening.npz",
+          "sha256": "e4e8cf01bf22d089d81f718cf5c7216952c90b295406f384f696246162e654d9",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "no_fields": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/no_fields/screening.npz",
+          "sha256": "ce8075e0b2da7cc96caabfb7291ebf62829b8ee285fcf9c06b09ae4726260cbf",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "mlp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/mlp/screening.npz",
+          "sha256": "93e156969bcd40d0e113eb6ae8a909d37ab9a8269f9661df8ae13b26d4f338cd",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "linear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/linear/screening.npz",
+          "sha256": "a5455461fda976977db32eb16b8d2c4ba58de1684647a65efa3a52f59bed1c8f",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "dlinear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/dlinear/screening.npz",
+          "sha256": "bbb6cc160d06de60b95efc71d5bca815f7a08ec0ab081b8b73898f4e0a7ed3eb",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "patchtst": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/patchtst/screening.npz",
+          "sha256": "3b0534c51a9b885aa51e5ffbb162b2a793a509ce81df94a1896cbbaf3f89d0a9",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "gatets_adapter": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/gatets_adapter/screening.npz",
+          "sha256": "f5352bcd49332f2f9882e69282df374161e868f61e628e6f1f02be0128473c3f",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "xgboost": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/xgboost/screening.npz",
+          "sha256": "3c043dd4c414a3273fd465428ea799973f4134ad59ac301f518c4fe935ea880b",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lightgbm": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/lightgbm/screening.npz",
+          "sha256": "ac04560ffe4f2ec01b5bab2f2231c8b75c0b8966735fab2c450311e105e8a862",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lasso_arx72_cp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/QLD1/lasso_arx72_cp/screening.npz",
+          "sha256": "c0175fe027f43e5198fde8b65e433dab1919339320b961eda8492205f7db7ca0",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        }
+      }
+    },
+    "TAS1": {
+      "origins": 64,
+      "horizon_hours": 24,
+      "input_hash": "1d2cce90522a8f3c28dcd60030d96ddfed6e3aa1bccbc3757d3f38607072cb16",
+      "sample_hash": "392e42d91179d795d689ac7dbb796b131deb46dd552c4da9457598f651a61455",
+      "preprocessing_hash": "6b845d7d985e02f1d8abe0d5ca27ee329ec59cc65dcdd46f83cf8563f26b110f",
+      "models": {
+        "full": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/full/screening.npz",
+          "sha256": "47a93f8aebdf09321209bae55dce5e3a97e01f40430ecb91d51d2d8bc500ede6",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "no_fields": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/no_fields/screening.npz",
+          "sha256": "9bf169120d45b2bfe437b65e4c0a6ee31ace6eb5f7ee2716c9329bfee9680be4",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "mlp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/mlp/screening.npz",
+          "sha256": "f8f807b8321ad062700d3a904d76a82556fe6922ddf90e1df02aa5dc3838b56f",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "linear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/linear/screening.npz",
+          "sha256": "bd88d57a3accc5f0fed4108e6fcf47caca08b3c757f5a4d949ad804955521741",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "dlinear": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/dlinear/screening.npz",
+          "sha256": "359ce5b6ce444a8ce0367c1f27d58a3bf03797d15485e49c4a587f12e56474d5",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "patchtst": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/patchtst/screening.npz",
+          "sha256": "76896aa5c528c3be93f60ed8d786615114a0aa025c71b2be6d96c47aa84f1fbe",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "gatets_adapter": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/gatets_adapter/screening.npz",
+          "sha256": "16e9af8be181bff7f0f99b8c878d085ec8f1c9be7c7f67ccd45802598c347d99",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "xgboost": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/xgboost/screening.npz",
+          "sha256": "e7d7abb05a1dff7f0612b3265b0cef9054d30adc89505cd55ff07b98d7356daa",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lightgbm": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/lightgbm/screening.npz",
+          "sha256": "680b0deff6a6321848a6f1dfebfdd2bc46a48f2eb87e87b745cc34498e1b5b44",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        },
+        "lasso_arx72_cp": {
+          "artifact": "outputs/forecasting/aligned_smoke_20261012_v2/TAS1/lasso_arx72_cp/screening.npz",
+          "sha256": "4af1fbaa94102400b06572d6da87ad1dc7b6207acf8dc0c30190a2911599f629",
+          "status": "shared_input_sample_label_scoring_checks_passed"
+        }
+      }
+    }
+  }
+}

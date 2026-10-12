@@ -1,65 +1,226 @@
-# DRAFT: 公平对比协议 v1（草案）。尚未被任何代码读取；数值为计划值，冻结前须经 P0 评审。
-# 详见 docs/fair_sota_plan_zl.md
-protocol_version: fair-sota-v1-draft
+# Plan-only configuration. No executor consumes this file yet.
+# Rules and evidence: docs/fair_sota_plan_zl.md
+protocol_version: fair-sota-v1-revised-draft
 status: draft_not_frozen
-exploratory_notice: "2023-2024 与 2025 已被查看过；结论仅为探索性复验，非盲测"
+execution_enabled: false
+active_fixed_rerun:
+  config: configs/aemo_forecast_aligned_20261012.yaml
+  run_id: aligned_baselines_20261012
+  scope: aligned_full_data_fixed_configuration_not_hpo_not_blind
+  note: "独立运行协议；2022H1 用于选择、2022H2 用于 CP 校准，不代表本草案的 D1/D2 或公平 HPO 已执行"
+exploratory_notice: "历史结果已参与研究设计；2023–2024 和已研究的 2025 均非盲测"
+reference_commit: af546fa3b1fd75852075460015810f745fd2fd74
 
 matrix:
   regions: [NSW1, QLD1, TAS1]
   seeds: [2026, 2027, 2028]
-  require_all_cells: true          # 缺任一格的模型不进榜
-  tracks:
-    T1: {name: hourly_origin, input_hours: 72, horizon_hours: 24, stride_hours: 1}
-    T2: {name: day_ahead_fixed_origin, horizon_hours: 24, origin: "TBD after availability audit"}
-  scopes: [global_single_model, region_specific]   # 分榜，不得拼接
+  screening_regions: [TAS1, NSW1]
+  screening_seed: 2026
+  require_all_stochastic_cells_for_final_ranking: true
+  deterministic_models: one_fit_with_prediction_hash_no_pseudoreplication
+  scope: region_specific
+  task: {timezone: Australia/Brisbane, input_hours: 72, horizon_hours: 24, stride_hours: 1}
+  deferred: [fixed_daily_origin, global_model, longer_context, foundation_model_finetuning]
 
 splits:
-  static:
-    train: ["2015-01-01", "2021-12-31"]
-    validation: ["2022-01-01", "2022-12-31"]
-    test: ["2023-01-01", "2024-12-31"]
+  boundary_convention: start_inclusive_end_exclusive_local_aest
+  development:
+    D1:
+      fit: ["2015-01-01", "2020-01-01"]
+      checkpoint_selection: ["2020-01-01", "2021-01-01"]
+      candidate_screening: ["2021-01-01", "2022-01-01"]
+    D2:
+      fit: ["2015-01-01", "2021-01-01"]
+      checkpoint_selection: ["2021-01-01", "2022-01-01"]
+      candidate_screening: ["2022-01-01", "2023-01-01"]
+  final_static:
+    fit: ["2015-01-01", "2022-01-01"]
+    checkpoint_selection: ["2022-01-01", "2023-01-01"]
+    retrospective_scoring: ["2023-01-01", "2025-01-01"]
     expected_origins_per_region: 17521
-  rolling: {quarters: 8, validation_months: 3, module: forecasting.rolling}
+  rolling:
+    quarters: 8
+    validation_months: 3
+    module: forecasting.rolling
+    allow_past_observations_for_scheduled_refits: true
+    allow_manual_score_driven_changes: false
+  all_targets_inside_split: true
+  scalers_fit_on: fit_only
+  overlapping_development_folds_are_independent: false
+  development_may_read_final_scoring: false
 
-selection:
-  metric: crps_quantile_approx     # 验证集未加权 CRPS~
-  only_on: validation
-  early_stopping: {neural_patience_epochs: 10, tree_patience_rounds: 50}
-  record_hit_epoch_cap: true
+objectives:
+  P:
+    metric: mae
+    checkpoint_metric: q50_mae_for_probabilistic_models
+    full_reference_output: sorted_q50
+    other_model_output: sorted_q50_for_probabilistic_models
+    point_only_models: separate_declared_L1_point_panel
+  Q:
+    metric: crps_quantile_approx
+    checkpoint_metric: crps_quantile_approx
+    diagnostic_point_output: point_q50
+    score_tail_weighted: false
+  H:
+    role: historical_anchor_only
+    full_checkpoint_metric: crps_quantile_approx
+    full_point_output: point_head
+  price_scoring_space: raw_rrp
+  quantiles: [0.05, 0.10, 0.50, 0.90, 0.95]
+  quantile_rearrangement: sort_and_report_pre_sort_crossings
+  forbid_undeclared_checkpoint_splicing: true
+  diagnostic_bands: {negative_below: 0.0, spike_above: 300.0}
 
-tuning:
-  trials_per_model_region: 30      # 计划值；P2 冒烟后按成本确认
-  search_seed: 7
-  seeds_share_best_config: true
-  search_spaces: "configs/fair_sota/search_spaces.yaml (TODO P0)"
+priority:
+  next_stage: aligned_boundary_verified_then_freeze_development_budget
+  core_panel: [xgboost_per_horizon, lightgbm, full_reference, plain_network_control]
+  full_must_win_standalone_before_ensemble: false
+  ensemble_rules: [equal_weight, global_convex_weight]
+  fit_weights_on: development_checkpoint_selection
+  evaluate_rules_on: development_candidate_screening
+  quantile_weights: shared_across_quantile_levels
+  require_matched_plain_network_increment_control: true
+  oracle_future_event_routing: false
+  additional_core_fits_count_toward_baseline_budget: true
+  targeted_repairs: conditional_on_core_comparison
 
-quantiles: [0.05, 0.10, 0.50, 0.90, 0.95]
-point_forecast: q50
-price_scoring_space: raw_rrp
-thresholds: {negative: 0.0, spike: 300.0}
+root_cause:
+  reference_config: configs/aemo_forecast_exploration_20261011_static_full.yaml
+  E1:
+    status: means_verified_slices_and_intervals_pending
+    report_sha256: 07ade862cf1a556ea9b1f89681d39065e41254b578fb5bdd782515c7fca215f9
+    source_hash: 33e2346fb81bbc68a31b8819f0adcb7ebbc7001ddd7c556d87890dcf684b3923
+    test_macro_mae: {point_head: 38.922885, q50: 42.089025, xgboost: 37.967935}
+    validation_macro_mae: {point_head: 76.267012, q50: 80.895386, xgboost: 71.205662}
+    prediction_hashes_verified: 36
+    checkpoint_hashes_verified: 9
+    historical_curve_hashes: not_previously_attested_record_during_audit
+  E2:
+    epochs: 30
+    early_stopping: false
+    checkpoint_metrics: [point_mae, q50_mae, crps_quantile_approx]
+    same_training_trajectory: true
+  E3a:
+    point_losses: [asinh_mse, raw_price_l1]
+    keep_point_parameterization: true
+    raw_l1_normalizer: training_raw_price_standard_deviation
+    point_weight: 1.0
+  E3b: {enabled: false, activation: E3a_numerical_or_scale_evidence, intervention: raw_space_point_head}
+  E4:
+    arms: [unchanged_year, clip_year_to_train_range, remove_year]
+    clip_other_features: false
+    inference_sensitivity_is_causal_training_evidence: false
+  E5a: {learning_rates: [0.0003, 0.0001], activation: curve_diagnostics}
+  E5b:
+    activation: curve_diagnostics
+    # Must be specified before scheduling this arm; no silent implementation defaults.
+    ema_decay: null
+    ema_start_epoch: null
+    preserve_model_epoch_state: true
+  E6a: {tail_weights: [0.5, 0.0], priority: before_architecture}
+  E6b: {additional_tail_weight: 0.25, activation: E6a_probability_tradeoff}
+  interaction: {point_loss_by_tail: conditional_four_cell_design, counts_toward_arm_budget: true}
+  E7:
+    arms: [xgboost_per_horizon, xgboost_joint_horizon]
+    per_horizon_remains_primary_baseline: true
+    interpretation: compound_architecture_and_selection_comparison
+  E8:
+    activation: feature_path_audit
+    max_new_paths: 1
+    existing_calibrator_hidden: 32
+    existing_scarcity_router: learned
+    require_novelty_relative_to_existing_calibrator: true
+  E9: {controls: [no_fields, raw_history, capacity_matched_plain_network]}
+  gradient_diagnostic: [shared_gradient_norms, pairwise_gradient_angles]
 
-pretrained_modes:
-  zero_shot: "no weight update; context only"
-  few_shot: "validation-period samples in context; no weight update"
-  full_shot: "fine-tuned on training split; budget declared"
+promotion:
+  only_on: development_candidate_screening
+  relative_loss: candidate_over_same_cell_reference_minus_one
+  zero_denominator: undefined_stop
+  screening:
+    mean_relative_gain_must_exceed: 0.0
+    max_single_fold_relative_regression: 0.01
+  replication:
+    max_candidates: 2
+    min_mean_relative_gain: 0.005
+    require_both_folds_improve: true
+    min_consistent_macro_seed_directions: 2
+    aggregation: seed_mean_then_equal_region_and_fold_mean
+  tradeoff_flags:
+    other_objective_macro_relative_regression: 0.01
+    any_region_primary_relative_regression: 0.01
+    action: label_limited_candidate_not_universal_fix
+  finalists: {max_full_P: 1, max_full_Q: 1}
+  negative_result: no_stable_improvement_within_budget_not_mechanism_disproof
+
+budget:
+  screening_max_new_training_configs: 8
+  screening_max_new_fits: 32
+  screening_reference_fits: 8
+  replication_max_candidate_cells: 36
+  identical_completed_cells_are_reused: true
+  reference_replication_cost_recorded_separately: true
+  tuning:
+    trials_per_model_region_objective: 12
+    development_folds_per_trial: 2
+    seed: 2026
+    shared_trajectory_cost_counted_once: true
+    max_independent_trials_across_P_Q: 24
+    same_selected_config_across_replication_seeds: true
+    search_spaces_status: pending_freeze_after_smoke
+  cap_extension: {max_times: 1, rule: freeze_before_tuning_apply_to_all_qualifying_fits}
+  training_caps_and_patience: pending_model_family_smoke
+  resources:
+    device_ids: null
+    max_concurrency: null
+    per_trial_timeout_seconds: null
+    total_cpu_hours: null
+    total_gpu_hours: null
+    batch_launch_requires_filled_resource_fields: true
+
+baselines:
+  required: [xgboost_per_horizon, full_reference, full_candidate_if_any, linear, dlinear, no_fields, capacity_matched_plain_network]
+  next_after_branch_audit: [lightgbm, existing_plain_network_members]
+  repair_before_quality_claims: [legacy_patchtst_target_space]
+  aligned_boundary_config: configs/aemo_forecast_aligned_core_v1.yaml
+  aligned_runner: forecasting.aligned_runner
+  aligned_runner_scope: integration_smoke_only
+  model_internal_architecture_loss_and_fusion: unrestricted_native_implementation
+  shared_preprocessing: identity_price_train_zscore_same_feature_blocks
+  shared_scoring: raw_rrp_q50_mae_pooled_rmse_five_quantile_score_proxy
+  audit_inventory: configs/fair_sota/baseline_audit_v1.yaml
+  new_required_comparators: [lasso_arx72_cp, tabpfn2, tabpfn3, chronos2, moirai2]
+  paper_track_required: [lear_cp_native]
+  conditional: [fixed_budget_ensembles, chronological_calibration]
+  external_status: source_pinned_adapters_weights_and_smoke_pending
+  missing_probability_levels: block_Q_entry_never_silent_clamp_or_extrapolate
+  admit_valid_low_scores: true
+  failed_cells: report_without_replacement_seed
 
 statistics:
-  bootstrap: {block_hours: 168, sensitivity_block_hours: 24, replicates: 19999, seed: 20261012}
+  difference: candidate_minus_baseline
+  bootstrap:
+    block_hours: 168
+    sensitivity_block_hours: 24
+    replicates: 19999
+    seed: 20261012
+    seed_handling: average_losses_before_resampling
+    synchronize_regions: true
+    p_values: null_centered_block_bootstrap
+    confidence_interval_method: percentile
+  comparison_families: separate_P_Q_candidate_by_required_baseline_by_region_and_macro
   multiple_comparison: holm
-  tests: [paired_block_bootstrap, diebold_mariano_newey_west, giacomini_white_cpa_daily]
-  empty_event_policy: report_NA
+  joint_P_Q_claim: correct_union_of_families
+  interval_label: pointwise_unless_explicitly_adjusted
+  supplementary: [dm_hac_with_declared_lag]
+  sparse_events: report_NA_and_effective_counts
+  noninferiority: {enabled: false, margins: null, nonsignificance_is_noninferiority: false}
+  blind_or_universal_sota_claim: false
 
-sota_criteria:
-  primary_metrics: [crps_quantile_approx, mae]
-  primary_test_metric: crps_quantile_approx
-  per_region_not_worse: true
-  macro_better_holm_p: 0.05
-  min_seed_cells_consistent: 8      # of 9
-  forbid_cherry_picking: [seed, region, metric]
-
-candidate_models:
-  existing: [xgboost, full, linear, dlinear, patchtst_fixed, gatets, gatets_adapter]
-  new: [tabpfn, chronos2, moirai2_info_limited, lear_cp, ensemble_validation_weighted]
-  optional: [timesfm25_xreg, mitra_cp, ddnn_jsu_reduced]
-
-admission: [unit_tests, smoke_origin_hash_match, leakage_audit, one_region_validation_fit]
+artifacts:
+  frozen_root_read_only: outputs/forecasting/exploration_20261011
+  new_identity: [run_id, protocol, fold, config_hash, region, seed, objective]
+  required_predictions: [origin_unix, target_time_unix, actual, point, quantile, quantile_levels]
+  additional_outputs_when_available: [point_head, point_q50]
+  record: [code_commit, dirty_patch_hash, source_hash, config_hash, data_hash, environment, epoch, model_epoch, output_definition, timings, failures, selection_ledger]
+  final_scoring_may_update_selection_ledger: false
