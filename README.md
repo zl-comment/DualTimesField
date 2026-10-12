@@ -581,6 +581,7 @@ Typical model size: ~35K parameters ($D=7$, $K=16$, $M=16$, $H=64$). Training: 2
 
 - [Forecasting exploration plan](docs/forecasting_exploration_plan.md) — frozen protocol of the 2026-10-11 exploration run.
 - [Fair-comparison and SOTA experiment plan](docs/fair_sota_plan_zl.md) — plan only (no new results): protocol defects found in the exploration run, a fair 3-region × 3-seed protocol, new baselines (TabPFN, Chronos-2, LEAR+CP), significance testing, ablations and pre-registered SOTA criteria. Draft config: [`configs/fair_sota/protocol_v1.draft.yaml`](configs/fair_sota/protocol_v1.draft.yaml).
+- [Full-vs-XGBoost root-cause diagnosis](docs/full_underperformance_diagnosis_zl.md) — evidence-based decomposition of where and why `full` trails XGBoost on macro MAE/CRPS~ (static protocol), with Confirmed / Strong evidence / Hypothesis grading; supersedes the hypothesis-only list in the fair-comparison plan §1.2. Reproduce with `python3 forecasting/analysis/full_vs_xgboost_gap.py`; outputs in `logs/forecasting/full_diagnosis_20261012/`.
 
 ## 🥳 Citation
 

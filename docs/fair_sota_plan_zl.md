@@ -62,6 +62,10 @@ README 已自述的限制（不再重复隐瞒）：测试期 2023–2024 与 20
 | D14 | 概率后处理：已有 floor/PD calibrator，但无共形（CP）、IDR 等规范的点→概率后处理对照 | 已证实 | 概率预测后处理 | 加 LEAR+CP、XGBoost+CP（滚动一年校准窗口，与论文一致）；用本数据的验证段做校准 | 覆盖率、区间宽度、CRPS~ |
 | D15 | “full”的收益来源不清：no_fields 的 MAE 与 full 差 1.095（显著），但 raw_history、no_tail 差别很小；加 ensemble 后 fields 无增益（`feature/ensemble-holdout-plan` 记录，非本分支，见 §11） | 部分证实 | 模型容量/预训练适配 | 容量对齐的普通网络对照；参数量与耗时入表 | 见 §8 |
 
+### 1.3 根因诊断（取代上表中“仅为怀疑/待审计”的表述）
+
+上表 D1–D15 是缺陷与怀疑清单，**不是**对 Full 落后 XGBoost 的根因结论。根因诊断见 [`docs/full_underperformance_diagnosis_zl.md`](full_underperformance_diagnosis_zl.md)（分支 `diag/full-underperformance-zl`）：基于已有产物的误差分解给出落后的位置（普通价格区间的精度；TAS1 贡献 80% 的 MAE 差距、NSW1 贡献 78% 的 CRPS~ 差距），并把 Full 自身问题、XGBoost 协议优势、其他神经基线的实现缺陷分开，逐项标注 Confirmed / Strong evidence / Hypothesis。该报告同时列出无法在本机完成的诊断及所需最小实验（如 `test.npz` 重评分）。下文各步骤中涉及 Full 的优先级应以该诊断为准。
+
 注意：D1–D3 修复后，PatchTST/GateTS/DLinear 的成绩可能显著变化，也可能 XGBoost 依然领先。**修复后的结果未知**，不得预设。
 
 ## 2. 实验矩阵：三地区 × 三 seed
