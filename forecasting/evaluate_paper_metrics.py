@@ -25,15 +25,21 @@ def denormalize(values: torch.Tensor, batch: Mapping, dataset, device) -> torch.
     return values * dataset.history_standardizer.std[0] + dataset.history_standardizer.mean[0]
 
 
-def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np.ndarray]:
+def collect_predictions(model, dataset, device, batch_size: int, *, include_diagnostics: bool = False) -> Dict[str, np.ndarray]:
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     points, quantiles, actuals = [], [], []
     normalized_quantiles, normalized_actuals = [], []
+    diagnostics = {}
     model.eval()
     with torch.no_grad():
         for batch in loader:
             inputs = move_inputs(batch, device)
             outputs = model(*inputs[:-1])
+            if include_diagnostics:
+                for key in ("dgf_fusion_weight", "dgf_quantile_fusion_weight",
+                            "event_probability_spike", "event_probability_trough"):
+                    if key in outputs:
+                        diagnostics.setdefault(key, []).append(outputs[key].detach().cpu())
             points.append(denormalize(outputs["point_forecast"], batch, dataset, device)[..., 0].cpu())
             if hasattr(dataset, "denormalize_quantiles"):
                 quantile = dataset.denormalize_quantiles(outputs["quantile_forecast"])
@@ -59,6 +65,7 @@ def collect_predictions(model, dataset, device, batch_size: int) -> Dict[str, np
         "naive": naive,
         "quantile_normalized": torch.cat(normalized_quantiles).double().numpy(),
         "actual_normalized": torch.cat(normalized_actuals).double().numpy(),
+        **{key: torch.cat(parts).numpy() for key, parts in diagnostics.items()},
     }
 
 

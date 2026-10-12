@@ -22,7 +22,7 @@ from .models import DualFieldLinearForecaster
 
 LOSS_NAMES = (
     "total", "point", "quantile", "decomposition", "smoothness", "sparsity",
-    "event_nll", "event_anchor",
+    "event_nll", "event_anchor", "tail",
 )
 
 
@@ -125,6 +125,9 @@ def build_model(config: Mapping) -> DualFieldLinearForecaster:
             else 0
         ),
         quantile_gate=model_config.get("quantile_gate", False),
+        scarcity_router=model_config.get("scarcity_router", "concat"),
+        router_hidden_dim=int(model_config.get("router_hidden_dim", 16)),
+        event_forecast=bool(model_config.get("event_forecast", True)),
         head_input=model_config.get("head_input", "fields"),
         event_field=model_config.get("event_field", False),
         event_state_source=model_config.get("event_state_source", "dgf"),
@@ -338,6 +341,7 @@ def evaluate(
     sample_count = 0
     absolute_error = 0.0
     squared_error = 0.0
+    crps_sum = 0.0
     target_count = 0
     interval_totals = {"80": [0.0, 0.0], "90": [0.0, 0.0]}
     fusion_weight_sum = 0.0
@@ -365,6 +369,11 @@ def evaluate(
             actual = batch["target_price_raw"].to(device)
             point = dataset.denormalize_target(outputs["point_forecast"])
             quantile = dataset.denormalize_quantiles(outputs["quantile_forecast"])
+            levels = quantile.new_tensor(model.quantiles)
+            quantile_error = actual - quantile
+            crps_sum += (2 * torch.maximum(
+                levels * quantile_error, (levels - 1) * quantile_error,
+            ).mean(dim=-1)).sum().item()
             error = point - actual
             absolute_error += error.abs().sum().item()
             squared_error += error.square().sum().item()
@@ -384,6 +393,7 @@ def evaluate(
     metrics = {
         "mae_aud_per_mwh": absolute_error / target_count,
         "rmse_aud_per_mwh": (squared_error / target_count) ** 0.5,
+        "crps_quantile_approx": crps_sum / target_count,
         "coverage_80": interval_totals["80"][0] / target_count,
         "mean_width_80_aud_per_mwh": interval_totals["80"][1] / target_count,
         "coverage_90": interval_totals["90"][0] / target_count,
@@ -756,6 +766,8 @@ def validation_selection_values(
             values["mae"] / baseline_metrics["mae"]
             + values["rmse"] / baseline_metrics["rmse"]
         )
+    if "crps_quantile_approx" in validation["metrics"]:
+        values["crps"] = validation["metrics"]["crps_quantile_approx"]
     return values
 
 

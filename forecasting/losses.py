@@ -23,6 +23,9 @@ class DualFieldForecastLoss(nn.Module):
         event_anchor_weight=0.0,
         spike_threshold=300.0,
         trough_threshold=0.0,
+        tail_weight=0.0,
+        negative_tail_weight=2.0,
+        spike_tail_weight=2.0,
     ):
         super().__init__()
         quantile_tensor = torch.as_tensor(quantiles, dtype=torch.float32)
@@ -58,6 +61,13 @@ class DualFieldForecastLoss(nn.Module):
         self.event_anchor_weight = float(event_anchor_weight)
         self.spike_threshold = float(spike_threshold)
         self.trough_threshold = float(trough_threshold)
+        if tail_weight < 0 or negative_tail_weight < 0 or spike_tail_weight < 0:
+            raise ValueError("Tail loss weights must be non-negative")
+        if trough_threshold >= spike_threshold:
+            raise ValueError("trough_threshold must be below spike_threshold")
+        self.tail_weight = float(tail_weight)
+        self.negative_tail_weight = float(negative_tail_weight)
+        self.spike_tail_weight = float(spike_tail_weight)
 
     def forward(self, outputs, history_values, target_price, quantile_target=None, target_price_raw=None):
         point_forecast = outputs["point_forecast"]
@@ -92,10 +102,22 @@ class DualFieldForecastLoss(nn.Module):
             device=quantile_forecast.device,
             dtype=quantile_forecast.dtype,
         )
-        quantile_loss = torch.maximum(
+        pinball = torch.maximum(
             quantiles * quantile_error,
             (quantiles - 1.0) * quantile_error,
-        ).mean()
+        )
+        quantile_loss = pinball.mean()
+        tail_loss = point_loss.new_zeros(())
+        if self.tail_weight:
+            if target_price_raw is None:
+                raise ValueError("tail_weight requires target_price_raw for price-space event masks")
+            tail_weights = (
+                self.negative_tail_weight * (target_price_raw < self.trough_threshold)
+                + self.spike_tail_weight * (target_price_raw > self.spike_threshold)
+            ).to(pinball.dtype)
+            # Average over all hours, so batches without events contribute zero
+            # and rare-event batches do not receive an unstable inverse-count gain.
+            tail_loss = (tail_weights * pinball).mean()
 
         decomposition_target = outputs.get("field_history", history_values)
         decomposition_loss = F.mse_loss(ctf_signal + event_signal, decomposition_target)
@@ -134,6 +156,7 @@ class DualFieldForecastLoss(nn.Module):
             + self.sparsity_weight * sparsity_loss
             + self.event_nll_weight * event_nll
             + self.event_anchor_weight * event_anchor
+            + self.tail_weight * tail_loss
         )
 
         return {
@@ -145,4 +168,5 @@ class DualFieldForecastLoss(nn.Module):
             "sparsity": sparsity_loss,
             "event_nll": event_nll,
             "event_anchor": event_anchor,
+            "tail": tail_loss,
         }

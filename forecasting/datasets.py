@@ -500,6 +500,11 @@ class AEMOForecastDataset(Dataset):
                 ).astype(np.float32)
             else:
                 standardized = np.clip(standardized, lower, upper).astype(np.float32)
+        # Information ablations preserve dimensions and parameter counts. Apply
+        # after all train-only transforms so no value from this source reaches
+        # any head, gate, or derived-feature path.
+        if exogenous_config.get("zero_values", False):
+            standardized = np.zeros_like(standardized)
         by_origin = {
             int(origin): standardized[index]
             for index, origin in enumerate(origins)

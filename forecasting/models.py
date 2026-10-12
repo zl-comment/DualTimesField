@@ -510,6 +510,9 @@ class DualFieldLinearForecaster(nn.Module):
         ctf_heads: bool = True,
         field_point: bool = True,
         calibrator_hidden: int = 0,
+        scarcity_router: str = "concat",
+        router_hidden_dim: int = 16,
+        event_forecast: bool = True,
     ):
         super().__init__()
         self.num_variables = num_variables
@@ -526,6 +529,18 @@ class DualFieldLinearForecaster(nn.Module):
         self.ctf_exogenous_dim = ctf_exogenous_dim
         self.quantile_gate = quantile_gate
         self.quantile_exogenous_dim = quantile_exogenous_dim
+        if scarcity_router not in {"concat", "learned", "uniform"}:
+            raise ValueError("scarcity_router must be 'concat', 'learned', or 'uniform'")
+        if (scarcity_router != "concat" or not event_forecast) and fusion_mode == "concatenate":
+            raise ValueError("Structured routing and event ablation require separate gated experts")
+        if scarcity_router == "learned" and (
+            future_exogenous_dim + ctf_exogenous_dim + quantile_exogenous_dim == 0
+        ):
+            raise ValueError("Learned scarcity routing requires future exogenous drivers")
+        if router_hidden_dim < 1:
+            raise ValueError("router_hidden_dim must be positive")
+        self.scarcity_router = scarcity_router
+        self.event_forecast = event_forecast
         if head_input not in {"fields", "raw_history"}:
             raise ValueError("head_input must be 'fields' or 'raw_history'")
         # Ablation: "raw_history" feeds the raw history to both expert heads in
@@ -776,6 +791,25 @@ class DualFieldLinearForecaster(nn.Module):
             nn.init.zeros_(self.calibrator[-1].weight)
             nn.init.zeros_(self.calibrator[-1].bias)
 
+        # Added after existing modules so legacy initializations/checkpoints are
+        # unchanged. Separate hour-wise routers isolate future-driver routing
+        # from simply concatenating those drivers into the forecast experts.
+        self.scarcity_point_router = None
+        self.scarcity_quantile_router = None
+        if scarcity_router == "learned":
+            router_in = calendar_dim + future_exogenous_dim + ctf_exogenous_dim + quantile_exogenous_dim
+            def make_router(output_dim):
+                router = nn.Sequential(
+                    nn.Linear(router_in, router_hidden_dim), nn.GELU(),
+                    nn.Linear(router_hidden_dim, output_dim),
+                )
+                nn.init.zeros_(router[-1].weight)
+                nn.init.zeros_(router[-1].bias)
+                return router
+            self.scarcity_point_router = make_router(1)
+            if quantile_gate:
+                self.scarcity_quantile_router = make_router(len(self.quantiles))
+
     def _concatenated_forecast(
         self,
         ctf_signal: torch.Tensor,
@@ -875,10 +909,25 @@ class DualFieldLinearForecaster(nn.Module):
             ctf_quantile = torch.zeros_like(ctf_quantile)
         dgf_quantile = torch.sort(dgf_quantile, dim=-1).values
 
-        gate_logit = self.fusion_gate(gate_features)
+        router_inputs = None
+        if self.scarcity_router == "learned":
+            router_inputs = torch.cat([
+                part for part in (future_calendar, future_exogenous, ctf_exogenous, quantile_exogenous)
+                if part is not None
+            ], dim=-1)
+            gate_logit = self.scarcity_point_router(router_inputs).squeeze(-1)
+        elif self.scarcity_router == "uniform":
+            gate_logit = ctf_point.new_zeros(ctf_point.shape[:2])
+        else:
+            gate_logit = self.fusion_gate(gate_features)
         fusion_angle = 0.5 * math.pi * torch.sigmoid(gate_logit)
         dgf_weight = torch.sin(fusion_angle).square().unsqueeze(-1)
-        if self.quantile_gate:
+        if self.scarcity_quantile_router is not None:
+            quantile_angle = 0.5 * math.pi * torch.sigmoid(
+                self.scarcity_quantile_router(router_inputs)
+            )
+            dgf_quantile_weight = torch.sin(quantile_angle).square()
+        elif self.quantile_gate and self.scarcity_router != "uniform":
             quantile_angle = 0.5 * math.pi * torch.sigmoid(
                 gate_logit.unsqueeze(-1) * self.quantile_gate_scale
                 + self.quantile_gate_bias
@@ -887,6 +936,11 @@ class DualFieldLinearForecaster(nn.Module):
         else:
             quantile_angle = fusion_angle.unsqueeze(-1)
             dgf_quantile_weight = dgf_weight
+        if not self.event_forecast:
+            fusion_angle = torch.zeros_like(fusion_angle)
+            quantile_angle = torch.zeros_like(quantile_angle)
+            dgf_weight = torch.zeros_like(dgf_weight)
+            dgf_quantile_weight = torch.zeros_like(dgf_quantile_weight)
         if self.fusion_mode == "additive_trigonometric_gate":
             ctf_weight = torch.ones_like(dgf_weight)
             point_forecast = ctf_point + dgf_weight * dgf_point
@@ -1032,7 +1086,7 @@ class DualFieldLinearForecaster(nn.Module):
             )
         else:
             remainder = (
-                history_values - ctf_signal - event_signal
+                history_values - ctf_signal - (event_signal if self.event_forecast else 0)
                 if self.residual_path
                 else None
             )
