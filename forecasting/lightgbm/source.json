@@ -1,0 +1,7 @@
+{
+  "implementation": "官方库调用 + 本地训练适配",
+  "repository": "https://github.com/microsoft/LightGBM",
+  "notes": "核心算法来自安装的 lightgbm 包；逐 horizon 训练五个分位数，五分位数联合选择该 horizon 的轮数。",
+  "experiment_model_id": "lightgbm",
+  "in_completed_baseline": true
+}

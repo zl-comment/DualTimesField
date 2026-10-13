@@ -25,7 +25,7 @@ worker() {
     out=$OUT/$protocol/$kind/seed$seed/q$q
     if [ -f "$out/$region.json" ]; then continue; fi
     CUDA_VISIBLE_DEVICES=$gpu OMP_NUM_THREADS=4 PYTHONPATH=. .venv/bin/python -m forecasting.baselines \
-      --baseline "$kind" --config "configs/aemo_forecast_rolling_${CONFIG_NAME}_${protocol}_q$q.yaml" \
+      --baseline "$kind" --config "configs/legacy/aemo_forecast_rolling_${CONFIG_NAME}_${protocol}_q$q.yaml" \
       --region "$region" --seed "$seed" --output-dir "$out" --device cuda \
       > "$LOGS/${protocol}_${kind}_seed${seed}_q${q}_${region}.log" 2>&1
   done

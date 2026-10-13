@@ -1,0 +1,9 @@
+{
+  "implementation": "本地移植（官方 TensorFlow → PyTorch）",
+  "repository": "https://github.com/runyao-yu/PriceFM",
+  "notes": "固定 2026 MoE 版本；单地区、单节点、从头训练。未复现多地区预训练或空间迁移；官方 TensorFlow 等价测试受主机运行环境阻碍，未通过验证。",
+  "experiment_model_id": "pricefm",
+  "in_completed_baseline": true,
+  "upstream_commit": "c72d1228bde80417d5cc782521328e02ab5401c3",
+  "provenance": "vendor/PROVENANCE.md"
+}

@@ -18,7 +18,7 @@ worker() {
     read -r name q seed region <<< "${jobs_list[$i]}"
     seed_arg=(); [ "$seed" != 2026 ] && seed_arg=(--seed "$seed")
     CUDA_VISIBLE_DEVICES=$gpu PYTHONPATH=. .venv/bin/python -u -m forecasting.train \
-      --config "configs/aemo_forecast_rolling_${name}_q$q.yaml" --region "$region" "${seed_arg[@]}" \
+      --config "configs/legacy/aemo_forecast_rolling_${name}_q$q.yaml" --region "$region" "${seed_arg[@]}" \
       > "$ROOT/logs/${name}_q${q}_seed${seed}_${region}.log" 2>&1
   done
 }

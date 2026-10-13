@@ -313,8 +313,8 @@ def mechanism_data() -> dict:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     runs = {
-        "gabor": ("configs/aemo_forecast_scarcity_quantile_inputs.yaml", "outputs/forecasting/scarcity_quantile_inputs"),
-        "detected": ("configs/aemo_forecast_detected_dgf.yaml", "outputs/forecasting/detected_dgf"),
+        "gabor": ("configs/legacy/aemo_forecast_scarcity_quantile_inputs.yaml", "outputs/forecasting/scarcity_quantile_inputs"),
+        "detected": ("configs/legacy/aemo_forecast_detected_dgf.yaml", "outputs/forecasting/detected_dgf"),
     }
     data = {}
     for region in REGIONS:
@@ -404,7 +404,7 @@ def table_cost() -> dict:
             seconds[name] = float(value)
     rows = []
     for label, key in (("Ours", "pd_calibrator"), ("Linear base only", "pd_linear_base_only")):
-        model = build_model(load_forecast_config(ROOT / f"configs/aemo_forecast_rolling_{key}_q3.yaml"))
+        model = build_model(load_forecast_config(ROOT / f"configs/legacy/aemo_forecast_rolling_{key}_q3.yaml"))
         rows.append((label, f"{sum(p.numel() for p in model.parameters()):,}", seconds.get(key)))
     for label, key in (("XGBoost", "xgboost"), ("PatchTST", "patchtst"), ("DLinear", "dlinear"), ("Linear", "linear_mse")):
         summary = json.loads((ROOT / f"outputs/forecasting/cost/{key}/NSW1.json").read_text())

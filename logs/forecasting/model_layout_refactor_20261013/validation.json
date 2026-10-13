@@ -1,0 +1,19 @@
+{
+  "name": "pytest",
+  "errors": "0",
+  "failures": "0",
+  "skipped": 1,
+  "tests": "236",
+  "time": "20.505",
+  "timestamp": "2026-10-13T12:52:42.078894+00:00",
+  "hostname": "k8s-worker1",
+  "command": "OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 .venv/bin/python -m pytest -q tests",
+  "passed": 232,
+  "subtests_passed": 3,
+  "skip_reason": "Optional official TensorFlow PriceFM parity test not enabled/validated on this host",
+  "baseline_frozen_snapshots_verified": [
+    "aligned_baselines_20261012",
+    "aligned_baselines_20261013_extension"
+  ],
+  "formal_training_started": false
+}

@@ -33,8 +33,8 @@ def load_case(refresh=False):
     # validation, so changing a dependency cannot silently retain old thumbnails.
     dependencies = [checkpoint,
         ROOT / "paper/draw_framework_lanes.py", ROOT / "paper/make_materials.py",
-        ROOT / "forecasting/models.py", ROOT / "src/dualfield/core.py",
-        ROOT / "configs/aemo_forecast_rolling_pd_calibrator_q3.yaml",
+        ROOT / "forecasting/full/model.py", ROOT / "src/dualfield/core.py",
+        ROOT / "configs/legacy/aemo_forecast_rolling_pd_calibrator_q3.yaml",
         ROOT / "logs/forecasting/price_floor/paper_metrics/pd_calibrator_floor/choices_QLD1.json",
         ROOT / "outputs/forecasting/significance_inputs/rolling_pd_calibrator_floor/QLD1.npz",
         ROOT / "data/aemo_exogenous/qld1_predispatch.npz"]
@@ -55,7 +55,7 @@ def load_case(refresh=False):
 
     torch.set_num_threads(4)
     data = case_data()
-    model = _load_model("configs/aemo_forecast_rolling_pd_calibrator_q3.yaml",
+    model = _load_model("configs/legacy/aemo_forecast_rolling_pd_calibrator_q3.yaml",
                         checkpoint, torch.device("cpu"))
     history = torch.from_numpy(np.stack([data["history"], data["demand"]], axis=-1))[None]
     with torch.no_grad():

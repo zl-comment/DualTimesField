@@ -7,11 +7,11 @@ import numpy as np
 import pytest
 import torch
 
-from forecasting.pricefm_baseline import (
+from forecasting.pricefm.model import (
     FUTURE_KEYS, HISTORY_KEYS, INPUT_KEYS, UPSTREAM_SOURCE_SHA256, build_pricefm,
 )
 
-VENDOR = Path(__file__).resolve().parents[1] / "forecasting/vendor/pricefm/model.py"
+VENDOR = Path(__file__).resolve().parents[1] / "forecasting/pricefm/vendor/model.py"
 
 
 def _batch():

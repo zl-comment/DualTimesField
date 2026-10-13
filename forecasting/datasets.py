@@ -56,7 +56,12 @@ def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
 def load_forecast_config(config_path: Path | str) -> dict:
     path = Path(config_path).resolve()
     config = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
-    config["project_root"] = str(path.parent.parent)
+    # Model configs may live below configs/<model>/ or configs/legacy/.
+    # Resolve dataset paths from the project, not the immediate config parent.
+    config["project_root"] = str(next(
+        (parent.parent for parent in path.parents if parent.name == "configs"),
+        path.parent.parent,
+    ))
     return config
 
 

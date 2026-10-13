@@ -1,5 +1,7 @@
 # DualTimesField
 
+电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
+
 **Rethinking Time Series as Continuous-Time Trends and Events**
 
 <p align="center">
@@ -171,7 +173,7 @@ to one. The gate is initialized to an equal 50/50 mixture.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_trigonometric_gate.yaml \
+  --config configs/legacy/aemo_forecast_trigonometric_gate.yaml \
   --region NSW1
 ```
 
@@ -188,7 +190,7 @@ gate from suppressing CTF and preserves direct gradient flow into the CTF head.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_additive_trigonometric_gate.yaml \
+  --config configs/legacy/aemo_forecast_additive_trigonometric_gate.yaml \
   --region NSW1
 ```
 
@@ -206,7 +208,7 @@ before point and quantile decoding.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_additive_tcn_head.yaml \
+  --config configs/legacy/aemo_forecast_additive_tcn_head.yaml \
   --region NSW1
 ```
 
@@ -222,7 +224,7 @@ for the CTF and DGF branches.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_additive_tcn_attention_head.yaml \
+  --config configs/legacy/aemo_forecast_additive_tcn_attention_head.yaml \
   --region NSW1
 ```
 
@@ -243,7 +245,7 @@ python -m forecasting.build_pdpasa_exogenous \
   --start-year 2015 --end-year 2024
 
 python -m forecasting.train \
-  --config configs/aemo_forecast_max_spare.yaml \
+  --config configs/legacy/aemo_forecast_max_spare.yaml \
   --region NSW1
 ```
 
@@ -262,7 +264,7 @@ loss, MAE, and RMSE each receive an independently selected checkpoint.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_max_spare_dgf_adapter.yaml \
+  --config configs/legacy/aemo_forecast_max_spare_dgf_adapter.yaml \
   --region NSW1
 ```
 
@@ -282,7 +284,7 @@ frozen throughout.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_stable_dgf_finetuning.yaml \
+  --config configs/legacy/aemo_forecast_stable_dgf_finetuning.yaml \
   --region NSW1
 ```
 
@@ -297,7 +299,7 @@ linear warmup, cosine learning-rate decay, and validation-based early stopping.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_stable_from_scratch.yaml \
+  --config configs/legacy/aemo_forecast_stable_from_scratch.yaml \
   --region NSW1
 ```
 
@@ -313,7 +315,7 @@ AUD/MWh with the inverse transform before any metric is computed.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_asinh_additive_trigonometric_gate.yaml \
+  --config configs/legacy/aemo_forecast_asinh_additive_trigonometric_gate.yaml \
   --region NSW1
 ```
 
@@ -332,7 +334,7 @@ standardized with training statistics. No parameters are added.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_asinh_price_space_quantiles.yaml \
+  --config configs/legacy/aemo_forecast_asinh_price_space_quantiles.yaml \
   --region NSW1
 ```
 
@@ -347,7 +349,7 @@ fusion mode with linear heads.
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_residual_skip_path.yaml \
+  --config configs/legacy/aemo_forecast_residual_skip_path.yaml \
   --region NSW1
 ```
 
@@ -364,7 +366,7 @@ gas days completed before the origin. The source is AEMO's
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --config configs/legacy/aemo_forecast_gas_price_ctf.yaml \
   --region NSW1
 ```
 
@@ -380,7 +382,7 @@ does not see it. The `.npz` inputs are built by
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_pdpasa_dgf.yaml \
+  --config configs/legacy/aemo_forecast_pdpasa_dgf.yaml \
   --region NSW1
 ```
 
@@ -411,11 +413,11 @@ load. Setting `clip_to_train_quantiles: [low, high]` in the block clips each
 standardized feature to those quantiles of its training values. Adding
 `out_of_range: log` keeps values inside the bounds unchanged and compresses
 the excess beyond each bound with `log1p` instead of clipping it
-(`configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml`).
+(`configs/legacy/aemo_forecast_pdpasa_netload_softclip_ctf.yaml`).
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_pdpasa_netload_ctf.yaml \
+  --config configs/legacy/aemo_forecast_pdpasa_netload_ctf.yaml \
   --region NSW1
 ```
 
@@ -432,24 +434,24 @@ RE-Price's XGBoost, GRU, and DeepAR baselines on the same inputs, and
 `forecasting/summarize_baselines.py` tabulates them against the trunk
 (`logs/forecasting/BASELINES.md`). Setting `data.price_cap: <c>` clips the price
 column at `c` before training and scoring
-(`configs/aemo_forecast_capped650_trunk.yaml`). The results and commands are in
+(`configs/legacy/aemo_forecast_capped650_trunk.yaml`). The results and commands are in
 `logs/forecasting/PROTOCOL_ALIGNMENT.md`.
 
 Setting `model.quantile_gate: true` gives each quantile level and horizon
 its own affine rescaling of the fusion-gate logit, so the tail quantiles can
 weight the DGF event field differently from the point forecast
-(`configs/aemo_forecast_quantile_gate.yaml`). A `quantile_exogenous` block
+(`configs/legacy/aemo_forecast_quantile_gate.yaml`). A `quantile_exogenous` block
 feeds forecast features to the DGF quantile head only; with
 `shortfall_below_train_quantiles: [q, ...]` each feature is replaced by its
 shortfalls `max(knot - value, 0)` below those training quantiles
-(`configs/aemo_forecast_scarcity_quantile_inputs.yaml`). For ablations,
+(`configs/legacy/aemo_forecast_scarcity_quantile_inputs.yaml`). For ablations,
 `model.head_input: raw_history` feeds the raw history to both expert heads
 instead of the CTF and DGF fields
-(`configs/aemo_forecast_ablation_raw_history.yaml`).
+(`configs/legacy/aemo_forecast_ablation_raw_history.yaml`).
 `model.dgf_type: detected` replaces the Gabor DGF with events detected
 explicitly in the price channel, as the largest departures from the window
 median with non-maximum suppression, so the CTF fits only what remains
-(`configs/aemo_forecast_detected_dgf.yaml`); `adaptive` locates atoms by
+(`configs/legacy/aemo_forecast_detected_dgf.yaml`); `adaptive` locates atoms by
 attention, and `model.event_echo` echoes events 24 and 48 hours into the
 horizon. `model.detected_events`, `detected_min_separation`,
 `detected_learn_threshold`, and `detected_baseline` set the detector for
@@ -468,7 +470,7 @@ Any configuration can be retrained with another seed for variance checks;
 
 ```bash
 python -m forecasting.train \
-  --config configs/aemo_forecast_gas_price_ctf.yaml \
+  --config configs/legacy/aemo_forecast_gas_price_ctf.yaml \
   --region NSW1 --seed 2027
 ```
 

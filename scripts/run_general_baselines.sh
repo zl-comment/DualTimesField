@@ -12,8 +12,8 @@ mkdir -p "$LOGS"
 
 jobs_list=()
 for protocol in raw capped650; do
-  if [ "$protocol" = raw ]; then config=configs/aemo_forecast_pdpasa_netload_softclip_ctf.yaml
-  else config=configs/aemo_forecast_capped650_trunk.yaml; fi
+  if [ "$protocol" = raw ]; then config=configs/legacy/aemo_forecast_pdpasa_netload_softclip_ctf.yaml
+  else config=configs/legacy/aemo_forecast_capped650_trunk.yaml; fi
   for kind in ${KINDS:-informer patchtst itransformer dlinear}; do
     for seed in 2026 2027 2028; do
       for region in NSW1 QLD1 TAS1; do

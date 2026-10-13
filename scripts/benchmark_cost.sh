@@ -16,10 +16,10 @@ time_run() {  # name, command...
   printf "%s\t%.1f\t%s\n" "$name" "$(echo "$(date +%s.%N) - $start" | bc)" "$status" >> "$OUT/seconds.tsv"
 }
 for name in pd_calibrator pd_linear_base_only; do
-  time_run "$name" .venv/bin/python -m forecasting.train --config "configs/aemo_forecast_rolling_${name}_q3.yaml" --region NSW1
+  time_run "$name" .venv/bin/python -m forecasting.train --config "configs/legacy/aemo_forecast_rolling_${name}_q3.yaml" --region NSW1
 done
 for kind in xgboost patchtst dlinear linear_mse; do
   time_run "$kind" .venv/bin/python -m forecasting.baselines --baseline "$kind" \
-    --config configs/aemo_forecast_rolling_pd_baseline_raw_q3.yaml --region NSW1 --seed 2026 \
+    --config configs/legacy/aemo_forecast_rolling_pd_baseline_raw_q3.yaml --region NSW1 --seed 2026 \
     --output-dir "outputs/forecasting/cost/$kind" --device cuda
 done

@@ -59,7 +59,7 @@ class PdpasaExogenousTest(unittest.TestCase):
 
     def test_zero_values_masks_only_requested_source_after_derived_transforms(self):
         root = Path(__file__).resolve().parents[1]
-        config = load_forecast_config(root / "configs/aemo_forecast_ic_calibrator.yaml")
+        config = load_forecast_config(root / "configs/legacy/aemo_forecast_ic_calibrator.yaml")
         config["forecast_protocol"].update(input_hours=4, output_hours=2)
         config["origin_context"]["enabled"] = False
         stamps = pd.date_range("2020-12-31 12:00", periods=32, freq="h", tz="Australia/Brisbane")

@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 import torch
 
-from forecasting.gatets_baseline import build_gatets
-from forecasting.vendor.gatets.new_moe import KroneckerGatingNetwork
+from forecasting.gatets.model import build_gatets
+from forecasting.gatets.vendor.new_moe import KroneckerGatingNetwork
 
 
 def _batch():
@@ -23,7 +23,7 @@ def _batch():
 
 
 def test_vendored_source_matches_pinned_official_commit():
-    source = Path(__file__).resolve().parents[1] / "forecasting/vendor/gatets/new_moe.py"
+    source = Path(__file__).resolve().parents[1] / "forecasting/gatets/vendor/new_moe.py"
     assert hashlib.sha256(source.read_bytes()).hexdigest() == (
         "0e7d9c23e55b3dcf9ee8984e1a21cb5e4b17353d9ee7cd4d5ffbf4c1b0d4bb54"
     )

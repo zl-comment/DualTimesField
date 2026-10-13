@@ -4,8 +4,8 @@ from types import SimpleNamespace
 import torch
 
 from forecasting.aligned_inputs import INPUT_KEYS
-from forecasting.timexer_baseline import build_timexer
-from forecasting.vendor.timexer.model import Model
+from forecasting.timexer.model import build_timexer
+from forecasting.timexer.vendor.model import Model
 
 
 def example():

@@ -77,7 +77,7 @@ def run_neural(kind, datasets, seed, device, config, output):
                for s, w in windows.items()}
     example = next(iter(loaders["validation"]))
     if kind.startswith("gatets"):
-        from .gatets_baseline import build_gatets
+        from .gatets.model import build_gatets
         model = build_gatets(kind, example)
     else:
         model = general_baselines.build(kind, example)

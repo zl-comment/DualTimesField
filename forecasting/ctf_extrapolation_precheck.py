@@ -12,13 +12,13 @@ corrected forecasts on the test split:
 
 The fit uses the split named in collect(region, ...); the committed version
 uses the 2022 validation split. Run from the repository root with
-PYTHONPATH=. after training configs/aemo_forecast_detected_dgf.yaml.
+PYTHONPATH=. after training configs/legacy/aemo_forecast_detected_dgf.yaml.
 """
 import math, torch, numpy as np
 from sklearn.linear_model import Ridge
 from forecasting.datasets import build_region_datasets, load_forecast_config
 from forecasting.train import build_model, DeviceBatches
-dev=torch.device('cuda'); cfg='configs/aemo_forecast_detected_dgf.yaml'; config=load_forecast_config(cfg)
+dev=torch.device('cuda'); cfg='configs/legacy/aemo_forecast_detected_dgf.yaml'; config=load_forecast_config(cfg)
 
 def anchored_features(x_price, events, cal, netload, tau=24.0, lam=1e-2, K=3):
     B,T=x_price.shape; H=cal.shape[1]

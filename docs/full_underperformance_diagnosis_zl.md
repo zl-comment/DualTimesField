@@ -121,7 +121,7 @@ python3 -m unittest tests/test_full_vs_xgboost_gap.py        # 6 tests
 ### F2（Confirmed 设计错位；贡献量未测）点预测、训练目标与选择指标三者不一致
 
 代码事实（逐文件）：
-- `forecasting/losses.py`：`point_loss_type` 默认 `mse`，`mse_loss = F.mse_loss(point_forecast, target_price)`，`target_price` 是 asinh 变换并标准化后的价格（`datasets.py`：`price_transform.forward` 后减均值除标准差）。配置 `loss.point_weight: 1.0`。
+- `forecasting/full/loss.py`：`point_loss_type` 默认 `mse`，`mse_loss = F.mse_loss(point_forecast, target_price)`，`target_price` 是 asinh 变换并标准化后的价格（`datasets.py`：`price_transform.forward` 后减均值除标准差）。配置 `loss.point_weight: 1.0`。
 - `forecasting/train.py::evaluate`：`point = dataset.denormalize_target(outputs["point_forecast"])`，MAE/RMSE 由该 point 头计算；`crps_quantile_approx` 由分位头（`quantile_target: price`，在**原始价格**标准化空间做 pinball）计算。即 MAE 来自“asinh 空间 MSE 头”，CRPS~ 来自“原始价格 pinball 头”。
 - 冻结配置：`training.checkpoint_metrics: [crps]`、`primary_selection: crps`：checkpoint 按**验证 CRPS~**选择，不按验证 MAE。
 - XGBoost（`exploration_baselines.py::run_tree`）：`objective="reg:quantileerror"`，目标是原始价格，点预测为 `q[..., 2]`（q50）。
@@ -160,7 +160,7 @@ python3 -m unittest tests/test_full_vs_xgboost_gap.py        # 6 tests
 
 | 审计点 | 结论 | 依据 |
 |---|---|---|
-| origins、actual、切分、外生特征是否相同 | **相同（Confirmed）** | `configs/aemo_forecast_exploration_20261011_static_{full,xgboost}.yaml` 的 `diff` 仅 `output_directory` 一行不同；两者都经 `build_region_datasets` 构建；报告 `check_sources/check_alignment` 对 origin 网格和 actual 逐元素断言相同 |
+| origins、actual、切分、外生特征是否相同 | **相同（Confirmed）** | `configs/legacy/aemo_forecast_exploration_20261011_static_{full,xgboost}.yaml` 的 `diff` 仅 `output_directory` 一行不同；两者都经 `build_region_datasets` 构建；报告 `check_sources/check_alignment` 对 origin 网格和 actual 逐元素断言相同 |
 | 缩放/asinh 仅在训练段拟合 | **是（Confirmed）** | `datasets.py`：`train_mask = split == "train"`；`_fit_price_transform`、`_fit_standardizer`、`quantile_standardizer`、日历年份标准化、外生标准化（`train_rows`）和 `clip_to_train_quantiles` 均只用训练段 |
 | 未来信息泄漏 | 未发现 | `_load_forecast_exogenous` 对 `source_run_unix/stpasa/last_changed > origin` 直接抛异常；但 README 已声明只是元数据代理，未审计真实发布延迟（遗留风险） |
 | 分位数排序 | 正确 | `torch.sort(..., dim=-1)`；重排前交叉率 Full/XGBoost 三地区均为 0.0（来自报告） |

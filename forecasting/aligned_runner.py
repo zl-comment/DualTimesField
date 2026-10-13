@@ -27,24 +27,11 @@ from .aligned_scoring import (
     save_prediction_artifact, score_predictions,
 )
 from .datasets import load_forecast_config
+from .mlp.model import PlainMLP
 
 NEURAL_MODELS = ('full', 'no_fields', 'mlp', 'linear', 'dlinear', 'patchtst', 'gatets_adapter',
                  'timexer', 'pricefm')
 TREE_MODELS = ('xgboost', 'lightgbm', 'lasso_arx72_cp')
-
-
-class PlainMLP(nn.Module):
-    """Independent all-input control, with no dual-field implementation dependency."""
-    def __init__(self, example, horizon, hidden=64):
-        super().__init__()
-        width = sum(int(np.prod(example[k].shape[1:])) for k in INPUT_KEYS)
-        self.horizon = horizon
-        self.network = nn.Sequential(nn.Linear(width, hidden), nn.GELU(),
-                                     nn.Linear(hidden, horizon * len(QUANTILE_LEVELS)))
-
-    def forward(self, batch):
-        flat = torch.cat([batch[k].flatten(1) for k in INPUT_KEYS], dim=1)
-        return self.network(flat).reshape(-1, self.horizon, len(QUANTILE_LEVELS))
 
 
 def _native_batch(batch):
@@ -172,7 +159,7 @@ def fit_neural(kind, train, selection, evaluation, config, *, seed=2026,
     Progress is append-only JSONL with explicit budget/early-stopping outcomes.
     """
     from . import general_baselines
-    from .gatets_baseline import build_gatets
+    from .gatets.model import build_gatets
     from .train import build_loss, build_model, set_seed
 
     if 'model' in config and not np.array_equal(
@@ -225,23 +212,30 @@ def fit_neural(kind, train, selection, evaluation, config, *, seed=2026,
     model_config = copy.deepcopy(config)
     model_config['training']['epochs'] = epochs
     if kind == 'no_fields':
-        model_config['model']['field_forecast'] = False
+        from .no_fields.model import configure
+        model_config = configure(model_config)
     if kind in ('full', 'no_fields'):
         model, criterion = build_model(model_config), build_loss(model_config)
     elif kind == 'mlp':
-        model, criterion = PlainMLP(example, train.actual.shape[1]), None
+        model = PlainMLP(example, train.actual.shape[1],
+                         **config.get('model_baselines', {}).get(kind, {}))
+        criterion = None
     elif kind == 'gatets_adapter':
-        model, criterion = build_gatets(kind, _native_batch(example)), None
+        model = build_gatets(kind, _native_batch(example),
+                             **config.get('model_baselines', {}).get(kind, {}))
+        criterion = None
     elif kind == 'timexer':
-        from .timexer_baseline import build_timexer
+        from .timexer.model import build_timexer
         model = build_timexer(example, **config.get('model_baselines', {}).get(kind, {}))
         criterion = None
     elif kind == 'pricefm':
-        from .pricefm_baseline import build_pricefm
+        from .pricefm.model import build_pricefm
         model = build_pricefm(example, **config.get('model_baselines', {}).get(kind, {}))
         criterion = None
     else:
-        model, criterion = general_baselines.build(kind, _native_batch(example)), None
+        model = general_baselines.build(kind, _native_batch(example),
+                                         **config.get('model_baselines', {}).get(kind, {}))
+        criterion = None
     model.to(device)
     if criterion is not None:
         criterion.to(device)
@@ -440,7 +434,7 @@ def run_smoke(config_path, output, *, regions=('NSW1',), seed=2026,
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', type=Path, default=Path('configs/aemo_forecast_aligned_core_v1.yaml'))
+    parser.add_argument('--config', type=Path, default=Path('configs/experiments/aemo_forecast_aligned_core_v1.yaml'))
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--regions', nargs='+', default=['NSW1'])
     parser.add_argument('--models', nargs='+', default=list(NEURAL_MODELS + TREE_MODELS))

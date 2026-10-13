@@ -142,7 +142,7 @@ frozen事件模型按验证事件损失选优、继承full价格预测；joint�
 
 GateTS使用官方commit `a3b821fff6fda3bde8124a79564a8d33df9732f1`，其核心源码原样保留；
 72小时输入、24×5分位输出和外生adapter是明确标注的AEMO适配，非原论文数据集成绩复现。
-来源与许可见 [GateTS provenance](../forecasting/vendor/gatets/PROVENANCE.md)。
+来源与许可见 [GateTS provenance](../forecasting/gatets/vendor/PROVENANCE.md)。
 FAME公开代码存在proxy专家，且任务不同，本轮不冒称其完整版复现；未定位到可核验官方代码
 的xTime/AME-TS仅保留为相关工作。
 
@@ -158,7 +158,7 @@ FAME公开代码存在proxy专家，且任务不同，本轮不冒称其完整�
 
 原文数字引用存在错位和不存在的[18][19]，已删除；Fourier features与SIREN不能作为互联线预测收益的证据。本文的实证判断以以上仓库记录为依据；新增论文只有核验原文及官方代码后才纳入manifest，不用未经核实的标题支持结论。
 
-本地核心文件：[models.py](../forecasting/models.py)、[losses.py](../forecasting/losses.py)、[datasets.py](../forecasting/datasets.py)、[train.py](../forecasting/train.py)、[tail_metrics.py](../forecasting/tail_metrics.py)、[significance.py](../forecasting/significance.py)。
+本地核心文件：[models.py](../forecasting/full/model.py)、[losses.py](../forecasting/full/loss.py)、[datasets.py](../forecasting/datasets.py)、[train.py](../forecasting/train.py)、[tail_metrics.py](../forecasting/tail_metrics.py)、[significance.py](../forecasting/significance.py)。
 
 以下文件存在于审查时的 `origin/feature/tail-decision-value`，不保证本分支工作区存在；用 `git show <ref>:<path>` 查看，不自动merge：
 

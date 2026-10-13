@@ -69,7 +69,13 @@ def validate_config(config, *, extension=False):
     if tuple(exp['regions']) != REGIONS or tuple(exp['seeds']) != SEEDS:
         raise ValueError('This matrix requires all three regions and all three seeds')
     required = EXTENSION_MODELS if extension else BASE_MODELS
-    if set(exp['models']) != set(required) or len(exp['models']) != len(required):
+    scope = exp.get('execution_scope', 'matrix')
+    if scope not in ('matrix', 'single_model'):
+        raise ValueError('execution_scope must be matrix or single_model')
+    if scope == 'single_model':
+        if extension or len(exp['models']) != 1 or exp['models'][0] not in BASE_MODELS + EXTENSION_MODELS:
+            raise ValueError('Single-model execution requires exactly one supported model and no extension parent')
+    elif set(exp['models']) != set(required) or len(exp['models']) != len(required):
         raise ValueError(f'All {len(required)} required models must be included exactly once')
     if config['data'].get('price_transform') != 'identity' or config['data'].get('quantile_target') != 'transformed':
         raise ValueError('Use the shared affine price space')

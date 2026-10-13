@@ -17,6 +17,8 @@ from typing import Any
 
 import numpy as np
 
+from .lasso.model import absolute_residual_cp
+
 DEFAULT_QUANTILES = (0.05, 0.10, 0.50, 0.90, 0.95)
 
 
@@ -63,27 +65,6 @@ def _levels(values: Any) -> np.ndarray:
     if np.count_nonzero(q == 0.5) != 1:
         raise ValueError("A q50 level is required for the common point prediction")
     return q
-
-
-def absolute_residual_cp(point: np.ndarray, calibration_point: np.ndarray,
-                         calibration_actual: np.ndarray,
-                         quantile_levels: Any = DEFAULT_QUANTILES) -> np.ndarray:
-    """Author-style symmetric CP, per horizon, with type-7 interpolation.
-
-    This reproduces the absolute-residual formula, not a finite-sample coverage
-    guarantee under overlapping hourly observations. Calibration must be OOS;
-    its chronological checks are enforced by ``fit_predict``.
-    Reference: lipiecki/PostForecasts.jl src/models/cp.jl at 589f940.
-    """
-    q = _levels(quantile_levels)
-    point, predicted, actual = map(lambda x: np.asarray(x, dtype=float),
-                                   (point, calibration_point, calibration_actual))
-    if point.ndim != 2 or predicted.ndim != 2 or predicted.shape != actual.shape or not len(actual) or predicted.shape[1] != point.shape[1]:
-        raise ValueError("CP requires matching nonempty [origin, horizon] calibration arrays")
-    if not all(np.isfinite(x).all() for x in (point, predicted, actual)):
-        raise ValueError("CP inputs must be finite")
-    widths = np.quantile(np.abs(actual - predicted), np.abs(2 * q - 1), axis=0, method="linear").T
-    return point[..., None] + widths[None, ...] * np.sign(q - 0.5)
 
 
 def _schema(split: Any) -> tuple:
@@ -201,100 +182,19 @@ def _fit_native_trees(kind, x_train, y_train, x_select, y_select, x_eval, *,
                       q, task, metric, seed, max_rounds, interval, patience,
                       learning_rate, n_jobs, parameters, artifacts):
     """Use native incremental validation caches, avoiding repeated prefix prediction."""
+    from .xgboost.model import fit_horizon as fit_xgboost
+    from .lightgbm.model import fit_horizon as fit_lightgbm
+
+    fit = fit_xgboost if kind == "xgboost" else fit_lightgbm
     predictions, chosen, fitted, traces = [], [], [], []
     horizon_count = y_train.shape[1]
     for h in range(horizon_count):
         artifacts.progress("fit_horizon", horizon=h, horizon_count=horizon_count)
-        trace = []
-        if kind == "xgboost":
-            from xgboost import XGBRegressor
-            from xgboost.callback import TrainingCallback
-
-            def aligned_score(actual, forecast):
-                shape = (len(actual), 1, len(q)) if task == "quantile" else (len(actual), 1)
-                return _loss(np.asarray(forecast).reshape(shape), actual[:, None], q, metric)
-
-            class SelectPrefix(TrainingCallback):
-                def __init__(self):
-                    self.best_score, self.best_round = np.inf, 1
-
-                def after_iteration(self, model, epoch, evals_log):
-                    rounds = epoch + 1
-                    if rounds != 1 and rounds != max_rounds and rounds % interval:
-                        return False
-                    score = float(evals_log["validation_0"]["aligned_score"][-1])
-                    if not np.isfinite(score):
-                        raise FloatingPointError("Non-finite XGBoost validation score")
-                    trace.append({"rounds": rounds, "score": score})
-                    if score < self.best_score:
-                        self.best_score, self.best_round = score, rounds
-                    artifacts.progress("fit_horizon", horizon=h, horizon_count=horizon_count,
-                                       rounds=rounds, selected_rounds=self.best_round, selection_score=self.best_score)
-                    return rounds - self.best_round >= patience
-
-            callback = SelectPrefix()
-            common = dict(n_estimators=max_rounds, learning_rate=learning_rate, n_jobs=n_jobs,
-                          random_state=seed, max_depth=6, tree_method="hist", disable_default_eval_metric=True,
-                          eval_metric=aligned_score, callbacks=[callback])
-            common.update(parameters)
-            objective = ({"objective": "reg:quantileerror", "quantile_alpha": q}
-                         if task == "quantile" else {"objective": "reg:absoluteerror"})
-            model = XGBRegressor(**common, **objective).fit(
-                x_train, y_train[:, h], eval_set=[(x_select, y_select[:, h])], verbose=False)
-            best_round = callback.best_round
-            values = model.predict(x_eval, iteration_range=(0, best_round))
-            actual_rounds = model.get_booster().num_boosted_rounds()
-            artifacts.save(f"h{h:02d}.ubj", model, "xgboost", horizon=h,
-                           selected_rounds=best_round, fitted_rounds=actual_rounds)
-        else:
-            import lightgbm as lgb
-            # One binned training/validation dataset is shared by this horizon's
-            # separate quantile boosters; each retains its native cached scores.
-            train_set = lgb.Dataset(x_train, label=np.ascontiguousarray(y_train[:, h]), free_raw_data=False)
-            valid_set = lgb.Dataset(x_select, label=np.ascontiguousarray(y_select[:, h]), reference=train_set, free_raw_data=False)
-            common = dict(learning_rate=learning_rate, num_threads=n_jobs, seed=seed,
-                          verbosity=-1, bagging_freq=1, metric="None")
-            common.update(parameters)
-            levels = q if task == "quantile" else [None]
-            boosters = []
-            for level in levels:
-                objective = ({"objective": "quantile", "alpha": float(level)}
-                             if level is not None else {"objective": "regression_l1"})
-                booster = lgb.Booster(params=dict(common, **objective), train_set=train_set)
-                booster.add_valid(valid_set, "selection")
-                boosters.append(booster)
-            best_score, best_round = np.inf, 1
-            for rounds in range(1, max_rounds + 1):
-                for booster in boosters:
-                    booster.update()
-                if rounds != 1 and rounds != max_rounds and rounds % interval:
-                    continue
-                cached = []
-                def capture(predicted, dataset):
-                    cached.append(np.array(predicted, copy=True))
-                    return "cache_only", 0., False
-                for booster in boosters:
-                    booster.eval_valid(feval=capture)
-                values = np.column_stack(cached)
-                shaped = values[:, None, :] if task == "quantile" else values
-                score = _loss(shaped, y_select[:, h:h + 1], q, metric)
-                if not np.isfinite(score):
-                    raise FloatingPointError("Non-finite LightGBM validation score")
-                trace.append({"rounds": rounds, "score": score})
-                if score < best_score:
-                    best_score, best_round = score, rounds
-                artifacts.progress("fit_horizon", horizon=h, horizon_count=horizon_count,
-                                   rounds=rounds, selected_rounds=best_round, selection_score=best_score)
-                if rounds - best_round >= patience:
-                    break
-            values = np.column_stack([b.predict(x_eval, num_iteration=best_round, num_threads=n_jobs) for b in boosters])
-            if task == "point":
-                values = values[:, 0]
-            actual_rounds = [b.current_iteration() for b in boosters]
-            for index, booster in enumerate(boosters):
-                artifacts.save(f"h{h:02d}_q{index:02d}.txt", booster, "lightgbm", horizon=h,
-                               quantile=float(q[index]) if task == "quantile" else None,
-                               selected_rounds=best_round, fitted_rounds=actual_rounds[index])
+        values, best_round, actual_rounds, trace = fit(
+            h, x_train, y_train, x_select, y_select, x_eval,
+            q=q, task=task, metric=metric, seed=seed, max_rounds=max_rounds,
+            interval=interval, patience=patience, learning_rate=learning_rate,
+            n_jobs=n_jobs, parameters=parameters, artifacts=artifacts)
         predictions.append(values)
         chosen.append(best_round)
         fitted.append(actual_rounds)
@@ -351,43 +251,10 @@ def fit_predict(kind: str, train: Any, selection: Any, evaluation: Any, *,
                 "package_version": version("scikit-learn" if kind == "lasso_arx72_cp" else kind),
                 "requested_params": dict(params or {})}
     if kind == "lasso_arx72_cp":
-        from sklearn.linear_model import Lasso
-        alphas = np.asarray(p.pop("alphas", (0.001, 0.01, 0.1, 1.0)), dtype=float)
-        max_iter, tol = int(p.pop("max_iter", 10000)), float(p.pop("tol", 1e-4))
-        if p:
-            raise ValueError(f"Unsupported Lasso parameters: {sorted(p)}")
-        if alphas.ndim != 1 or not len(alphas) or not np.isfinite(alphas).all() or np.any(alphas <= 0):
-            raise ValueError("alphas must be a nonempty positive finite sequence")
-        best, models, trace = np.inf, None, []
-        # Fortran layout avoids an additional layout conversion inside coordinate descent.
-        # Keep copy_X=True: sklearn centers X in place and must not mutate shared inputs.
-        x_train = np.asfortranarray(x_train)
-        for alpha_index, alpha in enumerate(alphas):
-            candidates = []
-            for h in range(train.target.shape[1]):
-                artifacts.progress("fit_lasso", alpha=float(alpha), alpha_index=alpha_index, horizon=h,
-                                   horizon_count=train.target.shape[1])
-                model = Lasso(alpha=float(alpha), max_iter=max_iter, tol=tol, copy_X=True).fit(x_train, train.target[:, h])
-                candidates.append(model)
-                artifacts.save(f"alpha{alpha_index:02d}_h{h:02d}.joblib", model, "joblib",
-                               alpha=float(alpha), horizon=h, iterations=int(model.n_iter_), dual_gap=float(model.dual_gap_))
-            score = _loss(np.column_stack([m.predict(x_select) for m in candidates]), selection.target, q, metric)
-            trace.append({"alpha": float(alpha), "score": score})
-            if score < best:
-                best, models, chosen = score, candidates, float(alpha)
-        point = np.column_stack([m.predict(x_eval) for m in models]) * std + mean
-        x_cal = flatten_inputs(calibration)
-        cal_point = np.column_stack([m.predict(x_cal) for m in models]) * std + mean
-        quantiles = absolute_residual_cp(point, cal_point, calibration.actual, q) if task == "quantile" else None
-        artifacts.save("cp_calibration.npz", dict(absolute_residual=np.abs(calibration.actual - cal_point),
-                       origin_unix=calibration.origin_unix, target_time_unix=calibration.target_time_unix), "numpy")
-        metadata.update(selected_alpha=chosen, selection_trace=trace, seed_effect="none_deterministic_coordinate_descent",
-                        point_definition="lasso_center_equals_cp_q50", paper_lear_replication=False,
-                        calibration="independent_oos_absolute_residual_type7_per_horizon",
-                        calibration_count=len(cal_point), calibration_last_target=int(np.max(calibration.target_time_unix)),
-                        postforecasts_source_commit="589f9407d375e2272fb731873443f691c0060d85")
-        artifacts.finish(metadata, train, selection, calibration)
-        return BaselinePrediction(point, quantiles, metadata)
+        from .lasso.model import fit_lasso
+        return fit_lasso(train, selection, evaluation, calibration,
+            x_train=x_train, x_select=x_select, x_eval=x_eval, q=q, task=task,
+            metric=metric, p=p, mean=mean, std=std, metadata=metadata, artifacts=artifacts)
 
     scope = p.pop("selection_scope", "per_horizon")
     if scope not in {"per_horizon", "shared"}:
@@ -419,29 +286,10 @@ def fit_predict(kind: str, train: Any, selection: Any, evaluation: Any, *,
         artifacts.finish(metadata, train, selection, calibration)
         return BaselinePrediction(point, quantiles, metadata)
     common = dict(n_estimators=max_rounds, learning_rate=learning_rate, n_jobs=n_jobs, random_state=seed)
-    if kind == "xgboost":
-        from xgboost import XGBRegressor
-        common.update(max_depth=6, tree_method="hist")
-        common.update(p)
-        objective = {"objective": "reg:quantileerror", "quantile_alpha": q} if task == "quantile" else {"objective": "reg:absoluteerror"}
-        models = [XGBRegressor(**common, **objective).fit(x_train, train.target[:, h]) for h in range(train.target.shape[1])]
-        def predict(x, rounds):
-            counts = [rounds] * len(models) if np.isscalar(rounds) else rounds
-            values = [m.predict(x, iteration_range=(0, int(count))) for m, count in zip(models, counts)]
-            return np.stack(values, axis=1)
-    else:
-        from lightgbm import LGBMRegressor
-        common.update(verbosity=-1, subsample_freq=1, **p)
-        fitted_levels = q if task == "quantile" else [None]
-        models = [[LGBMRegressor(**common, objective="quantile", alpha=float(level)).fit(x_train, train.target[:, h])
-                   if level is not None else LGBMRegressor(**common, objective="regression_l1").fit(x_train, train.target[:, h])
-                   for level in fitted_levels] for h in range(train.target.shape[1])]
-        def predict(x, rounds):
-            # Booster avoids sklearn's synthetic feature-name warning for ndarray input.
-            counts = [rounds] * len(models) if np.isscalar(rounds) else rounds
-            out = np.stack([np.column_stack([m.booster_.predict(x, num_iteration=int(count), num_threads=n_jobs) for m in horizon])
-                            for horizon, count in zip(models, counts)], axis=1)
-            return out if task == "quantile" else out[..., 0]
+    from .xgboost.model import fit_shared as fit_xgboost
+    from .lightgbm.model import fit_shared as fit_lightgbm
+    fit = fit_xgboost if kind == "xgboost" else fit_lightgbm
+    models, predict = fit(x_train, train, common=common, p=p, q=q, task=task, n_jobs=n_jobs)
     horizon_count = train.target.shape[1]
     count = 1 if scope == "shared" else horizon_count
     best, selected = np.full(count, np.inf), np.ones(count, dtype=int)

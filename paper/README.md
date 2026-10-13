@@ -9,8 +9,8 @@ PYTHONPATH=. .venv/bin/python paper/make_materials.py
 
 The script reads `logs/forecasting/**` (metrics, tail scores, and
 `significance/paper_final.json`) and, for the field-separation figure, the
-saved checkpoints of `configs/aemo_forecast_scarcity_quantile_inputs.yaml` and
-`configs/aemo_forecast_detected_dgf.yaml`. Figures are vector PDF and 300-dpi
+saved checkpoints of `configs/legacy/aemo_forecast_scarcity_quantile_inputs.yaml` and
+`configs/legacy/aemo_forecast_detected_dgf.yaml`. Figures are vector PDF and 300-dpi
 PNG; tables are LaTeX fragments for `booktabs`.
 
 ## Manuscript

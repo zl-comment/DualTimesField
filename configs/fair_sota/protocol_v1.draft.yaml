@@ -4,7 +4,7 @@ protocol_version: fair-sota-v1-revised-draft
 status: draft_not_frozen
 execution_enabled: false
 active_fixed_rerun:
-  config: configs/aemo_forecast_aligned_20261012.yaml
+  config: configs/experiments/aemo_forecast_aligned_20261012.yaml
   run_id: aligned_baselines_20261012
   scope: aligned_full_data_fixed_configuration_not_hpo_not_blind
   note: "独立运行协议；2022H1 用于选择、2022H2 用于 CP 校准，不代表本草案的 D1/D2 或公平 HPO 已执行"
@@ -85,7 +85,7 @@ priority:
   targeted_repairs: conditional_on_core_comparison
 
 root_cause:
-  reference_config: configs/aemo_forecast_exploration_20261011_static_full.yaml
+  reference_config: configs/legacy/aemo_forecast_exploration_20261011_static_full.yaml
   E1:
     status: means_verified_slices_and_intervals_pending
     report_sha256: 07ade862cf1a556ea9b1f89681d39065e41254b578fb5bdd782515c7fca215f9
@@ -182,7 +182,7 @@ baselines:
   required: [xgboost_per_horizon, full_reference, full_candidate_if_any, linear, dlinear, no_fields, capacity_matched_plain_network]
   next_after_branch_audit: [lightgbm, existing_plain_network_members]
   repair_before_quality_claims: [legacy_patchtst_target_space]
-  aligned_boundary_config: configs/aemo_forecast_aligned_core_v1.yaml
+  aligned_boundary_config: configs/experiments/aemo_forecast_aligned_core_v1.yaml
   aligned_runner: forecasting.aligned_runner
   aligned_runner_scope: integration_smoke_only
   model_internal_architecture_loss_and_fusion: unrestricted_native_implementation

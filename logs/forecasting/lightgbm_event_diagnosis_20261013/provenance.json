@@ -1,0 +1,232 @@
+{
+  "reads_test": false,
+  "trains_models": false,
+  "resumes_full_v2": false,
+  "baseline_jobs_sha256": "4baaaa3122eeafd268c083671d77b3befd8dfe6754a56ae21198ca116ce779a1",
+  "script_sha256": "81c5a0dd13f736a9725445917e3963b879b38a42661989079f15060a6f7de9eb",
+  "helper_source_sha256": {
+    "tree_anchor.py": "298610ce01478e6fc55de6888f17f1eee9a74617ef5c78f8139551a0ab909334",
+    "full_v2_experiment.py": "066f66852c17ef7306857e16d6c175dd9cefffdedc1a29655dfe34b5b1c1d72e",
+    "aligned_inputs.py": "62cd65377ce76f732df01c7da9863f276edf5805504f813c52d418774f96cdb1",
+    "aligned_scoring.py": "c214770fda62181c7e845535acbf962596656fca5284b705e3320315905bcb81",
+    "aligned_experiment.py": "d75182f4a53960b3d50f6043b1efd624aa38a31b87a697aa843fe85570f6637d"
+  },
+  "periods": [
+    "train:inventory_and_fixed_feature_thresholds_only",
+    "selection:2022H1_used_for_early_stopping",
+    "calibration:2022H2_development_diagnosis"
+  ],
+  "thresholds": [
+    300,
+    1000
+  ],
+  "event_lead_hours": 6,
+  "local_event_matching_tolerance_hours": 3,
+  "event_eligibility": "Complete observed episode, origin exists 6h before onset, episode ends within 24h forecast; excluded counts retained",
+  "q95_flag": "Risk flag, not a point prediction or estimated event probability",
+  "oracle": "Uses actual future labels; upper bounds only, not operational gains or learnability proof",
+  "independence": "Origins overlap and seeds share labels; no independence or significance claim",
+  "input_conditions": "Feature thresholds fit train only; associations are not causal importance or proof of incremental predictive information",
+  "cuts": [
+    {
+      "region": "NSW1",
+      "spare_p10": -1.2918076515197754,
+      "predispatch_p90": 0.027997158467769623,
+      "predispatch_p99": 0.3545147180557251
+    },
+    {
+      "region": "QLD1",
+      "spare_p10": -1.2380372285842896,
+      "predispatch_p90": 0.014072389341890812,
+      "predispatch_p99": 0.3501679599285126
+    },
+    {
+      "region": "TAS1",
+      "spare_p10": -1.3846557140350342,
+      "predispatch_p90": 0.3394421637058258,
+      "predispatch_p99": 1.5216511487960815
+    }
+  ],
+  "cells": [
+    {
+      "region": "NSW1",
+      "seed": 2026,
+      "split": "selection",
+      "anchor_manifest": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d",
+      "sample_hash": "e692978ccf1db4ba58a9e6e4ad35f72b142040b0beb5b7b807d38fad6d41935f",
+      "input_hash": "b75512a560daf4a69d8f47e6595caf37b41796958269ed8c47d2a1ba571f8b5b",
+      "prediction_sha256": "120b02e7815049b24e141a11851cde45c3d35579f0860ce510cb75328653a3dd",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "NSW1",
+      "seed": 2026,
+      "split": "calibration",
+      "anchor_manifest": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d",
+      "sample_hash": "cdd182b7d4e318002915fceb17d05b108a9f877ffba7aaf0400aef22b27e9f56",
+      "input_hash": "4ea073dd0f374220d1e85632cceaf64247373c5773439edd601314d5469a26c4",
+      "prediction_sha256": "44b394b14a33772086de8d193d21b3e98c4927c935ce896deafec56d19f26f06",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "NSW1",
+      "seed": 2027,
+      "split": "selection",
+      "anchor_manifest": "1b855dfc1d05c50848956ce4912369a534cf2e072c63d53dba04ca6bdccd0708",
+      "sample_hash": "e692978ccf1db4ba58a9e6e4ad35f72b142040b0beb5b7b807d38fad6d41935f",
+      "input_hash": "b75512a560daf4a69d8f47e6595caf37b41796958269ed8c47d2a1ba571f8b5b",
+      "prediction_sha256": "bbd8acb51116c6d2d546faa877732c43d9e9b3df195a769eee76742214edd70e",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "NSW1",
+      "seed": 2027,
+      "split": "calibration",
+      "anchor_manifest": "1b855dfc1d05c50848956ce4912369a534cf2e072c63d53dba04ca6bdccd0708",
+      "sample_hash": "cdd182b7d4e318002915fceb17d05b108a9f877ffba7aaf0400aef22b27e9f56",
+      "input_hash": "4ea073dd0f374220d1e85632cceaf64247373c5773439edd601314d5469a26c4",
+      "prediction_sha256": "684124c4149408c3ae9f8dea2005180ad2269dbbe6a201086fef2fde256ffa1b",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "NSW1",
+      "seed": 2028,
+      "split": "selection",
+      "anchor_manifest": "c697b94809903d71f250ce0adf7eb5e6183c245c08913003d28b07043dfa7d3a",
+      "sample_hash": "e692978ccf1db4ba58a9e6e4ad35f72b142040b0beb5b7b807d38fad6d41935f",
+      "input_hash": "b75512a560daf4a69d8f47e6595caf37b41796958269ed8c47d2a1ba571f8b5b",
+      "prediction_sha256": "de0dd2b4301ce5bb072f263580d732ba30d6b777b6a6f0b022ac9117c0550c07",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "NSW1",
+      "seed": 2028,
+      "split": "calibration",
+      "anchor_manifest": "c697b94809903d71f250ce0adf7eb5e6183c245c08913003d28b07043dfa7d3a",
+      "sample_hash": "cdd182b7d4e318002915fceb17d05b108a9f877ffba7aaf0400aef22b27e9f56",
+      "input_hash": "4ea073dd0f374220d1e85632cceaf64247373c5773439edd601314d5469a26c4",
+      "prediction_sha256": "455448aea74ab20d38067cc24078459adac2e9e0726e3de70095dafeeba429a0",
+      "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2026,
+      "split": "selection",
+      "anchor_manifest": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c",
+      "sample_hash": "93b2490ed0999b30fb5dd4b38f3479dc2d70a1395d9452d56f52f0e2e65684e1",
+      "input_hash": "96ada229c955c59bd6d92baae525184026ee9eacd6fac778b436f99e56663726",
+      "prediction_sha256": "fe1d448aefc2ffd178f2a77909efe360ad569f9f3810b2387081655d11f1e850",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2026,
+      "split": "calibration",
+      "anchor_manifest": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c",
+      "sample_hash": "3a5c93493eccbf403ab9d01de9fd08114d902cdccb4c400c83a7fc6f4b01c8f1",
+      "input_hash": "ec1d80d216a0cbb0d21083df06184de28f9b91096e75b8eb7252887691918cd3",
+      "prediction_sha256": "3cd179c55e3f1e39be3aeb1d3fd47674091933a32c0d8dd390a7201bd88b6ef2",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2027,
+      "split": "selection",
+      "anchor_manifest": "25a7319ea193e9b0c34fc4a4a984b1937201ac4c4ad6a2b243feebad55eab3b6",
+      "sample_hash": "93b2490ed0999b30fb5dd4b38f3479dc2d70a1395d9452d56f52f0e2e65684e1",
+      "input_hash": "96ada229c955c59bd6d92baae525184026ee9eacd6fac778b436f99e56663726",
+      "prediction_sha256": "67b6789d0f04f1a3701b49e8a650849fbb79c16184320a70fa39eb89cceec990",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2027,
+      "split": "calibration",
+      "anchor_manifest": "25a7319ea193e9b0c34fc4a4a984b1937201ac4c4ad6a2b243feebad55eab3b6",
+      "sample_hash": "3a5c93493eccbf403ab9d01de9fd08114d902cdccb4c400c83a7fc6f4b01c8f1",
+      "input_hash": "ec1d80d216a0cbb0d21083df06184de28f9b91096e75b8eb7252887691918cd3",
+      "prediction_sha256": "fcf06a0485cd3f1721dfa64fa9c9836bb6233846c814701c03c7fa958bf265a9",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2028,
+      "split": "selection",
+      "anchor_manifest": "eb2e86677efded90d210dae386eb436c0c3a8a3fe611e2ac4c182f57af3669ef",
+      "sample_hash": "93b2490ed0999b30fb5dd4b38f3479dc2d70a1395d9452d56f52f0e2e65684e1",
+      "input_hash": "96ada229c955c59bd6d92baae525184026ee9eacd6fac778b436f99e56663726",
+      "prediction_sha256": "a4730c20c63e045c15686257cced7303f2ec0556345a16cfa1f9dc6792b77e31",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "QLD1",
+      "seed": 2028,
+      "split": "calibration",
+      "anchor_manifest": "eb2e86677efded90d210dae386eb436c0c3a8a3fe611e2ac4c182f57af3669ef",
+      "sample_hash": "3a5c93493eccbf403ab9d01de9fd08114d902cdccb4c400c83a7fc6f4b01c8f1",
+      "input_hash": "ec1d80d216a0cbb0d21083df06184de28f9b91096e75b8eb7252887691918cd3",
+      "prediction_sha256": "a424f183a0436ba3d19468e679a674856ad0d67672a9ba81f99ddc111715ddc1",
+      "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2026,
+      "split": "selection",
+      "anchor_manifest": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9",
+      "sample_hash": "853702e13bb2bffad74807006419fabdb7dd509d0dca3dd3aa0ec76307daee05",
+      "input_hash": "c061861866f646342ffa57c947cb303982faaf9ae6e37c30fb8325d69bbf0ab7",
+      "prediction_sha256": "7c802619c76450da391be23cbdf8a85b4114a033b9656d52bb409e415479af7d",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2026,
+      "split": "calibration",
+      "anchor_manifest": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9",
+      "sample_hash": "4751ef99421d07c1c94c83d6520eaa8ec514fdbceb0915231aabae32d5b7f35a",
+      "input_hash": "cda43f8ec50081a96cc306d97afcb2b031e9a6ec3737aa231620e76392c0d8a0",
+      "prediction_sha256": "aa65516b13875cd60021bf9adeb303f206ad8ce8cb7fdd8ea1845ce642a3d0e8",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2027,
+      "split": "selection",
+      "anchor_manifest": "442c9e8c412874c209f4cc9b674dc695751c1621308f062c69d41b527e795277",
+      "sample_hash": "853702e13bb2bffad74807006419fabdb7dd509d0dca3dd3aa0ec76307daee05",
+      "input_hash": "c061861866f646342ffa57c947cb303982faaf9ae6e37c30fb8325d69bbf0ab7",
+      "prediction_sha256": "c200dab4dc90a5298f8964705e7e7d46fba0d580247e667b7b1d6f9ec3395356",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2027,
+      "split": "calibration",
+      "anchor_manifest": "442c9e8c412874c209f4cc9b674dc695751c1621308f062c69d41b527e795277",
+      "sample_hash": "4751ef99421d07c1c94c83d6520eaa8ec514fdbceb0915231aabae32d5b7f35a",
+      "input_hash": "cda43f8ec50081a96cc306d97afcb2b031e9a6ec3737aa231620e76392c0d8a0",
+      "prediction_sha256": "a26ea634360f9af362ba906bba259a15dde4e09dfa0b8c67e4ee12776847a1f2",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2028,
+      "split": "selection",
+      "anchor_manifest": "fa5f2935690ce9ddc8d10f30bea5e7849f9a2ac95baf254074c446850390f2f5",
+      "sample_hash": "853702e13bb2bffad74807006419fabdb7dd509d0dca3dd3aa0ec76307daee05",
+      "input_hash": "c061861866f646342ffa57c947cb303982faaf9ae6e37c30fb8325d69bbf0ab7",
+      "prediction_sha256": "fa995da52f3c1b6e96d05c9667e0d47903b925020f0179366984d8cfbb9c7dfb",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    },
+    {
+      "region": "TAS1",
+      "seed": 2028,
+      "split": "calibration",
+      "anchor_manifest": "fa5f2935690ce9ddc8d10f30bea5e7849f9a2ac95baf254074c446850390f2f5",
+      "sample_hash": "4751ef99421d07c1c94c83d6520eaa8ec514fdbceb0915231aabae32d5b7f35a",
+      "input_hash": "cda43f8ec50081a96cc306d97afcb2b031e9a6ec3737aa231620e76392c0d8a0",
+      "prediction_sha256": "1c3d450424b875a93b01475d428bc411bbbd3e8333ff95cf86c830418af73c85",
+      "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0"
+    }
+  ]
+}

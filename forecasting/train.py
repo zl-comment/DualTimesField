@@ -16,8 +16,8 @@ import torch
 from torch.utils.data import DataLoader
 
 from .datasets import build_region_datasets, load_forecast_config, APPENDED_FUTURE_BLOCKS
-from .losses import DualFieldForecastLoss
-from .models import DualFieldLinearForecaster
+from .full.loss import DualFieldForecastLoss
+from .full.model import DualFieldLinearForecaster
 
 
 LOSS_NAMES = (
@@ -1101,7 +1101,7 @@ def run_training(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train the dual-field linear AEMO forecaster")
-    parser.add_argument("--config", default="configs/aemo_forecast.yaml")
+    parser.add_argument("--config", default="configs/legacy/aemo_forecast.yaml")
     parser.add_argument("--region", required=True, choices=("NSW1", "QLD1", "TAS1"))
     parser.add_argument(
         "--seed",

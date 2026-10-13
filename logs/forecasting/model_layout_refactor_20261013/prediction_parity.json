@@ -1,0 +1,132 @@
+{
+  "models": {
+    "dlinear": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 6
+    },
+    "full": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles",
+        "point"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 45
+    },
+    "gatets_adapter": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 209
+    },
+    "lasso_arx72_cp": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles",
+        "point"
+      ]
+    },
+    "lightgbm": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles",
+        "point"
+      ]
+    },
+    "linear": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 6
+    },
+    "mlp": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 4
+    },
+    "no_fields": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles",
+        "point"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 45
+    },
+    "patchtst": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 63
+    },
+    "pricefm": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 24
+    },
+    "timexer": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles"
+      ],
+      "trained_state_dict_bitwise_equal": true,
+      "state_tensors": 63
+    },
+    "xgboost": {
+      "predictions_bitwise_equal": true,
+      "arrays": [
+        "quantiles",
+        "point"
+      ]
+    }
+  },
+  "training_metadata_identical_except_checkpoint_location": true,
+  "scope": "Synthetic one-epoch neural and four-round tree migration check; not a benchmark or architecture comparison",
+  "seed": 2026,
+  "epochs": 1,
+  "model_count": 12,
+  "timexer_test_dimensions": {
+    "d_model": 16,
+    "n_heads": 4,
+    "e_layers": 2,
+    "d_ff": 32
+  },
+  "additional_nonconstant_tree_checks": {
+    "lightgbm_per_horizon": {
+      "nonconstant": true,
+      "predictions_bitwise_equal": true
+    },
+    "lightgbm_shared": {
+      "nonconstant": true,
+      "predictions_bitwise_equal": true
+    },
+    "xgboost_shared": {
+      "nonconstant": true,
+      "predictions_bitwise_equal": true
+    },
+    "xgboost_per_horizon": {
+      "nonconstant": true,
+      "predictions_bitwise_equal": true
+    }
+  },
+  "existing_configs_moved_byte_for_byte": 371,
+  "official_source_files_moved_byte_for_byte": 9,
+  "final_per_model_configs_verified": true,
+  "per_model_configuration_note": "Neural adapter parameters loaded from per-model configs; TimeXer uses the stated reduced dimensions for both versions. Short synthetic checks do not establish full-training reproducibility."
+}

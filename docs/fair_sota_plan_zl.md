@@ -293,11 +293,11 @@ PostForecasts 为 MIT；本次快照的 TestForecasts/energy-analytics 未发现
 | 新增代码 | XGBoost/LightGBM 真正分位训练，Lasso-ARX72+独立 OOS CP，独立普通 MLP；CP 按绝对残差/type-7 实现，未宣称 Julia 数值对拍已完成 |
 | 可追踪性 | 输入/样本/公共预处理 hash，模型名+源码指纹、实际参数、库版本、选择轨迹和原始分位输出保留；源码在运行中变化则拒绝验收 |
 
-实际入口是 `forecasting.aligned_runner`，使用 [独立 smoke 配置](../configs/aemo_forecast_aligned_core_v1.yaml)。为独立 CP 校准，集成验证用 train 2015–2019 / selection 2020 / calibration 2021 / screening 2022；此划分只验证接口，**不替代 §4 的正式 D1/D2 研究协议**。最大每阶段 64 origins，只用最早共同样本；公共处理参数仍拟合完整训练段。模型训练 2 epoch 或 8 树轮，Lasso 仅两档 alpha；所得分数不进入研究榜单。
+实际入口是 `forecasting.aligned_runner`，使用 [独立 smoke 配置](../configs/experiments/aemo_forecast_aligned_core_v1.yaml)。为独立 CP 校准，集成验证用 train 2015–2019 / selection 2020 / calibration 2021 / screening 2022；此划分只验证接口，**不替代 §4 的正式 D1/D2 研究协议**。最大每阶段 64 origins，只用最早共同样本；公共处理参数仍拟合完整训练段。模型训练 2 epoch 或 8 树轮，Lasso 仅两档 alpha；所得分数不进入研究榜单。
 
 ```bash
 .venv/bin/python -m forecasting.aligned_runner \
-  --config configs/aemo_forecast_aligned_core_v1.yaml \
+  --config configs/experiments/aemo_forecast_aligned_core_v1.yaml \
   --output outputs/forecasting/aligned_smoke_new_run \
   --regions NSW1 QLD1 TAS1 --max-origins 64 --epochs 2
 ```
@@ -310,7 +310,7 @@ PostForecasts 为 MIT；本次快照的 TestForecasts/energy-analytics 未发现
 
 后续比较起点固定为本轮 `aligned_baselines_20261012`。此前实验和本文旧诊断只作归档，不进入新主表，也不用于证明新版改进；本规则优先于前文的历史结果对照安排。修改版 Full、新增基线及消融沿用本轮样本、标签、公共输入处理与评分，三地区 × 三 seed 完整后比较；候选、超参及集成权重只依据验证段确定，新版本另存冻结批次。主表组织为基线性能比较与最终 Full 消融，消融以最终版本为起点，保留固定配置预算及回顾性评估限制。
 
-已完成 `aligned_baselines_20261012`：Full、no_fields、MLP、Linear、DLinear、PatchTST、GateTS adapter、XGBoost、LightGBM、Lasso-ARX72+CP，共 10 模型 × NSW1/QLD1/TAS1 × 2026/2027/2028 三 seed，90 格，零失败。运行配置为 [aemo_forecast_aligned_20261012.yaml](../configs/aemo_forecast_aligned_20261012.yaml)，入口为 `forecasting.aligned_experiment`。此处日期是运行批次日期，不延长数据到当前日期。2026-10-13 完成结果整理、重新校验与探索性统计，见 [结果解读](../logs/forecasting/aligned_baselines_20261012/README.md) 和 [完整比较表](../logs/forecasting/aligned_baselines_20261012/results/report.md)。
+已完成 `aligned_baselines_20261012`：Full、no_fields、MLP、Linear、DLinear、PatchTST、GateTS adapter、XGBoost、LightGBM、Lasso-ARX72+CP，共 10 模型 × NSW1/QLD1/TAS1 × 2026/2027/2028 三 seed，90 格，零失败。运行配置为 [aemo_forecast_aligned_20261012.yaml](../configs/experiments/aemo_forecast_aligned_20261012.yaml)，入口为 `forecasting.aligned_experiment`。此处日期是运行批次日期，不延长数据到当前日期。2026-10-13 完成结果整理、重新校验与探索性统计，见 [结果解读](../logs/forecasting/aligned_baselines_20261012/README.md) 和 [完整比较表](../logs/forecasting/aligned_baselines_20261012/results/report.md)。
 
 此轮独立协议使用 train 2015–2021、selection 2022H1、CP calibration 2022H2、test 2023–2024；每地区分别为 61273 / 4321 / 4393 / 17521 个完整窗口。各模型复用同地区冻结缓存，公共处理只拟合训练段。2022 拆分用于避免 CP 校准与超参/早停选择共用残差；此轮不等于 §4 的 D1/D2 开发实验，也不等于完整公平 HPO。
 

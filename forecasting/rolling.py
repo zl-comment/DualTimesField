@@ -46,7 +46,7 @@ def _stamp(value: pd.Timestamp) -> str:
 
 
 def quarter_config_path(name: str, quarter: int) -> Path:
-    return Path("configs") / f"aemo_forecast_rolling_{name}_q{quarter}.yaml"
+    return Path("configs/legacy") / f"aemo_forecast_rolling_{name}_q{quarter}.yaml"
 
 
 def make_configs(base_config: Path, name: str) -> list[Path]:

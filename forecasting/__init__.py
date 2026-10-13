@@ -4,8 +4,8 @@ from .datasets import (
     build_region_datasets,
     load_forecast_config,
 )
-from .losses import DualFieldForecastLoss
-from .models import DualFieldLinearForecaster
+from .full.loss import DualFieldForecastLoss
+from .full.model import DualFieldLinearForecaster
 
 __all__ = [
     "AEMOForecastDataset",

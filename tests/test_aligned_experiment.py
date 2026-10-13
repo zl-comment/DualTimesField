@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_formal_config_is_complete_and_cannot_be_smoke_or_missing_model():
-    config = yaml.safe_load((ROOT / 'configs/aemo_forecast_aligned_20261012.yaml').read_text())
+    config = yaml.safe_load((ROOT / 'configs/experiments/aemo_forecast_aligned_20261012.yaml').read_text())
     validate_config(config)
     for key, value in [('max_origins', 64), ('models', config['experiment']['models'][:-1]), ('seeds', [2026])]:
         bad = copy.deepcopy(config)

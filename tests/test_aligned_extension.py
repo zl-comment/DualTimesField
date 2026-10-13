@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _config(models):
-    config = yaml.safe_load((ROOT / 'configs/aemo_forecast_aligned_20261012.yaml').read_text())
+    config = yaml.safe_load((ROOT / 'configs/experiments/aemo_forecast_aligned_20261012.yaml').read_text())
     config['experiment']['models'] = list(models)
     return config
 
