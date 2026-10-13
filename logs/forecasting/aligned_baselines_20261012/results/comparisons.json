@@ -1,0 +1,2918 @@
+{
+  "168": {
+    "full_minus_lightgbm": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 14.501448162422,
+            "ci_low": 12.049337231424074,
+            "ci_high": 17.60602538388101,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 14.452641267983239,
+            "ci_low": 12.69873515424304,
+            "ci_high": 16.502489522577513,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 5.134907950277376,
+            "ci_low": 4.362574399467131,
+            "ci_high": 6.092612004678728,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 11.362999126894204,
+            "ci_low": 10.074368168853589,
+            "ci_high": 12.853537359286662,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 5.573918899632231,
+            "ci_low": 4.4920330901446395,
+            "ci_high": 6.866516047043934,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 4.439462905257553,
+            "ci_low": 3.7491012361197193,
+            "ci_high": 5.225932333591406,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 2.929828709047286,
+            "ci_low": 2.4589168636239958,
+            "ci_high": 3.4707369700000013,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 4.31440350464569,
+            "ci_low": 3.7996316113406863,
+            "ci_high": 4.917484179071581,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_xgboost": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 13.625166136839468,
+            "ci_low": 11.206421123745463,
+            "ci_high": 16.696787367094952,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 13.19155059019431,
+            "ci_low": 11.489091634817882,
+            "ci_high": 15.22072539460265,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 4.78587845471133,
+            "ci_low": 4.019202745834835,
+            "ci_high": 5.721752714179792,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 10.534198393915036,
+            "ci_low": 9.2755876404223,
+            "ci_high": 12.008101914834679,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 3.973862648364247,
+            "ci_low": 3.065091454049619,
+            "ci_high": 5.1082989169014255,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.2321679129558167,
+            "ci_low": 1.4581367134185628,
+            "ci_high": 3.132646124362717,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 2.4448520906496416,
+            "ci_low": 1.986495387164582,
+            "ci_high": 2.959039884533562,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 2.8836275506565685,
+            "ci_low": 2.3964938225525025,
+            "ci_high": 3.4740924378937694,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_patchtst": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 4.544249628148164,
+            "ci_low": 3.380652751215854,
+            "ci_high": 5.9133635160572995,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 5.180151135740407,
+            "ci_low": 3.775287833074373,
+            "ci_high": 6.764659041397135,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 1.3776251072181847,
+            "ci_low": 0.5006729786478906,
+            "ci_high": 2.48515085395278,
+            "p_value": 0.0094,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.42300000000000004,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 3.7006752903689186,
+            "ci_low": 2.8686316895001363,
+            "ci_high": 4.652788126339168,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.5115766445284835,
+            "ci_low": -0.0004638939302671564,
+            "ci_high": 1.0714994414579135,
+            "p_value": 0.0605,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 1.2745006990799645,
+            "ci_low": 0.2727376740899813,
+            "ci_high": 2.1599766974955434,
+            "p_value": 0.0097,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.4268,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.2809771809510402,
+            "ci_low": 0.9025991943612522,
+            "ci_high": 1.7270589479895764,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 1.022351508186496,
+            "ci_low": 0.5769619490814133,
+            "ci_high": 1.4574851112284093,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_gatets_adapter": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 5.116168250758308,
+            "ci_low": 2.989667839638635,
+            "ci_high": 7.912231655375586,
+            "p_value": 0.0009,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.045,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.987056097398684,
+            "ci_low": 1.7592159505099139,
+            "ci_high": 4.263343367053706,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.9990027148690414,
+            "ci_low": -1.8926259749457317,
+            "ci_high": 0.047503539488960585,
+            "p_value": 0.0443,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 2.3680738777626504,
+            "ci_low": 1.4138823766845416,
+            "ci_high": 3.4602270854575803,
+            "p_value": 0.0002,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.0118,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 1.711252808705046,
+            "ci_low": 0.5534986049806655,
+            "ci_high": 3.1644542166220955,
+            "p_value": 0.0119,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.4998,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.2788137014068151,
+            "ci_low": -1.122963989588908,
+            "ci_high": 0.47967047047934536,
+            "p_value": 0.4987,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.558753602895855,
+            "ci_low": 0.14994042759662904,
+            "ci_high": 1.0160112200162688,
+            "p_value": 0.0116,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.49879999999999997,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.6637309033980286,
+            "ci_low": 0.15427586763470685,
+            "ci_high": 1.236545364129668,
+            "p_value": 0.0169,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.6759999999999999,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_linear": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.1239915316143123,
+            "ci_low": 1.3553023895328933,
+            "ci_high": 2.853149419180133,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.9073475321183704,
+            "ci_low": 1.844050500382167,
+            "ci_high": 3.963970266031925,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.1075227354932305,
+            "ci_low": -1.7231895692986143,
+            "ci_high": 1.2899783553536612,
+            "p_value": 0.8824,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.6412721094131506,
+            "ci_low": 0.8622786401321147,
+            "ci_high": 2.293684679293162,
+            "p_value": 0.0003,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.0168,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.4957901521583041,
+            "ci_low": 0.07839905791999142,
+            "ci_high": 1.0040705747450442,
+            "p_value": 0.0367,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.634736186041378,
+            "ci_low": -0.21322769346020629,
+            "ci_high": 1.3332779092039304,
+            "p_value": 0.1047,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.11765558225833679,
+            "ci_low": -0.9892455602052328,
+            "ci_high": 0.9365676976673053,
+            "p_value": 0.8129,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.41606064015267297,
+            "ci_low": -0.10442699635444612,
+            "ci_high": 0.8502813639312345,
+            "p_value": 0.0834,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_dlinear": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.264570270553627,
+            "ci_low": 1.514639561048259,
+            "ci_high": 2.9631599445124643,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.4908972732869845,
+            "ci_low": 1.4300778577964233,
+            "ci_high": 3.5362791387090082,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.05496278512576597,
+            "ci_low": -1.7052772149259932,
+            "ci_high": 1.3589531167028794,
+            "p_value": 0.9387,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.5668349195716151,
+            "ci_low": 0.7882840222764419,
+            "ci_high": 2.212365395100247,
+            "p_value": 0.0003,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.0168,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.6065764191060403,
+            "ci_low": 0.1754271131189036,
+            "ci_high": 1.167253725830442,
+            "p_value": 0.02,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.78,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.5101634880325229,
+            "ci_low": -0.35092288059968163,
+            "ci_high": 1.2214679664601527,
+            "p_value": 0.2004,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.2664541102837818,
+            "ci_low": -0.834585380123757,
+            "ci_high": 1.0856082694555085,
+            "p_value": 0.5932,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.46106467247411503,
+            "ci_low": -0.06252800104948256,
+            "ci_high": 0.9056687867603816,
+            "p_value": 0.0603,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_no_fields": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 0.06422418780003691,
+            "ci_low": -0.6129906323529444,
+            "ci_high": 0.7292855010596597,
+            "p_value": 0.8606,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 3.7212588123137613,
+            "ci_low": 3.028639210362368,
+            "ci_high": 4.45626998323141,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.06327128837967934,
+            "ci_low": -0.5020619858047336,
+            "ci_high": 0.4715967340590134,
+            "p_value": 0.8043,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.240737237244706,
+            "ci_low": 0.9022321029426614,
+            "ci_high": 1.6040221330741085,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -0.26718687780399153,
+            "ci_low": -0.5915698697543184,
+            "ci_high": 0.05935598136823386,
+            "p_value": 0.1071,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.5755154633976189,
+            "ci_low": 0.20986662368084547,
+            "ci_high": 0.9963265466857656,
+            "p_value": 0.0051,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.24480000000000002,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -0.25428417276433596,
+            "ci_low": -0.46787148803134,
+            "ci_high": -0.008312814606591433,
+            "p_value": 0.0311,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.018014804276430485,
+            "ci_low": -0.15334418369700556,
+            "ci_high": 0.20687075035709124,
+            "p_value": 0.8424,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_mlp": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.24908940506268,
+            "ci_low": 0.28148590004049595,
+            "ci_high": 4.658062948321987,
+            "p_value": 0.0425,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.06575064191199494,
+            "ci_low": -1.3535881055115364,
+            "ci_high": 1.6010211472698797,
+            "p_value": 0.9332,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -0.038117951988410746,
+            "ci_low": -0.6314024220728498,
+            "ci_high": 0.6512025878959092,
+            "p_value": 0.9069,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.7589073649954213,
+            "ci_low": -0.15381660194452684,
+            "ci_high": 1.7788709996105196,
+            "p_value": 0.1233,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -0.11821679044154033,
+            "ci_low": -0.8365738728739165,
+            "ci_high": 0.7773899622474237,
+            "p_value": 0.7726,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.4013661855549221,
+            "ci_low": -1.1076837769012409,
+            "ci_high": 0.1935407390523139,
+            "p_value": 0.2229,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -0.6155066568063374,
+            "ci_low": -1.0061819256624678,
+            "ci_high": -0.1599651869061468,
+            "p_value": 0.0056,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.2632,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -0.37836321093426656,
+            "ci_low": -0.7471218993057457,
+            "ci_high": 0.007571559166154012,
+            "p_value": 0.0494,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_lasso_arx72_cp": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": -12.012973431378017,
+            "ci_low": -15.18949766555583,
+            "ci_high": -8.909808003706662,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -19.06358413635923,
+            "ci_low": -21.65059408243624,
+            "ci_high": -16.549971596269888,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.6836000806432047,
+            "ci_low": -2.5189390099880193,
+            "ci_high": 0.8409285665342615,
+            "p_value": 0.4301,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -10.586719216126818,
+            "ci_low": -12.322863983138639,
+            "ci_high": -8.871414550991544,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -18.294258810828794,
+            "ci_low": -19.520724398705816,
+            "ci_high": -17.062435049945087,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -20.703362816069,
+            "ci_low": -22.866054542654545,
+            "ci_high": -18.917150938252785,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -3.5919894009460487,
+            "ci_low": -5.372381838378149,
+            "ci_high": -2.2257786388655423,
+            "p_value": 0.0003,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.0168,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -14.19653700928128,
+            "ci_low": -15.419405126943186,
+            "ci_high": -13.159777979761243,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_lightgbm_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": 0.3851718970929946,
+            "ci_low": -0.8141893412854805,
+            "ci_high": 1.6601251498231144,
+            "p_value": 0.5344,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.8338687517561804,
+            "ci_low": -1.2878262851407007,
+            "ci_high": -0.4217949771171387,
+            "p_value": 0.0005,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 0.026000000000000002,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -2.9954014667295255,
+            "ci_low": -4.345171071941333,
+            "ci_high": -1.646763629556701,
+            "p_value": 0.0002,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.0118,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -1.1480327737975704,
+            "ci_low": -1.8109952643942462,
+            "ci_high": -0.47197810906384985,
+            "p_value": 0.0007,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.0357,
+            "reject_holm": true
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -19.595686079489955,
+            "ci_low": -77.34361329996703,
+            "ci_high": 34.480850373028936,
+            "p_value": 0.4787,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -39.76351491582542,
+            "ci_low": -96.52725051890476,
+            "ci_high": 2.684528197895396,
+            "p_value": 0.1127,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -25.473288724658012,
+            "ci_low": -112.74053868023223,
+            "ci_high": 14.440413526506253,
+            "p_value": 0.4325,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -28.27749657332446,
+            "ci_low": -72.10000609553558,
+            "ci_high": 3.997636875380427,
+            "p_value": 0.1398,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_xgboost_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": -7.001231453516974,
+            "ci_low": -8.121416065305976,
+            "ci_high": -5.5994462517603285,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -1.5539032285407393,
+            "ci_low": -2.0040985992108955,
+            "ci_high": -1.1598602478236046,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -2.9344594223294997,
+            "ci_low": -4.239674289041917,
+            "ci_high": -1.6384912618269436,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -3.829864701462404,
+            "ci_low": -4.452784364563155,
+            "ci_high": -3.140682937109593,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -73.04639434048576,
+            "ci_low": -150.0190048313225,
+            "ci_high": -9.751113187489725,
+            "p_value": 0.0383,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -51.55403769672104,
+            "ci_low": -116.27265589810051,
+            "ci_high": 1.010399815989209,
+            "p_value": 0.0817,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -9.245247906013764,
+            "ci_low": -68.32145990688235,
+            "ci_high": 22.309395543252524,
+            "p_value": 0.6782,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -44.615226647740194,
+            "ci_low": -92.06636824640846,
+            "ci_high": -7.302181295549551,
+            "p_value": 0.0385,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_no_fields_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": -1.1067596686852605,
+            "ci_low": -1.7733696778404047,
+            "ci_high": -0.5211767749519495,
+            "p_value": 0.0013,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 0.06369999999999999,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.023838491781580203,
+            "ci_low": -0.1521507126250821,
+            "ci_high": 0.1268098487679741,
+            "p_value": 0.7356,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.1780608161372872,
+            "ci_low": 0.4716293012748325,
+            "ci_high": 2.2043268671346365,
+            "p_value": 0.0148,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.6068,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.015820885223482167,
+            "ci_low": -0.339200783828467,
+            "ci_high": 0.4445041824742704,
+            "p_value": 0.9331,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -44.56671052249065,
+            "ci_low": -70.13661052421348,
+            "ci_high": -24.140263085775096,
+            "p_value": 0.0004,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 0.0212,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -2.6304636261653704,
+            "ci_low": -18.779255417652095,
+            "ci_high": 11.498365232159035,
+            "p_value": 0.7249,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.8812886127779056,
+            "ci_low": -6.108300606346416,
+            "ci_high": 16.34677745216819,
+            "p_value": 0.7378,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -15.105295178626038,
+            "ci_low": -26.40001666288048,
+            "ci_high": -6.13205806583032,
+            "p_value": 0.0069,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.3174,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "lightgbm_minus_xgboost": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 168,
+        "block_hours_used": 168,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17354,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": -0.8762820255824675,
+            "ci_low": -1.0526325692103975,
+            "ci_high": -0.6949657157809401,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -1.2610906777889679,
+            "ci_low": -1.44052611195341,
+            "ci_high": -1.0706775686535999,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.3490294955660061,
+            "ci_low": -0.5249094060626689,
+            "ci_high": -0.20943720469944913,
+            "p_value": 0.0002,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.0118,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -0.8288007329791472,
+            "ci_low": -0.9587876762133086,
+            "ci_high": -0.6982960328163765,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -1.600056251267977,
+            "ci_low": -1.9896234772623613,
+            "ci_high": -1.228617793156142,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -2.2072949923017124,
+            "ci_low": -2.4920392935823177,
+            "ci_high": -1.8914542391737659,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.48497661839763895,
+            "ci_low": -0.6257049758091503,
+            "ci_high": -0.36395287183182584,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -1.4307759539891094,
+            "ci_low": -1.6135033034796438,
+            "ci_high": -1.233499833923272,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    }
+  },
+  "24": {
+    "full_minus_lightgbm": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 14.501448162422,
+            "ci_low": 13.028845566725373,
+            "ci_high": 16.244996747592104,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 14.452641267983239,
+            "ci_low": 13.268206959364564,
+            "ci_high": 15.705328319316843,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 5.134907950277376,
+            "ci_low": 4.617012394637081,
+            "ci_high": 5.713380052281142,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 11.362999126894204,
+            "ci_low": 10.596037471212027,
+            "ci_high": 12.219591609884153,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 5.573918899632231,
+            "ci_low": 4.680048796771357,
+            "ci_high": 6.552532242472379,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 4.439462905257553,
+            "ci_low": 3.5928109795512655,
+            "ci_high": 5.163453862597784,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 2.929828709047286,
+            "ci_low": 2.6047097779626744,
+            "ci_high": 3.2785484120999184,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 4.31440350464569,
+            "ci_low": 3.8193861270527685,
+            "ci_high": 4.799822327142703,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_xgboost": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 13.625166136839468,
+            "ci_low": 12.148561054329305,
+            "ci_high": 15.377524959146621,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 13.19155059019431,
+            "ci_low": 12.010030627050691,
+            "ci_high": 14.441503314225411,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 4.78587845471133,
+            "ci_low": 4.269419757244986,
+            "ci_high": 5.36111895377937,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 10.534198393915036,
+            "ci_low": 9.767887894760982,
+            "ci_high": 11.38925610231882,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 3.973862648364247,
+            "ci_low": 2.9858197365507686,
+            "ci_high": 4.987604149729622,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.2321679129558167,
+            "ci_low": 1.3191446381675176,
+            "ci_high": 3.037112703580488,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 2.4448520906496416,
+            "ci_low": 2.121471096928527,
+            "ci_high": 2.789930474126969,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 2.8836275506565685,
+            "ci_low": 2.321987588966243,
+            "ci_high": 3.405152314759839,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_patchtst": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 4.544249628148164,
+            "ci_low": 3.7678392871764306,
+            "ci_high": 5.366998228187772,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 5.180151135740407,
+            "ci_low": 4.302166486426636,
+            "ci_high": 6.066306859957521,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": 1.3776251072181847,
+            "ci_low": 0.823060638030639,
+            "ci_high": 1.9736933150043756,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 3.7006752903689186,
+            "ci_low": 3.197925544116533,
+            "ci_high": 4.222754567056196,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.5115766445284835,
+            "ci_low": -0.051525411908225356,
+            "ci_high": 1.0633392985136683,
+            "p_value": 0.0725,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 1.2745006990799645,
+            "ci_low": 0.36311191902589396,
+            "ci_high": 2.0227179738830405,
+            "p_value": 0.0052,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.18719999999999998,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.2809771809510402,
+            "ci_low": 0.9814388284280083,
+            "ci_high": 1.5857337090537873,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 1.022351508186496,
+            "ci_low": 0.5785951098804921,
+            "ci_high": 1.417797852838791,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_gatets_adapter": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 5.116168250758308,
+            "ci_low": 3.8476364900129587,
+            "ci_high": 6.635692128649391,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.987056097398684,
+            "ci_low": 2.262453779492365,
+            "ci_high": 3.704746629359695,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.9990027148690414,
+            "ci_low": -1.5773237320050837,
+            "ci_high": -0.3503333245294171,
+            "p_value": 0.0021,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.0798,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 2.3680738777626504,
+            "ci_low": 1.7953153917203044,
+            "ci_high": 3.0068165397844764,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 1.711252808705046,
+            "ci_low": 0.9723102900362919,
+            "ci_high": 2.5879023940072967,
+            "p_value": 0.0008,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.033600000000000005,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -0.2788137014068151,
+            "ci_low": -1.140385809692065,
+            "ci_high": 0.4508501808826362,
+            "p_value": 0.4833,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.558753602895855,
+            "ci_low": 0.27245538656436336,
+            "ci_high": 0.8801183613828529,
+            "p_value": 0.0005,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.021500000000000002,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 0.6637309033980286,
+            "ci_low": 0.27372430356789085,
+            "ci_high": 1.0757553173745906,
+            "p_value": 0.0013,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.0533,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_linear": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.1239915316143123,
+            "ci_low": 1.3337730729477544,
+            "ci_high": 2.840768560716666,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.9073475321183704,
+            "ci_low": 2.210722725741178,
+            "ci_high": 3.616092116338196,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.1075227354932305,
+            "ci_low": -1.2504968825422336,
+            "ci_high": 0.854915697612271,
+            "p_value": 0.8418,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.6412721094131506,
+            "ci_low": 1.0312480999788962,
+            "ci_high": 2.170016125309269,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.4957901521583041,
+            "ci_low": 0.12151118189503045,
+            "ci_high": 0.8808163605067005,
+            "p_value": 0.011,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.363,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.634736186041378,
+            "ci_low": -0.16961623369111278,
+            "ci_high": 1.2798702533096182,
+            "p_value": 0.0825,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.11765558225833679,
+            "ci_low": -0.6199613028458821,
+            "ci_high": 0.7071652538407224,
+            "p_value": 0.7311,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.41606064015267297,
+            "ci_low": -0.01511840190087589,
+            "ci_high": 0.7845855385130405,
+            "p_value": 0.0413,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_dlinear": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.264570270553627,
+            "ci_low": 1.5312567662738334,
+            "ci_high": 2.9390389704228577,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": 2.4908972732869845,
+            "ci_low": 1.7768946365023655,
+            "ci_high": 3.2104992565671067,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.05496278512576597,
+            "ci_low": -1.2136151037625162,
+            "ci_high": 0.9229849541546352,
+            "p_value": 0.9214,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.5668349195716151,
+            "ci_low": 0.9599597640283649,
+            "ci_high": 2.0960253653306835,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": 0.6065764191060403,
+            "ci_low": 0.2396534194578655,
+            "ci_high": 1.0011280645452094,
+            "p_value": 0.0019,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.076,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.5101634880325229,
+            "ci_low": -0.2815303268095947,
+            "ci_high": 1.1459002053972736,
+            "p_value": 0.1543,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 0.2664541102837818,
+            "ci_low": -0.4784760723112516,
+            "ci_high": 0.8556239614124157,
+            "p_value": 0.4354,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.46106467247411503,
+            "ci_low": 0.03750132038678746,
+            "ci_high": 0.8279461577175226,
+            "p_value": 0.024,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.744,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_no_fields": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 0.06422418780003691,
+            "ci_low": -0.43441560446795807,
+            "ci_high": 0.5404758414102255,
+            "p_value": 0.8005,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 3.7212588123137613,
+            "ci_low": 3.3213903771266744,
+            "ci_high": 4.124547980988759,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.06327128837967934,
+            "ci_low": -0.37142846086373366,
+            "ci_high": 0.28513920168752116,
+            "p_value": 0.7079,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 1.240737237244706,
+            "ci_low": 1.020316986678118,
+            "ci_high": 1.468727982315651,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -0.26718687780399153,
+            "ci_low": -0.5424160339545177,
+            "ci_high": -0.0014606040751515054,
+            "p_value": 0.0541,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.5755154633976189,
+            "ci_low": 0.3313354214252314,
+            "ci_high": 0.8261372341815465,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.25428417276433596,
+            "ci_low": -0.421129497955998,
+            "ci_high": -0.07877304371257192,
+            "p_value": 0.0039,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.14429999999999998,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.018014804276430485,
+            "ci_low": -0.11637090011720878,
+            "ci_high": 0.1506353141828796,
+            "p_value": 0.7823,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_mlp": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": 2.24908940506268,
+            "ci_low": 1.0542884025777992,
+            "ci_high": 3.6569986111485604,
+            "p_value": 0.0019,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.076,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": 0.06575064191199494,
+            "ci_low": -0.9263044393017038,
+            "ci_high": 1.1067024590805137,
+            "p_value": 0.8964,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -0.038117951988410746,
+            "ci_low": -0.37771875352792317,
+            "ci_high": 0.3412798490194679,
+            "p_value": 0.8269,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": 0.7589073649954213,
+            "ci_low": 0.17851717926137237,
+            "ci_high": 1.4018948115099208,
+            "p_value": 0.0159,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.5088,
+            "reject_holm": false
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -0.11821679044154033,
+            "ci_low": -0.7912303092419827,
+            "ci_high": 0.6014518888134194,
+            "p_value": 0.737,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.4013661855549221,
+            "ci_low": -1.0772032686858122,
+            "ci_high": 0.16833562285048825,
+            "p_value": 0.2048,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -0.6155066568063374,
+            "ci_low": -0.8397543198011556,
+            "ci_high": -0.362414309952585,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -0.37836321093426656,
+            "ci_low": -0.7595444392861049,
+            "ci_high": -0.014748431953465596,
+            "p_value": 0.0463,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_lasso_arx72_cp": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": -12.012973431378017,
+            "ci_low": -13.76455965396362,
+            "ci_high": -10.1828744454614,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -19.06358413635923,
+            "ci_low": -20.607935887464823,
+            "ci_high": -17.55430274282116,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.6836000806432047,
+            "ci_low": -1.9260214681216703,
+            "ci_high": 0.35536352455049774,
+            "p_value": 0.2417,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -10.586719216126818,
+            "ci_low": -11.59085133208858,
+            "ci_high": -9.586968246147794,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -18.294258810828794,
+            "ci_low": -19.702272496621863,
+            "ci_high": -16.95563802527491,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -20.703362816069,
+            "ci_low": -22.75924736984045,
+            "ci_high": -19.04065624380997,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -3.5919894009460487,
+            "ci_low": -4.812400235349789,
+            "ci_high": -2.6210878195341643,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -14.19653700928128,
+            "ci_low": -15.309681897505863,
+            "ci_high": -13.242518471597975,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "full_minus_lightgbm_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": 0.3851718970929946,
+            "ci_low": -0.4950285689251108,
+            "ci_high": 1.3230685406880747,
+            "p_value": 0.407,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -0.8338687517561804,
+            "ci_low": -1.1178933600316063,
+            "ci_high": -0.5249556989053796,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -2.9954014667295255,
+            "ci_low": -3.872890825952931,
+            "ci_high": -2.1497788685636547,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -1.1480327737975704,
+            "ci_low": -1.5858745248440471,
+            "ci_high": -0.6833866684575229,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -19.595686079489955,
+            "ci_low": -65.40620298775052,
+            "ci_high": 24.457882669254385,
+            "p_value": 0.3872,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -39.76351491582542,
+            "ci_low": -89.45502905791783,
+            "ci_high": 0.1748548302169941,
+            "p_value": 0.0821,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -25.473288724658012,
+            "ci_low": -71.99420677769827,
+            "ci_high": 5.463959654102634,
+            "p_value": 0.1813,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -28.27749657332446,
+            "ci_low": -59.22288392854827,
+            "ci_high": -2.5239618106739354,
+            "p_value": 0.0489,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_xgboost_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": -7.001231453516974,
+            "ci_low": -7.878112445298426,
+            "ci_high": -6.072459779223371,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -1.5539032285407393,
+            "ci_low": -1.8331321909086271,
+            "ci_high": -1.2579026082116782,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -2.9344594223294997,
+            "ci_low": -3.7907836472401595,
+            "ci_high": -2.1146398228320447,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -3.829864701462404,
+            "ci_low": -4.250140177889772,
+            "ci_high": -3.3715471757013105,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -73.04639434048576,
+            "ci_low": -131.39123469616965,
+            "ci_high": -23.041369183982475,
+            "p_value": 0.0089,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 0.3115,
+            "reject_holm": false
+          },
+          "QLD1": {
+            "difference": -51.55403769672104,
+            "ci_low": -106.86592629084697,
+            "ci_high": -5.160699137726727,
+            "p_value": 0.0443,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": -9.245247906013764,
+            "ci_low": -43.72678763466964,
+            "ci_high": 15.190533338725626,
+            "p_value": 0.5273,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -44.615226647740194,
+            "ci_low": -79.88685765380775,
+            "ci_high": -14.686255598518263,
+            "p_value": 0.0089,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.3115,
+            "reject_holm": false
+          }
+        }
+      }
+    },
+    "full_minus_no_fields_tail": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "pinball_q05_negative_hours": {
+          "NSW1": {
+            "difference": -1.1067596686852605,
+            "ci_low": -1.580190529891008,
+            "ci_high": -0.6671659042888312,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 26035,
+            "n_origins": 17521,
+            "n_event_origins": 6846,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -0.023838491781580203,
+            "ci_low": -0.10813734114988939,
+            "ci_high": 0.0674820532806236,
+            "p_value": 0.5939,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 55534,
+            "n_origins": 17521,
+            "n_event_origins": 10777,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.1780608161372872,
+            "ci_low": 0.634554790611152,
+            "ci_high": 1.7861207526233878,
+            "p_value": 0.0002,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 30984,
+            "n_origins": 17521,
+            "n_event_origins": 5672,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": 0.015820885223482167,
+            "ci_low": -0.2245251400134345,
+            "ci_high": 0.2705905553562226,
+            "p_value": 0.9012,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          }
+        },
+        "pinball_q95_spike_hours": {
+          "NSW1": {
+            "difference": -44.56671052249065,
+            "ci_low": -61.65053529086694,
+            "ci_high": -29.795936939179462,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7368,
+            "n_origins": 17521,
+            "n_event_origins": 3238,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -2.6304636261653704,
+            "ci_low": -15.143877101899117,
+            "ci_high": 9.38769742146961,
+            "p_value": 0.6713,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 7776,
+            "n_origins": 17521,
+            "n_event_origins": 4134,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "TAS1": {
+            "difference": 1.8812886127779056,
+            "ci_low": -4.430561990274768,
+            "ci_high": 11.257667587947466,
+            "p_value": 0.6251,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 2088,
+            "n_origins": 17521,
+            "n_event_origins": 901,
+            "p_value_holm": 1.0,
+            "reject_holm": false
+          },
+          "macro_regions": {
+            "difference": -15.105295178626038,
+            "ci_low": -22.71478979415141,
+            "ci_high": -8.498671648701254,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    },
+    "lightgbm_minus_xgboost": {
+      "direction": "candidate minus reference; negative favors candidate",
+      "bootstrap": {
+        "method": "paired noncircular moving blocks on complete hourly origin grid",
+        "block_hours_requested": 24,
+        "block_hours_used": 24,
+        "replicates": 9999,
+        "random_seed": 2026,
+        "confidence": 0.95,
+        "n_origins": 17521,
+        "possible_full_block_starts": 17498,
+        "seed_aggregation": "mean losses, not mean forecasts",
+        "region_aggregation": "equal-weight mean of region scores with joint block starts",
+        "tail_aggregation": "resampled loss sum / resampled event count"
+      },
+      "metrics": {
+        "mae": {
+          "NSW1": {
+            "difference": -0.8762820255824675,
+            "ci_low": -0.9799765037012316,
+            "ci_high": -0.7747424832658172,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -1.2610906777889679,
+            "ci_low": -1.3712433392085055,
+            "ci_high": -1.1575308393373451,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.3490294955660061,
+            "ci_low": -0.4393984438138207,
+            "ci_high": -0.2617403565180258,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -0.8288007329791472,
+            "ci_low": -0.8996581690093048,
+            "ci_high": -0.7610436671076425,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        },
+        "crps_quantile_approx": {
+          "NSW1": {
+            "difference": -1.600056251267977,
+            "ci_low": -1.9119117490812458,
+            "ci_high": -1.3244440386370218,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "QLD1": {
+            "difference": -2.2072949923017124,
+            "ci_low": -2.4131303649181044,
+            "ci_high": -2.0103699947899187,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "TAS1": {
+            "difference": -0.48497661839763895,
+            "ci_low": -0.5610846592998474,
+            "ci_high": -0.41350797439188225,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "n_observations": 420504,
+            "n_origins": 17521,
+            "n_event_origins": 17521,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          },
+          "macro_regions": {
+            "difference": -1.4307759539891094,
+            "ci_low": -1.575049962800225,
+            "ci_high": -1.299955172302923,
+            "p_value": 0.0001,
+            "bootstrap_valid_replicates": 9999,
+            "p_value_holm": 0.010400000000000001,
+            "reject_holm": true
+          }
+        }
+      }
+    }
+  }
+}

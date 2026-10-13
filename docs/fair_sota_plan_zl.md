@@ -3,7 +3,7 @@
 本轮以用户明确的边界为准：统一预测样本/标签、模型入口的数据及公共预处理、输出评分；模型内部变换、结构、融合方式和原生拟合策略由各模型自行决定。完成共同接口验收后建立核心基线的位置并筛查 Full 的互补价值；独立预测与集成增量是两条研究目标，最终结论允许是局部优势、预算内未改善或不支持领先。
 
 - 修订依据：分支 `diag/full-underperformance-zl`，起点 `af546fa3b1fd75852075460015810f745fd2fd74`；2026-10-12 在 `/root/workspace/Code/DualTimesField` 复核。
-- 状态：共同输入/评分代码及 LightGBM、Lasso-ARX72+CP、独立 MLP 已接入新路径，见 §8.6；全量固定配置 90 格队列已启动，作为后续比较起点，见 §8.7。此前结果仅归档，不进入新主表。公平调参草案尚未执行，基础模型仍待接入。
+- 状态：共同输入/评分代码及 LightGBM、Lasso-ARX72+CP、独立 MLP 已接入新路径，见 §8.6；全量固定配置 90 格已完成并整理结果，作为后续比较起点，见 §8.7。此前结果仅归档，不进入新主表。公平调参草案尚未执行，基础模型仍待接入。
 - 本计划由已查看的历史结果形成，属于事后研究计划；冻结只能约束后续选择，不能把 2023–2024 或已研究的 2025 变回盲测。
 - 数值配置见 [协议草案](../configs/fair_sota/protocol_v1.draft.yaml)。草案目前没有执行器读取；文中实现项、预算和晋级阈值均不是已完成实验。
 - 历史参考：[冻结实验及限制](../logs/forecasting/exploration_20261011/README.md)、[原诊断报告](full_underperformance_diagnosis_zl.md)、[历次实验](../logs/forecasting/EXPERIMENT_RESULTS.md)。原诊断的本机缺文件、纯线性头等判断由本计划替代。
@@ -310,7 +310,7 @@ PostForecasts 为 MIT；本次快照的 TestForecasts/energy-analytics 未发现
 
 后续比较起点固定为本轮 `aligned_baselines_20261012`。此前实验和本文旧诊断只作归档，不进入新主表，也不用于证明新版改进；本规则优先于前文的历史结果对照安排。修改版 Full、新增基线及消融沿用本轮样本、标签、公共输入处理与评分，三地区 × 三 seed 完整后比较；候选、超参及集成权重只依据验证段确定，新版本另存冻结批次。主表组织为基线性能比较与最终 Full 消融，消融以最终版本为起点，保留固定配置预算及回顾性评估限制。
 
-已启动 `aligned_baselines_20261012`：Full、no_fields、MLP、Linear、DLinear、PatchTST、GateTS adapter、XGBoost、LightGBM、Lasso-ARX72+CP，共 10 模型 × NSW1/QLD1/TAS1 × 2026/2027/2028 三 seed，90 格。运行配置为 [aemo_forecast_aligned_20261012.yaml](../configs/aemo_forecast_aligned_20261012.yaml)，入口为 `forecasting.aligned_experiment`。此处日期是运行批次日期，不延长数据到当前日期。
+已完成 `aligned_baselines_20261012`：Full、no_fields、MLP、Linear、DLinear、PatchTST、GateTS adapter、XGBoost、LightGBM、Lasso-ARX72+CP，共 10 模型 × NSW1/QLD1/TAS1 × 2026/2027/2028 三 seed，90 格，零失败。运行配置为 [aemo_forecast_aligned_20261012.yaml](../configs/aemo_forecast_aligned_20261012.yaml)，入口为 `forecasting.aligned_experiment`。此处日期是运行批次日期，不延长数据到当前日期。2026-10-13 完成结果整理、重新校验与探索性统计，见 [结果解读](../logs/forecasting/aligned_baselines_20261012/README.md) 和 [完整比较表](../logs/forecasting/aligned_baselines_20261012/results/report.md)。
 
 此轮独立协议使用 train 2015–2021、selection 2022H1、CP calibration 2022H2、test 2023–2024；每地区分别为 61273 / 4321 / 4393 / 17521 个完整窗口。各模型复用同地区冻结缓存，公共处理只拟合训练段。2022 拆分用于避免 CP 校准与超参/早停选择共用残差；此轮不等于 §4 的 D1/D2 开发实验，也不等于完整公平 HPO。
 
@@ -320,7 +320,7 @@ PostForecasts 为 MIT；本次快照的 TestForecasts/energy-analytics 未发现
 
 启动前 120 个测试和 3 个子测试通过，Full 与 XGBoost 的 GPU 小样本训练、预测及模型保存验证通过。第一批 Full、XGBoost、Linear、LightGBM 已实际训练；启动证据见 [launch.json](../logs/forecasting/aligned_baselines_20261012/launch.json)。实时状态见运行目录 `progress.json`；此处不记录未完成的性能结论。
 
-尚待补充：基础模型适配与权重（TabPFN-2/3、Chronos-2、Moirai-2）、原版 LEAR+CP 的日前赛道、公平调参、验证集决定的 Full+XGBoost 组合和配对统计。后续新增实验采用独立冻结批次，不改写当前队列身份。此前已查看的 2023–2024 仍是回顾性评分，外生数据真实发布时间审计仍未完成。
+尚待补充：基础模型适配与权重（TabPFN-2/3、Chronos-2、Moirai-2）、原版 LEAR+CP 的日前赛道、公平调参、验证集决定的组合，以及完整统计协议。结果整理已完成探索性的配对 block bootstrap 和 Holm 校正，DM/GW 尚未执行。后续新增实验采用独立冻结批次，不改写当前队列身份。此前已查看的 2023–2024 仍是回顾性评分，外生数据真实发布时间审计仍未完成。
 
 ## 9. 后处理、集成与尾部价值
 
