@@ -1,0 +1,64 @@
+{
+  "archived_at_utc": "2026-10-13T10:56:01.025470+00:00",
+  "completed_at_utc": "2026-10-13T10:33:40.676658+00:00",
+  "run_id": "aligned_baselines_20261013_extension+parent",
+  "state": "complete",
+  "progress": {
+    "expected_cells": 108,
+    "completed_cells": 108,
+    "parent": {
+      "expected_cells": 90,
+      "listed_cells": 90,
+      "completed_cells": 90,
+      "completion_fraction": 1.0,
+      "status_counts": {
+        "completed": 90
+      },
+      "missing_manifest_cells": []
+    },
+    "extension": {
+      "expected_cells": 18,
+      "listed_cells": 18,
+      "completed_cells": 18,
+      "completion_fraction": 1.0,
+      "status_counts": {
+        "completed": 18
+      },
+      "missing_manifest_cells": []
+    }
+  },
+  "completed_artifact_validation": "passed",
+  "frozen_snapshot_validation": {
+    "parent": "verified",
+    "extension": "verified"
+  },
+  "cross_run_alignment_validation": "passed_all_108_artifacts",
+  "files": {
+    "main.csv": {
+      "source": "outputs/forecasting/aligned_baselines_20261013_extension/combined_report_tables/main.csv",
+      "source_sha256": "3bbfa61a447e763f436a0e4a755f2c2d536a9e4315bdf1c06a3a311b35d867c4",
+      "rows": 12
+    },
+    "regional.csv": {
+      "source": "outputs/forecasting/aligned_baselines_20261013_extension/combined_report_tables/regional.csv",
+      "source_sha256": "0bb85590fc4a3e9c7516f58447fd63d8534ab70610da23e304f557283b5bc9aa",
+      "rows": 36
+    },
+    "per_seed.csv": {
+      "source": "outputs/forecasting/aligned_baselines_20261013_extension/combined_report_tables/per_seed.csv",
+      "source_sha256": "1bcb3614f673770293a29d6f4f4ea75b9fb0152b6c704964828ec2204b8a84f1",
+      "rows": 108
+    },
+    "combined_report.json.gz": {
+      "source": "outputs/forecasting/aligned_baselines_20261013_extension/combined_report.json",
+      "source_sha256": "91039706abda17418003bf44aafde7e08cb4a98295daee14fdb70b8c017f9658",
+      "archived_sha256": "c4f71f0e63c800c96b44290bc5e9fa6f656d9d699519965b499a162622d8a96e"
+    },
+    "extension_report.json.gz": {
+      "source": "outputs/forecasting/aligned_baselines_20261013_extension/report.json",
+      "source_sha256": "cc7db8c034a24bff262ca52019501e9593625f1862616eb0546b644796ac2343",
+      "archived_sha256": "0eef82b831bb7724ad983d7624a0039561f9c7bbe42b1f611778d7a719fc53df"
+    }
+  },
+  "scope": "fixed_configuration_retrospective_test_not_hpo; checkpoints and full prediction arrays remain in ignored outputs directory"
+}

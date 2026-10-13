@@ -1,0 +1,50 @@
+{
+  "model": "pricefm",
+  "upstream_commit": "c72d1228bde80417d5cc782521328e02ab5401c3",
+  "upstream_source_sha256": "c5ae12e0a9ae85535cad30e41f84c3b58fe2265c464249f2705802ece74f03c2",
+  "implementation_sha256": "4b326bea86de39ceb8f5ba85662cd6df4e275fdf6c6cdafbec8cc87f67ae5370",
+  "test_source_sha256": "0f08f212f2fdf3415869341faffb801d21e6d49980363209c33d7efd5da10b5a",
+  "primary_validation": {
+    "method": "Independent NumPy evaluation of official equations with the PyTorch Dense parameters",
+    "result": "passed",
+    "atol": 2e-05,
+    "rtol": 2e-05,
+    "scope": "Two history/future projections; three experts; softmax/swish; two-node nonuniform graph masks; epsilon-weighted pooling; five hierarchical absolute-increment heads",
+    "test": "tests/test_pricefm_baseline.py::test_graph_forward_matches_independent_numpy_equations"
+  },
+  "official_tensorflow_validation": {
+    "method": "Pinned upstream TensorFlow 2.18.0 model; Dense weight transfer; forward and all input/parameter gradients",
+    "result": "blocked_by_cpu_runtime",
+    "attempts": [
+      "Isolated tensorflow-cpu==2.18.0, numpy==2.0.2, keras==3.15.1; CUDA_VISIBLE_DEVICES empty",
+      "With oneDNN disabled, standalone tf.matmul(ones([3,864]),ones([864,8])) returned incorrect uninitialized output rather than 864",
+      "With oneDNN enabled, one thread and AVX2 ISA limits, the official TimeDistributed transpose raised SIGILL (exit 132)",
+      "XLA with oneDNN disabled also failed the standalone all-ones matmul sanity check"
+    ],
+    "meaning": "No official TensorFlow forward/gradient equivalence claim is made. Optional test remains available for a functioning runtime.",
+    "environment_path": "/tmp/pricefm-tf-validation",
+    "atol_forward": 2e-05,
+    "rtol_forward": 2e-05,
+    "atol_parameter_gradients": 2e-05,
+    "rtol_parameter_gradients": 0.0002
+  },
+  "local_suite": {
+    "result": "7 passed, 1 skipped",
+    "skip_reason": "TensorFlow not installed in unchanged experiment environment"
+  },
+  "environment": {
+    "python": "3.11.0",
+    "torch": "2.5.1+cu124",
+    "numpy": "2.4.6",
+    "device": "CPU",
+    "existing_experiment_environment_modified": false
+  },
+  "adaptations": {
+    "version": "2026 MoE",
+    "single_node_graph_gate": 1,
+    "pretrained_weights": false,
+    "input": "canonical seven blocks, 72h history to 24h forecast",
+    "emb_dim_default": 32,
+    "num_experts_default": 4
+  }
+}

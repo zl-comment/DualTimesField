@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-13",
+  "tests": {
+    "passed": 126,
+    "skipped": 1,
+    "skip": "optional official TensorFlow dynamic parity; see pricefm_parity.json"
+  },
+  "independent_review": {
+    "adapters_and_runner": "passed; no blocking findings",
+    "extension_and_combined_report": "passed; no blocking findings",
+    "checkpoint_reconstruction": "both models restored bit-exact predictions",
+    "hardening_fixes": [
+      "TimeXer masked-attention dependency import",
+      "PriceFM common quantile override rejection"
+    ]
+  },
+  "gpu_smoke": "gpu_smoke.json",
+  "pricefm_equation_parity": "pricefm_parity.json"
+}

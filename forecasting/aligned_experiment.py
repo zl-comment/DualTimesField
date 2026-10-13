@@ -26,13 +26,16 @@ import numpy as np
 import yaml
 
 from .aligned_inputs import AlignedSplit, INPUT_KEYS, build_aligned_splits
-from .aligned_runner import NEURAL_MODELS, TREE_MODELS, fit_neural
+from .aligned_runner import NEURAL_MODELS, fit_neural
 from .aligned_scoring import (QUANTILE_LEVELS, make_prediction_artifact,
                               save_prediction_artifact, score_predictions, load_prediction_artifact)
 
 REGIONS = ('NSW1', 'QLD1', 'TAS1')
 SEEDS = (2026, 2027, 2028)
 SPLITS = ('train', 'selection', 'calibration', 'test')
+BASE_MODELS = ('full', 'no_fields', 'mlp', 'linear', 'dlinear', 'patchtst',
+               'gatets_adapter', 'xgboost', 'lightgbm', 'lasso_arx72_cp')
+EXTENSION_MODELS = ('timexer', 'pricefm')
 
 
 def sha(path):
@@ -59,14 +62,15 @@ def timestamp():
     return datetime.now(timezone.utc).isoformat()
 
 
-def validate_config(config):
+def validate_config(config, *, extension=False):
     exp = config['experiment']
     if config.get('aligned_protocol', {}).get('stage') != 'full_fixed_configuration_rerun':
         raise ValueError('Expected a full-data fixed-configuration protocol')
     if tuple(exp['regions']) != REGIONS or tuple(exp['seeds']) != SEEDS:
         raise ValueError('This matrix requires all three regions and all three seeds')
-    if set(exp['models']) != set(NEURAL_MODELS + TREE_MODELS) or len(exp['models']) != 10:
-        raise ValueError('All ten implemented models must be included exactly once')
+    required = EXTENSION_MODELS if extension else BASE_MODELS
+    if set(exp['models']) != set(required) or len(exp['models']) != len(required):
+        raise ValueError(f'All {len(required)} required models must be included exactly once')
     if config['data'].get('price_transform') != 'identity' or config['data'].get('quantile_target') != 'transformed':
         raise ValueError('Use the shared affine price space')
     if tuple(config['data']['split_names']) != SPLITS:
@@ -127,13 +131,19 @@ def load_cache(root, expected_hashes_hash):
     return result
 
 
-def prepare(config_path, run_root):
+def prepare(config_path, run_root, extend_from=None):
     project = Path.cwd().resolve()
     config_path, run_root = Path(config_path).resolve(), Path(run_root).resolve()
     config = yaml.safe_load(config_path.read_text())
-    validate_config(config)
+    validate_config(config, extension=extend_from is not None)
     if run_root.exists():
         raise FileExistsError('Use a new dated run directory')
+    parent = None
+    if extend_from is not None:
+        from .aligned_extension import audit_parent, assert_shared_protocol
+        parent_root = Path(extend_from).resolve()
+        parent = audit_parent(parent_root)
+        assert_shared_protocol(yaml.safe_load((parent_root / 'config.yaml').read_text()), config)
     run_root.mkdir(parents=True)
     shutil.copyfile(config_path, run_root / 'config.yaml')
     source_files, source_hash = freeze_sources(project, run_root / 'source')
@@ -144,9 +154,13 @@ def prepare(config_path, run_root):
             paths.update(values.get('region_files', {}).values())
             if isinstance(values.get('path'), str):
                 paths.add(values['path'])
-    data_hashes = {str((project / path).resolve()): sha(project / path) for path in sorted(paths)}
+    data_hashes = (parent['data_hashes'] if parent is not None else
+                   {str((project / path).resolve()): sha(project / path) for path in sorted(paths)})
     cache_info, cache_hashes = {}, {}
-    for region in REGIONS:
+    if parent is not None:
+        (run_root / 'data_cache').symlink_to(parent_root / 'data_cache', target_is_directory=True)
+        cache_info, cache_hashes = parent['cache_info'], parent['cache_hashes']
+    for region in (() if parent is not None else REGIONS):
         print(f'Preparing complete shared data cache: {region}', flush=True)
         splits = build_aligned_splits(config, region, split_names=SPLITS)
         cache_info[region] = save_cache(run_root / 'data_cache' / region, splits)
@@ -171,6 +185,13 @@ def prepare(config_path, run_root):
                     **{name: version(name) for name in ('numpy', 'torch', 'xgboost', 'lightgbm', 'scikit-learn')}},
                 'git_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
                 'scope': 'aligned_full_data_fixed_configuration_not_hpo_not_blind'}
+    if parent is not None:
+        manifest['extension_from'] = {
+            'run_root': str(parent_root), 'run_id': parent['run_id'],
+            'jobs_hash': sha(parent_root / 'jobs.json'), 'source_hash': parent['source_hash'],
+            'config_hash': parent['config_hash'], 'cache_hashes': parent['cache_hashes'],
+            'cache_reuse': 'read_only_parent_cache_via_symlink',
+        }
     atomic_json(run_root / 'jobs.json', manifest)
     print(f'Prepared {len(jobs)} jobs in {run_root}', flush=True)
     return manifest
@@ -185,6 +206,9 @@ def verify_snapshot(root, manifest):
     digest = hashlib.sha256(json.dumps(manifest['source_files'], sort_keys=True).encode()).hexdigest()
     if digest != manifest['source_hash']:
         raise ValueError('Source manifest fingerprint mismatch')
+    if 'extension_from' in manifest:
+        from .aligned_extension import verify_extension
+        verify_extension(root, manifest)
 
 
 def completed(root, job, manifest):
@@ -417,6 +441,9 @@ def run(root, retry_failed=False):
             time.sleep(10)
     from .aligned_report import build_aligned_report
     atomic_json(root / 'report.json', build_aligned_report(root))
+    if 'extension_from' in manifest:
+        from .aligned_extension import build_extension_report, write_extension_report
+        write_extension_report(root / 'combined_report.json', build_extension_report(root))
 
 
 def main():
@@ -425,6 +452,8 @@ def main():
     p = sub.add_parser('prepare')
     p.add_argument('--config', type=Path, required=True)
     p.add_argument('--run-root', type=Path, required=True)
+    p.add_argument('--extend-from', type=Path,
+                   help='Reuse a completed ten-model frozen run; prepare only TimeXer and PriceFM')
     p = sub.add_parser('run')
     p.add_argument('--run-root', type=Path, required=True)
     p.add_argument('--retry-failed', action='store_true')
@@ -434,7 +463,7 @@ def main():
     p.add_argument('--device', required=True)
     args = parser.parse_args()
     if args.command == 'prepare':
-        prepare(args.config, args.run_root)
+        prepare(args.config, args.run_root, args.extend_from)
     elif args.command == 'run':
         run(args.run_root, args.retry_failed)
     else:

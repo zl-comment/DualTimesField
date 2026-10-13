@@ -1,0 +1,107 @@
+{
+  "scope": "development_only_integration_not_quality_comparison",
+  "parent_source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+  "region": "NSW1",
+  "seed": 2026,
+  "train_origins": 512,
+  "selection_origins": 128,
+  "prediction_split": "calibration",
+  "prediction_origins": 128,
+  "epochs": 2,
+  "batch_size": 256,
+  "models": {
+    "timexer": {
+      "state": "passed",
+      "seconds": 4.227017804980278,
+      "peak_gpu_allocated_bytes": 413978112,
+      "output_shape": [
+        128,
+        24,
+        5
+      ],
+      "best_selection_value": 6.236131387834413,
+      "model_provenance": {
+        "repository": "https://github.com/thuml/TimeXer",
+        "commit": "76011909357972bd55a27adba2e1be994d81b327",
+        "adaptation": "five_quantile_head_and_future_known_cross_attention_tokens",
+        "pretrained": false,
+        "include_future": true,
+        "dimensions": {
+          "task_name": "short_term_forecast",
+          "features": "MS",
+          "seq_len": 72,
+          "pred_len": 24,
+          "use_norm": true,
+          "patch_len": 24,
+          "enc_in": 2,
+          "d_model": 512,
+          "n_heads": 8,
+          "e_layers": 3,
+          "d_ff": 512,
+          "dropout": 0.1,
+          "embed": "timeF",
+          "freq": "h",
+          "factor": 5,
+          "activation": "gelu"
+        },
+        "unused_input_blocks": []
+      }
+    },
+    "pricefm": {
+      "state": "passed",
+      "seconds": 0.23811190575361252,
+      "peak_gpu_allocated_bytes": 26534912,
+      "output_shape": [
+        128,
+        24,
+        5
+      ],
+      "best_selection_value": 41.89434947509915,
+      "model_provenance": {
+        "repository": "https://github.com/runyao-yu/PriceFM",
+        "commit": "c72d1228bde80417d5cc782521328e02ab5401c3",
+        "source_sha256": "c5ae12e0a9ae85535cad30e41f84c3b58fe2265c464249f2705802ece74f03c2",
+        "license": "upstream does not declare a license",
+        "architecture_version": "2026 MoE",
+        "implementation": "PyTorch port of pinned official TensorFlow model",
+        "adaptation": "single-region single-node graph; canonical AEMO input dimensions",
+        "graph_nodes": 1,
+        "graph_gate": [
+          1.0
+        ],
+        "pretrained": false,
+        "training": "from scratch on shared training split",
+        "input_blocks": [
+          "history_values",
+          "history_calendar",
+          "future_calendar",
+          "future_exogenous",
+          "ctf_exogenous",
+          "quantile_exogenous",
+          "origin_context"
+        ],
+        "history_order": [
+          "history_values",
+          "history_calendar"
+        ],
+        "future_order": [
+          "future_calendar",
+          "future_exogenous",
+          "ctf_exogenous",
+          "quantile_exogenous",
+          "origin_context broadcast across horizon"
+        ],
+        "emb_dim": 32,
+        "num_experts": 4,
+        "quantiles": [
+          0.05,
+          0.1,
+          0.5,
+          0.9,
+          0.95
+        ],
+        "pool_epsilon": 1e-06
+      }
+    }
+  }
+}

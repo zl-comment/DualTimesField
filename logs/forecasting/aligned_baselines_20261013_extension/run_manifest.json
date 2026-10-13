@@ -1,0 +1,52 @@
+{
+  "run_id": "aligned_baselines_20261013_extension",
+  "created_at_utc": "2026-10-13T09:19:17.287915+00:00",
+  "source_hash": "aa8ad471145bb525b7ec6b0044ff1386510f507e1aa72f35129ba79ce647be46",
+  "config_hash": "b3ae7006d8c50f992d7b3cdafb3b87952575d45ce30b7c2dc02844502267bdab",
+  "git_head": "467e9766126636b08dc412e9e0ef2f8db9b55d89",
+  "models": [
+    "timexer",
+    "pricefm"
+  ],
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "cache_hashes": {
+    "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+    "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+    "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+  },
+  "extension_from": {
+    "run_root": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012",
+    "run_id": "aligned_baselines_20261012",
+    "jobs_hash": "4baaaa3122eeafd268c083671d77b3befd8dfe6754a56ae21198ca116ce779a1",
+    "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+    "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86",
+    "cache_hashes": {
+      "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+      "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+      "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+    },
+    "cache_reuse": "read_only_parent_cache_via_symlink"
+  },
+  "launch": {
+    "pid": 1137768,
+    "started_at_utc": "2026-10-13T09:19:44.376468+00:00",
+    "command": [
+      "/root/workspace/Code/DualTimesField/.venv/bin/python",
+      "-m",
+      "forecasting.aligned_experiment",
+      "run",
+      "--run-root",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension"
+    ],
+    "cwd": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/source"
+  }
+}

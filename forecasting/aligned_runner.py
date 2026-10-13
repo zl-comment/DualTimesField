@@ -28,7 +28,8 @@ from .aligned_scoring import (
 )
 from .datasets import load_forecast_config
 
-NEURAL_MODELS = ('full', 'no_fields', 'mlp', 'linear', 'dlinear', 'patchtst', 'gatets_adapter')
+NEURAL_MODELS = ('full', 'no_fields', 'mlp', 'linear', 'dlinear', 'patchtst', 'gatets_adapter',
+                 'timexer', 'pricefm')
 TREE_MODELS = ('xgboost', 'lightgbm', 'lasso_arx72_cp')
 
 
@@ -66,7 +67,7 @@ def _forward(model, kind, batch):
         output = model(*_full_inputs(batch))
         return output['quantile_forecast'], output
     inputs = {k: batch[k] for k in INPUT_KEYS}
-    return model(inputs if kind == 'mlp' else _native_batch(inputs)), None
+    return model(inputs if kind in ('mlp', 'timexer', 'pricefm') else _native_batch(inputs)), None
 
 
 def _loader(split, batch_size, *, shuffle=False, seed=2026):
@@ -231,6 +232,14 @@ def fit_neural(kind, train, selection, evaluation, config, *, seed=2026,
         model, criterion = PlainMLP(example, train.actual.shape[1]), None
     elif kind == 'gatets_adapter':
         model, criterion = build_gatets(kind, _native_batch(example)), None
+    elif kind == 'timexer':
+        from .timexer_baseline import build_timexer
+        model = build_timexer(example, **config.get('model_baselines', {}).get(kind, {}))
+        criterion = None
+    elif kind == 'pricefm':
+        from .pricefm_baseline import build_pricefm
+        model = build_pricefm(example, **config.get('model_baselines', {}).get(kind, {}))
+        criterion = None
     else:
         model, criterion = general_baselines.build(kind, _native_batch(example)), None
     model.to(device)
@@ -336,7 +345,9 @@ def fit_neural(kind, train, selection, evaluation, config, *, seed=2026,
                 'learning_rate': learning_rate, 'parameters': sum(p.numel() for p in model.parameters()),
                 'internal_loss': 'native_full_loss' if criterion is not None else 'pinball',
                 'input_mapping': 'shared_blocks_model_native_fusion',
-                'native_unused_blocks': [] if kind == 'mlp' else ['history_calendar']}
+                'native_unused_blocks': [] if kind in ('mlp', 'timexer', 'pricefm') else ['history_calendar']}
+    if hasattr(model, 'provenance'):
+        metadata['model_provenance'] = model.provenance
     _write_progress(progress_path, {'event': 'complete', 'best_epoch': best_epoch,
         'best_selection_value': best_value, 'epochs_executed': len(curve),
         'stop_reason': stop_reason, 'budget_cap_reached': len(curve) == epochs,

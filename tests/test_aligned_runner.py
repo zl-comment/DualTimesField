@@ -26,11 +26,13 @@ def split(start, seed):
                                   'region': 'NSW1', 'protocol_id': 'fixture'})
 
 
-@pytest.mark.parametrize('kind', ['mlp', 'linear'])
+@pytest.mark.parametrize('kind', ['mlp', 'linear', 'timexer', 'pricefm'])
 def test_evaluation_label_poisoning_cannot_change_trained_prediction(kind):
     torch.set_num_threads(2)
     train, selection, evaluation = split(0, 1), split(100000, 2), split(200000, 3)
-    config = {'training': {'weight_decay': 0., 'epochs': 1}}
+    config = {'training': {'weight_decay': 0., 'epochs': 1},
+              'model_baselines': {'timexer': {'patch_len': 2, 'd_model': 16,
+                  'n_heads': 4, 'e_layers': 2, 'd_ff': 32, 'dropout': 0.}}}
     q, _, meta = fit_neural(kind, train, selection, evaluation, config, epochs=1, batch_size=6)
     poison = copy.deepcopy(evaluation)
     poison.actual[:] = 1e15
@@ -41,7 +43,8 @@ def test_evaluation_label_poisoning_cannot_change_trained_prediction(kind):
     assert np.isfinite(q).all() and q.shape == (12, 3, 5)
 
 
-def test_model_forward_never_receives_supervision():
+@pytest.mark.parametrize('kind', ['mlp', 'timexer', 'pricefm'])
+def test_model_forward_never_receives_supervision(kind):
     class BoundarySpy(torch.nn.Module):
         def forward(self, values):
             assert set(values) == set(INPUT_KEYS)
@@ -50,7 +53,7 @@ def test_model_forward_never_receives_supervision():
     batch = {k: torch.from_numpy(v) for k, v in sample.inputs.items()}
     batch['target_price'] = torch.tensor(float('nan'))
     batch['target_quantile'] = torch.tensor(float('nan'))
-    _forward(BoundarySpy(), 'mlp', batch)
+    _forward(BoundarySpy(), kind, batch)
 
 
 def test_overlapping_or_unrealized_training_targets_are_rejected():
