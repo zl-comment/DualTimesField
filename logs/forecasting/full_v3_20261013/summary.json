@@ -1,0 +1,1442 @@
+{
+  "experiment_id": "full-v3-conditional-analogs-20261013",
+  "comparison_available": true,
+  "expected_cells": 15,
+  "declared_cells": 15,
+  "progress": {
+    "completed": 15,
+    "running": 0,
+    "failed": 0,
+    "pending": 0
+  },
+  "cells": [
+    {
+      "variant": "v3_level_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_level_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_level_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "status": "completed",
+      "error": null
+    }
+  ],
+  "limitations": "单 seed 2026、回顾性测试、固定配置比较。历史库可使用查询时已经实现并发布的观测，包括更早的验证/测试年份；树参数保持静态。这增加了历史信息，不能称为与原始基线完全相同输入下的 SOTA。QS 为共同五分位数 pinball 均值的两倍，不是精确 CRPS。",
+  "errors": [],
+  "macro": [
+    {
+      "variant": "v3_analog_features_lgb",
+      "mae": 37.593427941791084,
+      "quantile_score_proxy": 24.855731566657983,
+      "rmse_pooled": 294.3768703324707,
+      "rmse_region_macro": 277.51909336777106,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE",
+      "delta_mae_vs_lightgbm": 0.504426693186943,
+      "delta_rmse_pooled_vs_lightgbm": 0.49233635438639567,
+      "delta_quantile_score_proxy_vs_lightgbm": 0.6587993797607581
+    },
+    {
+      "variant": "v3_level_lgb",
+      "mae": 41.85206504689632,
+      "quantile_score_proxy": 26.474620579618215,
+      "rmse_pooled": 295.5943304861729,
+      "rmse_region_macro": 278.500457210599,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE",
+      "delta_mae_vs_lightgbm": 4.76306379829218,
+      "delta_rmse_pooled_vs_lightgbm": 1.7097965080886297,
+      "delta_quantile_score_proxy_vs_lightgbm": 2.2776883927209894
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "mae": 44.436213876085766,
+      "quantile_score_proxy": 29.52366015214876,
+      "rmse_pooled": 315.3860884343921,
+      "rmse_region_macro": 300.55023718353397,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE",
+      "delta_mae_vs_lightgbm": 7.347212627481625,
+      "delta_rmse_pooled_vs_lightgbm": 21.501554456307815,
+      "delta_quantile_score_proxy_vs_lightgbm": 5.326727965251536
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "mae": 46.424052413180426,
+      "quantile_score_proxy": 30.903665258088484,
+      "rmse_pooled": 306.11769792159686,
+      "rmse_region_macro": 292.93759614440256,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE",
+      "delta_mae_vs_lightgbm": 9.335051164576285,
+      "delta_rmse_pooled_vs_lightgbm": 12.23316394351258,
+      "delta_quantile_score_proxy_vs_lightgbm": 6.706733071191259
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "mae": 48.55639194813986,
+      "quantile_score_proxy": 33.33703742372875,
+      "rmse_pooled": 326.1609657222973,
+      "rmse_region_macro": 311.74088627139037,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE",
+      "delta_mae_vs_lightgbm": 11.46739069953572,
+      "delta_rmse_pooled_vs_lightgbm": 32.27643174421303,
+      "delta_quantile_score_proxy_vs_lightgbm": 9.140105236831527
+    }
+  ],
+  "regional": [
+    {
+      "variant": "v3_level_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 51.3451606343074,
+      "rmse_pooled": 400.993164385596,
+      "pinball_by_quantile": {
+        "0.05": 5.704196485393213,
+        "0.1": 9.259357095905395,
+        "0.5": 25.6725803171537,
+        "0.9": 24.32390772463861,
+        "0.95": 21.143409292058763
+      },
+      "quantile_score_proxy": 34.44138036605987,
+      "coverage_80": 0.6913703555733121,
+      "interval_width_80": 80.10591120879941,
+      "coverage_90": 0.8022016437417956,
+      "interval_width_90": 127.29100280538043,
+      "delta_mae_vs_lightgbm": 6.9818368606025984,
+      "delta_rmse_pooled_vs_lightgbm": 2.2420428886755985,
+      "delta_quantile_score_proxy_vs_lightgbm": 3.08454565977296,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 26.642650873758257,
+            "signed_bias": -3.779987420027259
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1288.238176140036,
+            "signed_bias": -1286.4666980573838
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 68.58881312411444,
+            "signed_bias": 68.57177498943152
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 821.897092003716,
+            "signed_bias": -820.7388675544107
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 847,
+          "false_positive": 828,
+          "false_negative": 6521,
+          "true_negative": 412308,
+          "precision": 0.5056716417910447,
+          "recall": 0.11495656894679696,
+          "false_alarm_rate": 0.0020041826420355525
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "480a830ce02296745be227c8baeaa78cc57f521516b0c43a6f101e0332c81010"
+    },
+    {
+      "variant": "v3_level_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 44.277938651400426,
+      "rmse_pooled": 276.134557428158,
+      "pinball_by_quantile": {
+        "0.05": 4.430184161428773,
+        "0.1": 7.9086994458175734,
+        "0.5": 22.138969325700213,
+        "0.9": 18.34529616013927,
+        "0.95": 15.080874304250049
+      },
+      "quantile_score_proxy": 27.16160935893435,
+      "coverage_80": 0.746594562715218,
+      "interval_width_80": 113.12145142468846,
+      "coverage_90": 0.8808643913018663,
+      "interval_width_90": 200.2292023316364,
+      "delta_mae_vs_lightgbm": 6.080401397848306,
+      "delta_rmse_pooled_vs_lightgbm": 2.4192817512122815,
+      "delta_quantile_score_proxy_vs_lightgbm": 2.251956534334912,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 26.035973606033778,
+            "signed_bias": -4.0045014572102975
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 864.5407183178662,
+            "signed_bias": -863.7531532572269
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 46.75492730210551,
+            "signed_bias": 46.41705978550612
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 577.5138584013473,
+            "signed_bias": -577.2667250022508
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 678,
+          "false_positive": 576,
+          "false_negative": 7098,
+          "true_negative": 412152,
+          "precision": 0.5406698564593302,
+          "recall": 0.08719135802469136,
+          "false_alarm_rate": 0.0013955922544629878
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "03055994e46374a121eb8975912876560f1a1411433fb36607dee9495dc7a658"
+    },
+    {
+      "variant": "v3_level_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 29.933095854981154,
+      "rmse_pooled": 158.37364981804285,
+      "pinball_by_quantile": {
+        "0.05": 4.831907323250318,
+        "0.1": 7.262200186369636,
+        "0.5": 14.966547927490577,
+        "0.9": 9.911267963194788,
+        "0.95": 7.580256634345747
+      },
+      "quantile_score_proxy": 17.820872013860424,
+      "coverage_80": 0.6261771588379659,
+      "interval_width_80": 59.738945808142,
+      "coverage_90": 0.7574910107870555,
+      "interval_width_90": 85.65339894655662,
+      "delta_mae_vs_lightgbm": 1.2269531364256494,
+      "delta_rmse_pooled_vs_lightgbm": -0.314247958029199,
+      "delta_quantile_score_proxy_vs_lightgbm": 1.496562984055096,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 25.550924706337202,
+            "signed_bias": -2.1933444010492105
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 813.2897608509056,
+            "signed_bias": -812.3892956503103
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 31.93879608574326,
+            "signed_bias": 29.555403975459264
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 677.1867476292592,
+            "signed_bias": -676.4887286473684
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 164,
+          "false_positive": 77,
+          "false_negative": 1924,
+          "true_negative": 418339,
+          "precision": 0.6804979253112033,
+          "recall": 0.07854406130268199,
+          "false_alarm_rate": 0.00018402737945011664
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "a9dbbb284ec8688da6e6105cb086e24034751ef697b5779bfc891fb8d725fa09"
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 44.90633517103096,
+      "rmse_pooled": 399.23714477741913,
+      "pinball_by_quantile": {
+        "0.05": 4.4909949002714455,
+        "0.1": 7.64940265880847,
+        "0.5": 22.45316758551548,
+        "0.9": 24.182171658800044,
+        "0.95": 21.766597856324644
+      },
+      "quantile_score_proxy": 32.21693386388804,
+      "coverage_80": 0.6995200996898959,
+      "interval_width_80": 82.84566261232197,
+      "coverage_90": 0.8305319331088408,
+      "interval_width_90": 152.3864122643826,
+      "delta_mae_vs_lightgbm": 0.5430113973261612,
+      "delta_rmse_pooled_vs_lightgbm": 0.48602328049872767,
+      "delta_quantile_score_proxy_vs_lightgbm": 0.8600991576011303,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 21.811305419192212,
+            "signed_bias": -10.894688770276296
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1276.2816618726729,
+            "signed_bias": -1276.2802739453691
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 39.8107217594249,
+            "signed_bias": 39.648499539359186
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 803.8342064512631,
+            "signed_bias": -803.8317000178378
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 26,
+          "false_positive": 0,
+          "false_negative": 7342,
+          "true_negative": 413136,
+          "precision": 1.0,
+          "recall": 0.003528773072747014,
+          "false_alarm_rate": 0.0
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "ee3437075ff36dd399f7643e97d8d77b13a304fcca06da3aabb9530ac5781aec"
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 38.84122525174784,
+      "rmse_pooled": 274.53820581013207,
+      "pinball_by_quantile": {
+        "0.05": 3.937676006972289,
+        "0.1": 6.741882451396424,
+        "0.5": 19.42061262587392,
+        "0.9": 18.44989442791841,
+        "0.95": 16.161916791896395
+      },
+      "quantile_score_proxy": 25.884792921622974,
+      "coverage_80": 0.7855977588798204,
+      "interval_width_80": 118.21419230845277,
+      "coverage_90": 0.9256939291897343,
+      "interval_width_90": 232.59278831596814,
+      "delta_mae_vs_lightgbm": 0.6436879981957162,
+      "delta_rmse_pooled_vs_lightgbm": 0.8229301331863326,
+      "delta_quantile_score_proxy_vs_lightgbm": 0.9751400970235373,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 22.962810100596073,
+            "signed_bias": -11.306633284508301
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 864.7599329738599,
+            "signed_bias": -864.6249973898211
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 25.323934047321007,
+            "signed_bias": 24.504221935678196
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 577.8719393862788,
+            "signed_bias": -577.8056038329449
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 193,
+          "false_positive": 125,
+          "false_negative": 7583,
+          "true_negative": 412603,
+          "precision": 0.6069182389937107,
+          "recall": 0.024819958847736627,
+          "false_alarm_rate": 0.00030286290244422475
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "44ab3fee94b8be7109b5999694bad283c80c959ea03eaa843c2af7c2f7ee709e"
+    },
+    {
+      "variant": "v3_analog_features_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 29.03272340259445,
+      "rmse_pooled": 158.78192951576196,
+      "pinball_by_quantile": {
+        "0.05": 3.860958002726264,
+        "0.1": 6.192856703365579,
+        "0.5": 14.516361701297225,
+        "0.9": 9.34079906039926,
+        "0.95": 7.252694318369033
+      },
+      "quantile_score_proxy": 16.465467914462945,
+      "coverage_80": 0.7217505659874817,
+      "interval_width_80": 68.00467098654948,
+      "coverage_90": 0.8466625763369671,
+      "interval_width_90": 99.02828347030652,
+      "delta_mae_vs_lightgbm": 0.32658068403894447,
+      "delta_rmse_pooled_vs_lightgbm": 0.09403173968991041,
+      "delta_quantile_score_proxy_vs_lightgbm": 0.14115888465761728,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 24.32433387712206,
+            "signed_bias": -8.929282163459707
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 849.7695963777517,
+            "signed_bias": -849.7505694733702
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 32.59850509187569,
+            "signed_bias": 31.85040133702473
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 710.1159970070919,
+            "signed_bias": -710.0853425500326
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 6,
+          "false_positive": 4,
+          "false_negative": 2082,
+          "true_negative": 418412,
+          "precision": 0.6,
+          "recall": 0.0028735632183908046,
+          "false_alarm_rate": 9.559863867538526e-06
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "36c66fbac745dd7d246df2c227cdc0a4227b60bce272749145f8e4d066cf01cc"
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 55.54111758665026,
+      "rmse_pooled": 413.48600990315225,
+      "pinball_by_quantile": {
+        "0.05": 10.553118043042188,
+        "0.1": 14.33803150944367,
+        "0.5": 27.77055879332513,
+        "0.9": 25.327133308334833,
+        "0.95": 22.206031531698198
+      },
+      "quantile_score_proxy": 40.07794927433761,
+      "coverage_80": 0.6742742042881875,
+      "interval_width_80": 82.00167209301628,
+      "coverage_90": 0.8113145178167152,
+      "interval_width_90": 154.77728167266403,
+      "delta_mae_vs_lightgbm": 11.17779381294546,
+      "delta_rmse_pooled_vs_lightgbm": 14.734888406231846,
+      "delta_quantile_score_proxy_vs_lightgbm": 8.721114568050705,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 33.46825647993437,
+            "signed_bias": 2.2086695625578843
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1269.7722898807233,
+            "signed_bias": -1090.5812905579269
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 40.0992635366445,
+            "signed_bias": 35.30634475248836
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 819.932878130663,
+            "signed_bias": -622.9138834613055
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 2752,
+          "false_positive": 4797,
+          "false_negative": 4616,
+          "true_negative": 408339,
+          "precision": 0.3645515962379123,
+          "recall": 0.3735070575461455,
+          "false_alarm_rate": 0.011611188567445103
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "d8a2bf88c99b6b1f31904a0eae7236aa688acb86ab1b36746c5396d449d3fc34"
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 55.30089355505643,
+      "rmse_pooled": 338.5461233707243,
+      "pinball_by_quantile": {
+        "0.05": 15.18987249105968,
+        "0.1": 18.634423590733753,
+        "0.5": 27.650446777528217,
+        "0.9": 19.686169122644472,
+        "0.95": 16.353555413732728
+      },
+      "quantile_score_proxy": 39.005786958279536,
+      "coverage_80": 0.7188635542111371,
+      "interval_width_80": 125.04629261130704,
+      "coverage_90": 0.8905313623651618,
+      "interval_width_90": 276.8646779367157,
+      "delta_mae_vs_lightgbm": 17.103356301504313,
+      "delta_rmse_pooled_vs_lightgbm": 64.83084769377854,
+      "delta_quantile_score_proxy_vs_lightgbm": 14.0961341336801,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 40.952767637361184,
+            "signed_bias": 8.894176176937181
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 877.8631700685319,
+            "signed_bias": -570.4087430946147
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 32.410776273327244,
+            "signed_bias": 18.03333006358597
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 612.3083916328413,
+            "signed_bias": -310.8649053838172
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 2671,
+          "false_positive": 8082,
+          "false_negative": 5105,
+          "true_negative": 404646,
+          "precision": 0.24839579652190086,
+          "recall": 0.34349279835390945,
+          "false_alarm_rate": 0.019581903820433795
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "eb97e0d78888506dcee8176dd8c4271ef9a534bbdce8df59d0ebf04133ec55c6"
+    },
+    {
+      "variant": "v3_analog_prior_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 34.82716470271289,
+      "rmse_pooled": 183.1905255402947,
+      "pinball_by_quantile": {
+        "0.05": 6.755159954001241,
+        "0.1": 9.51070060277011,
+        "0.5": 17.413582351356446,
+        "0.9": 10.674274647550682,
+        "0.95": 7.9647225407443
+      },
+      "quantile_score_proxy": 20.92737603856911,
+      "coverage_80": 0.6852158362346137,
+      "interval_width_80": 71.02553213164587,
+      "coverage_90": 0.8239089283336187,
+      "interval_width_90": 105.40901933555055,
+      "delta_mae_vs_lightgbm": 6.121021984157387,
+      "delta_rmse_pooled_vs_lightgbm": 24.502627764222638,
+      "delta_quantile_score_proxy_vs_lightgbm": 4.603067008763784,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 29.998568575924704,
+            "signed_bias": -4.168209804411333
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 960.75100711133,
+            "signed_bias": -638.4137789238473
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 32.80753107389195,
+            "signed_bias": 25.948366937698776
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 741.8473934736037,
+            "signed_bias": -606.759529129341
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 420,
+          "false_positive": 1983,
+          "false_negative": 1668,
+          "true_negative": 416433,
+          "precision": 0.17478152309612985,
+          "recall": 0.20114942528735633,
+          "false_alarm_rate": 0.004739302512332224
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "74d1379810ba9b9754427c44a07854022b1c19bac08d9fbf05ce3bb89ac7c06f"
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 52.00781049244846,
+      "rmse_pooled": 409.9280636196052,
+      "pinball_by_quantile": {
+        "0.05": 7.877827725335648,
+        "0.1": 11.58198417984011,
+        "0.5": 26.00390524622423,
+        "0.9": 24.62482952739588,
+        "0.95": 21.758122674884824
+      },
+      "quantile_score_proxy": 36.73866774147227,
+      "coverage_80": 0.6780744059509541,
+      "interval_width_80": 91.15213321125997,
+      "coverage_90": 0.814275250651599,
+      "interval_width_90": 162.73392184854228,
+      "delta_mae_vs_lightgbm": 7.644486718743664,
+      "delta_rmse_pooled_vs_lightgbm": 11.176942122684807,
+      "delta_quantile_score_proxy_vs_lightgbm": 5.3818330351853625,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 29.759857896421543,
+            "signed_bias": -0.3321153910523884
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1260.611764812415,
+            "signed_bias": -1149.1761409508204
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 40.761824798002515,
+            "signed_bias": 37.81242456838805
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 807.3812111977669,
+            "signed_bias": -695.5412577151515
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 2149,
+          "false_positive": 3365,
+          "false_negative": 5219,
+          "true_negative": 409771,
+          "precision": 0.3897352194414218,
+          "recall": 0.2916666666666667,
+          "false_alarm_rate": 0.008145017621315984
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "6979ce6d26b87881f9c592a3132fb626437cbfa3a3e7e3f082137f48ea7f453a"
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 48.59894152844238,
+      "rmse_pooled": 314.66741289222057,
+      "pinball_by_quantile": {
+        "0.05": 8.256010812734832,
+        "0.1": 11.745145925234565,
+        "0.5": 24.29947076422119,
+        "0.9": 19.570416413460535,
+        "0.95": 16.688151374087997
+      },
+      "quantile_score_proxy": 32.223678115895645,
+      "coverage_80": 0.724960999181934,
+      "interval_width_80": 137.02307486012728,
+      "coverage_90": 0.8851402126971444,
+      "interval_width_90": 273.593387008916,
+      "delta_mae_vs_lightgbm": 10.401404274890261,
+      "delta_rmse_pooled_vs_lightgbm": 40.95213721527483,
+      "delta_quantile_score_proxy_vs_lightgbm": 7.314025291296208,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 33.05676145753286,
+            "signed_bias": 2.435421534320465
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 871.1531961546497,
+            "signed_bias": -691.5120042459581
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 33.390089010616684,
+            "signed_bias": 27.819440610345296
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 598.0386012670587,
+            "signed_bias": -424.22097086249414
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 1402,
+          "false_positive": 2623,
+          "false_negative": 6374,
+          "true_negative": 410105,
+          "precision": 0.3483229813664596,
+          "recall": 0.18029835390946503,
+          "false_alarm_rate": 0.006355275144889612
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "0dcf5ff9726a71858b41b6ca1b4dd7477626407b130744f39ee59dfa1bfe8101"
+    },
+    {
+      "variant": "v3_dual_shared_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 32.701889607366454,
+      "rmse_pooled": 177.05523503877603,
+      "pinball_by_quantile": {
+        "0.05": 5.9312379926910745,
+        "0.1": 8.552716742806574,
+        "0.5": 16.350944803683227,
+        "0.9": 10.386244475897277,
+        "0.95": 7.800442482617737
+      },
+      "quantile_score_proxy": 19.608634599078357,
+      "coverage_80": 0.6659484808705743,
+      "interval_width_80": 65.72525180078625,
+      "coverage_90": 0.8068769857123832,
+      "interval_width_90": 97.89754329914544,
+      "delta_mae_vs_lightgbm": 3.995746888810949,
+      "delta_rmse_pooled_vs_lightgbm": 18.367337262703984,
+      "delta_quantile_score_proxy_vs_lightgbm": 3.2843255692730295,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 27.783865300225987,
+            "signed_bias": -3.6302241833018196
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 945.9556406746113,
+            "signed_bias": -657.2636521798274
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 32.65432186710177,
+            "signed_bias": 28.950537332710212
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 729.2521917382253,
+            "signed_bias": -620.1993023812955
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 367,
+          "false_positive": 792,
+          "false_negative": 1721,
+          "true_negative": 417624,
+          "precision": 0.3166522864538395,
+          "recall": 0.17576628352490423,
+          "false_alarm_rate": 0.0018928530457726282
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "0ff8c09ea654d7cd91c7ef475f09047b364dcf292fa7738be25a22a56af6b438"
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "NSW1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 54.58898508073509,
+      "rmse_pooled": 400.5403280189989,
+      "pinball_by_quantile": {
+        "0.05": 8.715887484955312,
+        "0.1": 12.807723983597613,
+        "0.5": 27.294492540367546,
+        "0.9": 25.33894496499213,
+        "0.95": 22.137477576800507
+      },
+      "quantile_score_proxy": 38.517810620285246,
+      "coverage_80": 0.6908162585849362,
+      "interval_width_80": 102.16563570657861,
+      "coverage_90": 0.8256948804291993,
+      "interval_width_90": 181.1985488717171,
+      "delta_mae_vs_lightgbm": 10.225661307030293,
+      "delta_rmse_pooled_vs_lightgbm": 1.789206522078473,
+      "delta_quantile_score_proxy_vs_lightgbm": 7.160975913998339,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 32.062130293860434,
+            "signed_bias": 1.0113685774165682
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1276.4443208759299,
+            "signed_bias": -1082.1424158307327
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 43.739663041748074,
+            "signed_bias": 41.626465284537645
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 836.3004891571803,
+            "signed_bias": -611.8668340564824
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 2487,
+          "false_positive": 4922,
+          "false_negative": 4881,
+          "true_negative": 408214,
+          "precision": 0.3356728303414766,
+          "recall": 0.33754071661237783,
+          "false_alarm_rate": 0.011913752372100229
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "0b6892e4bed764d6c38c13d47620925a57a8cc0db5c897e38777aa81d83fe4e6"
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "QLD1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 50.418229652312526,
+      "rmse_pooled": 295.34702711284274,
+      "pinball_by_quantile": {
+        "0.05": 8.041147483558289,
+        "0.1": 12.123486898853631,
+        "0.5": 25.209114826156263,
+        "0.9": 20.40688595144309,
+        "0.95": 17.019691106345643
+      },
+      "quantile_score_proxy": 33.12013050654277,
+      "coverage_80": 0.7209277438502368,
+      "interval_width_80": 140.33305339068175,
+      "coverage_90": 0.8836301200464205,
+      "interval_width_90": 262.68641638664025,
+      "delta_mae_vs_lightgbm": 12.220692398760406,
+      "delta_rmse_pooled_vs_lightgbm": 21.631751435897,
+      "delta_quantile_score_proxy_vs_lightgbm": 8.210477681943335,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 34.05561709120525,
+            "signed_bias": 1.2392019917581885
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 880.336734528742,
+            "signed_bias": -703.3194221203948
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 39.45522927836219,
+            "signed_bias": 35.678676482705555
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 598.9806215130894,
+            "signed_bias": -451.74695688051185
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 1496,
+          "false_positive": 2885,
+          "false_negative": 6280,
+          "true_negative": 409843,
+          "precision": 0.34147454918968273,
+          "recall": 0.19238683127572018,
+          "false_alarm_rate": 0.006990075788412708
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "ec61e8094262fedc1af0b78cdd542375ce721072f62a8a1bb879c0d114342f89"
+    },
+    {
+      "variant": "v3_dual_conditional_lgb",
+      "region": "TAS1",
+      "seed": 2026,
+      "table": "Q",
+      "n_origins": 17521,
+      "horizon": 24,
+      "n_cells": 420504,
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 34.264942506493654,
+      "rmse_pooled": 182.92543330136613,
+      "pinball_by_quantile": {
+        "0.05": 6.791107283039434,
+        "0.1": 9.433232709611868,
+        "0.5": 17.132471253246827,
+        "0.9": 10.960852813423598,
+        "0.95": 8.364972559271823
+      },
+      "quantile_score_proxy": 21.073054647437424,
+      "coverage_80": 0.667282594220269,
+      "interval_width_80": 66.88119737313868,
+      "coverage_90": 0.8086986092879022,
+      "interval_width_90": 100.10910472762208,
+      "delta_mae_vs_lightgbm": 5.558799787938149,
+      "delta_rmse_pooled_vs_lightgbm": 24.237535525294078,
+      "delta_quantile_score_proxy_vs_lightgbm": 4.748745617632096,
+      "diagnostics": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 29.29704206756647,
+            "signed_bias": -2.943064637319862
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 969.0841945231883,
+            "signed_bias": -674.3263193451857
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 33.3877479752381,
+            "signed_bias": 29.955528376218965
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 831.8083751197839,
+            "signed_bias": -527.9402883452359
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 274,
+          "false_positive": 1193,
+          "false_negative": 1814,
+          "true_negative": 417223,
+          "precision": 0.18677573278800272,
+          "recall": 0.13122605363984674,
+          "false_alarm_rate": 0.0028512293984933653
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "test_prediction_sha256": "a4ec122488390d3f9596e9112b12cb7280b03c8108054111971c9abfdb3eda0f"
+    }
+  ],
+  "reference": {
+    "model": "lightgbm",
+    "seed": 2026,
+    "artifacts": {
+      "NSW1": {
+        "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/test.npz",
+        "sha256": "639568368494182adea5aea0dedf5f373840c7887ae3df5bb69786d8e951dcdc"
+      },
+      "QLD1": {
+        "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/test.npz",
+        "sha256": "e0122a237e10fc9df00665d236cadb850b08f582e6527f9c1d38554eb4c7ee7c"
+      },
+      "TAS1": {
+        "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/TAS1/test.npz",
+        "sha256": "79c663eefb59edc9c908f97510ec86a92b0e731241b29f20b2e63a683b8792f5"
+      }
+    },
+    "macro": {
+      "mae": 37.08900124860414,
+      "quantile_score_proxy": 24.196932186897225,
+      "rmse_pooled": 293.8845339780843,
+      "rmse_region_macro": 277.0514316499794,
+      "n_cells": 1261512,
+      "regions": 3,
+      "seed": 2026,
+      "aggregation": "MAE/QS equal region means; rmse_pooled pools squared errors by cell count; rmse_region_macro averages regional RMSE"
+    },
+    "regional": {
+      "NSW1": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.19316819816220535,
+        "point_definition": "rearranged_q50",
+        "mae": 44.3633237737048,
+        "rmse_pooled": 398.7511214969204,
+        "pinball_by_quantile": {
+          "0.05": 4.336232033332847,
+          "0.1": 7.483149421561608,
+          "0.5": 22.1816618868524,
+          "0.9": 23.688379441762063,
+          "0.95": 20.702663982208353
+        },
+        "quantile_score_proxy": 31.356834706286907,
+        "coverage_80": 0.716387953503415,
+        "interval_width_80": 77.87616248302152,
+        "coverage_90": 0.83640821490402,
+        "interval_width_90": 128.39629276449534,
+        "native_point_diagnostic": {
+          "mae": 44.3633237737048,
+          "rmse_pooled": 398.7511214969204
+        }
+      },
+      "QLD1": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.23453046820006468,
+        "point_definition": "rearranged_q50",
+        "mae": 38.19753725355212,
+        "rmse_pooled": 273.71527567694574,
+        "pinball_by_quantile": {
+          "0.05": 3.8866705043951373,
+          "0.1": 6.751456080002548,
+          "0.5": 19.09876862677606,
+          "0.9": 17.590719936552855,
+          "0.95": 14.946516913771998
+        },
+        "quantile_score_proxy": 24.909652824599437,
+        "coverage_80": 0.7809509540931834,
+        "interval_width_80": 113.42649338420297,
+        "coverage_90": 0.909606091737534,
+        "interval_width_90": 208.99527362517733,
+        "native_point_diagnostic": {
+          "mae": 38.19753725355212,
+          "rmse_pooled": 273.71527567694574
+        }
+      },
+      "TAS1": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.2821804311017255,
+        "point_definition": "rearranged_q50",
+        "mae": 28.706142718555505,
+        "rmse_pooled": 158.68789777607205,
+        "pinball_by_quantile": {
+          "0.05": 3.8818868385200567,
+          "0.1": 6.119433855983646,
+          "0.5": 14.353071359277752,
+          "0.9": 9.242361342412138,
+          "0.95": 7.214019178319721
+        },
+        "quantile_score_proxy": 16.324309029805327,
+        "coverage_80": 0.6803026843977703,
+        "interval_width_80": 61.22450027478426,
+        "coverage_90": 0.8092289252896524,
+        "interval_width_90": 87.13932941903177,
+        "native_point_diagnostic": {
+          "mae": 28.706142718555505,
+          "rmse_pooled": 158.68789777607205
+        }
+      }
+    },
+    "diagnostics": {
+      "NSW1": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387101,
+            "n_unique_delivery_hours": 16149,
+            "mae": 21.525979675349245,
+            "signed_bias": -9.903836893340044
+          },
+          "spike_gt_300": {
+            "n_cells": 7368,
+            "n_unique_delivery_hours": 307,
+            "mae": 1265.3722990663903,
+            "signed_bias": -1265.3487486747897
+          },
+          "negative_lt_0": {
+            "n_cells": 26035,
+            "n_unique_delivery_hours": 1088,
+            "mae": 38.37003043247278,
+            "signed_bias": 38.06794972569122
+          },
+          "spike_onset": {
+            "n_cells": 4080,
+            "n_unique_delivery_hours": 170,
+            "mae": 794.8552820295232,
+            "signed_bias": -794.8232360944205
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 247,
+          "false_positive": 57,
+          "false_negative": 7121,
+          "true_negative": 413079,
+          "precision": 0.8125,
+          "recall": 0.033523344191096635,
+          "false_alarm_rate": 0.0001379690949227373
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "QLD1": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 357194,
+            "n_unique_delivery_hours": 14902,
+            "mae": 22.684834682062814,
+            "signed_bias": -9.89293026796196
+          },
+          "spike_gt_300": {
+            "n_cells": 7776,
+            "n_unique_delivery_hours": 324,
+            "mae": 854.9840847920706,
+            "signed_bias": -854.5916249918724
+          },
+          "negative_lt_0": {
+            "n_cells": 55534,
+            "n_unique_delivery_hours": 2318,
+            "mae": 23.606693602113893,
+            "signed_bias": 22.39176209055012
+          },
+          "spike_onset": {
+            "n_cells": 4992,
+            "n_unique_delivery_hours": 208,
+            "mae": 568.9629375805206,
+            "signed_bias": -568.7912114072417
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 592,
+          "false_positive": 438,
+          "false_negative": 7184,
+          "true_negative": 412290,
+          "precision": 0.574757281553398,
+          "recall": 0.07613168724279835,
+          "false_alarm_rate": 0.0010612316101645636
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      },
+      "TAS1": {
+        "slices": {
+          "ordinary_0_300": {
+            "n_cells": 387432,
+            "n_unique_delivery_hours": 16166,
+            "mae": 24.172989347556182,
+            "signed_bias": -10.034729744819233
+          },
+          "spike_gt_300": {
+            "n_cells": 2088,
+            "n_unique_delivery_hours": 87,
+            "mae": 844.6575618140971,
+            "signed_bias": -844.5832711011686
+          },
+          "negative_lt_0": {
+            "n_cells": 30984,
+            "n_unique_delivery_hours": 1291,
+            "mae": 30.403215845379595,
+            "signed_bias": 29.229552711623434
+          },
+          "spike_onset": {
+            "n_cells": 1296,
+            "n_unique_delivery_hours": 54,
+            "mae": 707.2018383844552,
+            "signed_bias": -707.1111691556689
+          }
+        },
+        "point_alarm_gt_300": {
+          "true_positive": 34,
+          "false_positive": 7,
+          "false_negative": 2054,
+          "true_negative": 418409,
+          "precision": 0.8292682926829268,
+          "recall": 0.016283524904214558,
+          "false_alarm_rate": 1.6729761768192422e-05
+        },
+        "onset_definition": "actual >300 and immediately preceding delivery hour is observed and <=300",
+        "overlap_note": "Forecast errors pool origin × horizon cells; unique delivery counts are not independent events."
+      }
+    }
+  }
+}

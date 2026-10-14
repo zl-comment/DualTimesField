@@ -1,0 +1,41 @@
+experiment_id: full-v3-conditional-analogs-20261013
+baseline_root: outputs/forecasting/aligned_baselines_20261012
+baseline_config: configs/lightgbm/aligned.yaml
+regions: [NSW1, QLD1, TAS1]
+seeds: [2026]
+variants: [v3_level_lgb, v3_analog_features_lgb, v3_analog_prior_lgb, v3_dual_shared_lgb, v3_dual_conditional_lgb]
+cpu_workers: 6
+memory:
+  timezone: Australia/Brisbane
+  year_lags: [1, 2, 3]
+  day_offsets: [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
+  weekly_lags_days: [7, 14, 21, 28]
+retrieval:
+  top_k: 4
+  temperature: 1.0
+  batch_size: 256
+fields:
+  basis_count: 4
+  widths: [0.75, 1.5, 3.0]
+  ridge: 0.01
+  l1: 0.03
+  iterations: 40
+  batch_size: 2048
+lightgbm:
+  n_estimators: 2000
+  early_stopping_rounds: 50
+  selection_interval: 1
+  learning_rate: 0.05
+  num_leaves: 31
+  min_child_samples: 50
+  subsample: 0.8
+  colsample_bytree: 0.8
+  n_jobs: 4
+  selection_metric: pinball
+interpretation:
+  baseline_inputs_unchanged: true
+  growing_asof_memory_static_tree_weights: true
+  additional_history_is_method_input: true
+  retrospective_single_seed: true
+  no_hpo_or_calibration_fit: true
+  full_v3_is_fixed_basis_not_original_neural_inr: true

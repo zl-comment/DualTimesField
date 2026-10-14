@@ -1,0 +1,55 @@
+{
+  "macro_mae_by_split": {
+    "selection": {
+      "v3_analog_features_lgb": 73.68253764513848,
+      "v3_analog_prior_lgb": 82.41559934217568,
+      "v3_dual_shared_lgb": 75.78271612654657,
+      "v3_dual_conditional_lgb": 76.74031552869577
+    },
+    "calibration": {
+      "v3_analog_features_lgb": 69.28322139137165,
+      "v3_analog_prior_lgb": 61.335886001607896,
+      "v3_dual_shared_lgb": 58.825087493393006,
+      "v3_dual_conditional_lgb": 60.28481598602008
+    },
+    "test": {
+      "v3_analog_features_lgb": 37.593427941791084,
+      "v3_analog_prior_lgb": 48.55639194813986,
+      "v3_dual_shared_lgb": 44.436213876085766,
+      "v3_dual_conditional_lgb": 46.424052413180426
+    }
+  },
+  "test_conditional_minus_features_mae": 8.830624471389342,
+  "gap_decomposition": {
+    "negative": {
+      "frequency": 0.08922071292227106,
+      "mae_contribution": 0.7225545513193898,
+      "share_of_gap": 0.08182372080937428
+    },
+    "ordinary_0_300": {
+      "frequency": 0.8971194883599999,
+      "mae_contribution": 7.813619640283135,
+      "share_of_gap": 0.8848320597935925
+    },
+    "high_gt300": {
+      "frequency": 0.013659798717729203,
+      "mae_contribution": 0.2944502797868211,
+      "share_of_gap": 0.03334421939703371
+    },
+    "conditional_prior_increment_abs_gt300": {
+      "frequency": 0.012962223110045724,
+      "mae_contribution": 4.849849396664268,
+      "share_of_gap": 0.5492079764435086
+    },
+    "conditional_prior_outside_train_horizon_range": {
+      "frequency": 0.0011105720754142649,
+      "mae_contribution": 1.3446665826916717,
+      "share_of_gap": 0.15227310220792487
+    }
+  },
+  "warning": "Outcome-conditioned retrospective diagnosis; overlapping origin-horizon forecast cells; attribution by actual-price slices is additive, mechanism contributions are not independently identified. No new training or tuning.",
+  "suggested_minimal_controls": [
+    "R+F, P=0, same tree budget: isolate adding field features without forced prior",
+    "R+F with explicit prior P and level L, retain P: probe ease of learning the correction; does not guarantee extrapolation or performance gains"
+  ]
+}
