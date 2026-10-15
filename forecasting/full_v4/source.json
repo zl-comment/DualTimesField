@@ -1,0 +1,12 @@
+{
+  "implementation": "local",
+  "architecture": "V4 trainable dual fields with current evidence, optional historical memory and OOF residual trees",
+  "upstream_model_repository": null,
+  "libraries": {
+    "pytorch": "https://github.com/pytorch/pytorch",
+    "lightgbm": "https://github.com/microsoft/LightGBM",
+    "scipy": "https://github.com/scipy/scipy"
+  },
+  "reused_local_components": ["forecasting/full_v3/memory.py", "forecasting/full_v3/model.py", "forecasting/full_v3/report.py", "forecasting/aligned_scoring.py"],
+  "not_a_reproduction_of_an_external_paper": true
+}

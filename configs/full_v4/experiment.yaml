@@ -1,0 +1,43 @@
+experiment_id: full-v4-trainable-dual-field-20261014
+baseline_root: outputs/forecasting/aligned_baselines_20261012
+baseline_config: configs/lightgbm/aligned.yaml
+regions: [NSW1, QLD1, TAS1]
+seeds: [2026]
+variants: [v4_lgb_oof_rows, v4_current_residual, v4_full, v4_forced_history, v4_direct_tree]
+gpu_ids: [5, 6, 7]
+tree_workers_per_region: 2
+smoke: false
+neural:
+  width: 64
+  dropout: 0.1
+  memory_dropout: 0.2
+  pretrain_epochs: 20
+  epochs: 100
+  patience: 10
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  torch_threads: 2
+lightgbm:
+  n_estimators: 2000
+  early_stopping_rounds: 50
+  selection_interval: 1
+  learning_rate: 0.05
+  num_leaves: 31
+  min_child_samples: 50
+  subsample: 0.8
+  colsample_bytree: 0.8
+  n_jobs: 4
+  selection_metric: pinball
+memory:
+  timezone: Australia/Brisbane
+  year_lags: [1, 2, 3]
+  day_offsets: [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
+  weekly_lags_days: [7, 14, 21, 28]
+interpretation:
+  retrospective_single_seed: true
+  original_baseline_inputs_unchanged: true
+  growing_asof_memory_static_parameters: true
+  prefix_preprocessing_rebuilt_from_raw: true
+  stacked_trees_train_on_oof_rows_only: true
+  no_hpo_or_calibration_fit: true
