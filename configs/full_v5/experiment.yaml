@@ -1,0 +1,85 @@
+# V5 Calibrated History — frozen experiment configuration
+# Spec: reports/round2_codex_review.md (round-2 frozen specification).
+# Every numeric value here is pre-declared; the run refuses silent changes via
+# schema validation and the identity hash recorded at prepare time.
+v5_calibrated_history:
+  protocol_id: v5-calibrated-history-20261015-r1
+  seed: 2026
+  threads: 4
+  regions: [NSW1, QLD1, TAS1]
+  timezone: Australia/Brisbane
+
+  segments:
+    dfit: {start: '2022-07-01', end_exclusive: '2022-10-01'}
+    v1: {start: '2022-10-01', end_exclusive: '2022-12-01'}
+    v2: {start: '2022-12-01', end_exclusive: '2023-01-01'}
+    h2: {start: '2022-07-01', end_exclusive: '2023-01-01'}
+    test: {start: '2023-01-01', end_exclusive: '2025-01-01'}
+  fit_cutoffs:
+    dfit: '2022-10-01'
+    h2: '2023-01-01'
+
+  baseline:
+    mode: frozen_lgbm            # seed-2026 frozen LightGBM anchor (read-only)
+    run_root: outputs/forecasting/aligned_baselines_20261012
+    seed: 2026
+    threads: 4
+  crosscheck_event_diagnosis: outputs/forecasting/lightgbm_event_diagnosis_20261013
+  cache:
+    root: outputs/forecasting/aligned_baselines_20261012/data_cache
+    jobs_json: outputs/forecasting/aligned_baselines_20261012/jobs.json
+  v4:
+    mode: frozen_artifact
+    run_root: outputs/forecasting/full_v4_20261014
+    variant: v4_full
+    seed: 2026
+
+  features:
+    price_scale: 300
+    exogenous_clip: 3.0
+    match_k: 16
+    match_min_candidates: 8
+    lookback_days: 365
+    window_short_days: 7
+    window_long_days: 28
+    window_min_records: 24
+    horizon_groups: [[0, 5], [6, 11], [12, 17], [18, 23]]
+
+  calibrator:
+    delta_scale: 150
+    s_min: 0.5
+    s_max: 1.5
+    a_l1_max: 1.0
+    c_l1_max: 0.5
+    reg: 0.001
+    extra_q50_weight: 0.2
+    constraint_tolerance: 1.0e-6
+  stacker:
+    reg: 0.001
+  trees:
+    rounds: 200
+    learning_rate: 0.05
+    num_leaves: 15
+    max_depth: 4
+    min_child_samples: 200
+    max_bin: 63
+    feature_fraction: 1.0
+    bagging_fraction: 1.0
+    seed: 2026
+    threads: 4
+
+  gates:
+    g1_macro_improvement: 0.01
+    g1_region_mae_max_worsening: 0.01
+    g1_region_band0300_max_worsening: 0.005
+    g2_macro_improvement: 0.005
+
+  bootstrap:
+    n: 9999
+    block_hours: 168
+    sensitivity_block_hours: 24
+    seed: 2026
+
+  budget:
+    dev_core_hours: 24
+    final_core_hours: 24

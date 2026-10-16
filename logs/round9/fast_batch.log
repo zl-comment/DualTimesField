@@ -1,0 +1,104 @@
+....FFF                                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_identity_doc_carries_verified_nsw1_hash _________________
+
+    def test_identity_doc_carries_verified_nsw1_hash():
+        doc = (REPO_ROOT / "docs" / "full_v5_baseline_identity.md").read_text()
+        assert NSW1_CSV_SHA256 in doc
+>       assert "454ac6013d13f351c6c1" not in doc  # the wrong hash must be gone
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert '454ac6013d13f351c6c1' not in '# V5 baseli...本轮不重跑、不修改。\n'
+E         
+E         '454ac6013d13f351c6c1' is contained here:
+E           256：NSW1 `454ac6013d13f351c6c1edf5dde832b66a441639a9f35414c8de0d23a8c8c08f`；QLD1 `29bfc9d1c02fc78baac77d145d3313132174559f4a3acc05ba7b42f1317d400f`；TAS1 `260df3603a382c1173566b089913b82586cb28d09a0efa17e289b91029178045`。
+E         ?           ++++++++++++++++++++
+E           - 缓存清单 `data_cache/{region}/hashes.json` SHA256：NSW1 `0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1`；QLD1 `a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5`；TAS1 `5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4`。
+E           - seed 2026 test 预测...
+E         
+E         ...Full output truncated (11 lines hidden), use '-vv' to show
+
+tests/test_full_v5_sharded_dev.py:509: AssertionError
+__________ test_child_logging_and_reclamation_high_output_and_timeout __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-131/test_child_logging_and_reclama0')
+
+    def test_child_logging_and_reclamation_high_output_and_timeout(tmp_path):
+        """A high-output child and a deadline-exceeding child: output lands in
+        independent realtime logs (never truncated by a full pipe), and the batch
+        reaper terminates/kills/waits EVERY child on timeout — none left behind."""
+        log_dir = tmp_path / "logs"
+        scripts = {}
+        for name, body in (("noisy", _NOISY_CHILD), ("sleeper", _SLEEPER_CHILD)):
+            script = tmp_path / f"{name}.py"
+            script.write_text(body)
+            scripts[name] = script
+        procs = {}
+        for name, script in scripts.items():
+            log_path = log_dir / f"{name}.log"
+>           handle = log_path.open("w", buffering=1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_full_v5_sharded_dev.py:350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-131/test_child_logging_and_reclama0/logs/noisy.log')
+mode = 'w', buffering = 1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-131/test_child_logging_and_reclama0/logs/noisy.log'
+
+/root/anaconda3/envs/reranker/lib/python3.11/pathlib.py:1044: FileNotFoundError
+______________ test_budget_refused_worker_and_killed_owner_ledger ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-131/test_budget_refused_worker_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc2a9d0310>
+patched_schema = <module 'forecasting.full_v5.schema' from '/root/workspace/Code/DualTimesField/forecasting/full_v5/schema.py'>
+
+    def test_budget_refused_worker_and_killed_owner_ledger(tmp_path, monkeypatch, patched_schema):
+        """REAL two-process regression (no mocked bodies): while a live owner
+        holds the region lock with an active budget record, a duplicate CLI worker
+        is refused WITHOUT changing one byte of the ledger; after the owner is
+        SIGKILLed (lock freed by the kernel, live keys left behind), the successor
+        worker inherits the accumulated ledger and loses nothing."""
+        _small_schema(monkeypatch)
+        world = build_world(tmp_path, structured=True, segments=SMALL_SEGMENTS, cutoffs=SMALL_CUTOFFS)
+        monkeypatch.chdir(world)
+        run_root = world / "run"
+        assert experiment.prepare(str(world / "configs" / "full_v5" / "experiment.yaml"), str(run_root)) == 0
+        _write_tests_passed(run_root)
+        ledger = run_root / "development" / "regions" / "NSW1" / "budget.json"
+        flags = tmp_path / "flags"
+    
+        owner = subprocess.Popen(
+            [sys.executable, "-c", _BUDGET_OWNER_CHILD, str(run_root), "NSW1", str(flags)],
+            cwd=str(world), env=_child_env(),
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        try:
+            for flag in ("lock.flag", "live.flag", "cpu.txt"):
+                for _ in range(600):  # up to ~30s
+                    if (flags / flag).exists():
+                        break
+                    time.sleep(0.05)
+                else:
+>                   raise AssertionError(f"owner never reached {flag}")
+E                   AssertionError: owner never reached lock.flag
+
+/root/workspace/Code/DualTimesField/tests/test_full_v5_sharded_dev.py:293: AssertionError
+----------------------------- Captured stdout call -----------------------------
+prepare complete: /tmp/pytest-of-root/pytest-131/test_budget_refused_worker_and0/world_ok/run
+=========================== short test summary info ============================
+FAILED tests/test_full_v5_sharded_dev.py::test_identity_doc_carries_verified_nsw1_hash
+FAILED tests/test_full_v5_sharded_dev.py::test_child_logging_and_reclamation_high_output_and_timeout
+FAILED tests/test_full_v5_sharded_dev.py::test_budget_refused_worker_and_killed_owner_ledger
+3 failed, 4 passed in 39.80s
+FAST_EXIT=1
+2026-10-16T12:46:20Z

@@ -1,0 +1,58 @@
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_budget_refused_worker_and_killed_owner_ledger ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-132/test_budget_refused_worker_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f24d41a4050>
+patched_schema = <module 'forecasting.full_v5.schema' from '/root/workspace/Code/DualTimesField/forecasting/full_v5/schema.py'>
+
+    def test_budget_refused_worker_and_killed_owner_ledger(tmp_path, monkeypatch, patched_schema):
+        """REAL two-process regression (no mocked bodies): while a live owner
+        holds the region lock with an active budget record, a duplicate CLI worker
+        is refused WITHOUT changing one byte of the ledger; after the owner is
+        SIGKILLed (lock freed by the kernel, live keys left behind), the successor
+        worker inherits the accumulated ledger and loses nothing."""
+        _small_schema(monkeypatch)
+        world = build_world(tmp_path, structured=True, segments=SMALL_SEGMENTS, cutoffs=SMALL_CUTOFFS)
+        monkeypatch.chdir(world)
+        run_root = world / "run"
+        assert experiment.prepare(str(world / "configs" / "full_v5" / "experiment.yaml"), str(run_root)) == 0
+        _write_tests_passed(run_root)
+        ledger = run_root / "development" / "regions" / "NSW1" / "budget.json"
+        flags = tmp_path / "flags"
+        flags.mkdir(parents=True, exist_ok=True)
+        owner_log = tmp_path / "owner.log"
+    
+        owner_handle = owner_log.open("w", buffering=1)
+        owner = subprocess.Popen(
+            [sys.executable, "-c", _BUDGET_OWNER_CHILD, str(run_root), "NSW1", str(flags)],
+            cwd=str(world), env=_child_env(), stdout=owner_handle, stderr=subprocess.STDOUT)
+        try:
+            for flag in ("lock.flag", "live.flag", "cpu.txt"):
+                for _ in range(600):  # up to ~30s
+                    if (flags / flag).exists():
+                        break
+                    time.sleep(0.05)
+                else:
+                    owner.kill()
+                    owner.wait(timeout=30)
+>                   raise AssertionError(f"owner never reached {flag}; log: {_log_tail(owner_log)}")
+E                   AssertionError: owner never reached lock.flag; log: Traceback (most recent call last):
+E                     File "<string>", line 6, in <module>
+E                     File "/tmp/pytest-of-root/pytest-132/test_budget_refused_worker_and0/world_ok/forecasting/full_v5/experiment.py", line 36, in <module>
+E                       from . import controls, data, diagnostics, history, report, schema
+E                     File "/tmp/pytest-of-root/pytest-132/test_budget_refused_worker_and0/world_ok/forecasting/full_v5/controls.py", line 6, in <module>
+E                       from . import schema
+E                     File "/tmp/pytest-of-root/pytest-132/test_budget_refused_worker_and0/world_ok/forecasting/full_v5/schema.py", line 23, in <module>
+E                       CALIBRATOR_CONTROLS = tuple(CONTROL_SPECS)
+E                                                   ^^^^^^^^^^^^^
+E                   NameError: name 'CONTROL_SPECS' is not defined
+
+/root/workspace/Code/DualTimesField/tests/test_full_v5_sharded_dev.py:297: AssertionError
+----------------------------- Captured stdout call -----------------------------
+prepare complete: /tmp/pytest-of-root/pytest-132/test_budget_refused_worker_and0/world_ok/run
+=========================== short test summary info ============================
+FAILED tests/test_full_v5_sharded_dev.py::test_budget_refused_worker_and_killed_owner_ledger
+1 failed, 2 passed in 39.22s
+RETRY_EXIT=1
+2026-10-16T12:49:27Z

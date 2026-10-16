@@ -1,0 +1,72 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_budget_refused_worker_and_killed_owner_ledger ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-135/test_budget_refused_worker_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19da857890>
+patched_schema = <module 'forecasting.full_v5.schema' from '/root/workspace/Code/DualTimesField/forecasting/full_v5/schema.py'>
+
+    def test_budget_refused_worker_and_killed_owner_ledger(tmp_path, monkeypatch, patched_schema):
+        """REAL two-process regression (no mocked bodies): while a live owner
+        holds the region lock with an active budget record, a duplicate CLI worker
+        is refused WITHOUT changing one byte of the ledger; after the owner is
+        SIGKILLed (lock freed by the kernel, live keys left behind), the successor
+        worker inherits the accumulated ledger and loses nothing."""
+        _small_schema(monkeypatch)
+        world = build_world(tmp_path, structured=True, segments=SMALL_SEGMENTS, cutoffs=SMALL_CUTOFFS)
+        monkeypatch.chdir(world)
+        run_root = world / "run"
+        assert experiment.prepare(str(world / "configs" / "full_v5" / "experiment.yaml"), str(run_root)) == 0
+        _write_tests_passed(run_root)
+        ledger = run_root / "development" / "regions" / "NSW1" / "budget.json"
+        flags = tmp_path / "flags"
+        flags.mkdir(parents=True, exist_ok=True)
+        owner_log = tmp_path / "owner.log"
+    
+        owner_handle = owner_log.open("w", buffering=1)
+        owner = subprocess.Popen(
+            [sys.executable, "-c", _BUDGET_OWNER_CHILD, str(run_root), "NSW1", str(flags)],
+            cwd=str(world), env=_child_env(), stdout=owner_handle, stderr=subprocess.STDOUT)
+        try:
+            for flag in ("lock.flag", "live.flag", "cpu.txt"):
+                for _ in range(600):  # up to ~30s
+                    if (flags / flag).exists():
+                        break
+                    time.sleep(0.05)
+                else:
+                    owner.kill()
+                    owner.wait(timeout=30)
+                    raise AssertionError(f"owner never reached {flag}; log: {_log_tail(owner_log)}")
+            owner_cpu = float((flags / "cpu.txt").read_text())
+            live_before = json.loads(ledger.read_text())["dev"]
+            assert live_before["live_pid"] == owner.pid
+            assert live_before["live_cpu_seconds"] >= owner_cpu
+    
+            # The duplicate worker runs the REAL CLI: identity checks pass, the
+            # region lock refuses it — and the ledger must not change one byte.
+            ledger_before = ledger.read_bytes()
+            code, log = _run_cli(world, tmp_path / "logs", "dup_worker",
+                                 ["dev-region", "--run-root", str(run_root), "--region", "NSW1"],
+                                 timeout=600)
+            assert code != 0, _log_tail(log)
+            tail = _log_tail(log)
+>           assert "held" in tail or "refusing" in tail, tail
+E           AssertionError: CHILD-VERIFY-OK schema=forecasting/full_v5/schema.py segments={'dfit': ['2022-07-01', '2022-07-29'], 'v1': ['2022-07-29', '2022-08-01'], 'v2': ['2022-08-01', '2022-08-03'], 'h2': ['2022-07-01', '2022-08-03'], 'test': ['2022-08-21', '2022-08-26']}
+E             Traceback (most recent call last):
+E               File "/root/workspace/Code/DualTimesField/tests/_v5_child_entry.py", line 88, in <module>
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/root/workspace/Code/DualTimesField/tests/_v5_child_entry.py", line 76, in main
+E                 runpy.run_module("forecasting.full_v5.experiment", run_name="__main__", alter_argv=False)
+E             TypeError: run_module() got an unexpected keyword argument 'alter_argv'
+E             
+E           assert ('held' in 'CHILD-VERIFY-OK schema=forecasting/full_v5/schema.py segments={\'dfit\': [\'2022-07-01\', \'2022-07-29\'], \'v1\': [\...", run_name="__main__", alter_argv=False)\nTypeError: run_module() got an unexpected keyword argument \'alter_argv\'\n' or 'refusing' in 'CHILD-VERIFY-OK schema=forecasting/full_v5/schema.py segments={\'dfit\': [\'2022-07-01\', \'2022-07-29\'], \'v1\': [\...", run_name="__main__", alter_argv=False)\nTypeError: run_module() got an unexpected keyword argument \'alter_argv\'\n')
+
+/root/workspace/Code/DualTimesField/tests/test_full_v5_sharded_dev.py:311: AssertionError
+----------------------------- Captured stdout call -----------------------------
+prepare complete: /tmp/pytest-of-root/pytest-135/test_budget_refused_worker_and0/world_ok/run
+=========================== short test summary info ============================
+FAILED tests/test_full_v5_sharded_dev.py::test_budget_refused_worker_and_killed_owner_ledger
+1 failed in 14.98s
+EXIT=1
+2026-10-16T12:52:09Z
