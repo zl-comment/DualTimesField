@@ -1,0 +1,152 @@
+{
+  "rows": 696,
+  "first_origin": 1661954400,
+  "latest_label_available": 1664542800,
+  "selection_used": false,
+  "full_visible": {
+    "fixed_smooth": {
+      "negative": {
+        "n_cells": 24,
+        "conditional_mae": 40.60984250677813,
+        "conditional_bias": 40.60984250677813,
+        "mae_contribution": 0.05834747486606053,
+        "fraction": 0.0014367816091954023
+      },
+      "range_0_300": {
+        "n_cells": 16536,
+        "conditional_mae": 28.383750053351406,
+        "conditional_bias": 1.05105840285704,
+        "mae_contribution": 28.098281302814822,
+        "fraction": 0.9899425287356322
+      },
+      "above_300": {
+        "n_cells": 144,
+        "conditional_mae": 127.46484701254728,
+        "conditional_bias": -127.46484701254728,
+        "mae_contribution": 1.0988348880392007,
+        "fraction": 0.008620689655172414
+      },
+      "mae_total": 29.25546366572008,
+      "contribution_sum": 29.255463665720082,
+      "mean_level_abs_error": 6.926132719716135e-15,
+      "spike_curves": 97,
+      "spike_peak_hour_mae": 6.154639175257732,
+      "spike_peak_exact_fraction": 0.061855670103092786,
+      "spike_max_price_mae": 120.62493307283188
+    },
+    "old_dual": {
+      "negative": {
+        "n_cells": 24,
+        "conditional_mae": 36.1573769201835,
+        "conditional_bias": 36.1573769201835,
+        "mae_contribution": 0.05195025419566595,
+        "fraction": 0.0014367816091954023
+      },
+      "range_0_300": {
+        "n_cells": 16536,
+        "conditional_mae": 33.91961186831936,
+        "conditional_bias": -7.018858953773454,
+        "mae_contribution": 33.578466346655226,
+        "fraction": 0.9899425287356322
+      },
+      "above_300": {
+        "n_cells": 144,
+        "conditional_mae": 116.90796714358859,
+        "conditional_bias": -116.90796714358859,
+        "mae_contribution": 1.0078273029619707,
+        "fraction": 0.008620689655172414
+      },
+      "mae_total": 34.638243903812864,
+      "contribution_sum": 34.638243903812864,
+      "mean_level_abs_error": 17.409593493970164,
+      "spike_curves": 97,
+      "spike_peak_hour_mae": 4.309278350515464,
+      "spike_peak_exact_fraction": 0.16494845360824742,
+      "spike_max_price_mae": 122.83140280812057,
+      "event_peak_exact_fraction": 0.05154639175257732,
+      "event_mean_abs": 5.668844223022461
+    },
+    "fixed_pulses": {
+      "negative": {
+        "n_cells": 24,
+        "conditional_mae": 20.47078957905372,
+        "conditional_bias": 17.589116101463635,
+        "mae_contribution": 0.029412053992893275,
+        "fraction": 0.0014367816091954023
+      },
+      "range_0_300": {
+        "n_cells": 16536,
+        "conditional_mae": 13.5966492952751,
+        "conditional_bias": -0.0017091418374519044,
+        "mae_contribution": 13.459901385696185,
+        "fraction": 0.9899425287356322
+      },
+      "above_300": {
+        "n_cells": 144,
+        "conditional_mae": 16.902480761210125,
+        "conditional_bias": -2.7352465523613825,
+        "mae_contribution": 0.14571104104491486,
+        "fraction": 0.008620689655172414
+      },
+      "mae_total": 13.635024480733993,
+      "contribution_sum": 13.635024480733993,
+      "mean_level_abs_error": 2.4570876525508033e-06,
+      "spike_curves": 97,
+      "spike_peak_hour_mae": 0.0,
+      "spike_peak_exact_fraction": 1.0,
+      "spike_max_price_mae": 8.581429393021102,
+      "event_peak_exact_fraction": 0.7319587628865979,
+      "event_mean_abs": 18.149560928344727
+    },
+    "adaptive": {
+      "negative": {
+        "n_cells": 24,
+        "conditional_mae": 8.753797742227713,
+        "conditional_bias": 7.013289193312327,
+        "mae_contribution": 0.012577295606649013,
+        "fraction": 0.0014367816091954023
+      },
+      "range_0_300": {
+        "n_cells": 16536,
+        "conditional_mae": 10.193527370186665,
+        "conditional_bias": 0.10488251493238976,
+        "mae_contribution": 10.091006261578466,
+        "fraction": 0.9899425287356322
+      },
+      "above_300": {
+        "n_cells": 144,
+        "conditional_mae": 21.49437713623047,
+        "conditional_bias": -13.21288808186849,
+        "mae_contribution": 0.18529635462267646,
+        "fraction": 0.008620689655172414
+      },
+      "mae_total": 10.28887991180779,
+      "contribution_sum": 10.288879911807792,
+      "mean_level_abs_error": 2.291799305270915e-06,
+      "spike_curves": 97,
+      "spike_peak_hour_mae": 1.6185567010309279,
+      "spike_peak_exact_fraction": 0.8144329896907216,
+      "spike_max_price_mae": 25.991867851965207,
+      "event_peak_exact_fraction": 0.4845360824742268,
+      "event_mean_abs": 27.771387100219727
+    }
+  },
+  "hidden_only": {
+    "old_dual": {
+      "mae": 37.631726254387374,
+      "spike_mae": 134.61759765625,
+      "spike_cells": 25
+    },
+    "fixed_pulses": {
+      "mae": 31.963150228337714,
+      "spike_mae": 140.94208465576173,
+      "spike_cells": 25
+    },
+    "adaptive": {
+      "mae": 23.922107798092355,
+      "spike_mae": 92.55409057617187,
+      "spike_cells": 25
+    }
+  },
+  "hidden_cells": 3312
+}

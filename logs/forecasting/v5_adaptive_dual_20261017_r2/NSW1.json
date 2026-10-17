@@ -1,0 +1,4372 @@
+{
+  "region": "NSW1",
+  "seed": 2026,
+  "scores": {
+    "B": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 25.71018967193638,
+        "rmse_pooled": 72.94306569448553,
+        "pinball_by_quantile": {
+          "0.05": 4.509482175936973,
+          "0.1": 6.846874127541385,
+          "0.5": 12.85509483596819,
+          "0.9": 7.433686381214433,
+          "0.95": 6.107906940377839
+        },
+        "quantile_score_proxy": 15.101217784415525,
+        "coverage_80": 0.7233009708737864,
+        "interval_width_80": 64.94009003427408,
+        "coverage_90": 0.8207928802588996,
+        "interval_width_90": 98.06391136103574
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 41.48468928570996,
+          "conditional_bias": 41.276939232629616,
+          "mae_contribution": 4.890705394293129,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 20.621722884354284,
+          "conditional_bias": -5.112245942208741,
+          "mae_contribution": 18.133387390680465,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 968.3379277500841,
+          "conditional_bias": -968.3379277500841,
+          "mae_contribution": 2.686096886962785,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 25.71018967193638,
+        "contribution_sum": 25.710189671936376
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": null,
+        "false_alarm_cells": 0,
+        "alarm_cells": 0,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "C_roll": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 31.216519005744672,
+        "rmse_pooled": 75.07991421701028,
+        "pinball_by_quantile": {
+          "0.05": 6.6888933175177225,
+          "0.1": 9.45798176300466,
+          "0.5": 15.608259502872336,
+          "0.9": 8.321246711510083,
+          "0.95": 6.4712230060517815
+        },
+        "quantile_score_proxy": 18.619041720382633,
+        "coverage_80": 0.5535714285714286,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6848705501618123,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 40.542330742525465,
+          "conditional_bias": 39.588696582691384,
+          "mae_contribution": 4.779609033446136,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 27.118170072790484,
+          "conditional_bias": 17.61834025320355,
+          "mae_contribution": 23.845935958598016,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 934.0461319390391,
+          "conditional_bias": -934.0461319390391,
+          "mae_contribution": 2.590974013700524,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 31.216519005744672,
+        "contribution_sum": 31.216519005744676
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 6,
+        "alarm_cells": 6,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_recent": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 25.850057175411184,
+        "rmse_pooled": 73.30763269607273,
+        "pinball_by_quantile": {
+          "0.05": 4.859513976959366,
+          "0.1": 7.025281819263115,
+          "0.5": 12.925028587705592,
+          "0.9": 7.818855772702916,
+          "0.95": 6.254940645696005
+        },
+        "quantile_score_proxy": 15.553448320930798,
+        "coverage_80": 0.6822699953767914,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.7903374942209893,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 33.23139136190955,
+          "conditional_bias": 29.926433442219246,
+          "mae_contribution": 3.917709106466452,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 21.95582663852512,
+          "conditional_bias": 5.033086945707799,
+          "mae_contribution": 19.306510525415987,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 946.6144344421136,
+          "conditional_bias": -946.6144344421136,
+          "mae_contribution": 2.625837543528748,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 25.850057175411184,
+        "contribution_sum": 25.850057175411187
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 4,
+        "alarm_cells": 4,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_raw": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.24566314269016,
+        "rmse_pooled": 77.70171950147484,
+        "pinball_by_quantile": {
+          "0.05": 9.771672166131602,
+          "0.1": 12.59610700899295,
+          "0.5": 17.12283157134508,
+          "0.9": 8.580515677611535,
+          "0.95": 6.567398924915576
+        },
+        "quantile_score_proxy": 21.8554101395987,
+        "coverage_80": 0.5358876560332871,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6411812297734628,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 37.44637719762636,
+          "conditional_bias": 35.03868116562579,
+          "mae_contribution": 4.414621444935147,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 30.980474477550477,
+          "conditional_bias": 20.64819844267462,
+          "mae_contribution": 27.24219253643135,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 933.2801226571828,
+          "conditional_bias": -933.2801226571828,
+          "mae_contribution": 2.5888491613236693,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.24566314269016,
+        "contribution_sum": 34.24566314269017
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 38,
+        "alarm_cells": 38,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_smooth": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.81998406439578,
+        "rmse_pooled": 77.34203780511648,
+        "pinball_by_quantile": {
+          "0.05": 9.53809736326145,
+          "0.1": 12.557232538332382,
+          "0.5": 17.40999203219789,
+          "0.9": 8.623624815053585,
+          "0.95": 6.585688212414545
+        },
+        "quantile_score_proxy": 21.885853984503942,
+        "coverage_80": 0.5010980120203421,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6228039759593158,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 42.812823385087626,
+          "conditional_bias": 42.17014981173327,
+          "mae_contribution": 5.047281536383423,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 30.891364320191638,
+          "conditional_bias": 20.905207225182515,
+          "mae_contribution": 27.163834922332175,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 940.496771847706,
+          "conditional_bias": -940.496771847706,
+          "mae_contribution": 2.6088676056801834,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.81998406439578,
+        "contribution_sum": 34.819984064395776
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 17,
+        "alarm_cells": 17,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_old_dual": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.08145445418331,
+        "rmse_pooled": 76.20587527725746,
+        "pinball_by_quantile": {
+          "0.05": 8.242612162577956,
+          "0.1": 11.255978544286268,
+          "0.5": 17.040727227091654,
+          "0.9": 8.567071914771725,
+          "0.95": 6.56279937617043
+        },
+        "quantile_score_proxy": 20.667675689959214,
+        "coverage_80": 0.4921983356449376,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6336107258437356,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 49.095750010137415,
+          "conditional_bias": 48.8208827230197,
+          "mae_contribution": 5.787987171791512,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 29.245226521396223,
+          "conditional_bias": 21.982667615418986,
+          "mae_contribution": 25.716329562503752,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 929.0581480196406,
+          "conditional_bias": -929.0581480196406,
+          "mae_contribution": 2.5771377198880456,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.08145445418331,
+        "contribution_sum": 34.08145445418331
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 6,
+        "alarm_cells": 6,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_fixed_pulses": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.445461611168355,
+        "rmse_pooled": 77.72519431397073,
+        "pinball_by_quantile": {
+          "0.05": 9.831788252762408,
+          "0.1": 12.682912151204501,
+          "0.5": 17.222730805584177,
+          "0.9": 8.614583085756324,
+          "0.95": 6.587086541303677
+        },
+        "quantile_score_proxy": 21.975640334644435,
+        "coverage_80": 0.5299352750809061,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6363846509477578,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 38.87450505062325,
+          "conditional_bias": 37.15137786298104,
+          "mae_contribution": 4.582986032320355,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 31.000936669199817,
+          "conditional_bias": 20.557959676802064,
+          "mae_contribution": 27.260185642541863,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 938.1255220383619,
+          "conditional_bias": -938.1255220383619,
+          "mae_contribution": 2.602289936306136,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.445461611168355,
+        "contribution_sum": 34.445461611168355
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 31,
+        "alarm_cells": 31,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_adaptive_trend": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 33.93321745495244,
+        "rmse_pooled": 76.9790776610358,
+        "pinball_by_quantile": {
+          "0.05": 9.327222670945293,
+          "0.1": 12.187130734085395,
+          "0.5": 16.96660872747622,
+          "0.9": 8.53563399638423,
+          "0.95": 6.554087905575461
+        },
+        "quantile_score_proxy": 21.42827361378664,
+        "coverage_80": 0.5325936199722607,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6443596856218216,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 41.43906059631782,
+          "conditional_bias": 40.5638941897483,
+          "mae_contribution": 4.885326145196969,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 30.057086470696,
+          "conditional_bias": 18.21568064635039,
+          "mae_contribution": 26.43022582860092,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 943.6684059562152,
+          "conditional_bias": -943.6684059562152,
+          "mae_contribution": 2.61766548115455,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 33.93321745495244,
+        "contribution_sum": 33.93321745495244
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 14,
+        "alarm_cells": 14,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_adaptive_full": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.537993312899886,
+        "rmse_pooled": 77.73666739374829,
+        "pinball_by_quantile": {
+          "0.05": 9.884918398577275,
+          "0.1": 12.736227805485083,
+          "0.5": 17.268996656449943,
+          "0.9": 8.616522940719356,
+          "0.95": 6.589031454939431
+        },
+        "quantile_score_proxy": 22.038278902468438,
+        "coverage_80": 0.5292995839112344,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6339574664817383,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 37.9269745932977,
+          "conditional_bias": 35.635341413469895,
+          "mae_contribution": 4.471279945118314,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 31.2412529424572,
+          "conditional_bias": 20.888358080944382,
+          "mae_contribution": 27.471503974365973,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 935.5729863263241,
+          "conditional_bias": -935.5729863263241,
+          "mae_contribution": 2.5952093934156006,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.537993312899886,
+        "contribution_sum": 34.537993312899886
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 32,
+        "alarm_cells": 32,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_adaptive_event_off": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 721,
+        "horizon": 24,
+        "n_cells": 17304,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.030336888424785,
+        "rmse_pooled": 77.06238306358145,
+        "pinball_by_quantile": {
+          "0.05": 9.425614352243523,
+          "0.1": 12.2795110541543,
+          "0.5": 17.015168444212392,
+          "0.9": 8.54449287396761,
+          "0.95": 6.558100845088652
+        },
+        "quantile_score_proxy": 21.529155027866594,
+        "coverage_80": 0.5336338418862691,
+        "interval_width_80": 60.11816115659118,
+        "coverage_90": 0.6434928340268146,
+        "interval_width_90": 90.7062151532464
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 2040,
+          "conditional_mae": 41.39700565209135,
+          "conditional_bias": 40.52101903640222,
+          "mae_contribution": 4.880368211411602,
+          "fraction": 0.11789181692094314
+        },
+        "range_0_300": {
+          "n_cells": 15216,
+          "conditional_mae": 30.17195523889445,
+          "conditional_bias": 18.181076538441783,
+          "mae_contribution": 26.531233871649214,
+          "fraction": 0.8793342579750347
+        },
+        "above_300": {
+          "n_cells": 48,
+          "conditional_mae": 944.0538973337119,
+          "conditional_bias": -944.0538973337119,
+          "mae_contribution": 2.618734805363972,
+          "fraction": 0.0027739251040221915
+        },
+        "mae_total": 34.030336888424785,
+        "contribution_sum": 34.030336888424785
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 15,
+        "alarm_cells": 15,
+        "true_cells": 48,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    }
+  },
+  "changes": {
+    "B": {
+      "fraction": 1.0,
+      "mean_abs": 21.875076796014024
+    },
+    "C_roll": {
+      "fraction": 0.0,
+      "mean_abs": 0.0
+    },
+    "H_recent": {
+      "fraction": 1.0,
+      "mean_abs": 12.628916318690688
+    },
+    "H_raw": {
+      "fraction": 1.0,
+      "mean_abs": 14.4172646546762
+    },
+    "H_smooth": {
+      "fraction": 1.0,
+      "mean_abs": 12.275626429099145
+    },
+    "H_old_dual": {
+      "fraction": 0.75,
+      "mean_abs": 5.391597755760755
+    },
+    "H_fixed_pulses": {
+      "fraction": 1.0,
+      "mean_abs": 14.100251855114635
+    },
+    "H_adaptive_trend": {
+      "fraction": 1.0,
+      "mean_abs": 14.288486229923004
+    },
+    "H_adaptive_full": {
+      "fraction": 1.0,
+      "mean_abs": 13.946607657669466
+    },
+    "H_adaptive_event_off": {
+      "fraction": 1.0,
+      "mean_abs": 14.704905041009422
+    }
+  },
+  "fits": {
+    "H_recent": {
+      "alpha": [
+        0.7141775139474055,
+        0.6704653075605116,
+        0.6592145912740146,
+        0.6176956716781092
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.7141775139474055,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 168803.83063445843
+          },
+          {
+            "alpha": 0.6704653075605116,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 172162.81061585943
+          },
+          {
+            "alpha": 0.6592145912740146,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 167624.39109962306
+          },
+          {
+            "alpha": 0.6176956716781092,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 150594.1447460545
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_raw": {
+      "alpha": [
+        0.6034092743938654,
+        0.5516351518021525,
+        0.5321909750624891,
+        0.5004433510712911
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.6034092743938654,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 179743.21175635007
+          },
+          {
+            "alpha": 0.5516351518021525,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 182715.00649601224
+          },
+          {
+            "alpha": 0.5321909750624891,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 176869.46508500673
+          },
+          {
+            "alpha": 0.5004433510712911,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 157594.73926773883
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_smooth": {
+      "alpha": [
+        0.5150923344275533,
+        0.4599631401749974,
+        0.4437288841163384,
+        0.36338903663925554
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.5150923344275533,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 185427.38704564038
+          },
+          {
+            "alpha": 0.4599631401749974,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 188077.72227423885
+          },
+          {
+            "alpha": 0.4437288841163384,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 182225.12989753953
+          },
+          {
+            "alpha": 0.36338903663925554,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 162308.55507710105
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_old_dual": {
+      "alpha": [
+        0.2890725823011224,
+        0.21337772759554044,
+        0.13807120542017515,
+        0.0
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.2890725823011224,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 203643.81477545525
+          },
+          {
+            "alpha": 0.21337772759554044,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 201849.44859190827
+          },
+          {
+            "alpha": 0.13807120542017515,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 194579.83980357938
+          },
+          {
+            "alpha": 0.0,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 169545.6093386415
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_fixed_pulses": {
+      "alpha": [
+        0.6011655753027834,
+        0.5529995469427679,
+        0.5339348471561508,
+        0.5007828681507898
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.6011655753027834,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 180003.01537638967
+          },
+          {
+            "alpha": 0.5529995469427679,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 183081.2075684305
+          },
+          {
+            "alpha": 0.5339348471561508,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 177314.6795463382
+          },
+          {
+            "alpha": 0.5007828681507898,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 157575.7591993631
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_adaptive_trend": {
+      "alpha": [
+        0.5801132361575243,
+        0.5345281319914672,
+        0.5257052376155238,
+        0.4577519469597602
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.5801132361575243,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 182193.34466109838
+          },
+          {
+            "alpha": 0.5345281319914672,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 184363.27827691234
+          },
+          {
+            "alpha": 0.5257052376155238,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 178410.76088266156
+          },
+          {
+            "alpha": 0.4577519469597602,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 159436.96661701304
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_adaptive_full": {
+      "alpha": [
+        0.5954622542714264,
+        0.541269773427389,
+        0.5231785124616442,
+        0.5004417367172954
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1669816800,
+        "fit_origin_count": 1440,
+        "last_fit_origin": 1669726800,
+        "latest_fit_label_available": 1669813200,
+        "groups": [
+          {
+            "alpha": 0.5954622542714264,
+            "objective_zero": 211012.84664436884,
+            "objective_fit": 180080.74951803894
+          },
+          {
+            "alpha": 0.541269773427389,
+            "objective_zero": 204394.5157220652,
+            "objective_fit": 183382.93848452222
+          },
+          {
+            "alpha": 0.5231785124616442,
+            "objective_zero": 195720.67575520062,
+            "objective_fit": 177324.29161934345
+          },
+          {
+            "alpha": 0.5004417367172954,
+            "objective_zero": 169545.6093386415,
+            "objective_fit": 157596.71989838843
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    }
+  },
+  "encoder": {
+    "seed": 2026,
+    "config": {
+      "epochs": 12,
+      "batch_size": 128,
+      "hidden_dim": 32,
+      "learning_rate": 0.003,
+      "device": "cpu"
+    },
+    "fit_cutoff": 1661954400,
+    "fit_start": 1656597600,
+    "fit_rows": 1464,
+    "first_fit_origin": 1656597600,
+    "last_fit_origin": 1661864400,
+    "latest_fit_label_available": 1661950800,
+    "architecture": "local Fourier DC+first harmonic and adaptive zero-frequency Gabor pulses",
+    "atoms": 6,
+    "ridge": 0.0001,
+    "fixed_price_scale": 300.0,
+    "loss": "full-visible MSE(price/300) weighted 1+3*(price>300)",
+    "geometry": "observed residual peak anchors; learned bounded center offset and width",
+    "coefficients": "observed-only joint ridge least squares; unpenalized intercept",
+    "interpretation": "learned geometry, analytic mature-price amplitudes; not future prediction",
+    "trainable_parameters": 962,
+    "trace": [
+      {
+        "epoch": 1,
+        "weighted_mse": 0.0426090519692077
+      },
+      {
+        "epoch": 2,
+        "weighted_mse": 0.01822167509769807
+      },
+      {
+        "epoch": 3,
+        "weighted_mse": 0.015231730116154652
+      },
+      {
+        "epoch": 4,
+        "weighted_mse": 0.013984583094308936
+      },
+      {
+        "epoch": 5,
+        "weighted_mse": 0.012906182419936189
+      },
+      {
+        "epoch": 6,
+        "weighted_mse": 0.011905049966251264
+      },
+      {
+        "epoch": 7,
+        "weighted_mse": 0.011361415029752776
+      },
+      {
+        "epoch": 8,
+        "weighted_mse": 0.011097142935979888
+      },
+      {
+        "epoch": 9,
+        "weighted_mse": 0.01087055951255104
+      },
+      {
+        "epoch": 10,
+        "weighted_mse": 0.010673759835950338
+      },
+      {
+        "epoch": 11,
+        "weighted_mse": 0.010427769924936398
+      },
+      {
+        "epoch": 12,
+        "weighted_mse": 0.010331721935685866
+      }
+    ]
+  },
+  "old_encoder": {
+    "seed": 2026,
+    "config": {
+      "epochs": 12,
+      "batch_size": 128,
+      "hidden_dim": 24,
+      "num_atoms": 6,
+      "num_frequencies": 4,
+      "learning_rate": 0.003,
+      "device": "cpu"
+    },
+    "fit_cutoff": 1661954400,
+    "fit_start": 1656597600,
+    "fit_rows": 1464,
+    "first_fit_origin": 1656597600,
+    "last_fit_origin": 1661864400,
+    "latest_fit_label_available": 1661950800,
+    "input_channels": 21,
+    "fixed_price_scale": 300.0,
+    "reconstruction_space": "raw price divided by 300; no target clipping",
+    "architecture": "adapted canonical Fourier CTF + gated Gabor DGF; no residual shortcut",
+    "loss": "masked_MSE + 0.1 full_MSE + 0.1 lowpass_prior + 0.01 smoothness + 0.001 live_gate",
+    "lowpass_prior": "DC + first harmonic; fixed smoothing control required",
+    "trainable_parameters": 7501,
+    "trace": [
+      {
+        "epoch": 1,
+        "loss": 1.0795471998837476,
+        "masked_mse": 0.9221996267636617,
+        "full_mse": 0.841296530486456,
+        "lowpass_prior": 0.7277686306036235,
+        "smoothness": 0.0003829121982800912,
+        "live_gate": 0.43722952487038785
+      },
+      {
+        "epoch": 2,
+        "loss": 0.36559441237827467,
+        "masked_mse": 0.3213448310728933,
+        "full_mse": 0.3035232907191652,
+        "lowpass_prior": 0.13418297888965555,
+        "smoothness": 0.0027029204673434054,
+        "live_gate": 0.45192399930432847
+      },
+      {
+        "epoch": 3,
+        "loss": 0.256680403169387,
+        "masked_mse": 0.2245121224493277,
+        "full_mse": 0.2233171610395765,
+        "lowpass_prior": 0.09440265439165746,
+        "smoothness": 0.0021872602942618518,
+        "live_gate": 0.37442423965110155
+      },
+      {
+        "epoch": 4,
+        "loss": 0.20665911605449322,
+        "masked_mse": 0.1820482124722069,
+        "full_mse": 0.1884943919429362,
+        "lowpass_prior": 0.05365191941541401,
+        "smoothness": 0.003881285271144223,
+        "live_gate": 0.35745967102181064
+      },
+      {
+        "epoch": 5,
+        "loss": 0.19915524186169514,
+        "masked_mse": 0.17809766734558377,
+        "full_mse": 0.170229757051976,
+        "lowpass_prior": 0.036595496679834326,
+        "smoothness": 0.0032414511797817353,
+        "live_gate": 0.3426359367500889
+      },
+      {
+        "epoch": 6,
+        "loss": 0.2205407112999692,
+        "masked_mse": 0.20118355946462663,
+        "full_mse": 0.1612339982243835,
+        "lowpass_prior": 0.028759124795677233,
+        "smoothness": 0.002550121342071174,
+        "live_gate": 0.3323363651994799
+      },
+      {
+        "epoch": 7,
+        "loss": 0.19539305909735258,
+        "masked_mse": 0.17651147855435564,
+        "full_mse": 0.15891425572132153,
+        "lowpass_prior": 0.026378665607972224,
+        "smoothness": 0.0025347930460639014,
+        "live_gate": 0.32694199062436
+      },
+      {
+        "epoch": 8,
+        "loss": 0.17983835931521297,
+        "masked_mse": 0.16111135747426195,
+        "full_mse": 0.15754439413058954,
+        "lowpass_prior": 0.026214480094733785,
+        "smoothness": 0.0028960784258514317,
+        "live_gate": 0.3221546263316941
+      },
+      {
+        "epoch": 9,
+        "loss": 0.16733155631628194,
+        "masked_mse": 0.1491753012756181,
+        "full_mse": 0.15355357967439245,
+        "lowpass_prior": 0.024584203001742806,
+        "smoothness": 0.002810838190797981,
+        "live_gate": 0.314365449987474
+      },
+      {
+        "epoch": 10,
+        "loss": 0.13832139109816055,
+        "masked_mse": 0.12085318260016989,
+        "full_mse": 0.14897345267032666,
+        "lowpass_prior": 0.02236986003531133,
+        "smoothness": 0.0029278417064457153,
+        "live_gate": 0.30459954406394335
+      },
+      {
+        "epoch": 11,
+        "loss": 0.15916157843636686,
+        "masked_mse": 0.14199063979862817,
+        "full_mse": 0.14557593279197567,
+        "lowpass_prior": 0.022886539051115838,
+        "smoothness": 0.0031272562238504817,
+        "live_gate": 0.29342069212204774
+      },
+      {
+        "epoch": 12,
+        "loss": 0.1918356228070181,
+        "masked_mse": 0.17474675960228092,
+        "full_mse": 0.14247013262060823,
+        "lowpass_prior": 0.025193343335976365,
+        "smoothness": 0.0036637810748477613,
+        "live_gate": 0.2858772621454437
+      }
+    ]
+  },
+  "reconstruction": {
+    "rows": 696,
+    "first_origin": 1661954400,
+    "latest_label_available": 1664542800,
+    "selection_used": false,
+    "full_visible": {
+      "fixed_smooth": {
+        "negative": {
+          "n_cells": 984,
+          "conditional_mae": 47.79331895431253,
+          "conditional_bias": 47.67128414593212,
+          "mae_contribution": 2.8154110303546176,
+          "fraction": 0.05890804597701149
+        },
+        "range_0_300": {
+          "n_cells": 15264,
+          "conditional_mae": 36.989631718897954,
+          "conditional_bias": 0.3171538447459754,
+          "mae_contribution": 33.80087036382054,
+          "fraction": 0.9137931034482759
+        },
+        "above_300": {
+          "n_cells": 456,
+          "conditional_mae": 113.48592080219281,
+          "conditional_bias": -113.48592080219281,
+          "mae_contribution": 3.0980351943127347,
+          "fraction": 0.027298850574712645
+        },
+        "mae_total": 39.714316588487904,
+        "contribution_sum": 39.7143165884879,
+        "mean_level_abs_error": 8.107818375811416e-15,
+        "spike_curves": 225,
+        "spike_peak_hour_mae": 5.96,
+        "spike_peak_exact_fraction": 0.05333333333333334,
+        "spike_max_price_mae": 95.6174715037284
+      },
+      "old_dual": {
+        "negative": {
+          "n_cells": 984,
+          "conditional_mae": 100.96086065555976,
+          "conditional_bias": 100.96086065555976,
+          "mae_contribution": 5.947407021376365,
+          "fraction": 0.05890804597701149
+        },
+        "range_0_300": {
+          "n_cells": 15264,
+          "conditional_mae": 41.44146008743461,
+          "conditional_bias": 11.13928630049155,
+          "mae_contribution": 37.868920424724735,
+          "fraction": 0.9137931034482759
+        },
+        "above_300": {
+          "n_cells": 456,
+          "conditional_mae": 76.1738714920847,
+          "conditional_bias": -63.597530030367665,
+          "mae_contribution": 2.079459135559784,
+          "fraction": 0.027298850574712645
+        },
+        "mae_total": 45.89578658166088,
+        "contribution_sum": 45.895786581660886,
+        "mean_level_abs_error": 20.87236995658912,
+        "spike_curves": 225,
+        "spike_peak_hour_mae": 5.551111111111111,
+        "spike_peak_exact_fraction": 0.035555555555555556,
+        "spike_max_price_mae": 50.65493035210503,
+        "event_peak_exact_fraction": 0.04,
+        "event_mean_abs": 4.848752975463867
+      },
+      "fixed_pulses": {
+        "negative": {
+          "n_cells": 984,
+          "conditional_mae": 21.650407192244277,
+          "conditional_bias": 15.954080964067602,
+          "mae_contribution": 1.2753831823017463,
+          "fraction": 0.05890804597701149
+        },
+        "range_0_300": {
+          "n_cells": 15264,
+          "conditional_mae": 18.78880403406012,
+          "conditional_bias": -0.4782815268009401,
+          "mae_contribution": 17.169079548365282,
+          "fraction": 0.9137931034482759
+        },
+        "above_300": {
+          "n_cells": 456,
+          "conditional_mae": 33.7052268647311,
+          "conditional_bias": -18.417405546757212,
+          "mae_contribution": 0.9201139517670847,
+          "fraction": 0.027298850574712645
+        },
+        "mae_total": 19.364576682434112,
+        "contribution_sum": 19.364576682434112,
+        "mean_level_abs_error": 2.843055738514411e-06,
+        "spike_curves": 225,
+        "spike_peak_hour_mae": 0.27111111111111114,
+        "spike_peak_exact_fraction": 0.8844444444444445,
+        "spike_max_price_mae": 12.11869859483507,
+        "event_peak_exact_fraction": 0.48444444444444446,
+        "event_mean_abs": 23.937984466552734
+      },
+      "adaptive": {
+        "negative": {
+          "n_cells": 984,
+          "conditional_mae": 9.611749136540281,
+          "conditional_bias": 4.437738084885466,
+          "mae_contribution": 0.5662093600548155,
+          "fraction": 0.05890804597701149
+        },
+        "range_0_300": {
+          "n_cells": 15264,
+          "conditional_mae": 11.353834726614878,
+          "conditional_bias": -0.15914404851802286,
+          "mae_contribution": 10.375055870872215,
+          "fraction": 0.9137931034482759
+        },
+        "above_300": {
+          "n_cells": 456,
+          "conditional_mae": 15.721238253409403,
+          "conditional_bias": -4.249054490474233,
+          "mae_contribution": 0.42917173392927965,
+          "fraction": 0.027298850574712645
+        },
+        "mae_total": 11.37043696485631,
+        "contribution_sum": 11.37043696485631,
+        "mean_level_abs_error": 2.615147545020242e-06,
+        "spike_curves": 225,
+        "spike_peak_hour_mae": 0.28,
+        "spike_peak_exact_fraction": 0.9022222222222223,
+        "spike_max_price_mae": 12.801931559244792,
+        "event_peak_exact_fraction": 0.4533333333333333,
+        "event_mean_abs": 36.653621673583984
+      }
+    },
+    "hidden_only": {
+      "old_dual": {
+        "mae": 45.188829846824135,
+        "spike_mae": 78.75027918553614,
+        "spike_cells": 91
+      },
+      "fixed_pulses": {
+        "mae": 43.393972827472545,
+        "spike_mae": 123.2353036063058,
+        "spike_cells": 91
+      },
+      "adaptive": {
+        "mae": 29.12330563681578,
+        "spike_mae": 75.24396523276528,
+        "spike_cells": 91
+      }
+    },
+    "hidden_cells": 3312
+  },
+  "history_audits": {
+    "adaptive": {
+      "history_start": 1664546400,
+      "queries": 4393,
+      "open_queries": 1993,
+      "open_fraction": 0.45367630320965174,
+      "encoder_calls": 2161,
+      "encoded_records": 2161,
+      "lookback_days": 365,
+      "match_k": 16,
+      "match_min_candidates": 8,
+      "pool_size_max": 91,
+      "max_abs_correction": 150.0,
+      "residual_definition": "represented mature past price - frozen_C_roll_q50",
+      "matching_uses": "current and historical six z coordinates only; no query target",
+      "matched_variants_share_ids": true,
+      "matched_variant_candidate_sha256": {
+        "rawmatched": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "fixedsmooth": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualtrend": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualfull": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030"
+      },
+      "latest_encoded_availability": 1672408800,
+      "minimum_release_margin_seconds": 0,
+      "maturity_violations": 0,
+      "selection_samples": [
+        {
+          "query_origin": 1665237600,
+          "horizon": 0,
+          "selected_indices": [
+            2328,
+            2280,
+            2352,
+            2376,
+            2304,
+            2232,
+            2256,
+            2208
+          ],
+          "selected_origins": [
+            1664978400,
+            1664805600,
+            1665064800,
+            1665151200,
+            1664892000,
+            1664632800,
+            1664719200,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376
+          ]
+        },
+        {
+          "query_origin": 1665583200,
+          "horizon": 0,
+          "selected_indices": [
+            2448,
+            2472,
+            2232,
+            2256,
+            2376,
+            2400,
+            2424,
+            2328,
+            2352,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665410400,
+            1665496800,
+            1664632800,
+            1664719200,
+            1665151200,
+            1665237600,
+            1665324000,
+            1664978400,
+            1665064800,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472
+          ]
+        },
+        {
+          "query_origin": 1665928800,
+          "horizon": 0,
+          "selected_indices": [
+            2568,
+            2544,
+            2256,
+            2472,
+            2496,
+            2448,
+            2232,
+            2520,
+            2376,
+            2400,
+            2424,
+            2352,
+            2328,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665842400,
+            1665756000,
+            1664719200,
+            1665496800,
+            1665583200,
+            1665410400,
+            1664632800,
+            1665669600,
+            1665151200,
+            1665237600,
+            1665324000,
+            1665064800,
+            1664978400,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568
+          ]
+        },
+        {
+          "query_origin": 1666274400,
+          "horizon": 0,
+          "selected_indices": [
+            2616,
+            2664,
+            2328,
+            2640,
+            2400,
+            2520,
+            2304,
+            2424,
+            2280,
+            2376,
+            2352,
+            2448,
+            2496,
+            2232,
+            2472,
+            2256
+          ],
+          "selected_origins": [
+            1666015200,
+            1666188000,
+            1664978400,
+            1666101600,
+            1665237600,
+            1665669600,
+            1664892000,
+            1665324000,
+            1664805600,
+            1665151200,
+            1665064800,
+            1665410400,
+            1665583200,
+            1664632800,
+            1665496800,
+            1664719200
+          ],
+          "recent_indices": [
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664
+          ]
+        },
+        {
+          "query_origin": 1666620000,
+          "horizon": 0,
+          "selected_indices": [
+            2352,
+            2280,
+            2376,
+            2640,
+            2424,
+            2400,
+            2688,
+            2328,
+            2616,
+            2232,
+            2664,
+            2448,
+            2472,
+            2520,
+            2496,
+            2304
+          ],
+          "selected_origins": [
+            1665064800,
+            1664805600,
+            1665151200,
+            1666101600,
+            1665324000,
+            1665237600,
+            1666274400,
+            1664978400,
+            1666015200,
+            1664632800,
+            1666188000,
+            1665410400,
+            1665496800,
+            1665669600,
+            1665583200,
+            1664892000
+          ],
+          "recent_indices": [
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760
+          ]
+        },
+        {
+          "query_origin": 1666965600,
+          "horizon": 0,
+          "selected_indices": [
+            2688,
+            2856,
+            2304,
+            2616,
+            2328,
+            2664,
+            2832,
+            2400,
+            2520,
+            2640,
+            2808,
+            2424,
+            2280,
+            2784,
+            2496,
+            2376
+          ],
+          "selected_origins": [
+            1666274400,
+            1666879200,
+            1664892000,
+            1666015200,
+            1664978400,
+            1666188000,
+            1666792800,
+            1665237600,
+            1665669600,
+            1666101600,
+            1666706400,
+            1665324000,
+            1664805600,
+            1666620000,
+            1665583200,
+            1665151200
+          ],
+          "recent_indices": [
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856
+          ]
+        },
+        {
+          "query_origin": 1667311200,
+          "horizon": 0,
+          "selected_indices": [
+            2664,
+            2616,
+            2688,
+            2880,
+            2400,
+            2520,
+            2424,
+            2808,
+            2328,
+            2904,
+            2640,
+            2856,
+            2952,
+            2832,
+            2304,
+            2496
+          ],
+          "selected_origins": [
+            1666188000,
+            1666015200,
+            1666274400,
+            1666965600,
+            1665237600,
+            1665669600,
+            1665324000,
+            1666706400,
+            1664978400,
+            1667052000,
+            1666101600,
+            1666879200,
+            1667224800,
+            1666792800,
+            1664892000,
+            1665583200
+          ],
+          "recent_indices": [
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952
+          ]
+        },
+        {
+          "query_origin": 1667656800,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            2208,
+            3024,
+            3000,
+            2976,
+            2520,
+            2496,
+            2448,
+            2664,
+            2616,
+            2472,
+            2688,
+            2808,
+            2232,
+            2400,
+            2424
+          ],
+          "selected_origins": [
+            1667570400,
+            1664546400,
+            1667484000,
+            1667397600,
+            1667311200,
+            1665669600,
+            1665583200,
+            1665410400,
+            1666188000,
+            1666015200,
+            1665496800,
+            1666274400,
+            1666706400,
+            1664632800,
+            1665237600,
+            1665324000
+          ],
+          "recent_indices": [
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048
+          ]
+        },
+        {
+          "query_origin": 1668002400,
+          "horizon": 0,
+          "selected_indices": [
+            3144,
+            2520,
+            2496,
+            2472,
+            2448,
+            2712,
+            2976,
+            2592,
+            2568,
+            2232,
+            2664,
+            2616,
+            2544,
+            2256,
+            2688,
+            3096
+          ],
+          "selected_origins": [
+            1667916000,
+            1665669600,
+            1665583200,
+            1665496800,
+            1665410400,
+            1666360800,
+            1667311200,
+            1665928800,
+            1665842400,
+            1664632800,
+            1666188000,
+            1666015200,
+            1665756000,
+            1664719200,
+            1666274400,
+            1667743200
+          ],
+          "recent_indices": [
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144
+          ]
+        },
+        {
+          "query_origin": 1668348000,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3240,
+            2952,
+            2880,
+            3000,
+            2928,
+            2856,
+            2304,
+            2664,
+            2904,
+            2616,
+            2688,
+            2520,
+            3024,
+            2328,
+            2400
+          ],
+          "selected_origins": [
+            1667311200,
+            1668261600,
+            1667224800,
+            1666965600,
+            1667397600,
+            1667138400,
+            1666879200,
+            1664892000,
+            1666188000,
+            1667052000,
+            1666015200,
+            1666274400,
+            1665669600,
+            1667484000,
+            1664978400,
+            1665237600
+          ],
+          "recent_indices": [
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240
+          ]
+        },
+        {
+          "query_origin": 1668693600,
+          "horizon": 0,
+          "selected_indices": [
+            3000,
+            3024,
+            3288,
+            3240,
+            2424,
+            2976,
+            2400,
+            2280,
+            2352,
+            2832,
+            2808,
+            2784,
+            2328,
+            3264,
+            3312,
+            2856
+          ],
+          "selected_origins": [
+            1667397600,
+            1667484000,
+            1668434400,
+            1668261600,
+            1665324000,
+            1667311200,
+            1665237600,
+            1664805600,
+            1665064800,
+            1666792800,
+            1666706400,
+            1666620000,
+            1664978400,
+            1668348000,
+            1668520800,
+            1666879200
+          ],
+          "recent_indices": [
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336
+          ]
+        },
+        {
+          "query_origin": 1669039200,
+          "horizon": 0,
+          "selected_indices": [
+            3288,
+            3408,
+            3264,
+            3432,
+            2976,
+            3240,
+            3000,
+            2928,
+            3024,
+            2304,
+            3360,
+            2856,
+            2952,
+            2904,
+            2880,
+            3384
+          ],
+          "selected_origins": [
+            1668434400,
+            1668866400,
+            1668348000,
+            1668952800,
+            1667311200,
+            1668261600,
+            1667397600,
+            1667138400,
+            1667484000,
+            1664892000,
+            1668693600,
+            1666879200,
+            1667224800,
+            1667052000,
+            1666965600,
+            1668780000
+          ],
+          "recent_indices": [
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432
+          ]
+        },
+        {
+          "query_origin": 1669384800,
+          "horizon": 0,
+          "selected_indices": [
+            3336,
+            3528,
+            3504,
+            3048,
+            2208,
+            3312,
+            3432,
+            3288,
+            3216,
+            3072,
+            3024,
+            3120,
+            3192,
+            3480,
+            3456,
+            3000
+          ],
+          "selected_origins": [
+            1668607200,
+            1669298400,
+            1669212000,
+            1667570400,
+            1664546400,
+            1668520800,
+            1668952800,
+            1668434400,
+            1668175200,
+            1667656800,
+            1667484000,
+            1667829600,
+            1668088800,
+            1669125600,
+            1669039200,
+            1667397600
+          ],
+          "recent_indices": [
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528
+          ]
+        },
+        {
+          "query_origin": 1669730400,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            3600,
+            3216,
+            3120,
+            3192,
+            2208,
+            3096,
+            3432,
+            3624,
+            3576,
+            3552,
+            3288,
+            3408,
+            3312,
+            3336,
+            3072
+          ],
+          "selected_origins": [
+            1667570400,
+            1669557600,
+            1668175200,
+            1667829600,
+            1668088800,
+            1664546400,
+            1667743200,
+            1668952800,
+            1669644000,
+            1669471200,
+            1669384800,
+            1668434400,
+            1668866400,
+            1668520800,
+            1668607200,
+            1667656800
+          ],
+          "recent_indices": [
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624
+          ]
+        },
+        {
+          "query_origin": 1670076000,
+          "horizon": 0,
+          "selected_indices": [
+            3672,
+            3144,
+            3168,
+            2976,
+            3096,
+            3720,
+            3240,
+            2496,
+            2448,
+            3120,
+            2472,
+            2568,
+            2520,
+            2712,
+            2544,
+            2592
+          ],
+          "selected_origins": [
+            1669816800,
+            1667916000,
+            1668002400,
+            1667311200,
+            1667743200,
+            1669989600,
+            1668261600,
+            1665583200,
+            1665410400,
+            1667829600,
+            1665496800,
+            1665842400,
+            1665669600,
+            1666360800,
+            1665756000,
+            1665928800
+          ],
+          "recent_indices": [
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720
+          ]
+        },
+        {
+          "query_origin": 1670421600,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3408,
+            3288,
+            3264,
+            3672,
+            3720,
+            3696,
+            3432,
+            3048,
+            3576,
+            3000,
+            3096,
+            3240,
+            3456,
+            3024,
+            3120
+          ],
+          "selected_origins": [
+            1667311200,
+            1668866400,
+            1668434400,
+            1668348000,
+            1669816800,
+            1669989600,
+            1669903200,
+            1668952800,
+            1667570400,
+            1669471200,
+            1667397600,
+            1667743200,
+            1668261600,
+            1669039200,
+            1667484000,
+            1667829600
+          ],
+          "recent_indices": [
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720,
+            3744,
+            3768,
+            3792,
+            3816
+          ]
+        }
+      ],
+      "release_samples": [
+        {
+          "as_of": 1664632800,
+          "global_indices": [
+            2208
+          ],
+          "latest_label_available": 1664632800
+        },
+        {
+          "as_of": 1664636400,
+          "global_indices": [
+            2209
+          ],
+          "latest_label_available": 1664636400
+        },
+        {
+          "as_of": 1664640000,
+          "global_indices": [
+            2210
+          ],
+          "latest_label_available": 1664640000
+        },
+        {
+          "as_of": 1664643600,
+          "global_indices": [
+            2211
+          ],
+          "latest_label_available": 1664643600
+        },
+        {
+          "as_of": 1664647200,
+          "global_indices": [
+            2212
+          ],
+          "latest_label_available": 1664647200
+        },
+        {
+          "as_of": 1664650800,
+          "global_indices": [
+            2213
+          ],
+          "latest_label_available": 1664650800
+        },
+        {
+          "as_of": 1664654400,
+          "global_indices": [
+            2214
+          ],
+          "latest_label_available": 1664654400
+        },
+        {
+          "as_of": 1664658000,
+          "global_indices": [
+            2215
+          ],
+          "latest_label_available": 1664658000
+        },
+        {
+          "as_of": 1664661600,
+          "global_indices": [
+            2216
+          ],
+          "latest_label_available": 1664661600
+        },
+        {
+          "as_of": 1664665200,
+          "global_indices": [
+            2217
+          ],
+          "latest_label_available": 1664665200
+        },
+        {
+          "as_of": 1664668800,
+          "global_indices": [
+            2218
+          ],
+          "latest_label_available": 1664668800
+        },
+        {
+          "as_of": 1664672400,
+          "global_indices": [
+            2219
+          ],
+          "latest_label_available": 1664672400
+        },
+        {
+          "as_of": 1664676000,
+          "global_indices": [
+            2220
+          ],
+          "latest_label_available": 1664676000
+        },
+        {
+          "as_of": 1664679600,
+          "global_indices": [
+            2221
+          ],
+          "latest_label_available": 1664679600
+        },
+        {
+          "as_of": 1664683200,
+          "global_indices": [
+            2222
+          ],
+          "latest_label_available": 1664683200
+        },
+        {
+          "as_of": 1664686800,
+          "global_indices": [
+            2223
+          ],
+          "latest_label_available": 1664686800
+        }
+      ]
+    },
+    "fixed": {
+      "history_start": 1664546400,
+      "queries": 4393,
+      "open_queries": 1993,
+      "open_fraction": 0.45367630320965174,
+      "encoder_calls": 2161,
+      "encoded_records": 2161,
+      "lookback_days": 365,
+      "match_k": 16,
+      "match_min_candidates": 8,
+      "pool_size_max": 91,
+      "max_abs_correction": 150.0,
+      "residual_definition": "represented mature past price - frozen_C_roll_q50",
+      "matching_uses": "current and historical six z coordinates only; no query target",
+      "matched_variants_share_ids": true,
+      "matched_variant_candidate_sha256": {
+        "rawmatched": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "fixedsmooth": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualtrend": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualfull": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030"
+      },
+      "latest_encoded_availability": 1672408800,
+      "minimum_release_margin_seconds": 0,
+      "maturity_violations": 0,
+      "selection_samples": [
+        {
+          "query_origin": 1665237600,
+          "horizon": 0,
+          "selected_indices": [
+            2328,
+            2280,
+            2352,
+            2376,
+            2304,
+            2232,
+            2256,
+            2208
+          ],
+          "selected_origins": [
+            1664978400,
+            1664805600,
+            1665064800,
+            1665151200,
+            1664892000,
+            1664632800,
+            1664719200,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376
+          ]
+        },
+        {
+          "query_origin": 1665583200,
+          "horizon": 0,
+          "selected_indices": [
+            2448,
+            2472,
+            2232,
+            2256,
+            2376,
+            2400,
+            2424,
+            2328,
+            2352,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665410400,
+            1665496800,
+            1664632800,
+            1664719200,
+            1665151200,
+            1665237600,
+            1665324000,
+            1664978400,
+            1665064800,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472
+          ]
+        },
+        {
+          "query_origin": 1665928800,
+          "horizon": 0,
+          "selected_indices": [
+            2568,
+            2544,
+            2256,
+            2472,
+            2496,
+            2448,
+            2232,
+            2520,
+            2376,
+            2400,
+            2424,
+            2352,
+            2328,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665842400,
+            1665756000,
+            1664719200,
+            1665496800,
+            1665583200,
+            1665410400,
+            1664632800,
+            1665669600,
+            1665151200,
+            1665237600,
+            1665324000,
+            1665064800,
+            1664978400,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568
+          ]
+        },
+        {
+          "query_origin": 1666274400,
+          "horizon": 0,
+          "selected_indices": [
+            2616,
+            2664,
+            2328,
+            2640,
+            2400,
+            2520,
+            2304,
+            2424,
+            2280,
+            2376,
+            2352,
+            2448,
+            2496,
+            2232,
+            2472,
+            2256
+          ],
+          "selected_origins": [
+            1666015200,
+            1666188000,
+            1664978400,
+            1666101600,
+            1665237600,
+            1665669600,
+            1664892000,
+            1665324000,
+            1664805600,
+            1665151200,
+            1665064800,
+            1665410400,
+            1665583200,
+            1664632800,
+            1665496800,
+            1664719200
+          ],
+          "recent_indices": [
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664
+          ]
+        },
+        {
+          "query_origin": 1666620000,
+          "horizon": 0,
+          "selected_indices": [
+            2352,
+            2280,
+            2376,
+            2640,
+            2424,
+            2400,
+            2688,
+            2328,
+            2616,
+            2232,
+            2664,
+            2448,
+            2472,
+            2520,
+            2496,
+            2304
+          ],
+          "selected_origins": [
+            1665064800,
+            1664805600,
+            1665151200,
+            1666101600,
+            1665324000,
+            1665237600,
+            1666274400,
+            1664978400,
+            1666015200,
+            1664632800,
+            1666188000,
+            1665410400,
+            1665496800,
+            1665669600,
+            1665583200,
+            1664892000
+          ],
+          "recent_indices": [
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760
+          ]
+        },
+        {
+          "query_origin": 1666965600,
+          "horizon": 0,
+          "selected_indices": [
+            2688,
+            2856,
+            2304,
+            2616,
+            2328,
+            2664,
+            2832,
+            2400,
+            2520,
+            2640,
+            2808,
+            2424,
+            2280,
+            2784,
+            2496,
+            2376
+          ],
+          "selected_origins": [
+            1666274400,
+            1666879200,
+            1664892000,
+            1666015200,
+            1664978400,
+            1666188000,
+            1666792800,
+            1665237600,
+            1665669600,
+            1666101600,
+            1666706400,
+            1665324000,
+            1664805600,
+            1666620000,
+            1665583200,
+            1665151200
+          ],
+          "recent_indices": [
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856
+          ]
+        },
+        {
+          "query_origin": 1667311200,
+          "horizon": 0,
+          "selected_indices": [
+            2664,
+            2616,
+            2688,
+            2880,
+            2400,
+            2520,
+            2424,
+            2808,
+            2328,
+            2904,
+            2640,
+            2856,
+            2952,
+            2832,
+            2304,
+            2496
+          ],
+          "selected_origins": [
+            1666188000,
+            1666015200,
+            1666274400,
+            1666965600,
+            1665237600,
+            1665669600,
+            1665324000,
+            1666706400,
+            1664978400,
+            1667052000,
+            1666101600,
+            1666879200,
+            1667224800,
+            1666792800,
+            1664892000,
+            1665583200
+          ],
+          "recent_indices": [
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952
+          ]
+        },
+        {
+          "query_origin": 1667656800,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            2208,
+            3024,
+            3000,
+            2976,
+            2520,
+            2496,
+            2448,
+            2664,
+            2616,
+            2472,
+            2688,
+            2808,
+            2232,
+            2400,
+            2424
+          ],
+          "selected_origins": [
+            1667570400,
+            1664546400,
+            1667484000,
+            1667397600,
+            1667311200,
+            1665669600,
+            1665583200,
+            1665410400,
+            1666188000,
+            1666015200,
+            1665496800,
+            1666274400,
+            1666706400,
+            1664632800,
+            1665237600,
+            1665324000
+          ],
+          "recent_indices": [
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048
+          ]
+        },
+        {
+          "query_origin": 1668002400,
+          "horizon": 0,
+          "selected_indices": [
+            3144,
+            2520,
+            2496,
+            2472,
+            2448,
+            2712,
+            2976,
+            2592,
+            2568,
+            2232,
+            2664,
+            2616,
+            2544,
+            2256,
+            2688,
+            3096
+          ],
+          "selected_origins": [
+            1667916000,
+            1665669600,
+            1665583200,
+            1665496800,
+            1665410400,
+            1666360800,
+            1667311200,
+            1665928800,
+            1665842400,
+            1664632800,
+            1666188000,
+            1666015200,
+            1665756000,
+            1664719200,
+            1666274400,
+            1667743200
+          ],
+          "recent_indices": [
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144
+          ]
+        },
+        {
+          "query_origin": 1668348000,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3240,
+            2952,
+            2880,
+            3000,
+            2928,
+            2856,
+            2304,
+            2664,
+            2904,
+            2616,
+            2688,
+            2520,
+            3024,
+            2328,
+            2400
+          ],
+          "selected_origins": [
+            1667311200,
+            1668261600,
+            1667224800,
+            1666965600,
+            1667397600,
+            1667138400,
+            1666879200,
+            1664892000,
+            1666188000,
+            1667052000,
+            1666015200,
+            1666274400,
+            1665669600,
+            1667484000,
+            1664978400,
+            1665237600
+          ],
+          "recent_indices": [
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240
+          ]
+        },
+        {
+          "query_origin": 1668693600,
+          "horizon": 0,
+          "selected_indices": [
+            3000,
+            3024,
+            3288,
+            3240,
+            2424,
+            2976,
+            2400,
+            2280,
+            2352,
+            2832,
+            2808,
+            2784,
+            2328,
+            3264,
+            3312,
+            2856
+          ],
+          "selected_origins": [
+            1667397600,
+            1667484000,
+            1668434400,
+            1668261600,
+            1665324000,
+            1667311200,
+            1665237600,
+            1664805600,
+            1665064800,
+            1666792800,
+            1666706400,
+            1666620000,
+            1664978400,
+            1668348000,
+            1668520800,
+            1666879200
+          ],
+          "recent_indices": [
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336
+          ]
+        },
+        {
+          "query_origin": 1669039200,
+          "horizon": 0,
+          "selected_indices": [
+            3288,
+            3408,
+            3264,
+            3432,
+            2976,
+            3240,
+            3000,
+            2928,
+            3024,
+            2304,
+            3360,
+            2856,
+            2952,
+            2904,
+            2880,
+            3384
+          ],
+          "selected_origins": [
+            1668434400,
+            1668866400,
+            1668348000,
+            1668952800,
+            1667311200,
+            1668261600,
+            1667397600,
+            1667138400,
+            1667484000,
+            1664892000,
+            1668693600,
+            1666879200,
+            1667224800,
+            1667052000,
+            1666965600,
+            1668780000
+          ],
+          "recent_indices": [
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432
+          ]
+        },
+        {
+          "query_origin": 1669384800,
+          "horizon": 0,
+          "selected_indices": [
+            3336,
+            3528,
+            3504,
+            3048,
+            2208,
+            3312,
+            3432,
+            3288,
+            3216,
+            3072,
+            3024,
+            3120,
+            3192,
+            3480,
+            3456,
+            3000
+          ],
+          "selected_origins": [
+            1668607200,
+            1669298400,
+            1669212000,
+            1667570400,
+            1664546400,
+            1668520800,
+            1668952800,
+            1668434400,
+            1668175200,
+            1667656800,
+            1667484000,
+            1667829600,
+            1668088800,
+            1669125600,
+            1669039200,
+            1667397600
+          ],
+          "recent_indices": [
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528
+          ]
+        },
+        {
+          "query_origin": 1669730400,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            3600,
+            3216,
+            3120,
+            3192,
+            2208,
+            3096,
+            3432,
+            3624,
+            3576,
+            3552,
+            3288,
+            3408,
+            3312,
+            3336,
+            3072
+          ],
+          "selected_origins": [
+            1667570400,
+            1669557600,
+            1668175200,
+            1667829600,
+            1668088800,
+            1664546400,
+            1667743200,
+            1668952800,
+            1669644000,
+            1669471200,
+            1669384800,
+            1668434400,
+            1668866400,
+            1668520800,
+            1668607200,
+            1667656800
+          ],
+          "recent_indices": [
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624
+          ]
+        },
+        {
+          "query_origin": 1670076000,
+          "horizon": 0,
+          "selected_indices": [
+            3672,
+            3144,
+            3168,
+            2976,
+            3096,
+            3720,
+            3240,
+            2496,
+            2448,
+            3120,
+            2472,
+            2568,
+            2520,
+            2712,
+            2544,
+            2592
+          ],
+          "selected_origins": [
+            1669816800,
+            1667916000,
+            1668002400,
+            1667311200,
+            1667743200,
+            1669989600,
+            1668261600,
+            1665583200,
+            1665410400,
+            1667829600,
+            1665496800,
+            1665842400,
+            1665669600,
+            1666360800,
+            1665756000,
+            1665928800
+          ],
+          "recent_indices": [
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720
+          ]
+        },
+        {
+          "query_origin": 1670421600,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3408,
+            3288,
+            3264,
+            3672,
+            3720,
+            3696,
+            3432,
+            3048,
+            3576,
+            3000,
+            3096,
+            3240,
+            3456,
+            3024,
+            3120
+          ],
+          "selected_origins": [
+            1667311200,
+            1668866400,
+            1668434400,
+            1668348000,
+            1669816800,
+            1669989600,
+            1669903200,
+            1668952800,
+            1667570400,
+            1669471200,
+            1667397600,
+            1667743200,
+            1668261600,
+            1669039200,
+            1667484000,
+            1667829600
+          ],
+          "recent_indices": [
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720,
+            3744,
+            3768,
+            3792,
+            3816
+          ]
+        }
+      ],
+      "release_samples": [
+        {
+          "as_of": 1664632800,
+          "global_indices": [
+            2208
+          ],
+          "latest_label_available": 1664632800
+        },
+        {
+          "as_of": 1664636400,
+          "global_indices": [
+            2209
+          ],
+          "latest_label_available": 1664636400
+        },
+        {
+          "as_of": 1664640000,
+          "global_indices": [
+            2210
+          ],
+          "latest_label_available": 1664640000
+        },
+        {
+          "as_of": 1664643600,
+          "global_indices": [
+            2211
+          ],
+          "latest_label_available": 1664643600
+        },
+        {
+          "as_of": 1664647200,
+          "global_indices": [
+            2212
+          ],
+          "latest_label_available": 1664647200
+        },
+        {
+          "as_of": 1664650800,
+          "global_indices": [
+            2213
+          ],
+          "latest_label_available": 1664650800
+        },
+        {
+          "as_of": 1664654400,
+          "global_indices": [
+            2214
+          ],
+          "latest_label_available": 1664654400
+        },
+        {
+          "as_of": 1664658000,
+          "global_indices": [
+            2215
+          ],
+          "latest_label_available": 1664658000
+        },
+        {
+          "as_of": 1664661600,
+          "global_indices": [
+            2216
+          ],
+          "latest_label_available": 1664661600
+        },
+        {
+          "as_of": 1664665200,
+          "global_indices": [
+            2217
+          ],
+          "latest_label_available": 1664665200
+        },
+        {
+          "as_of": 1664668800,
+          "global_indices": [
+            2218
+          ],
+          "latest_label_available": 1664668800
+        },
+        {
+          "as_of": 1664672400,
+          "global_indices": [
+            2219
+          ],
+          "latest_label_available": 1664672400
+        },
+        {
+          "as_of": 1664676000,
+          "global_indices": [
+            2220
+          ],
+          "latest_label_available": 1664676000
+        },
+        {
+          "as_of": 1664679600,
+          "global_indices": [
+            2221
+          ],
+          "latest_label_available": 1664679600
+        },
+        {
+          "as_of": 1664683200,
+          "global_indices": [
+            2222
+          ],
+          "latest_label_available": 1664683200
+        },
+        {
+          "as_of": 1664686800,
+          "global_indices": [
+            2223
+          ],
+          "latest_label_available": 1664686800
+        }
+      ]
+    },
+    "old": {
+      "history_start": 1664546400,
+      "queries": 4393,
+      "open_queries": 1993,
+      "open_fraction": 0.45367630320965174,
+      "encoder_calls": 2161,
+      "encoded_records": 2161,
+      "lookback_days": 365,
+      "match_k": 16,
+      "match_min_candidates": 8,
+      "pool_size_max": 91,
+      "max_abs_correction": 150.0,
+      "residual_definition": "represented mature past price - frozen_C_roll_q50",
+      "matching_uses": "current and historical six z coordinates only; no query target",
+      "matched_variants_share_ids": true,
+      "matched_variant_candidate_sha256": {
+        "rawmatched": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "fixedsmooth": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualtrend": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030",
+        "dualfull": "5931765748fc0d39f0a08138fe662c64cb65243e9b224ab512c45148d6e4f030"
+      },
+      "latest_encoded_availability": 1672408800,
+      "minimum_release_margin_seconds": 0,
+      "maturity_violations": 0,
+      "selection_samples": [
+        {
+          "query_origin": 1665237600,
+          "horizon": 0,
+          "selected_indices": [
+            2328,
+            2280,
+            2352,
+            2376,
+            2304,
+            2232,
+            2256,
+            2208
+          ],
+          "selected_origins": [
+            1664978400,
+            1664805600,
+            1665064800,
+            1665151200,
+            1664892000,
+            1664632800,
+            1664719200,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376
+          ]
+        },
+        {
+          "query_origin": 1665583200,
+          "horizon": 0,
+          "selected_indices": [
+            2448,
+            2472,
+            2232,
+            2256,
+            2376,
+            2400,
+            2424,
+            2328,
+            2352,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665410400,
+            1665496800,
+            1664632800,
+            1664719200,
+            1665151200,
+            1665237600,
+            1665324000,
+            1664978400,
+            1665064800,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472
+          ]
+        },
+        {
+          "query_origin": 1665928800,
+          "horizon": 0,
+          "selected_indices": [
+            2568,
+            2544,
+            2256,
+            2472,
+            2496,
+            2448,
+            2232,
+            2520,
+            2376,
+            2400,
+            2424,
+            2352,
+            2328,
+            2280,
+            2304,
+            2208
+          ],
+          "selected_origins": [
+            1665842400,
+            1665756000,
+            1664719200,
+            1665496800,
+            1665583200,
+            1665410400,
+            1664632800,
+            1665669600,
+            1665151200,
+            1665237600,
+            1665324000,
+            1665064800,
+            1664978400,
+            1664805600,
+            1664892000,
+            1664546400
+          ],
+          "recent_indices": [
+            2208,
+            2232,
+            2256,
+            2280,
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568
+          ]
+        },
+        {
+          "query_origin": 1666274400,
+          "horizon": 0,
+          "selected_indices": [
+            2616,
+            2664,
+            2328,
+            2640,
+            2400,
+            2520,
+            2304,
+            2424,
+            2280,
+            2376,
+            2352,
+            2448,
+            2496,
+            2232,
+            2472,
+            2256
+          ],
+          "selected_origins": [
+            1666015200,
+            1666188000,
+            1664978400,
+            1666101600,
+            1665237600,
+            1665669600,
+            1664892000,
+            1665324000,
+            1664805600,
+            1665151200,
+            1665064800,
+            1665410400,
+            1665583200,
+            1664632800,
+            1665496800,
+            1664719200
+          ],
+          "recent_indices": [
+            2304,
+            2328,
+            2352,
+            2376,
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664
+          ]
+        },
+        {
+          "query_origin": 1666620000,
+          "horizon": 0,
+          "selected_indices": [
+            2352,
+            2280,
+            2376,
+            2640,
+            2424,
+            2400,
+            2688,
+            2328,
+            2616,
+            2232,
+            2664,
+            2448,
+            2472,
+            2520,
+            2496,
+            2304
+          ],
+          "selected_origins": [
+            1665064800,
+            1664805600,
+            1665151200,
+            1666101600,
+            1665324000,
+            1665237600,
+            1666274400,
+            1664978400,
+            1666015200,
+            1664632800,
+            1666188000,
+            1665410400,
+            1665496800,
+            1665669600,
+            1665583200,
+            1664892000
+          ],
+          "recent_indices": [
+            2400,
+            2424,
+            2448,
+            2472,
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760
+          ]
+        },
+        {
+          "query_origin": 1666965600,
+          "horizon": 0,
+          "selected_indices": [
+            2688,
+            2856,
+            2304,
+            2616,
+            2328,
+            2664,
+            2832,
+            2400,
+            2520,
+            2640,
+            2808,
+            2424,
+            2280,
+            2784,
+            2496,
+            2376
+          ],
+          "selected_origins": [
+            1666274400,
+            1666879200,
+            1664892000,
+            1666015200,
+            1664978400,
+            1666188000,
+            1666792800,
+            1665237600,
+            1665669600,
+            1666101600,
+            1666706400,
+            1665324000,
+            1664805600,
+            1666620000,
+            1665583200,
+            1665151200
+          ],
+          "recent_indices": [
+            2496,
+            2520,
+            2544,
+            2568,
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856
+          ]
+        },
+        {
+          "query_origin": 1667311200,
+          "horizon": 0,
+          "selected_indices": [
+            2664,
+            2616,
+            2688,
+            2880,
+            2400,
+            2520,
+            2424,
+            2808,
+            2328,
+            2904,
+            2640,
+            2856,
+            2952,
+            2832,
+            2304,
+            2496
+          ],
+          "selected_origins": [
+            1666188000,
+            1666015200,
+            1666274400,
+            1666965600,
+            1665237600,
+            1665669600,
+            1665324000,
+            1666706400,
+            1664978400,
+            1667052000,
+            1666101600,
+            1666879200,
+            1667224800,
+            1666792800,
+            1664892000,
+            1665583200
+          ],
+          "recent_indices": [
+            2592,
+            2616,
+            2640,
+            2664,
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952
+          ]
+        },
+        {
+          "query_origin": 1667656800,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            2208,
+            3024,
+            3000,
+            2976,
+            2520,
+            2496,
+            2448,
+            2664,
+            2616,
+            2472,
+            2688,
+            2808,
+            2232,
+            2400,
+            2424
+          ],
+          "selected_origins": [
+            1667570400,
+            1664546400,
+            1667484000,
+            1667397600,
+            1667311200,
+            1665669600,
+            1665583200,
+            1665410400,
+            1666188000,
+            1666015200,
+            1665496800,
+            1666274400,
+            1666706400,
+            1664632800,
+            1665237600,
+            1665324000
+          ],
+          "recent_indices": [
+            2688,
+            2712,
+            2736,
+            2760,
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048
+          ]
+        },
+        {
+          "query_origin": 1668002400,
+          "horizon": 0,
+          "selected_indices": [
+            3144,
+            2520,
+            2496,
+            2472,
+            2448,
+            2712,
+            2976,
+            2592,
+            2568,
+            2232,
+            2664,
+            2616,
+            2544,
+            2256,
+            2688,
+            3096
+          ],
+          "selected_origins": [
+            1667916000,
+            1665669600,
+            1665583200,
+            1665496800,
+            1665410400,
+            1666360800,
+            1667311200,
+            1665928800,
+            1665842400,
+            1664632800,
+            1666188000,
+            1666015200,
+            1665756000,
+            1664719200,
+            1666274400,
+            1667743200
+          ],
+          "recent_indices": [
+            2784,
+            2808,
+            2832,
+            2856,
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144
+          ]
+        },
+        {
+          "query_origin": 1668348000,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3240,
+            2952,
+            2880,
+            3000,
+            2928,
+            2856,
+            2304,
+            2664,
+            2904,
+            2616,
+            2688,
+            2520,
+            3024,
+            2328,
+            2400
+          ],
+          "selected_origins": [
+            1667311200,
+            1668261600,
+            1667224800,
+            1666965600,
+            1667397600,
+            1667138400,
+            1666879200,
+            1664892000,
+            1666188000,
+            1667052000,
+            1666015200,
+            1666274400,
+            1665669600,
+            1667484000,
+            1664978400,
+            1665237600
+          ],
+          "recent_indices": [
+            2880,
+            2904,
+            2928,
+            2952,
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240
+          ]
+        },
+        {
+          "query_origin": 1668693600,
+          "horizon": 0,
+          "selected_indices": [
+            3000,
+            3024,
+            3288,
+            3240,
+            2424,
+            2976,
+            2400,
+            2280,
+            2352,
+            2832,
+            2808,
+            2784,
+            2328,
+            3264,
+            3312,
+            2856
+          ],
+          "selected_origins": [
+            1667397600,
+            1667484000,
+            1668434400,
+            1668261600,
+            1665324000,
+            1667311200,
+            1665237600,
+            1664805600,
+            1665064800,
+            1666792800,
+            1666706400,
+            1666620000,
+            1664978400,
+            1668348000,
+            1668520800,
+            1666879200
+          ],
+          "recent_indices": [
+            2976,
+            3000,
+            3024,
+            3048,
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336
+          ]
+        },
+        {
+          "query_origin": 1669039200,
+          "horizon": 0,
+          "selected_indices": [
+            3288,
+            3408,
+            3264,
+            3432,
+            2976,
+            3240,
+            3000,
+            2928,
+            3024,
+            2304,
+            3360,
+            2856,
+            2952,
+            2904,
+            2880,
+            3384
+          ],
+          "selected_origins": [
+            1668434400,
+            1668866400,
+            1668348000,
+            1668952800,
+            1667311200,
+            1668261600,
+            1667397600,
+            1667138400,
+            1667484000,
+            1664892000,
+            1668693600,
+            1666879200,
+            1667224800,
+            1667052000,
+            1666965600,
+            1668780000
+          ],
+          "recent_indices": [
+            3072,
+            3096,
+            3120,
+            3144,
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432
+          ]
+        },
+        {
+          "query_origin": 1669384800,
+          "horizon": 0,
+          "selected_indices": [
+            3336,
+            3528,
+            3504,
+            3048,
+            2208,
+            3312,
+            3432,
+            3288,
+            3216,
+            3072,
+            3024,
+            3120,
+            3192,
+            3480,
+            3456,
+            3000
+          ],
+          "selected_origins": [
+            1668607200,
+            1669298400,
+            1669212000,
+            1667570400,
+            1664546400,
+            1668520800,
+            1668952800,
+            1668434400,
+            1668175200,
+            1667656800,
+            1667484000,
+            1667829600,
+            1668088800,
+            1669125600,
+            1669039200,
+            1667397600
+          ],
+          "recent_indices": [
+            3168,
+            3192,
+            3216,
+            3240,
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528
+          ]
+        },
+        {
+          "query_origin": 1669730400,
+          "horizon": 0,
+          "selected_indices": [
+            3048,
+            3600,
+            3216,
+            3120,
+            3192,
+            2208,
+            3096,
+            3432,
+            3624,
+            3576,
+            3552,
+            3288,
+            3408,
+            3312,
+            3336,
+            3072
+          ],
+          "selected_origins": [
+            1667570400,
+            1669557600,
+            1668175200,
+            1667829600,
+            1668088800,
+            1664546400,
+            1667743200,
+            1668952800,
+            1669644000,
+            1669471200,
+            1669384800,
+            1668434400,
+            1668866400,
+            1668520800,
+            1668607200,
+            1667656800
+          ],
+          "recent_indices": [
+            3264,
+            3288,
+            3312,
+            3336,
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624
+          ]
+        },
+        {
+          "query_origin": 1670076000,
+          "horizon": 0,
+          "selected_indices": [
+            3672,
+            3144,
+            3168,
+            2976,
+            3096,
+            3720,
+            3240,
+            2496,
+            2448,
+            3120,
+            2472,
+            2568,
+            2520,
+            2712,
+            2544,
+            2592
+          ],
+          "selected_origins": [
+            1669816800,
+            1667916000,
+            1668002400,
+            1667311200,
+            1667743200,
+            1669989600,
+            1668261600,
+            1665583200,
+            1665410400,
+            1667829600,
+            1665496800,
+            1665842400,
+            1665669600,
+            1666360800,
+            1665756000,
+            1665928800
+          ],
+          "recent_indices": [
+            3360,
+            3384,
+            3408,
+            3432,
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720
+          ]
+        },
+        {
+          "query_origin": 1670421600,
+          "horizon": 0,
+          "selected_indices": [
+            2976,
+            3408,
+            3288,
+            3264,
+            3672,
+            3720,
+            3696,
+            3432,
+            3048,
+            3576,
+            3000,
+            3096,
+            3240,
+            3456,
+            3024,
+            3120
+          ],
+          "selected_origins": [
+            1667311200,
+            1668866400,
+            1668434400,
+            1668348000,
+            1669816800,
+            1669989600,
+            1669903200,
+            1668952800,
+            1667570400,
+            1669471200,
+            1667397600,
+            1667743200,
+            1668261600,
+            1669039200,
+            1667484000,
+            1667829600
+          ],
+          "recent_indices": [
+            3456,
+            3480,
+            3504,
+            3528,
+            3552,
+            3576,
+            3600,
+            3624,
+            3648,
+            3672,
+            3696,
+            3720,
+            3744,
+            3768,
+            3792,
+            3816
+          ]
+        }
+      ],
+      "release_samples": [
+        {
+          "as_of": 1664632800,
+          "global_indices": [
+            2208
+          ],
+          "latest_label_available": 1664632800
+        },
+        {
+          "as_of": 1664636400,
+          "global_indices": [
+            2209
+          ],
+          "latest_label_available": 1664636400
+        },
+        {
+          "as_of": 1664640000,
+          "global_indices": [
+            2210
+          ],
+          "latest_label_available": 1664640000
+        },
+        {
+          "as_of": 1664643600,
+          "global_indices": [
+            2211
+          ],
+          "latest_label_available": 1664643600
+        },
+        {
+          "as_of": 1664647200,
+          "global_indices": [
+            2212
+          ],
+          "latest_label_available": 1664647200
+        },
+        {
+          "as_of": 1664650800,
+          "global_indices": [
+            2213
+          ],
+          "latest_label_available": 1664650800
+        },
+        {
+          "as_of": 1664654400,
+          "global_indices": [
+            2214
+          ],
+          "latest_label_available": 1664654400
+        },
+        {
+          "as_of": 1664658000,
+          "global_indices": [
+            2215
+          ],
+          "latest_label_available": 1664658000
+        },
+        {
+          "as_of": 1664661600,
+          "global_indices": [
+            2216
+          ],
+          "latest_label_available": 1664661600
+        },
+        {
+          "as_of": 1664665200,
+          "global_indices": [
+            2217
+          ],
+          "latest_label_available": 1664665200
+        },
+        {
+          "as_of": 1664668800,
+          "global_indices": [
+            2218
+          ],
+          "latest_label_available": 1664668800
+        },
+        {
+          "as_of": 1664672400,
+          "global_indices": [
+            2219
+          ],
+          "latest_label_available": 1664672400
+        },
+        {
+          "as_of": 1664676000,
+          "global_indices": [
+            2220
+          ],
+          "latest_label_available": 1664676000
+        },
+        {
+          "as_of": 1664679600,
+          "global_indices": [
+            2221
+          ],
+          "latest_label_available": 1664679600
+        },
+        {
+          "as_of": 1664683200,
+          "global_indices": [
+            2222
+          ],
+          "latest_label_available": 1664683200
+        },
+        {
+          "as_of": 1664686800,
+          "global_indices": [
+            2223
+          ],
+          "latest_label_available": 1664686800
+        }
+      ]
+    }
+  },
+  "frozen_hashes": {
+    "development/models/C_roll_NSW1.json": "78990a83da6215e14fffe57180c53206c5e5ba0a37cbde2efd5dcdb0e9a43783",
+    "baseline_predictions/NSW1_calibration.npz": "44b394b14a33772086de8d193d21b3e98c4927c935ce896deafec56d19f26f06",
+    "development/predictions/C_roll/NSW1_v1.npz": "26f1934acc68eadee900bb5e286a805777bcf500dd84b97d11dddec17658c01a",
+    "development/predictions/C_roll/NSW1_v2.npz": "76a2012df32cd18cb033caae7705ae30d03bcc9e6993881f5c94bb4fb9bda992"
+  },
+  "reconstructed_boundary_origins": 23,
+  "checkpoint_hashes": {
+    "old": "3ac4bd3e504a4ea19fa7e0757056fc12ef4a5cf6dca7872a12c5878036acec9d",
+    "adaptive": "636d7920d6fe3ed2cd473666e7236a6b35d95bdb15516809f35196aa500f2b35"
+  },
+  "unique_test_spike_hours": 2,
+  "wall_seconds": 66.9082130342722
+}

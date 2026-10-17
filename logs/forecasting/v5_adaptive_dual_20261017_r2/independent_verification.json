@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "counts": {
+    "source_snapshots": 30,
+    "checkpoints": 6,
+    "predictions_rescored": 30,
+    "forecast_replays": 24,
+    "checkpoint_encoded_rows_replayed": 144,
+    "frozen_parent_files": 12,
+    "candidate_assignments": 6701184
+  },
+  "regions": {
+    "NSW1": {
+      "maturity_violations": 0,
+      "checkpoint_replay_max_abs": {
+        "adaptive": 0.0,
+        "fixed": 0.0,
+        "old": 0.0
+      },
+      "unique_spike_target_hours": 2,
+      "forecast_replay_exact": true
+    },
+    "QLD1": {
+      "maturity_violations": 0,
+      "checkpoint_replay_max_abs": {
+        "adaptive": 0.0,
+        "fixed": 0.0,
+        "old": 0.0
+      },
+      "unique_spike_target_hours": 10,
+      "forecast_replay_exact": true
+    },
+    "TAS1": {
+      "maturity_violations": 0,
+      "checkpoint_replay_max_abs": {
+        "adaptive": 0.0,
+        "fixed": 0.0,
+        "old": 0.0
+      },
+      "unique_spike_target_hours": 1,
+      "forecast_replay_exact": true
+    }
+  },
+  "r1_r2_precision_only_training_checks": {
+    "NSW1_old.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 28
+    },
+    "NSW1_adaptive.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 6
+    },
+    "QLD1_old.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 28
+    },
+    "QLD1_adaptive.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 6
+    },
+    "TAS1_old.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 28
+    },
+    "TAS1_adaptive.pt": {
+      "training_audit_identical": true,
+      "all_state_tensors_identical": true,
+      "tensor_count": 6
+    }
+  },
+  "script_sha256": "7e5df182d6cf925c0f579df6238adb7c9971b42b19ec7925970d86904c740a11",
+  "scope": "Independent sources/current-snapshot, data/cache, parent, checkpoint, maturity, equal-neighbor, rescoring, exact-head-replay validation; reconstruction checkpoint replay sampled16rows per region per representation; no retraining or parameter selection."
+}

@@ -1,0 +1,96 @@
+{
+  "macro": {
+    "B": {
+      "mae": 26.348678411016465,
+      "quantile_score_proxy": 15.219255894461178
+    },
+    "C_roll": {
+      "mae": 29.318699994674848,
+      "quantile_score_proxy": 17.428757304153304
+    },
+    "H_recent": {
+      "mae": 26.30175380857476,
+      "quantile_score_proxy": 15.480186521533563
+    },
+    "H_raw": {
+      "mae": 31.81831933630512,
+      "quantile_score_proxy": 19.991981761508836
+    },
+    "H_smooth": {
+      "mae": 31.906063919982497,
+      "quantile_score_proxy": 19.74298585451548
+    },
+    "H_old_dual": {
+      "mae": 31.856696499966645,
+      "quantile_score_proxy": 19.387706772131025
+    },
+    "H_fixed_pulses": {
+      "mae": 31.83692715193871,
+      "quantile_score_proxy": 19.961561227144173
+    },
+    "H_adaptive_trend": {
+      "mae": 31.394083912488508,
+      "quantile_score_proxy": 19.432390578721925
+    },
+    "H_adaptive_full": {
+      "mae": 31.93724646797163,
+      "quantile_score_proxy": 20.06041932215491
+    },
+    "H_adaptive_event_off": {
+      "mae": 31.671402217527653,
+      "quantile_score_proxy": 19.672161779402774
+    }
+  },
+  "reference_minus_adaptive": {
+    "B": {
+      "mae": -5.588568056955165,
+      "quantile_score_proxy": -4.841163427693733
+    },
+    "C_roll": {
+      "mae": -2.6185464732967816,
+      "quantile_score_proxy": -2.631662018001606
+    },
+    "H_recent": {
+      "mae": -5.635492659396871,
+      "quantile_score_proxy": -4.5802328006213475
+    },
+    "H_raw": {
+      "mae": -0.11892713166650992,
+      "quantile_score_proxy": -0.06843756064607476
+    },
+    "H_smooth": {
+      "mae": -0.03118254798913256,
+      "quantile_score_proxy": -0.3174334676394288
+    },
+    "H_old_dual": {
+      "mae": -0.08054996800498415,
+      "quantile_score_proxy": -0.6727125500238849
+    },
+    "H_fixed_pulses": {
+      "mae": -0.10031931603291966,
+      "quantile_score_proxy": -0.09885809501073695
+    },
+    "H_adaptive_trend": {
+      "mae": -0.5431625554831214,
+      "quantile_score_proxy": -0.628028743432985
+    },
+    "H_adaptive_event_off": {
+      "mae": -0.2658442504439762,
+      "quantile_score_proxy": -0.388257542752136
+    }
+  },
+  "macro_mae_and_qs_wins": {
+    "B": false,
+    "C_roll": false,
+    "H_recent": false,
+    "H_raw": false,
+    "H_smooth": false,
+    "H_old_dual": false,
+    "H_fixed_pulses": false,
+    "H_adaptive_trend": false,
+    "H_adaptive_event_off": false
+  },
+  "per_region_non_regression": false,
+  "incremental_value_pass": false,
+  "scope": "Retrospective December2022 development; fixed settings, no final test or blind-test claim"
+}
