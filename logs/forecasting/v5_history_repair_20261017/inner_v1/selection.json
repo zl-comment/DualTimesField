@@ -1,0 +1,467 @@
+{
+  "selected_policy": null,
+  "macro": {
+    "C_roll": {
+      "mae": 44.97138341742899,
+      "quantile_score_proxy": 30.934970646801446
+    },
+    "fresh28": {
+      "mae": 55.1271474103739,
+      "quantile_score_proxy": 39.89889044196196
+    },
+    "recent_consistent": {
+      "mae": 51.292099178222486,
+      "quantile_score_proxy": 36.59002727141163
+    }
+  },
+  "regions": {
+    "NSW1": {
+      "scores": {
+        "C_roll": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 34.12321864367102,
+          "rmse_pooled": 60.556881624221425,
+          "pinball_by_quantile": {
+            "0.05": 5.529699092656373,
+            "0.1": 8.556081182194072,
+            "0.5": 17.06160932183551,
+            "0.9": 9.303068900211635,
+            "0.95": 6.874232295219784
+          },
+          "quantile_score_proxy": 18.929876316846947,
+          "coverage_80": 0.5804041128646581,
+          "interval_width_80": 75.68401008118815,
+          "coverage_90": 0.7244141559062649,
+          "interval_width_90": 115.12265272647309
+        },
+        "fresh28": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 46.488294865144205,
+          "rmse_pooled": 71.04575484018373,
+          "pinball_by_quantile": {
+            "0.05": 15.728097572205076,
+            "0.1": 19.2481541521737,
+            "0.5": 23.244147432572102,
+            "0.9": 10.244842946838503,
+            "0.95": 7.232805143775776
+          },
+          "quantile_score_proxy": 30.279218899026066,
+          "coverage_80": 0.48601147776183645,
+          "interval_width_80": 75.68401008118815,
+          "coverage_90": 0.578610712577714,
+          "interval_width_90": 115.12265272647309
+        },
+        "recent_consistent": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 41.437485650618065,
+          "rmse_pooled": 66.1362519558298,
+          "pinball_by_quantile": {
+            "0.05": 11.712515445782772,
+            "0.1": 15.073737528318384,
+            "0.5": 20.718742825309032,
+            "0.9": 9.906679971429353,
+            "0.95": 7.097580981932011
+          },
+          "quantile_score_proxy": 25.80370270110862,
+          "coverage_80": 0.5334768053562888,
+          "interval_width_80": 75.68401008118815,
+          "coverage_90": 0.6321138211382114,
+          "interval_width_90": 115.12265272647309
+        }
+      },
+      "fits": {
+        "fresh28": {
+          "alpha": [
+            0.8976219242517763,
+            0.8488820720583031,
+            0.8400904801542496,
+            0.7951195834871101
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.8976219242517763,
+                "objective_zero": 155681.53187612328,
+                "objective_fit": 94113.76939264302
+              },
+              {
+                "alpha": 0.8488820720583031,
+                "objective_zero": 142895.19725688518,
+                "objective_fit": 95131.12800223113
+              },
+              {
+                "alpha": 0.8400904801542496,
+                "objective_zero": 134766.91870949502,
+                "objective_fit": 92886.3772691988
+              },
+              {
+                "alpha": 0.7951195834871101,
+                "objective_zero": 108389.51128653283,
+                "objective_fit": 82078.3230372062
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        },
+        "recent_consistent": {
+          "alpha": [
+            0.9226236499903367,
+            0.8735351702253409,
+            0.8608514236816612,
+            0.8219190327901839
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.9226236499903367,
+                "objective_zero": 155681.53187612328,
+                "objective_fit": 93718.70291011114
+              },
+              {
+                "alpha": 0.8735351702253409,
+                "objective_zero": 142895.19725688518,
+                "objective_fit": 94684.56730522611
+              },
+              {
+                "alpha": 0.8608514236816612,
+                "objective_zero": 134766.91870949502,
+                "objective_fit": 92762.03644191896
+              },
+              {
+                "alpha": 0.8219190327901839,
+                "objective_zero": 108389.51128653283,
+                "objective_fit": 81964.10152387555
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        }
+      }
+    },
+    "QLD1": {
+      "scores": {
+        "C_roll": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 34.844987280827226,
+          "rmse_pooled": 83.0140979411251,
+          "pinball_by_quantile": {
+            "0.05": 4.532632546846916,
+            "0.1": 7.268371292106455,
+            "0.5": 17.422493640413613,
+            "0.9": 12.325711903180997,
+            "0.95": 10.666906601344026
+          },
+          "quantile_score_proxy": 20.886446393556803,
+          "coverage_80": 0.6194404591104734,
+          "interval_width_80": 81.36123381801548,
+          "coverage_90": 0.7822812051649928,
+          "interval_width_90": 158.38159280175682
+        },
+        "fresh28": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 50.885866770266,
+          "rmse_pooled": 92.31484855416214,
+          "pinball_by_quantile": {
+            "0.05": 17.083070574409405,
+            "0.1": 20.334409949841987,
+            "0.5": 25.442933385133,
+            "0.9": 13.820386959881963,
+            "0.95": 11.415263307575653
+          },
+          "quantile_score_proxy": 35.2384256707368,
+          "coverage_80": 0.45863223338115733,
+          "interval_width_80": 81.36123381801548,
+          "coverage_90": 0.5750836920133907,
+          "interval_width_90": 158.38159280175682
+        },
+        "recent_consistent": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 45.81961602571349,
+          "rmse_pooled": 89.07532253602437,
+          "pinball_by_quantile": {
+            "0.05": 13.112061651951151,
+            "0.1": 16.29885264253763,
+            "0.5": 22.909808012856747,
+            "0.9": 13.1694237677069,
+            "0.95": 11.002272993618899
+          },
+          "quantile_score_proxy": 30.596967627468526,
+          "coverage_80": 0.5118962219033955,
+          "interval_width_80": 81.36123381801548,
+          "coverage_90": 0.6376135820181731,
+          "interval_width_90": 158.38159280175682
+        }
+      },
+      "fits": {
+        "fresh28": {
+          "alpha": [
+            0.9351751856617206,
+            0.9398255189825817,
+            0.9149845480697729,
+            0.8658567869514874
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.9351751856617206,
+                "objective_zero": 151716.35895494305,
+                "objective_fit": 94254.44476514174
+              },
+              {
+                "alpha": 0.9398255189825817,
+                "objective_zero": 154158.47274851397,
+                "objective_fit": 98228.6276673846
+              },
+              {
+                "alpha": 0.9149845480697729,
+                "objective_zero": 142957.4522138656,
+                "objective_fit": 95318.0099099048
+              },
+              {
+                "alpha": 0.8658567869514874,
+                "objective_zero": 119823.0086837436,
+                "objective_fit": 85436.66171069333
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        },
+        "recent_consistent": {
+          "alpha": [
+            0.9552396422203078,
+            0.963045488438701,
+            0.9397170426484674,
+            0.8992948885264199
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.9552396422203078,
+                "objective_zero": 151716.35895494305,
+                "objective_fit": 94268.78602431229
+              },
+              {
+                "alpha": 0.963045488438701,
+                "objective_zero": 154158.47274851397,
+                "objective_fit": 98468.86504854924
+              },
+              {
+                "alpha": 0.9397170426484674,
+                "objective_zero": 142957.4522138656,
+                "objective_fit": 95669.26293348947
+              },
+              {
+                "alpha": 0.8992948885264199,
+                "objective_zero": 119823.0086837436,
+                "objective_fit": 85555.11075613844
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        }
+      }
+    },
+    "TAS1": {
+      "scores": {
+        "C_roll": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 65.94594432778872,
+          "rmse_pooled": 551.0977010733967,
+          "pinball_by_quantile": {
+            "0.05": 8.943441803147358,
+            "0.1": 13.011903035544323,
+            "0.5": 32.97297216389436,
+            "0.9": 39.15258532469579,
+            "0.95": 38.39057074771968
+          },
+          "quantile_score_proxy": 52.98858923000059,
+          "coverage_80": 0.6371951219512195,
+          "interval_width_80": 71.52899784081532,
+          "coverage_90": 0.7350549976087997,
+          "interval_width_90": 107.04294868343541
+        },
+        "fresh28": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 68.00728059571148,
+          "rmse_pooled": 551.3334548609772,
+          "pinball_by_quantile": {
+            "0.05": 9.30860519287825,
+            "0.1": 13.531218519846407,
+            "0.5": 34.00364029785574,
+            "0.9": 39.818100263036506,
+            "0.95": 38.78600261669067
+          },
+          "quantile_score_proxy": 54.17902675612303,
+          "coverage_80": 0.5934361549497847,
+          "interval_width_80": 71.52899784081532,
+          "coverage_90": 0.713534194165471,
+          "interval_width_90": 107.04294868343541
+        },
+        "recent_consistent": {
+          "table": "Q",
+          "n_origins": 697,
+          "horizon": 24,
+          "n_cells": 16728,
+          "crossing_rate": 0.0,
+          "point_definition": "rearranged_q50",
+          "mae": 66.6191958583359,
+          "rmse_pooled": 551.3720309262822,
+          "pinball_by_quantile": {
+            "0.05": 8.826572358887883,
+            "0.1": 12.97648291689509,
+            "0.5": 33.30959792916795,
+            "0.9": 39.61301959073656,
+            "0.95": 38.69785591845686
+          },
+          "quantile_score_proxy": 53.369411485657736,
+          "coverage_80": 0.622907699665232,
+          "interval_width_80": 71.52899784081532,
+          "coverage_90": 0.7305117168818747,
+          "interval_width_90": 107.04294868343541
+        }
+      },
+      "fits": {
+        "fresh28": {
+          "alpha": [
+            0.5735570463494076,
+            0.5346644433702019,
+            0.5227366389009812,
+            0.41981608287273975
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.5735570463494076,
+                "objective_zero": 125613.36624577886,
+                "objective_fit": 115429.26110429125
+              },
+              {
+                "alpha": 0.5346644433702019,
+                "objective_zero": 131603.34943935028,
+                "objective_fit": 123482.48084507126
+              },
+              {
+                "alpha": 0.5227366389009812,
+                "objective_zero": 129130.10571259263,
+                "objective_fit": 121610.95600191914
+              },
+              {
+                "alpha": 0.41981608287273975,
+                "objective_zero": 115231.4731477924,
+                "objective_fit": 112694.71854975133
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        },
+        "recent_consistent": {
+          "alpha": [
+            0.6169280083406381,
+            0.5823877936499755,
+            0.5666266210419105,
+            0.4819363938424139
+          ],
+          "diagnostics": {
+            "fit_start": 1664546400,
+            "fit_cutoff": 1667224800,
+            "fit_origin_count": 720,
+            "last_fit_origin": 1667134800,
+            "latest_fit_label_available": 1667221200,
+            "groups": [
+              {
+                "alpha": 0.6169280083406381,
+                "objective_zero": 125613.36624577886,
+                "objective_fit": 114629.99722785177
+              },
+              {
+                "alpha": 0.5823877936499755,
+                "objective_zero": 131603.34943935028,
+                "objective_fit": 122646.61752088818
+              },
+              {
+                "alpha": 0.5666266210419105,
+                "objective_zero": 129130.10571259263,
+                "objective_fit": 120693.05821514907
+              },
+              {
+                "alpha": 0.4819363938424139,
+                "objective_zero": 115231.4731477924,
+                "objective_fit": 112082.85102712497
+              }
+            ],
+            "solver": "bounded weighted pinball breakpoints"
+          }
+        }
+      }
+    }
+  },
+  "parent_identity_sha": "182f7bd90c77f77b0dee1259d9b8923b2e3746d1cda740411818ecb31564534b",
+  "fit_cutoff": 1667224800,
+  "score_end_exclusive": 1669816800,
+  "scope": "October fit, November scoring; December excluded from all candidate calculations"
+}

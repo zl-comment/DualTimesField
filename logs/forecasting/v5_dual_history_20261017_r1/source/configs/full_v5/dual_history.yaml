@@ -1,0 +1,15 @@
+# Fixed contribution experiment, declared before December scores.
+protocol: v5-dual-history-contribution-20261017
+seed: 2026
+regions: [NSW1, QLD1, TAS1]
+encoder:
+  epochs: 12
+  batch_size: 128
+  hidden_dim: 24
+  num_atoms: 6
+  num_frequencies: 4
+  learning_rate: 0.003
+  device: cpu
+# Other numerical parameters inherit frozen V5 (K16, min8, same hour,
+# 365-day window, six state coordinates, +/-150 shift, four [0,1] weights).
+# No search or early-stopping selection in this contribution check.

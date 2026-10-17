@@ -1,0 +1,74 @@
+{
+  "macro": {
+    "B": {
+      "mae": 26.348678411016465,
+      "quantile_score_proxy": 15.219255894461178
+    },
+    "C_roll": {
+      "mae": 29.318699994674848,
+      "quantile_score_proxy": 17.428757304153304
+    },
+    "H_recent": {
+      "mae": 26.30175380857476,
+      "quantile_score_proxy": 15.480186521533563
+    },
+    "H_raw": {
+      "mae": 31.81831933630512,
+      "quantile_score_proxy": 19.991981761508836
+    },
+    "H_smooth": {
+      "mae": 31.906063919982497,
+      "quantile_score_proxy": 19.74298585451548
+    },
+    "H_dual_trend": {
+      "mae": 29.654604678576714,
+      "quantile_score_proxy": 17.675738828828933
+    },
+    "H_dual_full": {
+      "mae": 29.849719948703456,
+      "quantile_score_proxy": 17.808057714109307
+    },
+    "H_dual_event_off": {
+      "mae": 29.70545437386755,
+      "quantile_score_proxy": 17.707603361549904
+    }
+  },
+  "reference_minus_dual_full": {
+    "B": {
+      "mae": -3.501041537686991,
+      "quantile_score_proxy": -2.588801819648129
+    },
+    "C_roll": {
+      "mae": -0.5310199540286078,
+      "quantile_score_proxy": -0.3793004099560022
+    },
+    "H_recent": {
+      "mae": -3.547966140128697,
+      "quantile_score_proxy": -2.327871192575744
+    },
+    "H_raw": {
+      "mae": 1.9685993876016639,
+      "quantile_score_proxy": 2.183924047399529
+    },
+    "H_smooth": {
+      "mae": 2.0563439712790412,
+      "quantile_score_proxy": 1.934928140406175
+    },
+    "H_dual_trend": {
+      "mae": -0.1951152701267418,
+      "quantile_score_proxy": -0.13231888528037317
+    },
+    "H_dual_event_off": {
+      "mae": -0.14426557483590585,
+      "quantile_score_proxy": -0.10045435255940305
+    }
+  },
+  "field_activation": true,
+  "forecast_activation": true,
+  "incremental_value_pass": false,
+  "per_region_non_regression": false,
+  "beats_original_baseline": false,
+  "event_increment_pass": false,
+  "event_fixed_head_pass": false,
+  "scope": "Retrospective December2022 development; all settings fixed before scoring; no final test"
+}

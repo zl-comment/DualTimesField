@@ -1,0 +1,314 @@
+{
+  "C_roll": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.5310199540286069,
+        "qs": -0.3793004099559997
+      },
+      "ci95": {
+        "mae": [
+          -0.78525039705849,
+          -0.2445424699384445
+        ],
+        "qs": [
+          -0.5546237462269431,
+          -0.17564057870488273
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.5310199540286069,
+        "qs": -0.3793004099559997
+      },
+      "ci95": {
+        "mae": [
+          -0.7505628102957886,
+          -0.333292941709086
+        ],
+        "qs": [
+          -0.5289263693619971,
+          -0.24350582349751312
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  },
+  "H_raw": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": 1.968599387601656,
+        "qs": 2.18392404739953
+      },
+      "ci95": {
+        "mae": [
+          0.17996184778449206,
+          3.584727522412223
+        ],
+        "qs": [
+          0.7211784541667572,
+          3.46542930323865
+        ]
+      },
+      "p_value": {
+        "mae": 0.026026026026026026,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": 1.968599387601656,
+        "qs": 2.18392404739953
+      },
+      "ci95": {
+        "mae": [
+          0.9720560933963163,
+          2.991377456324583
+        ],
+        "qs": [
+          1.379308357381877,
+          2.9814498372949787
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  },
+  "H_smooth": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": 2.056343971279045,
+        "qs": 1.9349281404061787
+      },
+      "ci95": {
+        "mae": [
+          0.6917982015710101,
+          3.0712366547124326
+        ],
+        "qs": [
+          0.92090748786122,
+          2.8255861952224954
+        ]
+      },
+      "p_value": {
+        "mae": 0.002002002002002002,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": 2.056343971279045,
+        "qs": 1.9349281404061787
+      },
+      "ci95": {
+        "mae": [
+          1.2606668058378154,
+          2.8388159490188056
+        ],
+        "qs": [
+          1.2970720919269318,
+          2.5629700751017404
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  },
+  "H_recent": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -3.547966140128699,
+        "qs": -2.32787119257574
+      },
+      "ci95": {
+        "mae": [
+          -4.060633112131059,
+          -3.011818861742165
+        ],
+        "qs": [
+          -2.741011827200008,
+          -1.909512528299796
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -3.547966140128699,
+        "qs": -2.32787119257574
+      },
+      "ci95": {
+        "mae": [
+          -4.215329160199766,
+          -2.8599418868538184
+        ],
+        "qs": [
+          -2.8208330450429058,
+          -1.8630432043870255
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  },
+  "H_dual_trend": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.19511527012674304,
+        "qs": -0.1323188852803693
+      },
+      "ci95": {
+        "mae": [
+          -0.2524358843352727,
+          -0.14579045095059215
+        ],
+        "qs": [
+          -0.17791908889042982,
+          -0.09549511624898256
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.19511527012674304,
+        "qs": -0.1323188852803693
+      },
+      "ci95": {
+        "mae": [
+          -0.24474082681856643,
+          -0.1500844044866288
+        ],
+        "qs": [
+          -0.17074530371267777,
+          -0.09684214968223166
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  },
+  "H_dual_event_off": {
+    "168": {
+      "block_hours": 168,
+      "n_blocks": 5,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.14426557483590674,
+        "qs": -0.10045435255940009
+      },
+      "ci95": {
+        "mae": [
+          -0.18589983876124322,
+          -0.09609173614862893
+        ],
+        "qs": [
+          -0.13364936207028588,
+          -0.06336392897323626
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    },
+    "24": {
+      "block_hours": 24,
+      "n_blocks": 31,
+      "n_boot": 999,
+      "seed": 2026,
+      "effect_convention": "positive = candidate (second argument) better: mean(loss_ref) - mean(loss_cand)",
+      "point_difference": {
+        "mae": -0.14426557483590674,
+        "qs": -0.10045435255940009
+      },
+      "ci95": {
+        "mae": [
+          -0.18387254005027243,
+          -0.10301039700775257
+        ],
+        "qs": [
+          -0.12822211504753936,
+          -0.07279500954414207
+        ]
+      },
+      "p_value": {
+        "mae": 0.0,
+        "qs": 0.0
+      }
+    }
+  }
+}
