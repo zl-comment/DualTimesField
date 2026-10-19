@@ -1,0 +1,58 @@
+{
+  "macro": {
+    "B": {
+      "mae": 45.3950089590849,
+      "quantile_score_proxy": 30.421851430193318
+    },
+    "C_roll": {
+      "mae": 44.999826060328644,
+      "quantile_score_proxy": 30.96175138000156
+    },
+    "H_recent": {
+      "mae": 51.73512180703167,
+      "quantile_score_proxy": 36.79815359459096
+    },
+    "H_previous_global": {
+      "mae": 57.69099844317316,
+      "quantile_score_proxy": 42.16549530897034
+    },
+    "T_only": {
+      "mae": 49.14919910129405,
+      "quantile_score_proxy": 34.50349960627272
+    },
+    "TE_unshifted": {
+      "mae": 50.193766608392025,
+      "quantile_score_proxy": 35.560931110834936
+    },
+    "TE_full": {
+      "mae": 49.9070135374304,
+      "quantile_score_proxy": 35.23967525471434
+    },
+    "TE_fixed_pulses": {
+      "mae": 49.78363774695432,
+      "quantile_score_proxy": 35.15769281523705
+    },
+    "TE_event_off": {
+      "mae": 48.62568665375878,
+      "quantile_score_proxy": 33.97962314182539
+    },
+    "TE_time_shift_off": {
+      "mae": 49.718642551877,
+      "quantile_score_proxy": 35.12966860683512
+    }
+  },
+  "macro_wins_mae_and_qs": {
+    "B": false,
+    "C_roll": false,
+    "H_recent": true,
+    "H_previous_global": true,
+    "T_only": false,
+    "TE_unshifted": true,
+    "TE_fixed_pulses": false,
+    "TE_event_off": false,
+    "TE_time_shift_off": false
+  },
+  "per_region_non_regression": false,
+  "incremental_value_pass": false,
+  "scope": "Retrospective November2022; fixed October fitting; no December scoring or final test"
+}

@@ -1,0 +1,3908 @@
+{
+  "region": "QLD1",
+  "seed": 2026,
+  "scores": {
+    "B": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 37.41203845131827,
+        "rmse_pooled": 88.34885925712128,
+        "pinball_by_quantile": {
+          "0.05": 4.612852859373695,
+          "0.1": 8.042273057694091,
+          "0.5": 18.706019225659134,
+          "0.9": 12.799650813114495,
+          "0.95": 11.507750557462545
+        },
+        "quantile_score_proxy": 22.267418605321584,
+        "coverage_80": 0.7761015325670498,
+        "interval_width_80": 122.0086801420621,
+        "coverage_90": 0.9162476053639846,
+        "interval_width_90": 236.57669115697774
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 36.43297598615355,
+          "conditional_bias": 34.54723634762226,
+          "mae_contribution": 2.9313888724491366,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 29.770678205552738,
+          "conditional_bias": -21.62347203490966,
+          "mae_contribution": 26.6303564264469,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 313.7112364068443,
+          "conditional_bias": -313.7112364068443,
+          "mae_contribution": 7.8502931524222275,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 37.41203845131827,
+        "contribution_sum": 37.41203845131827
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_alarm_cells": 3,
+        "alarm_cells": 3,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "C_roll": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.856338465661516,
+        "rmse_pooled": 83.06474405683839,
+        "pinball_by_quantile": {
+          "0.05": 4.535213936371595,
+          "0.1": 7.272639939797837,
+          "0.5": 17.428169232830758,
+          "0.9": 12.334482203740238,
+          "0.95": 10.67283149676618
+        },
+        "quantile_score_proxy": 20.89733472380264,
+        "coverage_80": 0.6192528735632183,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.7822677203065134,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 31.097760214714352,
+          "conditional_bias": 22.730214921127,
+          "mae_contribution": 2.502118637965522,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 28.987488707723404,
+          "conditional_bias": 2.8361546577918606,
+          "mae_contribution": 25.929780667552862,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 256.7316548589255,
+          "conditional_bias": -256.2783880618114,
+          "mae_contribution": 6.424439160143131,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 34.856338465661516,
+        "contribution_sum": 34.856338465661516
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.03349282296650718,
+        "precision": 0.4,
+        "false_alarm_cells": 21,
+        "alarm_cells": 35,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_recent": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 46.95785613656097,
+        "rmse_pooled": 90.44450521111217,
+        "pinball_by_quantile": {
+          "0.05": 13.66523769782744,
+          "0.1": 16.974755440102946,
+          "0.5": 23.478928068280485,
+          "0.9": 13.240018451813324,
+          "0.95": 10.973101101620392
+        },
+        "quantile_score_proxy": 31.332816303857832,
+        "coverage_80": 0.5113146551724138,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.638948754789272,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 42.403825684708245,
+          "conditional_bias": 37.539392384185035,
+          "mae_contribution": 3.4118020665857216,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 41.685507100609904,
+          "conditional_bias": 15.262981649879134,
+          "mae_contribution": 37.28836488848858,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 250.0680384869696,
+          "conditional_bias": -241.43450969700407,
+          "mae_contribution": 6.2576891814866675,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 46.95785613656097,
+        "contribution_sum": 46.95785613656097
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.14832535885167464,
+        "precision": 0.1425287356321839,
+        "false_alarm_cells": 373,
+        "alarm_cells": 435,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "H_previous_global": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 56.17295547804977,
+        "rmse_pooled": 95.17899027738554,
+        "pinball_by_quantile": {
+          "0.05": 21.38279021203883,
+          "0.1": 24.789960901009888,
+          "0.5": 28.086477739024886,
+          "0.9": 14.370097671880584,
+          "0.95": 11.746749367473232
+        },
+        "quantile_score_proxy": 40.15043035657097,
+        "coverage_80": 0.3899066091954023,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.4940134099616858,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 35.91205883308819,
+          "conditional_bias": 25.082222461130353,
+          "mae_contribution": 2.889475998064567,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 53.24319224442116,
+          "conditional_bias": 34.841192120095144,
+          "mae_contribution": 47.62690244948162,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 226.04656152519564,
+          "conditional_bias": -213.28587076316254,
+          "mae_contribution": 5.656577030503577,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 56.17295547804977,
+        "contribution_sum": 56.172955478049765
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.3229665071770335,
+        "precision": 0.18854748603351956,
+        "false_alarm_cells": 581,
+        "alarm_cells": 716,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "T_only": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 43.67069333393678,
+        "rmse_pooled": 86.89343252295905,
+        "pinball_by_quantile": {
+          "0.05": 10.843260436804153,
+          "0.1": 14.083496796642278,
+          "0.5": 21.83534666696839,
+          "0.9": 13.154065059633172,
+          "0.95": 11.031794537866542
+        },
+        "quantile_score_proxy": 28.379185399165817,
+        "coverage_80": 0.49922174329501917,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.6319444444444444,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 30.722889163108615,
+          "conditional_bias": 22.099011012473994,
+          "mae_contribution": 2.471956599330578,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 38.97946733229886,
+          "conditional_bias": 15.51502266146034,
+          "mae_contribution": 34.86776825186839,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 252.99640558768516,
+          "conditional_bias": -252.32178258460348,
+          "mae_contribution": 6.330968482737811,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 43.67069333393678,
+        "contribution_sum": 43.670693333936775
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.03588516746411483,
+        "precision": 0.13636363636363635,
+        "false_alarm_cells": 95,
+        "alarm_cells": 110,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "TE_unshifted": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 44.54239926905229,
+        "rmse_pooled": 87.89445412184847,
+        "pinball_by_quantile": {
+          "0.05": 12.08870966813324,
+          "0.1": 15.24895765991695,
+          "0.5": 22.271199634526145,
+          "0.9": 13.286720289732452,
+          "0.95": 11.206791582427895
+        },
+        "quantile_score_proxy": 29.640951533894675,
+        "coverage_80": 0.48617097701149425,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.6142840038314177,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 31.928804900994116,
+          "conditional_bias": 21.778426962060653,
+          "mae_contribution": 2.568984302378837,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 40.70257752953098,
+          "conditional_bias": 19.239257029712885,
+          "mae_contribution": 36.40911838160033,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 222.35887597383123,
+          "conditional_bias": -213.34175295042257,
+          "mae_contribution": 5.564296585073122,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 44.54239926905229,
+        "contribution_sum": 44.54239926905229
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.3684210526315789,
+        "precision": 0.23950233281493002,
+        "false_alarm_cells": 489,
+        "alarm_cells": 643,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "TE_full": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 44.668245556383866,
+        "rmse_pooled": 87.15590193864574,
+        "pinball_by_quantile": {
+          "0.05": 12.104981210109365,
+          "0.1": 15.300192028737108,
+          "0.5": 22.334122778191933,
+          "0.9": 13.26004477364178,
+          "0.95": 11.148521871607278
+        },
+        "quantile_score_proxy": 29.65914506491498,
+        "coverage_80": 0.48814655172413796,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.6133860153256705,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 31.16637581027671,
+          "conditional_bias": 21.314324092752763,
+          "mae_contribution": 2.5076394330107696,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 40.59399627022596,
+          "conditional_bias": 19.079775748145266,
+          "mae_contribution": 36.31199067706635,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 233.72074740456475,
+          "conditional_bias": -229.12067730501406,
+          "mae_contribution": 5.848615446306757,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 44.668245556383866,
+        "contribution_sum": 44.66824555638387
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.20095693779904306,
+        "precision": 0.23863636363636365,
+        "false_alarm_cells": 268,
+        "alarm_cells": 352,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "TE_fixed_pulses": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 45.2179197906254,
+        "rmse_pooled": 87.66669550864621,
+        "pinball_by_quantile": {
+          "0.05": 12.523449118220812,
+          "0.1": 15.726206379164177,
+          "0.5": 22.6089598953127,
+          "0.9": 13.279442375720016,
+          "0.95": 11.168267860251833
+        },
+        "quantile_score_proxy": 30.122530251467815,
+        "coverage_80": 0.4783285440613027,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.6078184865900383,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 32.14014203718319,
+          "conditional_bias": 23.155813764994072,
+          "mae_contribution": 2.5859884397733595,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 41.09998516102881,
+          "conditional_bias": 20.57192993653321,
+          "mae_contribution": 36.76460597917221,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 234.46842825009594,
+          "conditional_bias": -231.02548775070832,
+          "mae_contribution": 5.867325371679841,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 45.2179197906254,
+        "contribution_sum": 45.21791979062541
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.16985645933014354,
+        "precision": 0.20579710144927535,
+        "false_alarm_cells": 274,
+        "alarm_cells": 345,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "TE_event_off": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 42.31670018569429,
+        "rmse_pooled": 85.77382035469023,
+        "pinball_by_quantile": {
+          "0.05": 9.622855366784654,
+          "0.1": 12.878459616599821,
+          "0.5": 21.158350092847144,
+          "0.9": 13.042627255996058,
+          "0.95": 11.00539970586691
+        },
+        "quantile_score_proxy": 27.08307681523784,
+        "coverage_80": 0.5065852490421456,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.6399066091954023,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 31.110659905411634,
+          "conditional_bias": 21.234691675964125,
+          "mae_contribution": 2.50315654411358,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 37.427839150349186,
+          "conditional_bias": 14.013475120815698,
+          "mae_contribution": 33.47981157713826,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 253.10684307283884,
+          "conditional_bias": -252.46480835885268,
+          "mae_contribution": 6.333732064442446,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 42.31670018569429,
+        "contribution_sum": 42.31670018569428
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.03588516746411483,
+        "precision": 0.15,
+        "false_alarm_cells": 85,
+        "alarm_cells": 100,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    },
+    "TE_time_shift_off": {
+      "metrics": {
+        "table": "Q",
+        "n_origins": 696,
+        "horizon": 24,
+        "n_cells": 16704,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 44.0616518668664,
+        "rmse_pooled": 87.0839214413553,
+        "pinball_by_quantile": {
+          "0.05": 11.712446669917403,
+          "0.1": 14.858959131543296,
+          "0.5": 22.0308259334332,
+          "0.9": 13.2496016637589,
+          "0.95": 11.183031771822145
+        },
+        "quantile_score_proxy": 29.213946068189976,
+        "coverage_80": 0.4891044061302682,
+        "interval_width_80": 81.3765419356028,
+        "coverage_90": 0.617397030651341,
+        "interval_width_90": 158.39879227439346
+      },
+      "bands": {
+        "negative": {
+          "n_cells": 1344,
+          "conditional_mae": 31.110139332313523,
+          "conditional_bias": 21.235724247126218,
+          "mae_contribution": 2.503114658921777,
+          "fraction": 0.08045977011494253
+        },
+        "range_0_300": {
+          "n_cells": 14942,
+          "conditional_mae": 40.24849323538039,
+          "conditional_bias": 18.712748956969634,
+          "mae_contribution": 36.00293258638971,
+          "fraction": 0.8945162835249042
+        },
+        "above_300": {
+          "n_cells": 418,
+          "conditional_mae": 222.0115301398403,
+          "conditional_bias": -213.22321998646194,
+          "mae_contribution": 5.555604621554911,
+          "fraction": 0.025023946360153256
+        },
+        "mae_total": 44.0616518668664,
+        "contribution_sum": 44.0616518668664
+      },
+      "spike": {
+        "threshold": 300.0,
+        "recall": 0.37320574162679426,
+        "precision": 0.2708333333333333,
+        "false_alarm_cells": 420,
+        "alarm_cells": 576,
+        "true_cells": 418,
+        "q95_ranking_score_note": "q95 values are retained as the fixed ranking score for any alarm ordering"
+      }
+    }
+  },
+  "fits": {
+    "H_recent": {
+      "alpha": [
+        0.9305016899535355,
+        0.9342817657634556,
+        0.9160763973179428,
+        0.872145896482075
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1667224800,
+        "fit_origin_count": 720,
+        "last_fit_origin": 1667134800,
+        "latest_fit_label_available": 1667221200,
+        "groups": [
+          {
+            "alpha": 0.9305016899535355,
+            "objective_zero": 151716.35895494305,
+            "objective_fit": 96633.11912315173
+          },
+          {
+            "alpha": 0.9342817657634556,
+            "objective_zero": 154158.47274851397,
+            "objective_fit": 100647.60262837322
+          },
+          {
+            "alpha": 0.9160763973179428,
+            "objective_zero": 142957.4522138656,
+            "objective_fit": 97525.3900500433
+          },
+          {
+            "alpha": 0.872145896482075,
+            "objective_zero": 119823.0086837436,
+            "objective_fit": 86828.12889690971
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "H_previous_global": {
+      "alpha": [
+        0.9345900540968702,
+        0.9555553660807595,
+        0.9303682049198168,
+        0.8839274431755576
+      ],
+      "diagnostics": {
+        "fit_start": 1664546400,
+        "fit_cutoff": 1667224800,
+        "fit_origin_count": 720,
+        "last_fit_origin": 1667134800,
+        "latest_fit_label_available": 1667221200,
+        "groups": [
+          {
+            "alpha": 0.9345900540968702,
+            "objective_zero": 151716.35895494305,
+            "objective_fit": 94370.44769965182
+          },
+          {
+            "alpha": 0.9555553660807595,
+            "objective_zero": 154158.47274851397,
+            "objective_fit": 98136.8994182752
+          },
+          {
+            "alpha": 0.9303682049198168,
+            "objective_zero": 142957.4522138656,
+            "objective_fit": 94990.85162208864
+          },
+          {
+            "alpha": 0.8839274431755576,
+            "objective_zero": 119823.0086837436,
+            "objective_fit": 85528.0275465408
+          }
+        ],
+        "solver": "bounded weighted pinball breakpoints"
+      }
+    },
+    "T_only": {
+      "seed": 2026,
+      "config": {
+        "epochs": 80,
+        "learning_rate": 0.01,
+        "l2": 0.001,
+        "gate_penalty": 0.001,
+        "device": "cpu"
+      },
+      "mode": "trend",
+      "fit_start": 1664546400,
+      "fit_cutoff": 1667224800,
+      "fit_rows": 720,
+      "first_fit_origin": 1664546400,
+      "last_fit_origin": 1667134800,
+      "latest_fit_label_available": 1667221200,
+      "feature_count": 29,
+      "trainable_parameters": 60,
+      "gate": "clamp(linear(features),0,1); shared across horizons",
+      "correction": "clip(gT*trend+gE*event,-150,150); same offset for all five quantiles",
+      "loss_weights": [
+        0.2,
+        0.2,
+        0.4,
+        0.2,
+        0.2
+      ],
+      "price_scale": 300.0,
+      "loss": "mean weighted pinball + l2*mean(parameter^2) + gate_penalty*(mean(gT)+mean(gE))",
+      "selection": "fixed final epoch or exact zero null using fitting objective only; no epoch search or held-out selection",
+      "final_trained_objective": 0.07219999008286104,
+      "null_objective": 0.10969430798631678,
+      "selected_null": false,
+      "final_selected_objective": 0.07219999008286104,
+      "final_objective": 0.07219999008286104,
+      "trace": [
+        {
+          "epoch": 1,
+          "loss": 0.10297374501911499,
+          "pinball": 0.10287341168578165,
+          "l2": 3.333333333333334e-07,
+          "gate_penalty": 0.00010000000000000007
+        },
+        {
+          "epoch": 2,
+          "loss": 0.09667003977186131,
+          "pinball": 0.0964795230471993,
+          "l2": 3.8508929780862075e-07,
+          "gate_penalty": 0.00019013163536419576
+        },
+        {
+          "epoch": 3,
+          "loss": 0.09089715066494444,
+          "pinball": 0.09061663895841864,
+          "l2": 5.395103230887149e-07,
+          "gate_penalty": 0.000279972196202726
+        },
+        {
+          "epoch": 4,
+          "loss": 0.08573545079401422,
+          "pinball": 0.08536560887698703,
+          "l2": 7.937871643724979e-07,
+          "gate_penalty": 0.0003690481298628072
+        },
+        {
+          "epoch": 5,
+          "loss": 0.08129808834706334,
+          "pinball": 0.08084028120726595,
+          "l2": 1.1422028027504499e-06,
+          "gate_penalty": 0.0004566649369946363
+        },
+        {
+          "epoch": 6,
+          "loss": 0.07775009828925242,
+          "pinball": 0.07720661565793066,
+          "l2": 1.5759390279586232e-06,
+          "gate_penalty": 0.0005419066922938014
+        },
+        {
+          "epoch": 7,
+          "loss": 0.07524872993074375,
+          "pinball": 0.07462275361338934,
+          "l2": 2.0839944430974877e-06,
+          "gate_penalty": 0.000623892322911305
+        },
+        {
+          "epoch": 8,
+          "loss": 0.07389865569906146,
+          "pinball": 0.0731951053362649,
+          "l2": 2.6496395858190414e-06,
+          "gate_penalty": 0.0007009007232107387
+        },
+        {
+          "epoch": 9,
+          "loss": 0.07363345385876038,
+          "pinball": 0.07286150729957805,
+          "l2": 3.242515071163321e-06,
+          "gate_penalty": 0.0007687040441111719
+        },
+        {
+          "epoch": 10,
+          "loss": 0.07397794202511877,
+          "pinball": 0.07315114251533106,
+          "l2": 3.829170909630218e-06,
+          "gate_penalty": 0.0008229703388780891
+        },
+        {
+          "epoch": 11,
+          "loss": 0.07439343594612226,
+          "pinball": 0.07352813056105258,
+          "l2": 4.3814749835478235e-06,
+          "gate_penalty": 0.0008609239100861376
+        },
+        {
+          "epoch": 12,
+          "loss": 0.07465756775519845,
+          "pinball": 0.07376556758032767,
+          "l2": 4.895244431197989e-06,
+          "gate_penalty": 0.0008871049304395896
+        },
+        {
+          "epoch": 13,
+          "loss": 0.07479877449886058,
+          "pinball": 0.07388789497773489,
+          "l2": 5.374894849117146e-06,
+          "gate_penalty": 0.0009055046262765737
+        },
+        {
+          "epoch": 14,
+          "loss": 0.07488410141829234,
+          "pinball": 0.07395951019699278,
+          "l2": 5.82271531095509e-06,
+          "gate_penalty": 0.0009187685059886135
+        },
+        {
+          "epoch": 15,
+          "loss": 0.07493248501154903,
+          "pinball": 0.07399792875945962,
+          "l2": 6.240642698690891e-06,
+          "gate_penalty": 0.0009283156093907235
+        },
+        {
+          "epoch": 16,
+          "loss": 0.07496167544341474,
+          "pinball": 0.0740200401686056,
+          "l2": 6.630031718783286e-06,
+          "gate_penalty": 0.0009350052430903498
+        },
+        {
+          "epoch": 17,
+          "loss": 0.0749789017459132,
+          "pinball": 0.07403237481252536,
+          "l2": 6.991793185146297e-06,
+          "gate_penalty": 0.000939535140202701
+        },
+        {
+          "epoch": 18,
+          "loss": 0.07498430348110344,
+          "pinball": 0.07403455534994949,
+          "l2": 7.327013967110496e-06,
+          "gate_penalty": 0.0009424211171868377
+        },
+        {
+          "epoch": 19,
+          "loss": 0.07497833983921391,
+          "pinball": 0.07402660718634922,
+          "l2": 7.637170424758946e-06,
+          "gate_penalty": 0.0009440954824399298
+        },
+        {
+          "epoch": 20,
+          "loss": 0.07496312581319588,
+          "pinball": 0.07401037050249304,
+          "l2": 7.924310373710252e-06,
+          "gate_penalty": 0.0009448310003291344
+        },
+        {
+          "epoch": 21,
+          "loss": 0.07494046610278193,
+          "pinball": 0.07398749693770272,
+          "l2": 8.190092862193446e-06,
+          "gate_penalty": 0.0009447790722170146
+        },
+        {
+          "epoch": 22,
+          "loss": 0.07491108683041092,
+          "pinball": 0.07395860000143901,
+          "l2": 8.43631072866402e-06,
+          "gate_penalty": 0.0009440505182432458
+        },
+        {
+          "epoch": 23,
+          "loss": 0.07487550372574109,
+          "pinball": 0.07392411163278363,
+          "l2": 8.664707019605956e-06,
+          "gate_penalty": 0.0009427273859378522
+        },
+        {
+          "epoch": 24,
+          "loss": 0.07483397434089777,
+          "pinball": 0.07388422373645363,
+          "l2": 8.877015839140107e-06,
+          "gate_penalty": 0.0009408735886049918
+        },
+        {
+          "epoch": 25,
+          "loss": 0.07478679276078783,
+          "pinball": 0.07383918414847894,
+          "l2": 9.075136684575754e-06,
+          "gate_penalty": 0.000938533475624313
+        },
+        {
+          "epoch": 26,
+          "loss": 0.07473416214899863,
+          "pinball": 0.07378916874153739,
+          "l2": 9.260638724381024e-06,
+          "gate_penalty": 0.0009357327687368664
+        },
+        {
+          "epoch": 27,
+          "loss": 0.07467570078654996,
+          "pinball": 0.07373379178852471,
+          "l2": 9.434839635177547e-06,
+          "gate_penalty": 0.0009324741583900719
+        },
+        {
+          "epoch": 28,
+          "loss": 0.0746121765742178,
+          "pinball": 0.07367380917845406,
+          "l2": 9.59907941774795e-06,
+          "gate_penalty": 0.0009287683163459909
+        },
+        {
+          "epoch": 29,
+          "loss": 0.07454446909943144,
+          "pinball": 0.07361007334613516,
+          "l2": 9.754831526645706e-06,
+          "gate_penalty": 0.0009246409217696369
+        },
+        {
+          "epoch": 30,
+          "loss": 0.07447434645845763,
+          "pinball": 0.07354432410748897,
+          "l2": 9.903468534588904e-06,
+          "gate_penalty": 0.0009201188824340738
+        },
+        {
+          "epoch": 31,
+          "loss": 0.07440277534423552,
+          "pinball": 0.07347748795730077,
+          "l2": 1.0046077564168625e-05,
+          "gate_penalty": 0.0009152413093705828
+        },
+        {
+          "epoch": 32,
+          "loss": 0.07432917790307315,
+          "pinball": 0.0734089638130775,
+          "l2": 1.0183740829433676e-05,
+          "gate_penalty": 0.0009100303491662228
+        },
+        {
+          "epoch": 33,
+          "loss": 0.07425382289369006,
+          "pinball": 0.0733390295449514,
+          "l2": 1.0317404215658935e-05,
+          "gate_penalty": 0.0009044759445229975
+        },
+        {
+          "epoch": 34,
+          "loss": 0.07417657379599628,
+          "pinball": 0.07326754433258692,
+          "l2": 1.0447986623188229e-05,
+          "gate_penalty": 0.000898581476786178
+        },
+        {
+          "epoch": 35,
+          "loss": 0.07409712001457036,
+          "pinball": 0.07319419002496735,
+          "l2": 1.0576290235328101e-05,
+          "gate_penalty": 0.0008923536993676743
+        },
+        {
+          "epoch": 36,
+          "loss": 0.07401304290001429,
+          "pinball": 0.07311657861141264,
+          "l2": 1.0702523061998552e-05,
+          "gate_penalty": 0.0008857617655396467
+        },
+        {
+          "epoch": 37,
+          "loss": 0.07392262033492188,
+          "pinball": 0.07303304893093131,
+          "l2": 1.0827041653491249e-05,
+          "gate_penalty": 0.0008787443623370837
+        },
+        {
+          "epoch": 38,
+          "loss": 0.07382317957386098,
+          "pinball": 0.07294098646508486,
+          "l2": 1.0950180371094393e-05,
+          "gate_penalty": 0.000871242928405025
+        },
+        {
+          "epoch": 39,
+          "loss": 0.07371560694001578,
+          "pinball": 0.07284134971557177,
+          "l2": 1.1071858346580063e-05,
+          "gate_penalty": 0.000863185366097438
+        },
+        {
+          "epoch": 40,
+          "loss": 0.0736040269282277,
+          "pinball": 0.072738254915503,
+          "l2": 1.1192097697341576e-05,
+          "gate_penalty": 0.0008545799150273686
+        },
+        {
+          "epoch": 41,
+          "loss": 0.0734949249409092,
+          "pinball": 0.07263813485442445,
+          "l2": 1.131082250716649e-05,
+          "gate_penalty": 0.0008454792639775889
+        },
+        {
+          "epoch": 42,
+          "loss": 0.07340253848851898,
+          "pinball": 0.07255502723817668,
+          "l2": 1.1427924941283123e-05,
+          "gate_penalty": 0.0008360833254010083
+        },
+        {
+          "epoch": 43,
+          "loss": 0.07333247967931529,
+          "pinball": 0.07249428916118118,
+          "l2": 1.1543468141801718e-05,
+          "gate_penalty": 0.0008266470499923038
+        },
+        {
+          "epoch": 44,
+          "loss": 0.07328473023741902,
+          "pinball": 0.07245561235438058,
+          "l2": 1.1656585794906064e-05,
+          "gate_penalty": 0.000817461297243533
+        },
+        {
+          "epoch": 45,
+          "loss": 0.07325841344335812,
+          "pinball": 0.07243784759323103,
+          "l2": 1.176563142389631e-05,
+          "gate_penalty": 0.0008088002187031961
+        },
+        {
+          "epoch": 46,
+          "loss": 0.07325319455489328,
+          "pinball": 0.07244036884126917,
+          "l2": 1.1869682239422604e-05,
+          "gate_penalty": 0.0008009560313846792
+        },
+        {
+          "epoch": 47,
+          "loss": 0.07326104973749384,
+          "pinball": 0.0724549366282775,
+          "l2": 1.1967759304564866e-05,
+          "gate_penalty": 0.0007941453499117731
+        },
+        {
+          "epoch": 48,
+          "loss": 0.07327205943455381,
+          "pinball": 0.0724714728200992,
+          "l2": 1.2057579154252884e-05,
+          "gate_penalty": 0.0007885290353003551
+        },
+        {
+          "epoch": 49,
+          "loss": 0.07328260627527765,
+          "pinball": 0.072486229829789,
+          "l2": 1.2138920592283487e-05,
+          "gate_penalty": 0.0007842375248963764
+        },
+        {
+          "epoch": 50,
+          "loss": 0.07328519202849008,
+          "pinball": 0.07249168699852207,
+          "l2": 1.2211499787291689e-05,
+          "gate_penalty": 0.0007812935301807249
+        },
+        {
+          "epoch": 51,
+          "loss": 0.07327766258237343,
+          "pinball": 0.0724857270529272,
+          "l2": 1.227593191731796e-05,
+          "gate_penalty": 0.0007796595975289217
+        },
+        {
+          "epoch": 52,
+          "loss": 0.07325922783024959,
+          "pinball": 0.07246763166850399,
+          "l2": 1.2333297464651634e-05,
+          "gate_penalty": 0.0007792628642809478
+        },
+        {
+          "epoch": 53,
+          "loss": 0.07323096909353594,
+          "pinball": 0.07243860967253031,
+          "l2": 1.238491186620552e-05,
+          "gate_penalty": 0.0007799745091394127
+        },
+        {
+          "epoch": 54,
+          "loss": 0.07319485289851453,
+          "pinball": 0.07240077014160619,
+          "l2": 1.2432224863274751e-05,
+          "gate_penalty": 0.0007816505320450753
+        },
+        {
+          "epoch": 55,
+          "loss": 0.07315377253295992,
+          "pinball": 0.07235719397230482,
+          "l2": 1.2476095871280275e-05,
+          "gate_penalty": 0.0007841024647838188
+        },
+        {
+          "epoch": 56,
+          "loss": 0.07311068423375033,
+          "pinball": 0.07231101711553015,
+          "l2": 1.2517689830570283e-05,
+          "gate_penalty": 0.000787149428389619
+        },
+        {
+          "epoch": 57,
+          "loss": 0.0730681402712208,
+          "pinball": 0.07226498670183977,
+          "l2": 1.2558199020932524e-05,
+          "gate_penalty": 0.0007905953703601014
+        },
+        {
+          "epoch": 58,
+          "loss": 0.07302792064927884,
+          "pinball": 0.0722210569244608,
+          "l2": 1.259842786854706e-05,
+          "gate_penalty": 0.0007942652969494793
+        },
+        {
+          "epoch": 59,
+          "loss": 0.07299175534231196,
+          "pinball": 0.07218113007761631,
+          "l2": 1.2638823873832978e-05,
+          "gate_penalty": 0.0007979864408218053
+        },
+        {
+          "epoch": 60,
+          "loss": 0.07296052871336359,
+          "pinball": 0.07214625256383074,
+          "l2": 1.26792396197602e-05,
+          "gate_penalty": 0.0008015969099130894
+        },
+        {
+          "epoch": 61,
+          "loss": 0.0729329230714779,
+          "pinball": 0.07211523073382936,
+          "l2": 1.2718987937898784e-05,
+          "gate_penalty": 0.0008049733497106444
+        },
+        {
+          "epoch": 62,
+          "loss": 0.07290793644056959,
+          "pinball": 0.07208714004321504,
+          "l2": 1.2757998095710977e-05,
+          "gate_penalty": 0.0008080383992588496
+        },
+        {
+          "epoch": 63,
+          "loss": 0.07288465712900738,
+          "pinball": 0.07206116016737861,
+          "l2": 1.2796392890872437e-05,
+          "gate_penalty": 0.0008107005687379006
+        },
+        {
+          "epoch": 64,
+          "loss": 0.07286177634998037,
+          "pinball": 0.07203607580174504,
+          "l2": 1.2833850150130646e-05,
+          "gate_penalty": 0.0008128666980852005
+        },
+        {
+          "epoch": 65,
+          "loss": 0.072836972246359,
+          "pinball": 0.07200966205589207,
+          "l2": 1.2869869963397279e-05,
+          "gate_penalty": 0.0008144403205035439
+        },
+        {
+          "epoch": 66,
+          "loss": 0.07280896137765387,
+          "pinball": 0.071980656392832,
+          "l2": 1.290439138253366e-05,
+          "gate_penalty": 0.0008154005934393528
+        },
+        {
+          "epoch": 67,
+          "loss": 0.0727772878144262,
+          "pinball": 0.07194861785959532,
+          "l2": 1.2937291876680553e-05,
+          "gate_penalty": 0.0008157326629542078
+        },
+        {
+          "epoch": 68,
+          "loss": 0.07274269216182315,
+          "pinball": 0.07191420278262771,
+          "l2": 1.2968855958362942e-05,
+          "gate_penalty": 0.0008155205232370773
+        },
+        {
+          "epoch": 69,
+          "loss": 0.07270568288614201,
+          "pinball": 0.07187787584701201,
+          "l2": 1.2998996634975678e-05,
+          "gate_penalty": 0.0008148080424950366
+        },
+        {
+          "epoch": 70,
+          "loss": 0.07266644035183277,
+          "pinball": 0.07183972879862081,
+          "l2": 1.3028325815324923e-05,
+          "gate_penalty": 0.0008136832273966224
+        },
+        {
+          "epoch": 71,
+          "loss": 0.07262588741802155,
+          "pinball": 0.07180060349168663,
+          "l2": 1.3056743605398795e-05,
+          "gate_penalty": 0.0008122271827295284
+        },
+        {
+          "epoch": 72,
+          "loss": 0.07258447313918831,
+          "pinball": 0.07176085677723923,
+          "l2": 1.3084736745453877e-05,
+          "gate_penalty": 0.0008105316252036328
+        },
+        {
+          "epoch": 73,
+          "loss": 0.07254178967335079,
+          "pinball": 0.07172002562517893,
+          "l2": 1.3111645519131036e-05,
+          "gate_penalty": 0.0008086524026527283
+        },
+        {
+          "epoch": 74,
+          "loss": 0.07249918397217724,
+          "pinball": 0.07167934719442333,
+          "l2": 1.3137607535480216e-05,
+          "gate_penalty": 0.0008066991702184263
+        },
+        {
+          "epoch": 75,
+          "loss": 0.07245725410760448,
+          "pinball": 0.07163930831979429,
+          "l2": 1.3162308321829106e-05,
+          "gate_penalty": 0.0008047834794883637
+        },
+        {
+          "epoch": 76,
+          "loss": 0.07241572122946026,
+          "pinball": 0.07159952096363213,
+          "l2": 1.3185481752293499e-05,
+          "gate_penalty": 0.0008030147840758324
+        },
+        {
+          "epoch": 77,
+          "loss": 0.0723745797163522,
+          "pinball": 0.07155987854126228,
+          "l2": 1.3206863413378004e-05,
+          "gate_penalty": 0.0008014943116765322
+        },
+        {
+          "epoch": 78,
+          "loss": 0.07233303835184665,
+          "pinball": 0.07151953860132297,
+          "l2": 1.3226244508090515e-05,
+          "gate_penalty": 0.0008002735060155927
+        },
+        {
+          "epoch": 79,
+          "loss": 0.07229057957138312,
+          "pinball": 0.07147790947179718,
+          "l2": 1.3243623972930259e-05,
+          "gate_penalty": 0.000799426475613013
+        },
+        {
+          "epoch": 80,
+          "loss": 0.07224650677103461,
+          "pinball": 0.07143428256952132,
+          "l2": 1.3258641380596766e-05,
+          "gate_penalty": 0.0007989655601326945
+        }
+      ]
+    },
+    "TE_unshifted": {
+      "seed": 2026,
+      "config": {
+        "epochs": 80,
+        "learning_rate": 0.01,
+        "l2": 0.001,
+        "gate_penalty": 0.001,
+        "device": "cpu"
+      },
+      "mode": "full",
+      "fit_start": 1664546400,
+      "fit_cutoff": 1667224800,
+      "fit_rows": 720,
+      "first_fit_origin": 1664546400,
+      "last_fit_origin": 1667134800,
+      "latest_fit_label_available": 1667221200,
+      "feature_count": 29,
+      "trainable_parameters": 60,
+      "gate": "clamp(linear(features),0,1); shared across horizons",
+      "correction": "clip(gT*trend+gE*event,-150,150); same offset for all five quantiles",
+      "loss_weights": [
+        0.2,
+        0.2,
+        0.4,
+        0.2,
+        0.2
+      ],
+      "price_scale": 300.0,
+      "loss": "mean weighted pinball + l2*mean(parameter^2) + gate_penalty*(mean(gT)+mean(gE))",
+      "selection": "fixed final epoch or exact zero null using fitting objective only; no epoch search or held-out selection",
+      "final_trained_objective": 0.06918859055392099,
+      "null_objective": 0.10969430798631678,
+      "selected_null": false,
+      "final_selected_objective": 0.06918859055392099,
+      "final_objective": 0.06918859055392099,
+      "trace": [
+        {
+          "epoch": 1,
+          "loss": 0.10195731310866944,
+          "pinball": 0.1017569797753361,
+          "l2": 3.333333333333334e-07,
+          "gate_penalty": 0.00020000000000000015
+        },
+        {
+          "epoch": 2,
+          "loss": 0.09460337812009281,
+          "pinball": 0.0942405424242086,
+          "l2": 4.966634089822344e-07,
+          "gate_penalty": 0.0003623390324752334
+        },
+        {
+          "epoch": 3,
+          "loss": 0.08795232004100097,
+          "pinball": 0.08742735200573011,
+          "l2": 8.51869146898157e-07,
+          "gate_penalty": 0.0005241161661239514
+        },
+        {
+          "epoch": 4,
+          "loss": 0.08220993581756969,
+          "pinball": 0.081523981749302,
+          "l2": 1.3937169007518025e-06,
+          "gate_penalty": 0.0006845603513669392
+        },
+        {
+          "epoch": 5,
+          "loss": 0.07759253986333388,
+          "pinball": 0.07674813269114858,
+          "l2": 2.1098700707450527e-06,
+          "gate_penalty": 0.0008422973021145488
+        },
+        {
+          "epoch": 6,
+          "loss": 0.07441060134774675,
+          "pinball": 0.07341322071292643,
+          "l2": 2.9718711623579067e-06,
+          "gate_penalty": 0.0009944087636579709
+        },
+        {
+          "epoch": 7,
+          "loss": 0.07269672502215284,
+          "pinball": 0.07155722339439592,
+          "l2": 3.927030640353191e-06,
+          "gate_penalty": 0.0011355745971165614
+        },
+        {
+          "epoch": 8,
+          "loss": 0.07215896093017266,
+          "pinball": 0.07089293018498452,
+          "l2": 4.916563317230955e-06,
+          "gate_penalty": 0.0012611141818709005
+        },
+        {
+          "epoch": 9,
+          "loss": 0.0724327348369222,
+          "pinball": 0.07105982898664658,
+          "l2": 5.888116477828635e-06,
+          "gate_penalty": 0.0013670177337977952
+        },
+        {
+          "epoch": 10,
+          "loss": 0.07309343077927716,
+          "pinball": 0.0716354097984157,
+          "l2": 6.798251088192995e-06,
+          "gate_penalty": 0.0014512227297732523
+        },
+        {
+          "epoch": 11,
+          "loss": 0.07370474758163136,
+          "pinball": 0.072185764409138,
+          "l2": 7.618581998245195e-06,
+          "gate_penalty": 0.001511364590495108
+        },
+        {
+          "epoch": 12,
+          "loss": 0.07408033453138062,
+          "pinball": 0.07251977001196676,
+          "l2": 8.348664186363837e-06,
+          "gate_penalty": 0.0015522158552274932
+        },
+        {
+          "epoch": 13,
+          "loss": 0.07432229846587654,
+          "pinball": 0.0727347983820593,
+          "l2": 8.993579947591719e-06,
+          "gate_penalty": 0.0015785065038696519
+        },
+        {
+          "epoch": 14,
+          "loss": 0.07444718181015819,
+          "pinball": 0.07284387548333526,
+          "l2": 9.561459606411149e-06,
+          "gate_penalty": 0.0015937448672165148
+        },
+        {
+          "epoch": 15,
+          "loss": 0.07449203461051569,
+          "pinball": 0.07288140376587314,
+          "l2": 1.0063080274840198e-05,
+          "gate_penalty": 0.0016005677643677115
+        },
+        {
+          "epoch": 16,
+          "loss": 0.07448121720217332,
+          "pinball": 0.0728700642751233,
+          "l2": 1.0507095002643537e-05,
+          "gate_penalty": 0.001600645832047385
+        },
+        {
+          "epoch": 17,
+          "loss": 0.07442606038351922,
+          "pinball": 0.07281981849465122,
+          "l2": 1.0901943341664677e-05,
+          "gate_penalty": 0.001595339945526343
+        },
+        {
+          "epoch": 18,
+          "loss": 0.07433076958292266,
+          "pinball": 0.07273396954777994,
+          "l2": 1.125358819839752e-05,
+          "gate_penalty": 0.0015855464469443285
+        },
+        {
+          "epoch": 19,
+          "loss": 0.07419322775252882,
+          "pinball": 0.0726095859570297,
+          "l2": 1.156703850882081e-05,
+          "gate_penalty": 0.0015720747569902924
+        },
+        {
+          "epoch": 20,
+          "loss": 0.0740114950863179,
+          "pinball": 0.07244422823508949,
+          "l2": 1.1846474406904653e-05,
+          "gate_penalty": 0.0015554203768215098
+        },
+        {
+          "epoch": 21,
+          "loss": 0.07379214628596671,
+          "pinball": 0.07224417143482229,
+          "l2": 1.2096500223690305e-05,
+          "gate_penalty": 0.0015358783509207415
+        },
+        {
+          "epoch": 22,
+          "loss": 0.07353819424035117,
+          "pinball": 0.0720119738863732,
+          "l2": 1.2321709713675281e-05,
+          "gate_penalty": 0.0015138986442642913
+        },
+        {
+          "epoch": 23,
+          "loss": 0.07326163650478215,
+          "pinball": 0.07175967408517218,
+          "l2": 1.2526152633655056e-05,
+          "gate_penalty": 0.0014894362669763059
+        },
+        {
+          "epoch": 24,
+          "loss": 0.07296635980744369,
+          "pinball": 0.07149101246826264,
+          "l2": 1.2713823673738673e-05,
+          "gate_penalty": 0.0014626335155073107
+        },
+        {
+          "epoch": 25,
+          "loss": 0.07267544340082592,
+          "pinball": 0.07122872834519767,
+          "l2": 1.2889238358861596e-05,
+          "gate_penalty": 0.0014338258172693975
+        },
+        {
+          "epoch": 26,
+          "loss": 0.07240664308283705,
+          "pinball": 0.07099012659485747,
+          "l2": 1.3056899702410402e-05,
+          "gate_penalty": 0.0014034595882771708
+        },
+        {
+          "epoch": 27,
+          "loss": 0.07217538755172513,
+          "pinball": 0.0707901583977786,
+          "l2": 1.3220104833051657e-05,
+          "gate_penalty": 0.0013720090491134839
+        },
+        {
+          "epoch": 28,
+          "loss": 0.07198959483132368,
+          "pinball": 0.0706361570995745,
+          "l2": 1.338099865210208e-05,
+          "gate_penalty": 0.0013400567330970749
+        },
+        {
+          "epoch": 29,
+          "loss": 0.07186567129311834,
+          "pinball": 0.0705437508442308,
+          "l2": 1.3541407107041559e-05,
+          "gate_penalty": 0.0013083790417804983
+        },
+        {
+          "epoch": 30,
+          "loss": 0.07180363273753136,
+          "pinball": 0.07051203125970043,
+          "l2": 1.3704681009789855e-05,
+          "gate_penalty": 0.0012778967968211442
+        },
+        {
+          "epoch": 31,
+          "loss": 0.07179267701488702,
+          "pinball": 0.07052940990514192,
+          "l2": 1.3873128844029081e-05,
+          "gate_penalty": 0.0012493939809010727
+        },
+        {
+          "epoch": 32,
+          "loss": 0.07181111401302805,
+          "pinball": 0.07057332966495077,
+          "l2": 1.4048553566316272e-05,
+          "gate_penalty": 0.0012237357945109565
+        },
+        {
+          "epoch": 33,
+          "loss": 0.07183543159356795,
+          "pinball": 0.07061982190004912,
+          "l2": 1.423034638117613e-05,
+          "gate_penalty": 0.0012013793471376613
+        },
+        {
+          "epoch": 34,
+          "loss": 0.07185171296670395,
+          "pinball": 0.07065436904517637,
+          "l2": 1.4415814607609523e-05,
+          "gate_penalty": 0.0011829281069199737
+        },
+        {
+          "epoch": 35,
+          "loss": 0.07184640972915529,
+          "pinball": 0.07066316000592354,
+          "l2": 1.4600329428511882e-05,
+          "gate_penalty": 0.001168649393803238
+        },
+        {
+          "epoch": 36,
+          "loss": 0.07180820062492828,
+          "pinball": 0.0706348254908368,
+          "l2": 1.4778511240723929e-05,
+          "gate_penalty": 0.0011585966228507495
+        },
+        {
+          "epoch": 37,
+          "loss": 0.07173438089301203,
+          "pinball": 0.07056678105677408,
+          "l2": 1.4951092348687907e-05,
+          "gate_penalty": 0.0011526487438892612
+        },
+        {
+          "epoch": 38,
+          "loss": 0.07163203868901202,
+          "pinball": 0.07046657059447986,
+          "l2": 1.5119598787592478e-05,
+          "gate_penalty": 0.001150348495744561
+        },
+        {
+          "epoch": 39,
+          "loss": 0.0715162962496547,
+          "pinball": 0.07035003699381497,
+          "l2": 1.5284604007006704e-05,
+          "gate_penalty": 0.001150974651832739
+        },
+        {
+          "epoch": 40,
+          "loss": 0.07140112919700099,
+          "pinball": 0.0702319339773013,
+          "l2": 1.5443814501706828e-05,
+          "gate_penalty": 0.0011537514051979767
+        },
+        {
+          "epoch": 41,
+          "loss": 0.07129640617263627,
+          "pinball": 0.07012295400319156,
+          "l2": 1.559567873166811e-05,
+          "gate_penalty": 0.0011578564907130525
+        },
+        {
+          "epoch": 42,
+          "loss": 0.07120614977019865,
+          "pinball": 0.07002787939423491,
+          "l2": 1.5739236670276665e-05,
+          "gate_penalty": 0.0011625311392934592
+        },
+        {
+          "epoch": 43,
+          "loss": 0.07113326911147953,
+          "pinball": 0.06995048891837001,
+          "l2": 1.5873375318737913e-05,
+          "gate_penalty": 0.0011669068177907885
+        },
+        {
+          "epoch": 44,
+          "loss": 0.07107698884472533,
+          "pinball": 0.06989068498226342,
+          "l2": 1.5998108199542016e-05,
+          "gate_penalty": 0.0011703057542623739
+        },
+        {
+          "epoch": 45,
+          "loss": 0.07103316383203073,
+          "pinball": 0.06984482999112979,
+          "l2": 1.6112660403764553e-05,
+          "gate_penalty": 0.0011722211804971888
+        },
+        {
+          "epoch": 46,
+          "loss": 0.07099755267886791,
+          "pinball": 0.06980890883748779,
+          "l2": 1.621587620768539e-05,
+          "gate_penalty": 0.001172427965172433
+        },
+        {
+          "epoch": 47,
+          "loss": 0.07096424617340157,
+          "pinball": 0.0697773057105594,
+          "l2": 1.6306194196935337e-05,
+          "gate_penalty": 0.0011706342686452391
+        },
+        {
+          "epoch": 48,
+          "loss": 0.07092815938088641,
+          "pinball": 0.06974499152775956,
+          "l2": 1.6382312824831906e-05,
+          "gate_penalty": 0.0011667855403020197
+        },
+        {
+          "epoch": 49,
+          "loss": 0.07088533841577215,
+          "pinball": 0.06970800144243876,
+          "l2": 1.6444185659137072e-05,
+          "gate_penalty": 0.001160892787674258
+        },
+        {
+          "epoch": 50,
+          "loss": 0.07083079863660222,
+          "pinball": 0.069661382574151,
+          "l2": 1.6490334233655746e-05,
+          "gate_penalty": 0.0011529257282175609
+        },
+        {
+          "epoch": 51,
+          "loss": 0.07076258725020415,
+          "pinball": 0.0696031706684913,
+          "l2": 1.651909233395165e-05,
+          "gate_penalty": 0.001142897489378905
+        },
+        {
+          "epoch": 52,
+          "loss": 0.07067669802139695,
+          "pinball": 0.0695293162440579,
+          "l2": 1.652975673291615e-05,
+          "gate_penalty": 0.0011308520206061302
+        },
+        {
+          "epoch": 53,
+          "loss": 0.07056975974510024,
+          "pinball": 0.0694362502577008,
+          "l2": 1.6523084353020084e-05,
+          "gate_penalty": 0.0011169864030464236
+        },
+        {
+          "epoch": 54,
+          "loss": 0.07044534581384528,
+          "pinball": 0.06932733900710485,
+          "l2": 1.649922271337462e-05,
+          "gate_penalty": 0.0011015075840270444
+        },
+        {
+          "epoch": 55,
+          "loss": 0.07031401295512903,
+          "pinball": 0.06921275848252838,
+          "l2": 1.646131767787513e-05,
+          "gate_penalty": 0.0010847931549227631
+        },
+        {
+          "epoch": 56,
+          "loss": 0.07018893798553913,
+          "pinball": 0.06910506966460188,
+          "l2": 1.641478461989856e-05,
+          "gate_penalty": 0.001067453536317353
+        },
+        {
+          "epoch": 57,
+          "loss": 0.07008525011787436,
+          "pinball": 0.06901846646999331,
+          "l2": 1.6369325524772447e-05,
+          "gate_penalty": 0.001050414322356274
+        },
+        {
+          "epoch": 58,
+          "loss": 0.07000632100573943,
+          "pinball": 0.06895531892084948,
+          "l2": 1.6334058586857625e-05,
+          "gate_penalty": 0.0010346680263030883
+        },
+        {
+          "epoch": 59,
+          "loss": 0.06995380309269705,
+          "pinball": 0.06891649975599112,
+          "l2": 1.6316785474819706e-05,
+          "gate_penalty": 0.001020986551231108
+        },
+        {
+          "epoch": 60,
+          "loss": 0.06991791258208002,
+          "pinball": 0.068891480571835,
+          "l2": 1.6324210837630935e-05,
+          "gate_penalty": 0.0010101077994073854
+        },
+        {
+          "epoch": 61,
+          "loss": 0.06988485688015751,
+          "pinball": 0.06886590634800259,
+          "l2": 1.6362057754839414e-05,
+          "gate_penalty": 0.0010025884744000874
+        },
+        {
+          "epoch": 62,
+          "loss": 0.0698453839290631,
+          "pinball": 0.068830334359016,
+          "l2": 1.6434031063244908e-05,
+          "gate_penalty": 0.0009986155389838532
+        },
+        {
+          "epoch": 63,
+          "loss": 0.06979347322962108,
+          "pinball": 0.06877902757111093,
+          "l2": 1.6540500224610737e-05,
+          "gate_penalty": 0.0009979051582855415
+        },
+        {
+          "epoch": 64,
+          "loss": 0.06973256925467439,
+          "pinball": 0.0687160123176448,
+          "l2": 1.6679513863782357e-05,
+          "gate_penalty": 0.0009998774231658087
+        },
+        {
+          "epoch": 65,
+          "loss": 0.06967006542476631,
+          "pinball": 0.06864958663844539,
+          "l2": 1.684689964579993e-05,
+          "gate_penalty": 0.0010036318866751142
+        },
+        {
+          "epoch": 66,
+          "loss": 0.0696121594373602,
+          "pinball": 0.06858678578471045,
+          "l2": 1.703740841008258e-05,
+          "gate_penalty": 0.0010083362442396707
+        },
+        {
+          "epoch": 67,
+          "loss": 0.0695653582571616,
+          "pinball": 0.06853493997077012,
+          "l2": 1.7244874961107293e-05,
+          "gate_penalty": 0.0010131734114303833
+        },
+        {
+          "epoch": 68,
+          "loss": 0.06953354761342001,
+          "pinball": 0.06849889607192974,
+          "l2": 1.74623202552596e-05,
+          "gate_penalty": 0.001017189221235003
+        },
+        {
+          "epoch": 69,
+          "loss": 0.06951288774958157,
+          "pinball": 0.06847558117922757,
+          "l2": 1.768286647846724e-05,
+          "gate_penalty": 0.0010196237038755426
+        },
+        {
+          "epoch": 70,
+          "loss": 0.06949801057059707,
+          "pinball": 0.0684602669995512,
+          "l2": 1.7900477061485786e-05,
+          "gate_penalty": 0.0010198430939843788
+        },
+        {
+          "epoch": 71,
+          "loss": 0.06948139244792338,
+          "pinball": 0.06844577960918485,
+          "l2": 1.8110765763647792e-05,
+          "gate_penalty": 0.0010175020729748818
+        },
+        {
+          "epoch": 72,
+          "loss": 0.06945757335207173,
+          "pinball": 0.06842666963875388,
+          "l2": 1.8311849814032317e-05,
+          "gate_penalty": 0.001012591863503816
+        },
+        {
+          "epoch": 73,
+          "loss": 0.06942459079513218,
+          "pinball": 0.06840083864633531,
+          "l2": 1.8503336731651642e-05,
+          "gate_penalty": 0.0010052488120652246
+        },
+        {
+          "epoch": 74,
+          "loss": 0.06938459219412786,
+          "pinball": 0.06836996863635297,
+          "l2": 1.8687204980207574e-05,
+          "gate_penalty": 0.0009959363527946902
+        },
+        {
+          "epoch": 75,
+          "loss": 0.06934252822880899,
+          "pinball": 0.0683383868272645,
+          "l2": 1.886744694709138e-05,
+          "gate_penalty": 0.0009852739545973934
+        },
+        {
+          "epoch": 76,
+          "loss": 0.0693035984319671,
+          "pinball": 0.06831046017765752,
+          "l2": 1.9049599424900382e-05,
+          "gate_penalty": 0.0009740886548846658
+        },
+        {
+          "epoch": 77,
+          "loss": 0.06927090760334632,
+          "pinball": 0.0682885944027361,
+          "l2": 1.9238311613805548e-05,
+          "gate_penalty": 0.0009630748889964155
+        },
+        {
+          "epoch": 78,
+          "loss": 0.06924507707674059,
+          "pinball": 0.06827254189451427,
+          "l2": 1.9437694205174286e-05,
+          "gate_penalty": 0.0009530974880211399
+        },
+        {
+          "epoch": 79,
+          "loss": 0.06922418237337194,
+          "pinball": 0.06826003550727607,
+          "l2": 1.9649107437256816e-05,
+          "gate_penalty": 0.0009444977586586213
+        },
+        {
+          "epoch": 80,
+          "loss": 0.06920682406514915,
+          "pinball": 0.0682492513303068,
+          "l2": 1.987465088663372e-05,
+          "gate_penalty": 0.0009376980839557093
+        }
+      ]
+    },
+    "TE_full": {
+      "seed": 2026,
+      "config": {
+        "epochs": 80,
+        "learning_rate": 0.01,
+        "l2": 0.001,
+        "gate_penalty": 0.001,
+        "device": "cpu"
+      },
+      "mode": "full",
+      "fit_start": 1664546400,
+      "fit_cutoff": 1667224800,
+      "fit_rows": 720,
+      "first_fit_origin": 1664546400,
+      "last_fit_origin": 1667134800,
+      "latest_fit_label_available": 1667221200,
+      "feature_count": 29,
+      "trainable_parameters": 60,
+      "gate": "clamp(linear(features),0,1); shared across horizons",
+      "correction": "clip(gT*trend+gE*event,-150,150); same offset for all five quantiles",
+      "loss_weights": [
+        0.2,
+        0.2,
+        0.4,
+        0.2,
+        0.2
+      ],
+      "price_scale": 300.0,
+      "loss": "mean weighted pinball + l2*mean(parameter^2) + gate_penalty*(mean(gT)+mean(gE))",
+      "selection": "fixed final epoch or exact zero null using fitting objective only; no epoch search or held-out selection",
+      "final_trained_objective": 0.06985599567817012,
+      "null_objective": 0.10969430798631678,
+      "selected_null": false,
+      "final_selected_objective": 0.06985599567817012,
+      "final_objective": 0.06985599567817012,
+      "trace": [
+        {
+          "epoch": 1,
+          "loss": 0.10200788385538692,
+          "pinball": 0.10180755052205358,
+          "l2": 3.333333333333334e-07,
+          "gate_penalty": 0.00020000000000000015
+        },
+        {
+          "epoch": 2,
+          "loss": 0.09474549277415667,
+          "pinball": 0.09438130694707186,
+          "l2": 4.999965142058389e-07,
+          "gate_penalty": 0.00036368583057059547
+        },
+        {
+          "epoch": 3,
+          "loss": 0.0883039531882144,
+          "pinball": 0.08777651789318645,
+          "l2": 8.644939118587789e-07,
+          "gate_penalty": 0.0005265708011160908
+        },
+        {
+          "epoch": 4,
+          "loss": 0.08284680607693737,
+          "pinball": 0.08215792642213884,
+          "l2": 1.4197050256397674e-06,
+          "gate_penalty": 0.00068745994977288
+        },
+        {
+          "epoch": 5,
+          "loss": 0.07859548206069841,
+          "pinball": 0.07774909258324249,
+          "l2": 2.1486035671431456e-06,
+          "gate_penalty": 0.0008442408738887701
+        },
+        {
+          "epoch": 6,
+          "loss": 0.07570181936643007,
+          "pinball": 0.07470564954817,
+          "l2": 3.0159360247184487e-06,
+          "gate_penalty": 0.0009931538822353467
+        },
+        {
+          "epoch": 7,
+          "loss": 0.07415160276482301,
+          "pinball": 0.0730188234078319,
+          "l2": 3.9632830608014395e-06,
+          "gate_penalty": 0.0011288160739303032
+        },
+        {
+          "epoch": 8,
+          "loss": 0.07371165534931241,
+          "pinball": 0.07246011238604712,
+          "l2": 4.925671985281277e-06,
+          "gate_penalty": 0.0012466172912800149
+        },
+        {
+          "epoch": 9,
+          "loss": 0.07402895691446855,
+          "pinball": 0.07268118414008942,
+          "l2": 5.84500368047202e-06,
+          "gate_penalty": 0.001341927770698646
+        },
+        {
+          "epoch": 10,
+          "loss": 0.07468637223957789,
+          "pinball": 0.07326618343089933,
+          "l2": 6.673745051215899e-06,
+          "gate_penalty": 0.0014135150636273442
+        },
+        {
+          "epoch": 11,
+          "loss": 0.0752619519548023,
+          "pinball": 0.07379471020895091,
+          "l2": 7.3871671513965395e-06,
+          "gate_penalty": 0.0014598545786999883
+        },
+        {
+          "epoch": 12,
+          "loss": 0.0756107901820042,
+          "pinball": 0.0741168430633247,
+          "l2": 7.99044525545265e-06,
+          "gate_penalty": 0.001485956673424051
+        },
+        {
+          "epoch": 13,
+          "loss": 0.07580703473532378,
+          "pinball": 0.07430192105235393,
+          "l2": 8.496482264444345e-06,
+          "gate_penalty": 0.0014966172007053959
+        },
+        {
+          "epoch": 14,
+          "loss": 0.07588066120620053,
+          "pinball": 0.07437616397319631,
+          "l2": 8.921157368225225e-06,
+          "gate_penalty": 0.0014955760756359935
+        },
+        {
+          "epoch": 15,
+          "loss": 0.07587535892607769,
+          "pinball": 0.07438053381225088,
+          "l2": 9.278579592924002e-06,
+          "gate_penalty": 0.0014855465342338903
+        },
+        {
+          "epoch": 16,
+          "loss": 0.07581353175247436,
+          "pinball": 0.07433527433367994,
+          "l2": 9.579334649799684e-06,
+          "gate_penalty": 0.0014686780841446192
+        },
+        {
+          "epoch": 17,
+          "loss": 0.07570473200493852,
+          "pinball": 0.07424863347157311,
+          "l2": 9.833087268572952e-06,
+          "gate_penalty": 0.0014462654460968467
+        },
+        {
+          "epoch": 18,
+          "loss": 0.07555062576623396,
+          "pinball": 0.07412147796891529,
+          "l2": 1.004664542294899e-05,
+          "gate_penalty": 0.001419101151895721
+        },
+        {
+          "epoch": 19,
+          "loss": 0.07535317322631553,
+          "pinball": 0.07395516027900723,
+          "l2": 1.0225516085209074e-05,
+          "gate_penalty": 0.0013877874312230997
+        },
+        {
+          "epoch": 20,
+          "loss": 0.07510868395808362,
+          "pinball": 0.07374570665872832,
+          "l2": 1.0373755660379579e-05,
+          "gate_penalty": 0.0013526035436949285
+        },
+        {
+          "epoch": 21,
+          "loss": 0.074827498837843,
+          "pinball": 0.07350271738525228,
+          "l2": 1.049740811111432e-05,
+          "gate_penalty": 0.0013142840444796018
+        },
+        {
+          "epoch": 22,
+          "loss": 0.07451370093460809,
+          "pinball": 0.07322951309732334,
+          "l2": 1.0603474864525512e-05,
+          "gate_penalty": 0.001273584362420226
+        },
+        {
+          "epoch": 23,
+          "loss": 0.07417637857645666,
+          "pinball": 0.07293442289220378,
+          "l2": 1.0696403105124381e-05,
+          "gate_penalty": 0.0012312592811477524
+        },
+        {
+          "epoch": 24,
+          "loss": 0.07383962835029412,
+          "pinball": 0.07264112778031273,
+          "l2": 1.078063866622586e-05,
+          "gate_penalty": 0.0011877199313151691
+        },
+        {
+          "epoch": 25,
+          "loss": 0.07352148610944861,
+          "pinball": 0.0723672284619017,
+          "l2": 1.0860587789258065e-05,
+          "gate_penalty": 0.0011433970597576409
+        },
+        {
+          "epoch": 26,
+          "loss": 0.07325550850443169,
+          "pinball": 0.07214525336811459,
+          "l2": 1.0938729804817964e-05,
+          "gate_penalty": 0.00109931640651229
+        },
+        {
+          "epoch": 27,
+          "loss": 0.07305405253873014,
+          "pinball": 0.07198665204470929,
+          "l2": 1.1012462461587443e-05,
+          "gate_penalty": 0.0010563880315592636
+        },
+        {
+          "epoch": 28,
+          "loss": 0.07292028397615163,
+          "pinball": 0.07189335320593797,
+          "l2": 1.1080581400254769e-05,
+          "gate_penalty": 0.0010158501888134107
+        },
+        {
+          "epoch": 29,
+          "loss": 0.0728507317141168,
+          "pinball": 0.07186123590110133,
+          "l2": 1.1145083852849337e-05,
+          "gate_penalty": 0.0009783507291626229
+        },
+        {
+          "epoch": 30,
+          "loss": 0.07283346069813891,
+          "pinball": 0.07187747722735605,
+          "l2": 1.1208010345305907e-05,
+          "gate_penalty": 0.0009447754604375601
+        },
+        {
+          "epoch": 31,
+          "loss": 0.07285522067633787,
+          "pinball": 0.07192821977110342,
+          "l2": 1.127346282519662e-05,
+          "gate_penalty": 0.000915727442409248
+        },
+        {
+          "epoch": 32,
+          "loss": 0.07288842690436521,
+          "pinball": 0.0719852497862505,
+          "l2": 1.13473810721632e-05,
+          "gate_penalty": 0.000891829737042543
+        },
+        {
+          "epoch": 33,
+          "loss": 0.07290055992434394,
+          "pinball": 0.07201587055143559,
+          "l2": 1.143410503197542e-05,
+          "gate_penalty": 0.0008732552678763781
+        },
+        {
+          "epoch": 34,
+          "loss": 0.07287693221279307,
+          "pinball": 0.07200550202729832,
+          "l2": 1.1535668584291687e-05,
+          "gate_penalty": 0.0008598945169104587
+        },
+        {
+          "epoch": 35,
+          "loss": 0.07281332771018409,
+          "pinball": 0.07195002828448739,
+          "l2": 1.1654208248830939e-05,
+          "gate_penalty": 0.0008516452174478576
+        },
+        {
+          "epoch": 36,
+          "loss": 0.07271171393857055,
+          "pinball": 0.07185187096505333,
+          "l2": 1.179057008088734e-05,
+          "gate_penalty": 0.0008480524034363418
+        },
+        {
+          "epoch": 37,
+          "loss": 0.07258486450914695,
+          "pinball": 0.07172451313312828,
+          "l2": 1.194382740464921e-05,
+          "gate_penalty": 0.0008484075486140246
+        },
+        {
+          "epoch": 38,
+          "loss": 0.07244569060210666,
+          "pinball": 0.0715817181277162,
+          "l2": 1.2111454561910619e-05,
+          "gate_penalty": 0.0008518610198285539
+        },
+        {
+          "epoch": 39,
+          "loss": 0.07230386056339877,
+          "pinball": 0.071433861226357,
+          "l2": 1.2292664177018287e-05,
+          "gate_penalty": 0.0008577066728647564
+        },
+        {
+          "epoch": 40,
+          "loss": 0.0721688634773393,
+          "pinball": 0.07129109383663483,
+          "l2": 1.2487153538074848e-05,
+          "gate_penalty": 0.0008652824871664052
+        },
+        {
+          "epoch": 41,
+          "loss": 0.0720507712164543,
+          "pinball": 0.07116413591499472,
+          "l2": 1.2694346777961633e-05,
+          "gate_penalty": 0.0008739409546816144
+        },
+        {
+          "epoch": 42,
+          "loss": 0.07195464390269697,
+          "pinball": 0.0710587695569956,
+          "l2": 1.2912816262350297e-05,
+          "gate_penalty": 0.0008829615294390182
+        },
+        {
+          "epoch": 43,
+          "loss": 0.07188129066379013,
+          "pinball": 0.07097649182394154,
+          "l2": 1.3140005642196897e-05,
+          "gate_penalty": 0.0008916588342063841
+        },
+        {
+          "epoch": 44,
+          "loss": 0.07182760832362768,
+          "pinball": 0.07091479459259444,
+          "l2": 1.337241072909006e-05,
+          "gate_penalty": 0.0008994413203041642
+        },
+        {
+          "epoch": 45,
+          "loss": 0.07178725526847411,
+          "pinball": 0.07086784383614297,
+          "l2": 1.3606657870591426e-05,
+          "gate_penalty": 0.0009058047744605473
+        },
+        {
+          "epoch": 46,
+          "loss": 0.07174962426108814,
+          "pinball": 0.07082549062225586,
+          "l2": 1.3838974608281933e-05,
+          "gate_penalty": 0.0009102946642239926
+        },
+        {
+          "epoch": 47,
+          "loss": 0.07170770308842074,
+          "pinball": 0.0707809257880984,
+          "l2": 1.4067673247803321e-05,
+          "gate_penalty": 0.000912709627074547
+        },
+        {
+          "epoch": 48,
+          "loss": 0.0716574392218772,
+          "pinball": 0.07073016650343836,
+          "l2": 1.4291520261954983e-05,
+          "gate_penalty": 0.0009129811981768795
+        },
+        {
+          "epoch": 49,
+          "loss": 0.07159741959297188,
+          "pinball": 0.07067175889369097,
+          "l2": 1.4509326526457981e-05,
+          "gate_penalty": 0.0009111513727544491
+        },
+        {
+          "epoch": 50,
+          "loss": 0.07152727639563207,
+          "pinball": 0.07060519830337753,
+          "l2": 1.4720884383241529e-05,
+          "gate_penalty": 0.0009073572078713059
+        },
+        {
+          "epoch": 51,
+          "loss": 0.0714519265768924,
+          "pinball": 0.07053506362481672,
+          "l2": 1.4927692449507137e-05,
+          "gate_penalty": 0.0009019352596261642
+        },
+        {
+          "epoch": 52,
+          "loss": 0.07137242566496059,
+          "pinball": 0.07046201452281389,
+          "l2": 1.5132252816718317e-05,
+          "gate_penalty": 0.0008952788893299905
+        },
+        {
+          "epoch": 53,
+          "loss": 0.07129232743601947,
+          "pinball": 0.07038922769834073,
+          "l2": 1.5337723959272656e-05,
+          "gate_penalty": 0.0008877620137194666
+        },
+        {
+          "epoch": 54,
+          "loss": 0.07121082552640899,
+          "pinball": 0.07031546797990704,
+          "l2": 1.5546017922111498e-05,
+          "gate_penalty": 0.000879811528579845
+        },
+        {
+          "epoch": 55,
+          "loss": 0.07112814084036886,
+          "pinball": 0.07024063036011297,
+          "l2": 1.575729318363705e-05,
+          "gate_penalty": 0.0008717531870722576
+        },
+        {
+          "epoch": 56,
+          "loss": 0.0710431177562625,
+          "pinball": 0.07016325923387785,
+          "l2": 1.5971888112121754e-05,
+          "gate_penalty": 0.0008638866342725268
+        },
+        {
+          "epoch": 57,
+          "loss": 0.07096383954302174,
+          "pinball": 0.07009098017891562,
+          "l2": 1.6191921032906133e-05,
+          "gate_penalty": 0.0008566674430732263
+        },
+        {
+          "epoch": 58,
+          "loss": 0.0708890696112132,
+          "pinball": 0.07002212073566823,
+          "l2": 1.6420905956204043e-05,
+          "gate_penalty": 0.0008505279695887732
+        },
+        {
+          "epoch": 59,
+          "loss": 0.07082198976839027,
+          "pinball": 0.06995947363917723,
+          "l2": 1.666103714471094e-05,
+          "gate_penalty": 0.0008458550920683339
+        },
+        {
+          "epoch": 60,
+          "loss": 0.07075886415652319,
+          "pinball": 0.06989890354365286,
+          "l2": 1.691569616821945e-05,
+          "gate_penalty": 0.000843044916702117
+        },
+        {
+          "epoch": 61,
+          "loss": 0.0706956225041264,
+          "pinball": 0.06983614152287886,
+          "l2": 1.7185527460994226e-05,
+          "gate_penalty": 0.0008422954537865552
+        },
+        {
+          "epoch": 62,
+          "loss": 0.07063136789973427,
+          "pinball": 0.06977017442276583,
+          "l2": 1.747115643366963e-05,
+          "gate_penalty": 0.000843722320534789
+        },
+        {
+          "epoch": 63,
+          "loss": 0.07056634271355874,
+          "pinball": 0.0697013037080425,
+          "l2": 1.777337345695118e-05,
+          "gate_penalty": 0.0008472656320592926
+        },
+        {
+          "epoch": 64,
+          "loss": 0.07049988831520905,
+          "pinball": 0.06962920092344928,
+          "l2": 1.8090642249349096e-05,
+          "gate_penalty": 0.000852596749510418
+        },
+        {
+          "epoch": 65,
+          "loss": 0.07043447671544922,
+          "pinball": 0.06955673324504832,
+          "l2": 1.8421673381989358e-05,
+          "gate_penalty": 0.0008593217970189058
+        },
+        {
+          "epoch": 66,
+          "loss": 0.07037385716147491,
+          "pinball": 0.06948820758354307,
+          "l2": 1.8762847724074786e-05,
+          "gate_penalty": 0.0008668867302077697
+        },
+        {
+          "epoch": 67,
+          "loss": 0.07032062637930422,
+          "pinball": 0.06942679789303194,
+          "l2": 1.9111193882740765e-05,
+          "gate_penalty": 0.0008747172923895389
+        },
+        {
+          "epoch": 68,
+          "loss": 0.07027485100564484,
+          "pinball": 0.06937310704170072,
+          "l2": 1.946282208505258e-05,
+          "gate_penalty": 0.0008822811418590842
+        },
+        {
+          "epoch": 69,
+          "loss": 0.0702369637533027,
+          "pinball": 0.0693280204200385,
+          "l2": 1.9815540126848896e-05,
+          "gate_penalty": 0.0008891277931373568
+        },
+        {
+          "epoch": 70,
+          "loss": 0.07020467517089464,
+          "pinball": 0.06928973003081039,
+          "l2": 2.0165168466683838e-05,
+          "gate_penalty": 0.0008947799716175593
+        },
+        {
+          "epoch": 71,
+          "loss": 0.07017408563701459,
+          "pinball": 0.06925454640906498,
+          "l2": 2.050989756698711e-05,
+          "gate_penalty": 0.0008990293303826382
+        },
+        {
+          "epoch": 72,
+          "loss": 0.0701431258886553,
+          "pinball": 0.06922055612470397,
+          "l2": 2.0848791115636614e-05,
+          "gate_penalty": 0.000901720972835689
+        },
+        {
+          "epoch": 73,
+          "loss": 0.07011015561722103,
+          "pinball": 0.06918608261394278,
+          "l2": 2.1180914614685722e-05,
+          "gate_penalty": 0.0009028920886635639
+        },
+        {
+          "epoch": 74,
+          "loss": 0.07007507280823756,
+          "pinball": 0.06915087782460544,
+          "l2": 2.150678414128377e-05,
+          "gate_penalty": 0.0009026881994908387
+        },
+        {
+          "epoch": 75,
+          "loss": 0.07003855875784265,
+          "pinball": 0.0691153784349361,
+          "l2": 2.1828668425287673e-05,
+          "gate_penalty": 0.0009013516544812606
+        },
+        {
+          "epoch": 76,
+          "loss": 0.07000234448202844,
+          "pinball": 0.06908102490725519,
+          "l2": 2.2148745786956956e-05,
+          "gate_penalty": 0.0008991708289862939
+        },
+        {
+          "epoch": 77,
+          "loss": 0.06996782665399594,
+          "pinball": 0.06904885498263917,
+          "l2": 2.246916460496302e-05,
+          "gate_penalty": 0.0008965025067517964
+        },
+        {
+          "epoch": 78,
+          "loss": 0.06993612665458593,
+          "pinball": 0.06901971796589271,
+          "l2": 2.2791299974536055e-05,
+          "gate_penalty": 0.0008936173887186818
+        },
+        {
+          "epoch": 79,
+          "loss": 0.0699077165435292,
+          "pinball": 0.06899364601398406,
+          "l2": 2.3117258318612553e-05,
+          "gate_penalty": 0.0008909532712265402
+        },
+        {
+          "epoch": 80,
+          "loss": 0.06988140109376982,
+          "pinball": 0.06896916964853682,
+          "l2": 2.344809129333393e-05,
+          "gate_penalty": 0.0008887833539396679
+        }
+      ]
+    },
+    "TE_fixed_pulses": {
+      "seed": 2026,
+      "config": {
+        "epochs": 80,
+        "learning_rate": 0.01,
+        "l2": 0.001,
+        "gate_penalty": 0.001,
+        "device": "cpu"
+      },
+      "mode": "full",
+      "fit_start": 1664546400,
+      "fit_cutoff": 1667224800,
+      "fit_rows": 720,
+      "first_fit_origin": 1664546400,
+      "last_fit_origin": 1667134800,
+      "latest_fit_label_available": 1667221200,
+      "feature_count": 29,
+      "trainable_parameters": 60,
+      "gate": "clamp(linear(features),0,1); shared across horizons",
+      "correction": "clip(gT*trend+gE*event,-150,150); same offset for all five quantiles",
+      "loss_weights": [
+        0.2,
+        0.2,
+        0.4,
+        0.2,
+        0.2
+      ],
+      "price_scale": 300.0,
+      "loss": "mean weighted pinball + l2*mean(parameter^2) + gate_penalty*(mean(gT)+mean(gE))",
+      "selection": "fixed final epoch or exact zero null using fitting objective only; no epoch search or held-out selection",
+      "final_trained_objective": 0.0695382744438688,
+      "null_objective": 0.10969430798631678,
+      "selected_null": false,
+      "final_selected_objective": 0.0695382744438688,
+      "final_objective": 0.0695382744438688,
+      "trace": [
+        {
+          "epoch": 1,
+          "loss": 0.10202169013521666,
+          "pinball": 0.10182135680188331,
+          "l2": 3.333333333333334e-07,
+          "gate_penalty": 0.00020000000000000015
+        },
+        {
+          "epoch": 2,
+          "loss": 0.09481780530184444,
+          "pinball": 0.09445267560180302,
+          "l2": 4.999946560575975e-07,
+          "gate_penalty": 0.0003646297053853609
+        },
+        {
+          "epoch": 3,
+          "loss": 0.08842179521840667,
+          "pinball": 0.08789276147840502,
+          "l2": 8.616688869715259e-07,
+          "gate_penalty": 0.00052817207111467
+        },
+        {
+          "epoch": 4,
+          "loss": 0.08297046567581878,
+          "pinball": 0.08228023607087535,
+          "l2": 1.404593890174609e-06,
+          "gate_penalty": 0.0006888250110532651
+        },
+        {
+          "epoch": 5,
+          "loss": 0.07865241897112707,
+          "pinball": 0.07780590723349164,
+          "l2": 2.1121515645816155e-06,
+          "gate_penalty": 0.0008443995860708577
+        },
+        {
+          "epoch": 6,
+          "loss": 0.07565861953713318,
+          "pinball": 0.07466493006613577,
+          "l2": 2.9456466239423174e-06,
+          "gate_penalty": 0.0009907438243734767
+        },
+        {
+          "epoch": 7,
+          "loss": 0.07398438022078606,
+          "pinball": 0.0728587567511764,
+          "l2": 3.840408353331223e-06,
+          "gate_penalty": 0.0011217830612563335
+        },
+        {
+          "epoch": 8,
+          "loss": 0.07351734980655053,
+          "pinball": 0.07227798212885016,
+          "l2": 4.742746206046445e-06,
+          "gate_penalty": 0.0012346249314943364
+        },
+        {
+          "epoch": 9,
+          "loss": 0.07389029762206874,
+          "pinball": 0.07256005027941807,
+          "l2": 5.598333520219109e-06,
+          "gate_penalty": 0.0013246490091304403
+        },
+        {
+          "epoch": 10,
+          "loss": 0.07462040565079986,
+          "pinball": 0.07322364568990983,
+          "l2": 6.367438763382156e-06,
+          "gate_penalty": 0.0013903925221266469
+        },
+        {
+          "epoch": 11,
+          "loss": 0.0752402497820373,
+          "pinball": 0.07380208162350854,
+          "l2": 7.02872060680646e-06,
+          "gate_penalty": 0.001431139437921959
+        },
+        {
+          "epoch": 12,
+          "loss": 0.07561764187791449,
+          "pinball": 0.07415754277174855,
+          "l2": 7.589079068828177e-06,
+          "gate_penalty": 0.0014525100270971168
+        },
+        {
+          "epoch": 13,
+          "loss": 0.07583323713967785,
+          "pinball": 0.07436653903189427,
+          "l2": 8.057376372006758e-06,
+          "gate_penalty": 0.0014586407314115667
+        },
+        {
+          "epoch": 14,
+          "loss": 0.07591395595583954,
+          "pinball": 0.07445246929964723,
+          "l2": 8.446118314785862e-06,
+          "gate_penalty": 0.001453040537877523
+        },
+        {
+          "epoch": 15,
+          "loss": 0.07589063638772905,
+          "pinball": 0.07444382410525241,
+          "l2": 8.767372025577766e-06,
+          "gate_penalty": 0.0014380449104510631
+        },
+        {
+          "epoch": 16,
+          "loss": 0.07579358238247494,
+          "pinball": 0.07436849426678734,
+          "l2": 9.033552647577515e-06,
+          "gate_penalty": 0.0014160545630400336
+        },
+        {
+          "epoch": 17,
+          "loss": 0.07563229421157601,
+          "pinball": 0.07423474664640542,
+          "l2": 9.25349645130357e-06,
+          "gate_penalty": 0.0013882940687192972
+        },
+        {
+          "epoch": 18,
+          "loss": 0.07541190124437541,
+          "pinball": 0.07404678278666932,
+          "l2": 9.435253700454952e-06,
+          "gate_penalty": 0.0013556832040056382
+        },
+        {
+          "epoch": 19,
+          "loss": 0.07513461773868244,
+          "pinball": 0.07380607355504551,
+          "l2": 9.586300049376019e-06,
+          "gate_penalty": 0.0013189578835875412
+        },
+        {
+          "epoch": 20,
+          "loss": 0.07481673217562208,
+          "pinball": 0.07352837441116791,
+          "l2": 9.713738472820058e-06,
+          "gate_penalty": 0.0012786440259813547
+        },
+        {
+          "epoch": 21,
+          "loss": 0.07446224122167198,
+          "pinball": 0.07321745241302184,
+          "l2": 9.825154861887276e-06,
+          "gate_penalty": 0.0012349636537882498
+        },
+        {
+          "epoch": 22,
+          "loss": 0.07408939685807792,
+          "pinball": 0.0728906713292672,
+          "l2": 9.927297228230396e-06,
+          "gate_penalty": 0.0011887982315824809
+        },
+        {
+          "epoch": 23,
+          "loss": 0.07373021169773558,
+          "pinball": 0.07257865791239179,
+          "l2": 1.0027500601029113e-05,
+          "gate_penalty": 0.0011415262847427575
+        },
+        {
+          "epoch": 24,
+          "loss": 0.07341054482386901,
+          "pinball": 0.07230621987789117,
+          "l2": 1.0132238700563483e-05,
+          "gate_penalty": 0.0010941927072772735
+        },
+        {
+          "epoch": 25,
+          "loss": 0.0731430122183088,
+          "pinball": 0.0720847366788723,
+          "l2": 1.0245089523145952e-05,
+          "gate_penalty": 0.0010480304499133509
+        },
+        {
+          "epoch": 26,
+          "loss": 0.07293979601331751,
+          "pinball": 0.07192604736518723,
+          "l2": 1.0362940194253288e-05,
+          "gate_penalty": 0.0010033857079360198
+        },
+        {
+          "epoch": 27,
+          "loss": 0.07283193185893407,
+          "pinball": 0.07186016182132057,
+          "l2": 1.0482359460299168e-05,
+          "gate_penalty": 0.0009612876781531983
+        },
+        {
+          "epoch": 28,
+          "loss": 0.07280938782992306,
+          "pinball": 0.07187544279086079,
+          "l2": 1.0600896753847332e-05,
+          "gate_penalty": 0.0009233441423084213
+        },
+        {
+          "epoch": 29,
+          "loss": 0.07284049977552312,
+          "pinball": 0.0719389223868265,
+          "l2": 1.0721491347329908e-05,
+          "gate_penalty": 0.000890855897349292
+        },
+        {
+          "epoch": 30,
+          "loss": 0.07288352216884467,
+          "pinball": 0.07200827559376623,
+          "l2": 1.084793336756065e-05,
+          "gate_penalty": 0.0008643986417108767
+        },
+        {
+          "epoch": 31,
+          "loss": 0.0729081972965873,
+          "pinball": 0.07205353924615483,
+          "l2": 1.0981109960348885e-05,
+          "gate_penalty": 0.0008436769404721237
+        },
+        {
+          "epoch": 32,
+          "loss": 0.07289568335041466,
+          "pinball": 0.07205601184233835,
+          "l2": 1.112265221689939e-05,
+          "gate_penalty": 0.0008285488558594066
+        },
+        {
+          "epoch": 33,
+          "loss": 0.07283808313039526,
+          "pinball": 0.07200795179242753,
+          "l2": 1.1273831574115772e-05,
+          "gate_penalty": 0.0008188575063936106
+        },
+        {
+          "epoch": 34,
+          "loss": 0.07273631360629512,
+          "pinball": 0.07191088255340011,
+          "l2": 1.1435376406408963e-05,
+          "gate_penalty": 0.000813995676488597
+        },
+        {
+          "epoch": 35,
+          "loss": 0.07260036888042946,
+          "pinball": 0.07177551486581835,
+          "l2": 1.160785163535595e-05,
+          "gate_penalty": 0.0008132461629757652
+        },
+        {
+          "epoch": 36,
+          "loss": 0.07244375030278248,
+          "pinball": 0.07161603425694907,
+          "l2": 1.1792926356616156e-05,
+          "gate_penalty": 0.0008159231194768016
+        },
+        {
+          "epoch": 37,
+          "loss": 0.07228050041668456,
+          "pinball": 0.07144725208373805,
+          "l2": 1.1988986925693844e-05,
+          "gate_penalty": 0.0008212593460208176
+        },
+        {
+          "epoch": 38,
+          "loss": 0.07211736036659913,
+          "pinball": 0.07127674191163272,
+          "l2": 1.2194734293244627e-05,
+          "gate_penalty": 0.0008284237206731645
+        },
+        {
+          "epoch": 39,
+          "loss": 0.07196411776927875,
+          "pinball": 0.07111492381583048,
+          "l2": 1.2409841538760691e-05,
+          "gate_penalty": 0.0008367841119094997
+        },
+        {
+          "epoch": 40,
+          "loss": 0.07182324777502938,
+          "pinball": 0.07096526495017878,
+          "l2": 1.263182960372331e-05,
+          "gate_penalty": 0.0008453509952468768
+        },
+        {
+          "epoch": 41,
+          "loss": 0.07169852954543983,
+          "pinball": 0.07083237184977627,
+          "l2": 1.2857283753005566e-05,
+          "gate_penalty": 0.0008533004119105528
+        },
+        {
+          "epoch": 42,
+          "loss": 0.07158195547602354,
+          "pinball": 0.07070896922650378,
+          "l2": 1.308224359585512e-05,
+          "gate_penalty": 0.0008599040059239155
+        },
+        {
+          "epoch": 43,
+          "loss": 0.07146733279722386,
+          "pinball": 0.07058923347267403,
+          "l2": 1.330419427029325e-05,
+          "gate_penalty": 0.0008647951302795395
+        },
+        {
+          "epoch": 44,
+          "loss": 0.07135365575529742,
+          "pinball": 0.07047239061768933,
+          "l2": 1.3521574629932894e-05,
+          "gate_penalty": 0.000867743562978171
+        },
+        {
+          "epoch": 45,
+          "loss": 0.07123942844068401,
+          "pinball": 0.07035702804436024,
+          "l2": 1.3733075546774473e-05,
+          "gate_penalty": 0.0008686673207769901
+        },
+        {
+          "epoch": 46,
+          "loss": 0.0711243887190164,
+          "pinball": 0.07024290389764692,
+          "l2": 1.3938173030835836e-05,
+          "gate_penalty": 0.0008675466483386462
+        },
+        {
+          "epoch": 47,
+          "loss": 0.07101168881801424,
+          "pinball": 0.07013305481308414,
+          "l2": 1.4137289820074127e-05,
+          "gate_penalty": 0.0008644967151100366
+        },
+        {
+          "epoch": 48,
+          "loss": 0.0709045060995067,
+          "pinball": 0.07003018672601985,
+          "l2": 1.4333082152214839e-05,
+          "gate_penalty": 0.0008599862913346289
+        },
+        {
+          "epoch": 49,
+          "loss": 0.07081123916779113,
+          "pinball": 0.06994202991632095,
+          "l2": 1.4530045945347934e-05,
+          "gate_penalty": 0.000854679205524833
+        },
+        {
+          "epoch": 50,
+          "loss": 0.0707339815642638,
+          "pinball": 0.06987008408422934,
+          "l2": 1.473293160944041e-05,
+          "gate_penalty": 0.0008491645484250092
+        },
+        {
+          "epoch": 51,
+          "loss": 0.07066711398055037,
+          "pinball": 0.069808292783634,
+          "l2": 1.494584117792146e-05,
+          "gate_penalty": 0.0008438753557384479
+        },
+        {
+          "epoch": 52,
+          "loss": 0.07060972036491137,
+          "pinball": 0.06975530709273878,
+          "l2": 1.517108004531872e-05,
+          "gate_penalty": 0.0008392421921272717
+        },
+        {
+          "epoch": 53,
+          "loss": 0.07055979779150123,
+          "pinball": 0.06970874541619115,
+          "l2": 1.541182444923656e-05,
+          "gate_penalty": 0.0008356405508608366
+        },
+        {
+          "epoch": 54,
+          "loss": 0.07051309362707966,
+          "pinball": 0.06966404509777746,
+          "l2": 1.5669490886643314e-05,
+          "gate_penalty": 0.0008333790384155538
+        },
+        {
+          "epoch": 55,
+          "loss": 0.0704662930622539,
+          "pinball": 0.06961784582650975,
+          "l2": 1.5944524125191004e-05,
+          "gate_penalty": 0.0008325027116189545
+        },
+        {
+          "epoch": 56,
+          "loss": 0.07041901481504714,
+          "pinball": 0.06956966778938106,
+          "l2": 1.6236739705097774e-05,
+          "gate_penalty": 0.0008331102859609825
+        },
+        {
+          "epoch": 57,
+          "loss": 0.07037024662407441,
+          "pinball": 0.06951857242608028,
+          "l2": 1.6545142410291264e-05,
+          "gate_penalty": 0.0008351290555838407
+        },
+        {
+          "epoch": 58,
+          "loss": 0.07032068152032286,
+          "pinball": 0.06946554775891645,
+          "l2": 1.6867668339662414e-05,
+          "gate_penalty": 0.0008382660930667521
+        },
+        {
+          "epoch": 59,
+          "loss": 0.07027377153254931,
+          "pinball": 0.06941441608179147,
+          "l2": 1.7201930515707154e-05,
+          "gate_penalty": 0.0008421535202421336
+        },
+        {
+          "epoch": 60,
+          "loss": 0.0702305772941887,
+          "pinball": 0.06936667361543114,
+          "l2": 1.7544359044984208e-05,
+          "gate_penalty": 0.0008463593197125864
+        },
+        {
+          "epoch": 61,
+          "loss": 0.07019077429353358,
+          "pinball": 0.06932235814918723,
+          "l2": 1.7892121678794855e-05,
+          "gate_penalty": 0.0008505240226675569
+        },
+        {
+          "epoch": 62,
+          "loss": 0.07015337013348559,
+          "pinball": 0.06928075580544578,
+          "l2": 1.824326509312828e-05,
+          "gate_penalty": 0.0008543710629466847
+        },
+        {
+          "epoch": 63,
+          "loss": 0.07011685297018491,
+          "pinball": 0.06924061022716269,
+          "l2": 1.859579918955209e-05,
+          "gate_penalty": 0.0008576469438326724
+        },
+        {
+          "epoch": 64,
+          "loss": 0.07007998402236573,
+          "pinball": 0.06920085571748592,
+          "l2": 1.894852057270318e-05,
+          "gate_penalty": 0.0008601797843071058
+        },
+        {
+          "epoch": 65,
+          "loss": 0.07004174839447436,
+          "pinball": 0.06916058181004787,
+          "l2": 1.9298662135510735e-05,
+          "gate_penalty": 0.000861867922290962
+        },
+        {
+          "epoch": 66,
+          "loss": 0.07000156953095835,
+          "pinball": 0.0691192444048081,
+          "l2": 1.9646394463977095e-05,
+          "gate_penalty": 0.0008626787316862673
+        },
+        {
+          "epoch": 67,
+          "loss": 0.06995990802015187,
+          "pinball": 0.06907721028816598,
+          "l2": 1.9992040428849478e-05,
+          "gate_penalty": 0.0008627056915570347
+        },
+        {
+          "epoch": 68,
+          "loss": 0.06991819000636255,
+          "pinball": 0.0690357618839217,
+          "l2": 2.0336565886783877e-05,
+          "gate_penalty": 0.0008620915565540769
+        },
+        {
+          "epoch": 69,
+          "loss": 0.06987822276350798,
+          "pinball": 0.0689964923291304,
+          "l2": 2.0681244637894507e-05,
+          "gate_penalty": 0.0008610491897397039
+        },
+        {
+          "epoch": 70,
+          "loss": 0.06984076557536534,
+          "pinball": 0.06895991769575922,
+          "l2": 2.1027613740277123e-05,
+          "gate_penalty": 0.000859820265865839
+        },
+        {
+          "epoch": 71,
+          "loss": 0.06980659814568048,
+          "pinball": 0.06892657599256515,
+          "l2": 2.1377274231287274e-05,
+          "gate_penalty": 0.000858644878884041
+        },
+        {
+          "epoch": 72,
+          "loss": 0.06977514295714035,
+          "pinball": 0.06889563365252964,
+          "l2": 2.1730105291667458e-05,
+          "gate_penalty": 0.0008577791993190435
+        },
+        {
+          "epoch": 73,
+          "loss": 0.0697455033383896,
+          "pinball": 0.06886603317508223,
+          "l2": 2.2087328819689207e-05,
+          "gate_penalty": 0.0008573828344876716
+        },
+        {
+          "epoch": 74,
+          "loss": 0.06971675651276564,
+          "pinball": 0.06883677950171577,
+          "l2": 2.2449374487705712e-05,
+          "gate_penalty": 0.0008575276365621637
+        },
+        {
+          "epoch": 75,
+          "loss": 0.06968875723081294,
+          "pinball": 0.06880777090510777,
+          "l2": 2.2815116798844635e-05,
+          "gate_penalty": 0.0008581712089063229
+        },
+        {
+          "epoch": 76,
+          "loss": 0.0696614509179123,
+          "pinball": 0.0687790685144363,
+          "l2": 2.318240866333978e-05,
+          "gate_penalty": 0.0008591999948126619
+        },
+        {
+          "epoch": 77,
+          "loss": 0.0696346718532429,
+          "pinball": 0.06875068895499678,
+          "l2": 2.3549877166070825e-05,
+          "gate_penalty": 0.000860433021080047
+        },
+        {
+          "epoch": 78,
+          "loss": 0.06960896025236765,
+          "pinball": 0.06872338514054455,
+          "l2": 2.3915201250752795e-05,
+          "gate_penalty": 0.0008616599105723528
+        },
+        {
+          "epoch": 79,
+          "loss": 0.06958425055412881,
+          "pinball": 0.06869725304912908,
+          "l2": 2.4277550892883206e-05,
+          "gate_penalty": 0.000862719954106842
+        },
+        {
+          "epoch": 80,
+          "loss": 0.06956081941935408,
+          "pinball": 0.06867277539391382,
+          "l2": 2.4635352599930692e-05,
+          "gate_penalty": 0.0008634086728403241
+        }
+      ]
+    }
+  },
+  "activation": {
+    "T_only": {
+      "gate_trend": {
+        "mean": 0.6175130312631496,
+        "positive_fraction": 0.9211566091954023
+      },
+      "gate_event": {
+        "mean": 0.0,
+        "positive_fraction": 0.0
+      },
+      "mean_abs_shift": 15.670297174778852
+    },
+    "TE_unshifted": {
+      "gate_trend": {
+        "mean": 0.5951286230044285,
+        "positive_fraction": 1.0
+      },
+      "gate_event": {
+        "mean": 0.13280467191531395,
+        "positive_fraction": 0.4680914750957854
+      },
+      "mean_abs_shift": 18.920710640576555
+    },
+    "TE_full": {
+      "gate_trend": {
+        "mean": 0.5992488001321518,
+        "positive_fraction": 1.0
+      },
+      "gate_event": {
+        "mean": 0.09821186783078237,
+        "positive_fraction": 0.3331537356321839
+      },
+      "mean_abs_shift": 18.343601405870245
+    },
+    "TE_fixed_pulses": {
+      "gate_trend": {
+        "mean": 0.5715784197452958,
+        "positive_fraction": 0.9976652298850575
+      },
+      "gate_event": {
+        "mean": 0.0876160956779047,
+        "positive_fraction": 0.3066331417624521
+      },
+      "mean_abs_shift": 18.42497767683558
+    },
+    "TE_event_off": {
+      "gate_trend": {
+        "mean": 0.5992488001321518,
+        "positive_fraction": 1.0
+      },
+      "gate_event": {
+        "mean": 0.09821186783078237,
+        "positive_fraction": 0.3331537356321839
+      },
+      "mean_abs_shift": 14.282770709260387
+    },
+    "TE_time_shift_off": {
+      "gate_trend": {
+        "mean": 0.5992488001321518,
+        "positive_fraction": 1.0
+      },
+      "gate_event": {
+        "mean": 0.09821186783078237,
+        "positive_fraction": 0.3331537356321839
+      },
+      "mean_abs_shift": 18.405903669640853
+    }
+  },
+  "feature_names": [
+    "const_one",
+    "baseline_q50_scaled",
+    "baseline_width80_scaled",
+    "predispatch_price",
+    "predispatch_demand",
+    "available_generation",
+    "spare_capacity",
+    "net_load",
+    "import_room",
+    "shortfall_q05",
+    "predispatch_coverage",
+    "interconnector_coverage",
+    "target_hour_sin",
+    "target_hour_cos",
+    "target_weekend",
+    "target_dow_sin",
+    "lag72_mean",
+    "lag72_std",
+    "lag_last_price",
+    "lag24_mean",
+    "trend_correction",
+    "event_correction",
+    "trend_match_distance",
+    "recent28_median_error",
+    "event_best_distance",
+    "event_support",
+    "event_age",
+    "eligible_pool_count",
+    "event_movement"
+  ],
+  "memory_audits": {
+    "full": {
+      "queries": 3648,
+      "history_start": 1664546400,
+      "fixed_geometry": false,
+      "shift": true,
+      "encoded_records": 1416,
+      "encoder_calls": 1416,
+      "open_queries": 1248,
+      "historical_event_records": 556,
+      "no_event_queries": 2418,
+      "positive_payload_event_records": 541,
+      "nonzero_event_fraction": 0.1694878472222222,
+      "moved_event_fraction": 0.7289184234647113,
+      "maturity_violations": 0,
+      "max_release_violation_seconds": 0,
+      "minimum_release_margin_seconds": 0,
+      "selected_event_references": 4364,
+      "selected_trend_references": 458496,
+      "trend_candidate_sha256": "d650615a07c24e4c038df0a281a97212ff3165a2b903f6ea94a7287e784e3fd7",
+      "event_selection_samples": [
+        {
+          "query_origin": 1665302400,
+          "event_origins": [
+            1665216000
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            2
+          ]
+        },
+        {
+          "query_origin": 1665306000,
+          "event_origins": [
+            1665219600
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665309600,
+          "event_origins": [
+            1665223200
+          ],
+          "source_h": [
+            22
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665313200,
+          "event_origins": [
+            1665226800
+          ],
+          "source_h": [
+            21
+          ],
+          "target_h": [
+            22
+          ]
+        },
+        {
+          "query_origin": 1665316800,
+          "event_origins": [
+            1665230400
+          ],
+          "source_h": [
+            20
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665320400,
+          "event_origins": [
+            1665234000
+          ],
+          "source_h": [
+            19
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665324000,
+          "event_origins": [
+            1665237600
+          ],
+          "source_h": [
+            18
+          ],
+          "target_h": [
+            18
+          ]
+        },
+        {
+          "query_origin": 1665327600,
+          "event_origins": [
+            1665241200
+          ],
+          "source_h": [
+            17
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665331200,
+          "event_origins": [
+            1665244800
+          ],
+          "source_h": [
+            16
+          ],
+          "target_h": [
+            18
+          ]
+        },
+        {
+          "query_origin": 1665334800,
+          "event_origins": [
+            1665248400
+          ],
+          "source_h": [
+            15
+          ],
+          "target_h": [
+            16
+          ]
+        },
+        {
+          "query_origin": 1665338400,
+          "event_origins": [
+            1665252000
+          ],
+          "source_h": [
+            14
+          ],
+          "target_h": [
+            13
+          ]
+        },
+        {
+          "query_origin": 1665342000,
+          "event_origins": [
+            1665255600
+          ],
+          "source_h": [
+            13
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665345600,
+          "event_origins": [
+            1665259200
+          ],
+          "source_h": [
+            12
+          ],
+          "target_h": [
+            14
+          ]
+        },
+        {
+          "query_origin": 1665349200,
+          "event_origins": [
+            1665262800
+          ],
+          "source_h": [
+            11
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665352800,
+          "event_origins": [
+            1665266400
+          ],
+          "source_h": [
+            10
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665356400,
+          "event_origins": [
+            1665270000
+          ],
+          "source_h": [
+            9
+          ],
+          "target_h": [
+            10
+          ]
+        }
+      ],
+      "event_eligibility": "released actual peak>300 and actual peak minus frozen anchor q50>0; independent of learned geometry",
+      "event_amplitude_cap": "entire pulse amplitude <= missed peak minus positive historical trend error; nonmatching atom yields zero payload, candidate retained",
+      "residual_definition": "encoded mature trend minus smoothed historical anchor q50; missed positive atom only",
+      "feature_scaling": "z bounded; prices/300; corrections/150; distances/4; age/365; counts/365 or4; movement/23"
+    },
+    "unshifted": {
+      "queries": 3648,
+      "history_start": 1664546400,
+      "fixed_geometry": false,
+      "shift": false,
+      "encoded_records": 1416,
+      "encoder_calls": 1416,
+      "open_queries": 1248,
+      "historical_event_records": 556,
+      "no_event_queries": 2418,
+      "positive_payload_event_records": 541,
+      "nonzero_event_fraction": 0.18022432383040934,
+      "moved_event_fraction": 0.0,
+      "maturity_violations": 0,
+      "max_release_violation_seconds": 0,
+      "minimum_release_margin_seconds": 0,
+      "selected_event_references": 4364,
+      "selected_trend_references": 458496,
+      "trend_candidate_sha256": "d650615a07c24e4c038df0a281a97212ff3165a2b903f6ea94a7287e784e3fd7",
+      "event_selection_samples": [
+        {
+          "query_origin": 1665302400,
+          "event_origins": [
+            1665216000
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665306000,
+          "event_origins": [
+            1665219600
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665309600,
+          "event_origins": [
+            1665223200
+          ],
+          "source_h": [
+            22
+          ],
+          "target_h": [
+            22
+          ]
+        },
+        {
+          "query_origin": 1665313200,
+          "event_origins": [
+            1665226800
+          ],
+          "source_h": [
+            21
+          ],
+          "target_h": [
+            21
+          ]
+        },
+        {
+          "query_origin": 1665316800,
+          "event_origins": [
+            1665230400
+          ],
+          "source_h": [
+            20
+          ],
+          "target_h": [
+            20
+          ]
+        },
+        {
+          "query_origin": 1665320400,
+          "event_origins": [
+            1665234000
+          ],
+          "source_h": [
+            19
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665324000,
+          "event_origins": [
+            1665237600
+          ],
+          "source_h": [
+            18
+          ],
+          "target_h": [
+            18
+          ]
+        },
+        {
+          "query_origin": 1665327600,
+          "event_origins": [
+            1665241200
+          ],
+          "source_h": [
+            17
+          ],
+          "target_h": [
+            17
+          ]
+        },
+        {
+          "query_origin": 1665331200,
+          "event_origins": [
+            1665244800
+          ],
+          "source_h": [
+            16
+          ],
+          "target_h": [
+            16
+          ]
+        },
+        {
+          "query_origin": 1665334800,
+          "event_origins": [
+            1665248400
+          ],
+          "source_h": [
+            15
+          ],
+          "target_h": [
+            15
+          ]
+        },
+        {
+          "query_origin": 1665338400,
+          "event_origins": [
+            1665252000
+          ],
+          "source_h": [
+            14
+          ],
+          "target_h": [
+            14
+          ]
+        },
+        {
+          "query_origin": 1665342000,
+          "event_origins": [
+            1665255600
+          ],
+          "source_h": [
+            13
+          ],
+          "target_h": [
+            13
+          ]
+        },
+        {
+          "query_origin": 1665345600,
+          "event_origins": [
+            1665259200
+          ],
+          "source_h": [
+            12
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665349200,
+          "event_origins": [
+            1665262800
+          ],
+          "source_h": [
+            11
+          ],
+          "target_h": [
+            11
+          ]
+        },
+        {
+          "query_origin": 1665352800,
+          "event_origins": [
+            1665266400
+          ],
+          "source_h": [
+            10
+          ],
+          "target_h": [
+            10
+          ]
+        },
+        {
+          "query_origin": 1665356400,
+          "event_origins": [
+            1665270000
+          ],
+          "source_h": [
+            9
+          ],
+          "target_h": [
+            9
+          ]
+        }
+      ],
+      "event_eligibility": "released actual peak>300 and actual peak minus frozen anchor q50>0; independent of learned geometry",
+      "event_amplitude_cap": "entire pulse amplitude <= missed peak minus positive historical trend error; nonmatching atom yields zero payload, candidate retained",
+      "residual_definition": "encoded mature trend minus smoothed historical anchor q50; missed positive atom only",
+      "feature_scaling": "z bounded; prices/300; corrections/150; distances/4; age/365; counts/365 or4; movement/23"
+    },
+    "fixed": {
+      "queries": 3648,
+      "history_start": 1664546400,
+      "fixed_geometry": true,
+      "shift": true,
+      "encoded_records": 1416,
+      "encoder_calls": 1416,
+      "open_queries": 1248,
+      "historical_event_records": 556,
+      "no_event_queries": 2418,
+      "positive_payload_event_records": 550,
+      "nonzero_event_fraction": 0.12560535453216373,
+      "moved_event_fraction": 0.7289184234647113,
+      "maturity_violations": 0,
+      "max_release_violation_seconds": 0,
+      "minimum_release_margin_seconds": 0,
+      "selected_event_references": 4364,
+      "selected_trend_references": 458496,
+      "trend_candidate_sha256": "d650615a07c24e4c038df0a281a97212ff3165a2b903f6ea94a7287e784e3fd7",
+      "event_selection_samples": [
+        {
+          "query_origin": 1665302400,
+          "event_origins": [
+            1665216000
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            2
+          ]
+        },
+        {
+          "query_origin": 1665306000,
+          "event_origins": [
+            1665219600
+          ],
+          "source_h": [
+            23
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665309600,
+          "event_origins": [
+            1665223200
+          ],
+          "source_h": [
+            22
+          ],
+          "target_h": [
+            23
+          ]
+        },
+        {
+          "query_origin": 1665313200,
+          "event_origins": [
+            1665226800
+          ],
+          "source_h": [
+            21
+          ],
+          "target_h": [
+            22
+          ]
+        },
+        {
+          "query_origin": 1665316800,
+          "event_origins": [
+            1665230400
+          ],
+          "source_h": [
+            20
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665320400,
+          "event_origins": [
+            1665234000
+          ],
+          "source_h": [
+            19
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665324000,
+          "event_origins": [
+            1665237600
+          ],
+          "source_h": [
+            18
+          ],
+          "target_h": [
+            18
+          ]
+        },
+        {
+          "query_origin": 1665327600,
+          "event_origins": [
+            1665241200
+          ],
+          "source_h": [
+            17
+          ],
+          "target_h": [
+            19
+          ]
+        },
+        {
+          "query_origin": 1665331200,
+          "event_origins": [
+            1665244800
+          ],
+          "source_h": [
+            16
+          ],
+          "target_h": [
+            18
+          ]
+        },
+        {
+          "query_origin": 1665334800,
+          "event_origins": [
+            1665248400
+          ],
+          "source_h": [
+            15
+          ],
+          "target_h": [
+            16
+          ]
+        },
+        {
+          "query_origin": 1665338400,
+          "event_origins": [
+            1665252000
+          ],
+          "source_h": [
+            14
+          ],
+          "target_h": [
+            13
+          ]
+        },
+        {
+          "query_origin": 1665342000,
+          "event_origins": [
+            1665255600
+          ],
+          "source_h": [
+            13
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665345600,
+          "event_origins": [
+            1665259200
+          ],
+          "source_h": [
+            12
+          ],
+          "target_h": [
+            14
+          ]
+        },
+        {
+          "query_origin": 1665349200,
+          "event_origins": [
+            1665262800
+          ],
+          "source_h": [
+            11
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665352800,
+          "event_origins": [
+            1665266400
+          ],
+          "source_h": [
+            10
+          ],
+          "target_h": [
+            12
+          ]
+        },
+        {
+          "query_origin": 1665356400,
+          "event_origins": [
+            1665270000
+          ],
+          "source_h": [
+            9
+          ],
+          "target_h": [
+            10
+          ]
+        }
+      ],
+      "event_eligibility": "released actual peak>300 and actual peak minus frozen anchor q50>0; independent of learned geometry",
+      "event_amplitude_cap": "entire pulse amplitude <= missed peak minus positive historical trend error; nonmatching atom yields zero payload, candidate retained",
+      "residual_definition": "encoded mature trend minus smoothed historical anchor q50; missed positive atom only",
+      "feature_scaling": "z bounded; prices/300; corrections/150; distances/4; age/365; counts/365 or4; movement/23"
+    }
+  },
+  "encoder_checkpoint_sha256": "542dad271cb284aac61fe58ac9c9b76fcac94ac971fdd2594264863e02ea0196",
+  "encoder_audit": {
+    "seed": 2026,
+    "config": {
+      "epochs": 12,
+      "batch_size": 128,
+      "hidden_dim": 32,
+      "learning_rate": 0.003,
+      "device": "cpu"
+    },
+    "fit_cutoff": 1661954400,
+    "fit_start": 1656597600,
+    "fit_rows": 1464,
+    "first_fit_origin": 1656597600,
+    "last_fit_origin": 1661864400,
+    "latest_fit_label_available": 1661950800,
+    "architecture": "local Fourier DC+first harmonic and adaptive zero-frequency Gabor pulses",
+    "atoms": 6,
+    "ridge": 0.0001,
+    "fixed_price_scale": 300.0,
+    "loss": "full-visible MSE(price/300) weighted 1+3*(price>300)",
+    "geometry": "observed residual peak anchors; learned bounded center offset and width",
+    "coefficients": "observed-only joint ridge least squares; unpenalized intercept",
+    "interpretation": "learned geometry, analytic mature-price amplitudes; not future prediction",
+    "trainable_parameters": 962,
+    "trace": [
+      {
+        "epoch": 1,
+        "weighted_mse": 0.28568001700147905
+      },
+      {
+        "epoch": 2,
+        "weighted_mse": 0.13230457931471978
+      },
+      {
+        "epoch": 3,
+        "weighted_mse": 0.11372882705894324
+      },
+      {
+        "epoch": 4,
+        "weighted_mse": 0.10623868778755105
+      },
+      {
+        "epoch": 5,
+        "weighted_mse": 0.09981369862302406
+      },
+      {
+        "epoch": 6,
+        "weighted_mse": 0.10049704792069607
+      },
+      {
+        "epoch": 7,
+        "weighted_mse": 0.09293521370718388
+      },
+      {
+        "epoch": 8,
+        "weighted_mse": 0.08297612776603204
+      },
+      {
+        "epoch": 9,
+        "weighted_mse": 0.07900149273416383
+      },
+      {
+        "epoch": 10,
+        "weighted_mse": 0.07604663489294834
+      },
+      {
+        "epoch": 11,
+        "weighted_mse": 0.07623783983493763
+      },
+      {
+        "epoch": 12,
+        "weighted_mse": 0.07477939029127523
+      }
+    ]
+  },
+  "reused_corrections_sha256": "684a7daeae2b649a0fec2b52c41be8d4fe64352af2893ae4a2b924bc03d54ced",
+  "frozen_hashes": {
+    "development/models/C_roll_QLD1.json": "96f4e5ebf7e849c4664234f9478e937d086ff06a421553acac5cabc58ef890c4",
+    "baseline_predictions/QLD1_calibration.npz": "3cd179c55e3f1e39be3aeb1d3fd47674091933a32c0d8dd390a7201bd88b6ef2",
+    "development/predictions/C_roll/QLD1_v1.npz": "aee0e98d8eec1ee5f919e2d21d1547b174623f5447a4620b2dd310b72c786374",
+    "development/predictions/C_roll/QLD1_v2.npz": "255cd28410f501877afa2e92f91b0f60f2411ab2cedbbe90f4ae8a182643edad"
+  },
+  "reconstructed_boundary_origins": 23,
+  "assessment_rows": 696,
+  "first_assessment_origin": 1667224800,
+  "latest_assessment_label_available": 1669813200,
+  "unique_spike_hours": 18,
+  "gate_checkpoint_hashes": {
+    "T_only": "7ed4d80da402071447ad54f071a7eb143ad6f82fc0aeb0225353cb4100c8cd85",
+    "TE_unshifted": "a1ad630b029d9b65581ae706b38da01a8b79d5aed2bd34f70f2da4f801fc3005",
+    "TE_full": "bdf2c9664a50aa9290db35956ab0e1d87181a20269da9e42372430e64344a3d2",
+    "TE_fixed_pulses": "b9b570239c9fad65f805fc96f522a65d63b2291cdd9ef7eb79e2a1b8debb0ca2"
+  },
+  "shared_event_candidates": true,
+  "shared_timing_control_gates": true,
+  "wall_seconds": 22.08692629262805
+}

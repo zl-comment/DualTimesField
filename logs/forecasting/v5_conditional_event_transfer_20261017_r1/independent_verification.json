@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "counts": {
+    "source_snapshots": 27,
+    "frozen_encoder_checkpoints": 3,
+    "gate_checkpoints": 12,
+    "predictions_rescored": 30,
+    "forecast_replays": 24,
+    "event_proposal_replays": 9,
+    "event_candidate_references": 35988,
+    "trend_candidate_references": 4126464,
+    "frozen_parent_files": 12
+  },
+  "regions": {
+    "NSW1": {
+      "maturity_violations": 0,
+      "assessment_rows": 696,
+      "unique_spike_target_hours": 4,
+      "event_gate_positive_fraction": 0.23820641762452108,
+      "event_proposal_positive_fraction": 0.6030890804597702,
+      "actual_event_delta_nonzero_fraction": 0.195522030651341,
+      "actual_event_delta_mean_abs": 1.0279737031939182,
+      "raw_gated_event_mean_abs": 1.0279737031939182,
+      "all_forecast_replays_exact": true
+    },
+    "QLD1": {
+      "maturity_violations": 0,
+      "assessment_rows": 696,
+      "unique_spike_target_hours": 18,
+      "event_gate_positive_fraction": 0.3331537356321839,
+      "event_proposal_positive_fraction": 0.5016163793103449,
+      "actual_event_delta_nonzero_fraction": 0.30334051724137934,
+      "actual_event_delta_mean_abs": 5.122457897642893,
+      "raw_gated_event_mean_abs": 5.134632624602509,
+      "all_forecast_replays_exact": true
+    },
+    "TAS1": {
+      "maturity_violations": 0,
+      "assessment_rows": 696,
+      "unique_spike_target_hours": 6,
+      "event_gate_positive_fraction": 0.390205938697318,
+      "event_proposal_positive_fraction": 0.5552562260536399,
+      "actual_event_delta_nonzero_fraction": 0.20875239463601533,
+      "actual_event_delta_mean_abs": 1.4964490055472026,
+      "raw_gated_event_mean_abs": 1.4964490055472026,
+      "all_forecast_replays_exact": true
+    }
+  },
+  "script_sha256": "8a1af5663280037f4a49230a0a8890012c96dd989788bb9a75b20fb057fb868f",
+  "scope": "Immutable sources/snapshots; frozen encoder/parent/cache; exact scoring/head/event-proposal replay; causal same-hour unique historical events; October fitting and November assessment. Does not independently establish first-publication timestamps."
+}

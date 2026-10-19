@@ -1,0 +1,17 @@
+protocol: conditional-event-transfer-20261017
+regions: [NSW1, QLD1, TAS1]
+seed: 2026
+encoder_source: outputs/forecasting/v5_adaptive_dual_20261017_r2
+gate:
+  epochs: 80
+  learning_rate: 0.01
+  l2: 0.001
+  gate_penalty: 0.001
+  device: cpu
+gate_fit_cutoff: '2022-11-01'
+assessment_end: '2022-12-01'
+assessment: retrospective_November2022
+# Frozen memory constants: 365d, same origin hour, min8, trend K16,
+# event K4, state-MSE temperature0.1, exp(-age_days/28), price threshold300.
+# Current actual labels never enter proposals/transport/gates at inference.
+# No December scoring, hyperparameter search or encoder retraining.
