@@ -1,0 +1,434 @@
+{
+  "frozen_commit": "a013fd9f1f4c1c85fec3665c640195ac74bf750f",
+  "regions": {
+    "NSW1": {
+      "months": {
+        "10": {
+          "price": {
+            "hours": 744,
+            "mean": 151.64934025079972,
+            "median": 151.47624969482422,
+            "p95": 263.3365722656251,
+            "maximum": 1326.199951171875,
+            "spike_hours_gt300": 9,
+            "negative_hours": 28
+          },
+          "prediction_origins": 720,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 84.49865221322678,
+              "median_actual_minus_prediction": 85.27058490724983,
+              "underprediction_fraction": 0.8996527777777777,
+              "mae": 94.47618571215752
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": 63.63303665973548,
+              "median_actual_minus_prediction": 64.20994318472277,
+              "underprediction_fraction": 0.8721643518518518,
+              "mae": 75.85657876729492
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": -0.02220420568802509,
+              "std": 0.007237507391357564
+            },
+            "demand": {
+              "mean": -0.02280854214425486,
+              "std": 0.03719187743340759
+            },
+            "available_generation": {
+              "mean": 0.012336918904335938,
+              "std": 0.031344632140249115
+            },
+            "spare_capacity": {
+              "mean": -0.1461017735809639,
+              "std": 0.29847806903740576
+            },
+            "net_load": {
+              "mean": -0.3011369697662163,
+              "std": 0.291795957831313
+            },
+            "import_room": {
+              "mean": 0.0006240774622800717,
+              "std": 0.05283191789340347
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-10-29T23:00:00+10:00",
+            "median_age_days": 9.0,
+            "reference_fraction_from_October": 1.0,
+            "has_any_selected_trend_fraction": 0.7333333333333333,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        },
+        "11": {
+          "price": {
+            "hours": 720,
+            "mean": 112.8996701322496,
+            "median": 116.4495849609375,
+            "p95": 213.84303665161127,
+            "maximum": 1332.4525146484375,
+            "spike_hours_gt300": 4,
+            "negative_hours": 44
+          },
+          "prediction_origins": 696,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 19.53084390771655,
+              "median_actual_minus_prediction": 14.099248177566103,
+              "underprediction_fraction": 0.7079741379310345,
+              "mae": 33.206287507564596
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": -11.894372591560787,
+              "median_actual_minus_prediction": -17.06071355253536,
+              "underprediction_fraction": 0.3068726053639847,
+              "mae": 34.1323225139381
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": 0.00783867672775757,
+              "std": 0.05106536091413134
+            },
+            "demand": {
+              "mean": -0.3164304288023744,
+              "std": 0.24317604709547383
+            },
+            "available_generation": {
+              "mean": -0.187157635559089,
+              "std": 0.2854846122995378
+            },
+            "spare_capacity": {
+              "mean": -0.1471809712969246,
+              "std": 0.24698941622186052
+            },
+            "net_load": {
+              "mean": -0.42665475645901735,
+              "std": 0.3059019955917796
+            },
+            "import_room": {
+              "mean": 0.35393709301368315,
+              "std": 0.34555163889594487
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-11-28T23:00:00+10:00",
+            "median_age_days": 17.0,
+            "reference_fraction_from_October": 0.5068621288314177,
+            "has_any_selected_trend_fraction": 1.0,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        }
+      },
+      "history_examples": {
+        "2022-10-05T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 0,
+          "earliest_selected": null,
+          "latest_selected": null
+        },
+        "2022-10-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 14,
+          "earliest_selected": "2022-10-01T12:00:00+10:00",
+          "latest_selected": "2022-10-14T12:00:00+10:00"
+        },
+        "2022-11-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 39,
+          "earliest_selected": "2022-10-01T12:00:00+10:00",
+          "latest_selected": "2022-11-14T12:00:00+10:00"
+        }
+      }
+    },
+    "QLD1": {
+      "months": {
+        "10": {
+          "price": {
+            "hours": 744,
+            "mean": 154.046696815119,
+            "median": 150.56832885742188,
+            "p95": 279.8718292236328,
+            "maximum": 1492.1158447265625,
+            "spike_hours_gt300": 19,
+            "negative_hours": 29
+          },
+          "prediction_origins": 720,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 85.1197290500025,
+              "median_actual_minus_prediction": 82.47723883649475,
+              "underprediction_fraction": 0.8820601851851851,
+              "mae": 94.94480028910442
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": 71.21895843186891,
+              "median_actual_minus_prediction": 69.06604330032607,
+              "underprediction_fraction": 0.8652777777777778,
+              "mae": 82.33440869877224
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": -0.023557600662815405,
+              "std": 0.006088962987657304
+            },
+            "demand": {
+              "mean": -0.04317825530787907,
+              "std": 0.04861393559378534
+            },
+            "available_generation": {
+              "mean": -0.015571666584223692,
+              "std": 0.05169264509808489
+            },
+            "spare_capacity": {
+              "mean": -0.20270810159388616,
+              "std": 0.24769068158922827
+            },
+            "net_load": {
+              "mean": -0.2318477581651554,
+              "std": 0.35884220853087234
+            },
+            "import_room": {
+              "mean": -0.003754368361752526,
+              "std": 0.05908391430493179
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-10-29T23:00:00+10:00",
+            "median_age_days": 9.0,
+            "reference_fraction_from_October": 1.0,
+            "has_any_selected_trend_fraction": 0.7333333333333333,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        },
+        "11": {
+          "price": {
+            "hours": 720,
+            "mean": 121.5039616442389,
+            "median": 121.70208358764648,
+            "p95": 256.2344497680664,
+            "maximum": 1478.2191162109375,
+            "spike_hours_gt300": 18,
+            "negative_hours": 56
+          },
+          "prediction_origins": 696,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 24.413178299358044,
+              "median_actual_minus_prediction": 15.0984301908491,
+              "underprediction_fraction": 0.6989942528735632,
+              "mae": 37.41203845131827
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": 2.0472422449183725,
+              "median_actual_minus_prediction": -7.521473367988747,
+              "underprediction_fraction": 0.4096024904214559,
+              "mae": 34.856338465661516
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": 0.01381927691474518,
+              "std": 0.06095575500056896
+            },
+            "demand": {
+              "mean": -0.16228661957871607,
+              "std": 0.37219240894084327
+            },
+            "available_generation": {
+              "mean": -0.5722183531955799,
+              "std": 0.22096867995402386
+            },
+            "spare_capacity": {
+              "mean": -0.19276861009797008,
+              "std": 0.32556843803709223
+            },
+            "net_load": {
+              "mean": -0.2701411366924743,
+              "std": 0.4318910217680766
+            },
+            "import_room": {
+              "mean": -0.11140016759990948,
+              "std": 0.330429015987625
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-11-28T23:00:00+10:00",
+            "median_age_days": 20.0,
+            "reference_fraction_from_October": 0.5935479525862069,
+            "has_any_selected_trend_fraction": 1.0,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        }
+      },
+      "history_examples": {
+        "2022-10-05T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 0,
+          "earliest_selected": null,
+          "latest_selected": null
+        },
+        "2022-10-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 14,
+          "earliest_selected": "2022-10-01T12:00:00+10:00",
+          "latest_selected": "2022-10-14T12:00:00+10:00"
+        },
+        "2022-11-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 45,
+          "earliest_selected": "2022-10-01T12:00:00+10:00",
+          "latest_selected": "2022-11-14T12:00:00+10:00"
+        }
+      }
+    },
+    "TAS1": {
+      "months": {
+        "10": {
+          "price": {
+            "hours": 744,
+            "mean": 121.99856655683709,
+            "median": 129.38375091552734,
+            "p95": 226.0549530029297,
+            "maximum": 3229.160888671875,
+            "spike_hours_gt300": 6,
+            "negative_hours": 56
+          },
+          "prediction_origins": 720,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 45.88063668369599,
+              "median_actual_minus_prediction": 52.430263213373024,
+              "underprediction_fraction": 0.6747685185185185,
+              "mae": 77.9128693056378
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": 41.32143060249941,
+              "median_actual_minus_prediction": 46.08215093901355,
+              "underprediction_fraction": 0.6603587962962963,
+              "mae": 74.98512322651446
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": -0.03275933071531149,
+              "std": 0.01822125421547981
+            },
+            "demand": {
+              "mean": -0.05116394533003507,
+              "std": 0.034076840741827215
+            },
+            "available_generation": {
+              "mean": 0.01989712562572993,
+              "std": 0.021085107631061528
+            },
+            "spare_capacity": {
+              "mean": -0.1504034044143683,
+              "std": 0.32669326110069713
+            },
+            "net_load": {
+              "mean": 0.0022234229196857794,
+              "std": 0.2883774937632787
+            },
+            "import_room": {
+              "mean": -0.1206198221751644,
+              "std": 0.037002002908354314
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-10-29T23:00:00+10:00",
+            "median_age_days": 8.0,
+            "reference_fraction_from_October": 1.0,
+            "has_any_selected_trend_fraction": 0.7333333333333333,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        },
+        "11": {
+          "price": {
+            "hours": 720,
+            "mean": 100.98459191760114,
+            "median": 63.74416542053223,
+            "p95": 153.6249618530273,
+            "maximum": 12011.6611328125,
+            "spike_hours_gt300": 6,
+            "negative_hours": 38
+          },
+          "prediction_origins": 696,
+          "errors": {
+            "LightGBM": {
+              "mean_actual_minus_prediction": 40.2215582259786,
+              "median_actual_minus_prediction": 2.6834687136738964,
+              "underprediction_fraction": 0.5381944444444444,
+              "mae": 65.56670091837185
+            },
+            "C_roll": {
+              "mean_actual_minus_prediction": 30.42526679852034,
+              "median_actual_minus_prediction": -1.479908256634232,
+              "underprediction_fraction": 0.48299808429118773,
+              "mae": 66.01081720138632
+            }
+          },
+          "state_values_clipped_training_zscore_divided_by_3": {
+            "predispatch_price": {
+              "mean": 0.01720299226329687,
+              "std": 0.15305617514328568
+            },
+            "demand": {
+              "mean": -0.04523442499589024,
+              "std": 0.21529093997456347
+            },
+            "available_generation": {
+              "mean": -0.23900445768501327,
+              "std": 0.2493547113274901
+            },
+            "spare_capacity": {
+              "mean": -0.48715282606804267,
+              "std": 0.14421050033422309
+            },
+            "net_load": {
+              "mean": -0.02274865883826409,
+              "std": 0.22638188692365474
+            },
+            "import_room": {
+              "mean": 0.05985089693870418,
+              "std": 0.40824115735100197
+            }
+          },
+          "trend_history": {
+            "earliest": "2022-10-01T00:00:00+10:00",
+            "latest": "2022-11-28T23:00:00+10:00",
+            "median_age_days": 15.0,
+            "reference_fraction_from_October": 0.5757004310344828,
+            "has_any_selected_trend_fraction": 1.0,
+            "note": "reference counts across origin/horizon/neighbors, not unique events or weighted influence"
+          }
+        }
+      },
+      "history_examples": {
+        "2022-10-05T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 0,
+          "earliest_selected": null,
+          "latest_selected": null
+        },
+        "2022-10-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 14,
+          "earliest_selected": "2022-10-01T12:00:00+10:00",
+          "latest_selected": "2022-10-14T12:00:00+10:00"
+        },
+        "2022-11-15T12:00:00+10:00": {
+          "selected_unique_records_across_24_leads": 34,
+          "earliest_selected": "2022-10-08T12:00:00+10:00",
+          "latest_selected": "2022-11-14T12:00:00+10:00"
+        }
+      }
+    }
+  },
+  "price_scope": "Full calendar month, unique delivery hours: 744 October /720 November",
+  "prediction_scope": "Origins with full labels available strictly before next month: 720 October /696 November",
+  "history_start": "2022-10-01T00:00:00+10:00",
+  "fit_warning": "Gates fitted using whole October. October predictions are IN-SAMPLE, not a chronological daily deployment backtest.",
+  "frozen_files_unchanged": true,
+  "script_sha256": "770e004fcfdce1e074f0181d9c14aac2a0ee88a57f2a753dd967bdf2fe4b2de1"
+}

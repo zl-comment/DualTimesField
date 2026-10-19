@@ -1,0 +1,21 @@
+protocol: v5-joint-history-20261019
+regions: [NSW1, QLD1, TAS1]
+seed: 2026
+base_config: configs/lightgbm/aligned.yaml
+oof_years: [2017, 2018, 2019, 2020, 2021, 2022]
+# Each OOF year: train from2015 until previous July; select previous July-Dec;
+# predict next year (2022 first half only). A separate2022H2 deployment fold
+# trains2015–2021/selects2022H1, matching the neural final cutoff.
+# Every fold rebuilds preprocessing using that fold's train.
+train_start: '2018-01-01'
+train_end: '2022-01-01'
+selection_end: '2022-07-01'
+evaluation_end: '2023-01-01'
+history_days: 730
+candidates: 16
+batch_size: 16
+epochs: 20
+learning_rate: 0.001
+reconstruction_weight: 0.05
+gate_penalty: 0.001
+device: cpu

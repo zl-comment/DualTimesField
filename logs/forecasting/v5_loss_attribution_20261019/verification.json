@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "frozen_files_verified": 144,
+  "independent_checks": {
+    "rescored_forecasts": 12,
+    "additive_band_checks": 36
+  },
+  "diagnostic_unit_tests": {
+    "passed": 4,
+    "command": ".venv/bin/python -m pytest -q tests/test_v5_loss_attribution.py"
+  },
+  "replay_and_oracle_invariants": {
+    "NSW1": {
+      "grid_equal": true,
+      "full_replay": true,
+      "event_payload_replay": true,
+      "same_head_gates": true,
+      "additivity": true,
+      "oracle_bounds": true,
+      "candidate_maturity_violations": 0,
+      "candidate_references": {
+        "event_record_indices": 2772,
+        "trend_ids": 267264
+      }
+    },
+    "QLD1": {
+      "grid_equal": true,
+      "full_replay": true,
+      "event_payload_replay": true,
+      "same_head_gates": true,
+      "additivity": true,
+      "oracle_bounds": true,
+      "candidate_maturity_violations": 0,
+      "candidate_references": {
+        "event_record_indices": 2784,
+        "trend_ids": 267264
+      }
+    },
+    "TAS1": {
+      "grid_equal": true,
+      "full_replay": true,
+      "event_payload_replay": true,
+      "same_head_gates": true,
+      "additivity": true,
+      "oracle_bounds": true,
+      "candidate_maturity_violations": 0,
+      "candidate_references": {
+        "event_record_indices": 2758,
+        "trend_ids": 267264
+      }
+    }
+  },
+  "diagnostic_script_sha256": "e4931c847a47143ddabaa33f2058e5473cc341ada88d210bebb92572d4442058"
+}

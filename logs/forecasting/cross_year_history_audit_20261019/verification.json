@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "tests": {
+    "passed": 8,
+    "command": ".venv/bin/python -m pytest -q tests/test_cross_year_history_audit.py tests/test_v5_loss_attribution.py"
+  },
+  "prediction_scores_independently_rescored": 24,
+  "all_probe_corrections_bounded_150": true,
+  "frozen_files_unchanged": 144,
+  "calendar_checks": [
+    "three prior calendar dates preserve month/day/hour",
+    "nearest same weekday within three days",
+    "leap day excluded",
+    "72h history excludes current and future",
+    "candidate 24h maturity"
+  ]
+}
