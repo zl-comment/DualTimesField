@@ -2,6 +2,8 @@
 
 电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
 
+最新电价预测比较：[主基线表（seed 2026 与原三 seed 档案分列）](logs/forecasting/aligned_baselines_20261013_extension/README.md)。
+
 **Rethinking Time Series as Continuous-Time Trends and Events**
 
 <p align="center">

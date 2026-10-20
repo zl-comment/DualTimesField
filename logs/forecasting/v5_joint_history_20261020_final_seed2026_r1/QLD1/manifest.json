@@ -1,0 +1,129 @@
+{
+  "region": "QLD1",
+  "seed": 2026,
+  "best_epoch": 1,
+  "checkpoint_sha256": "dcf236e41b4ed1a43e8c67f234ef8a1fc8362735733bc817ddd31bcdee391837",
+  "tree": {
+    "manifest_sha256": "2b89130442383f1e15c83cca39bb509f6b2e604f190d597173081e7c29d8f018",
+    "model_directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/models",
+    "seed": 2026,
+    "region": "QLD1",
+    "package_version": "4.7.0",
+    "files_verified": 120,
+    "selected_rounds": [
+      189,
+      171,
+      168,
+      230,
+      238,
+      227,
+      175,
+      225,
+      249,
+      176,
+      710,
+      180,
+      256,
+      273,
+      146,
+      269,
+      205,
+      192,
+      159,
+      260,
+      135,
+      198,
+      301,
+      252
+    ],
+    "target_mean": 70.93837860665722,
+    "target_std": 202.46565255218724,
+    "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183"
+  },
+  "canonical_test_metadata": {
+    "protocol_id": "aligned-baselines-20261012-static-v1",
+    "region": "QLD1",
+    "split": "test",
+    "input_hash": "a0605cd150670630c7e3325a56fcf58cc0aecd9798cebbc88a8448dce28d2e7b",
+    "sample_hash": "daef68d49de9d887e3283e5a734493e6bd4ac03c3116e768e90d1f04cc0f22d6",
+    "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183",
+    "target_mean": 70.93837860665722,
+    "target_std": 202.46565255218724,
+    "price_transform": "identity",
+    "standardization": "train_zscore",
+    "input_block_order": [
+      "history_values",
+      "history_calendar",
+      "future_calendar",
+      "origin_context",
+      "future_exogenous",
+      "ctf_exogenous",
+      "quantile_exogenous"
+    ],
+    "load_end_exclusive": "2025-01-01 00:00:00+10:00",
+    "availability_audit": "archive_timestamp_proxies_only"
+  },
+  "origins": 17521,
+  "protocol": "exact_original_test_samples_frozen_parameters_mature_online_memory",
+  "historical_bundles": {
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz": "33cbf6cd60c147e48db8d1726b6c31353ab299ecd98d433b34f9f3b610e6c68a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz": "9e8927a0218f85e489407eb667d93d38a6990adcc0dbee4162aee50221caae05",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz": "70ca6ed11e2d54e2194fa30ed9a17d2d755cdd71734cd0301d9469fea6ff4813",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz": "d3283f489b590496b5c6613c0f61c70b3ab35d38dd7f050ddefbbc64d933bd5f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz": "f7b1ee3a63a6c07352a0e5bef25bcb27787d02392dd756fb6ccae8fc69e13e79",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz": "1a39320bfc086e1a08b1355af9b96fe7d855459b34cf3e3c528ff1d7681e3b93",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz": "3b672bb139fbec77608cfd6d2450f5bbea362b335e6285b485625258f5dec248"
+  },
+  "input_scope": "canonical_seven_blocks_plus_causal_mature_history_and_residuals",
+  "interpretation": "Retrospective test; same-head interventions are not retrained ablations",
+  "baseline_artifacts": {
+    "baseline_dlinear": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/dlinear/seed2026/QLD1/test.npz",
+      "sha256": "af33298eabf8bbb33708172d8318a8cfbe88e6b4af27aea4209a87694310e8e7"
+    },
+    "baseline_full": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/full/seed2026/QLD1/test.npz",
+      "sha256": "5ff028e15cfa6ee150d0d1a6f81d931b6a56328be637a4873f7df3f8db433537"
+    },
+    "baseline_gatets_adapter": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/gatets_adapter/seed2026/QLD1/test.npz",
+      "sha256": "1ce00de1d41118b288c6b56c967aa547c84cfe3e627b3759e91ebd5164354616"
+    },
+    "baseline_lasso_arx72_cp": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lasso_arx72_cp/seed2026/QLD1/test.npz",
+      "sha256": "77478b5d7d78a144490cdfbcd790efe5805e3c6527f3434ff754185aff1247d7"
+    },
+    "baseline_lightgbm": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/test.npz",
+      "sha256": "e0122a237e10fc9df00665d236cadb850b08f582e6527f9c1d38554eb4c7ee7c"
+    },
+    "baseline_linear": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/linear/seed2026/QLD1/test.npz",
+      "sha256": "7504e5bb609fbb213528232503cc83d0c4b07a61086585462bfda53e8ff55526"
+    },
+    "baseline_mlp": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/mlp/seed2026/QLD1/test.npz",
+      "sha256": "fbdef9a63f3b4d32bb8a3a0ee44c9e7224c3ac67ee28a098a175052bcc79ad4d"
+    },
+    "baseline_no_fields": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/no_fields/seed2026/QLD1/test.npz",
+      "sha256": "5082c98eb47cfec708ab4f892fcb21fc4cc6ff03591e896c1aa7713848b31e28"
+    },
+    "baseline_patchtst": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/QLD1/test.npz",
+      "sha256": "e51e1ef8fec6a33f3a5c3800425b959cde6286a63395412f4bc6fccee2618790"
+    },
+    "baseline_xgboost": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/QLD1/test.npz",
+      "sha256": "0509c95c2ac1a4b5bba3301fdc3a5f7aa58f62b7efce65f0a20912a45093d132"
+    },
+    "baseline_pricefm": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/pricefm/seed2026/QLD1/test.npz",
+      "sha256": "37261926005655ea97a9af9aa4aef6036644747a474b3ffb70c628ff0cb12fce"
+    },
+    "baseline_timexer": {
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/timexer/seed2026/QLD1/test.npz",
+      "sha256": "ea06a12b536f1b81b38123f440c7b558dff845d12efb6466639b9d06b2398474"
+    }
+  }
+}

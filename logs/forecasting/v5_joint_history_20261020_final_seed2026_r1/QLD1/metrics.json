@@ -1,0 +1,396 @@
+{
+  "B_retrained": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 38.282502890328175,
+    "rmse_pooled": 273.8347823021039,
+    "pinball_by_quantile": {
+      "0.05": 3.895944962417768,
+      "0.1": 6.780652105778712,
+      "0.5": 19.141251445164087,
+      "0.9": 17.612529804229784,
+      "0.95": 14.912114012473983
+    },
+    "quantile_score_proxy": 24.936996932025735,
+    "coverage_80": 0.7805680802085116,
+    "interval_width_80": 112.36933880091433,
+    "coverage_90": 0.9093183417993645,
+    "interval_width_90": 206.96681234813656
+  },
+  "Anchor_joint": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 39.05976566451755,
+    "rmse_pooled": 273.7007196704479,
+    "pinball_by_quantile": {
+      "0.05": 3.82808470238736,
+      "0.1": 6.52461576031968,
+      "0.5": 19.529882832258775,
+      "0.9": 17.651135965072644,
+      "0.95": 14.113970422362739
+    },
+    "quantile_score_proxy": 24.659075872960482,
+    "coverage_80": 0.7033226794513251,
+    "interval_width_80": 84.6117746349419,
+    "coverage_90": 0.8596446169358675,
+    "interval_width_90": 151.04854228082007
+  },
+  "Full_joint": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 38.99102568181822,
+    "rmse_pooled": 272.920201589576,
+    "pinball_by_quantile": {
+      "0.05": 3.825224757822449,
+      "0.1": 6.500761479613834,
+      "0.5": 19.49551284090911,
+      "0.9": 17.63149025589089,
+      "0.95": 14.10134172734368
+    },
+    "quantile_score_proxy": 24.621732424631983,
+    "coverage_80": 0.7033298137473127,
+    "interval_width_80": 84.61177463022493,
+    "coverage_90": 0.8591832657953313,
+    "interval_width_90": 151.048542294795
+  },
+  "event_off_same_head": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 38.98518151676883,
+    "rmse_pooled": 273.58147517869264,
+    "pinball_by_quantile": {
+      "0.05": 3.834856579644464,
+      "0.1": 6.526112592991466,
+      "0.5": 19.492590758384416,
+      "0.9": 17.640272649616065,
+      "0.95": 14.110465534474333
+    },
+    "quantile_score_proxy": 24.641719246044296,
+    "coverage_80": 0.7036223198828073,
+    "interval_width_80": 84.611774641341,
+    "coverage_90": 0.85954473679204,
+    "interval_width_90": 151.0485423219108
+  },
+  "time_shift_off_same_head": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 38.882163960461746,
+    "rmse_pooled": 272.5893022138567,
+    "pinball_by_quantile": {
+      "0.05": 3.8213503574989867,
+      "0.1": 6.494475617332365,
+      "0.5": 19.441081980230873,
+      "0.9": 17.61098797889195,
+      "0.95": 14.085989881369834
+    },
+    "quantile_score_proxy": 24.5815543261296,
+    "coverage_80": 0.7034867682590416,
+    "interval_width_80": 84.61177464057698,
+    "coverage_90": 0.8592617430511957,
+    "interval_width_90": 151.04854227950486
+  },
+  "baseline_dlinear": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.5193624793105416,
+    "point_definition": "rearranged_q50",
+    "mae": 49.04167487039061,
+    "rmse_pooled": 264.89399340369766,
+    "pinball_by_quantile": {
+      "0.05": 4.902135202831341,
+      "0.1": 8.886637178034746,
+      "0.5": 24.520837435195304,
+      "0.9": 18.84874301611724,
+      "0.95": 15.234629511764451
+    },
+    "quantile_score_proxy": 28.95719293757723,
+    "coverage_80": 0.6857770675189773,
+    "interval_width_80": 109.75985864062685,
+    "coverage_90": 0.8795754618267603,
+    "interval_width_90": 176.65973027595228
+  },
+  "baseline_full": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 51.06215934344495,
+    "rmse_pooled": 257.8192597459549,
+    "pinball_by_quantile": {
+      "0.05": 5.170416129775248,
+      "0.1": 8.255418081446111,
+      "0.5": 25.531079671722473,
+      "0.9": 19.347396434521652,
+      "0.95": 14.916484719957431
+    },
+    "quantile_score_proxy": 29.288318014969168,
+    "coverage_80": 0.8655637045069726,
+    "interval_width_80": 170.74396800728334,
+    "coverage_90": 0.9594106120274718,
+    "interval_width_90": 267.0378392167747,
+    "native_point_diagnostic": {
+      "mae": 66.58345999189596,
+      "rmse_pooled": 264.1038515952099
+    }
+  },
+  "baseline_gatets_adapter": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.509895268534901,
+    "point_definition": "rearranged_q50",
+    "mae": 49.25139381060737,
+    "rmse_pooled": 266.07876234672045,
+    "pinball_by_quantile": {
+      "0.05": 4.91635214567024,
+      "0.1": 8.877629071482998,
+      "0.5": 24.625696905303684,
+      "0.9": 19.93308020171358,
+      "0.95": 16.05261988875776
+    },
+    "quantile_score_proxy": 29.762151285171303,
+    "coverage_80": 0.6523267317314461,
+    "interval_width_80": 99.65924051117408,
+    "coverage_90": 0.8413166105435382,
+    "interval_width_90": 164.38520226423816
+  },
+  "baseline_lasso_arx72_cp": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 71.72963944280848,
+    "rmse_pooled": 290.9318678334292,
+    "pinball_by_quantile": {
+      "0.05": 14.042147106535307,
+      "0.1": 20.214481401046324,
+      "0.5": 35.86481972140424,
+      "0.9": 30.180123057802223,
+      "0.95": 24.852507831565767
+    },
+    "quantile_score_proxy": 50.06163164734154,
+    "coverage_80": 0.9503571904191161,
+    "interval_width_80": 343.8748387654623,
+    "coverage_90": 0.9865946578391644,
+    "interval_width_90": 501.3050544738769,
+    "native_point_diagnostic": {
+      "mae": 71.72963944280848,
+      "rmse_pooled": 290.9318678334292
+    }
+  },
+  "baseline_lightgbm": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.23453046820006468,
+    "point_definition": "rearranged_q50",
+    "mae": 38.19753725355212,
+    "rmse_pooled": 273.71527567694574,
+    "pinball_by_quantile": {
+      "0.05": 3.8866705043951373,
+      "0.1": 6.751456080002548,
+      "0.5": 19.09876862677606,
+      "0.9": 17.590719936552855,
+      "0.95": 14.946516913771998
+    },
+    "quantile_score_proxy": 24.909652824599437,
+    "coverage_80": 0.7809509540931834,
+    "interval_width_80": 113.42649338420297,
+    "coverage_90": 0.909606091737534,
+    "interval_width_90": 208.99527362517733,
+    "native_point_diagnostic": {
+      "mae": 38.19753725355212,
+      "rmse_pooled": 273.71527567694574
+    }
+  },
+  "baseline_linear": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.5037906892681163,
+    "point_definition": "rearranged_q50",
+    "mae": 49.12299606429628,
+    "rmse_pooled": 265.13581941322917,
+    "pinball_by_quantile": {
+      "0.05": 4.865012057143143,
+      "0.1": 8.677371434910121,
+      "0.5": 24.56149803214814,
+      "0.9": 18.971585135276104,
+      "0.95": 15.28968656879701
+    },
+    "quantile_score_proxy": 28.946061291309807,
+    "coverage_80": 0.6949232349751726,
+    "interval_width_80": 110.14123575330119,
+    "coverage_90": 0.8737562543994826,
+    "interval_width_90": 173.52024012568307
+  },
+  "baseline_mlp": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.02469417651199513,
+    "point_definition": "rearranged_q50",
+    "mae": 52.18547652396367,
+    "rmse_pooled": 273.17381297254,
+    "pinball_by_quantile": {
+      "0.05": 4.835454256941756,
+      "0.1": 8.512466151188498,
+      "0.5": 26.092738261981836,
+      "0.9": 19.26094456835958,
+      "0.95": 14.762177012829321
+    },
+    "quantile_score_proxy": 29.385512100520398,
+    "coverage_80": 0.8084061031524076,
+    "interval_width_80": 137.75534615988443,
+    "coverage_90": 0.9320030249414988,
+    "interval_width_90": 202.25717516654677
+  },
+  "baseline_no_fields": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 48.438593145935556,
+    "rmse_pooled": 255.73145679478375,
+    "pinball_by_quantile": {
+      "0.05": 4.531762700295688,
+      "0.1": 7.693076184845629,
+      "0.5": 24.219296572967778,
+      "0.9": 19.63899914330674,
+      "0.95": 16.450275245747594
+    },
+    "quantile_score_proxy": 29.013363938865375,
+    "coverage_80": 0.869563666457394,
+    "interval_width_80": 165.80831643156554,
+    "coverage_90": 0.9645972452105093,
+    "interval_width_90": 288.37417369552685,
+    "native_point_diagnostic": {
+      "mae": 76.33229623948263,
+      "rmse_pooled": 264.8401402873567
+    }
+  },
+  "baseline_patchtst": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.13586553278922436,
+    "point_definition": "rearranged_q50",
+    "mae": 46.911822564834424,
+    "rmse_pooled": 265.8576940643516,
+    "pinball_by_quantile": {
+      "0.05": 4.7391674722166,
+      "0.1": 8.244938489051927,
+      "0.5": 23.455911282417212,
+      "0.9": 18.278252016466812,
+      "0.95": 14.843315133413725
+    },
+    "quantile_score_proxy": 27.82463375742651,
+    "coverage_80": 0.772282784468162,
+    "interval_width_80": 119.15320702488862,
+    "coverage_90": 0.8844648326769781,
+    "interval_width_90": 172.58261017470295
+  },
+  "baseline_xgboost": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.4114063124250899,
+    "point_definition": "rearranged_q50",
+    "mae": 39.445533886272166,
+    "rmse_pooled": 274.6073248104117,
+    "pinball_by_quantile": {
+      "0.05": 4.051830022231872,
+      "0.1": 7.203288846512912,
+      "0.5": 19.722766943136083,
+      "0.9": 19.396549135271666,
+      "0.95": 17.47159925865116
+    },
+    "quantile_score_proxy": 27.138413682321477,
+    "coverage_80": 0.7693957726918175,
+    "interval_width_80": 128.2141741888755,
+    "coverage_90": 0.9142695432148089,
+    "interval_width_90": 257.17500483490545,
+    "native_point_diagnostic": {
+      "mae": 39.445533886272166,
+      "rmse_pooled": 274.6073248104117
+    }
+  },
+  "baseline_pricefm": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 58.600027370684145,
+    "rmse_pooled": 275.5132407131049,
+    "pinball_by_quantile": {
+      "0.05": 5.10341500476673,
+      "0.1": 8.972085338721797,
+      "0.5": 29.300013685342073,
+      "0.9": 21.146636755993793,
+      "0.95": 16.455939206025697
+    },
+    "quantile_score_proxy": 32.391235996340036,
+    "coverage_80": 0.7480784962806537,
+    "interval_width_80": 129.10253848011132,
+    "coverage_90": 0.8599609040579875,
+    "interval_width_90": 187.70519655752304
+  },
+  "baseline_timexer": {
+    "table": "Q",
+    "n_origins": 17521,
+    "horizon": 24,
+    "n_cells": 420504,
+    "crossing_rate": 0.09775887982040599,
+    "point_definition": "rearranged_q50",
+    "mae": 50.51030620976357,
+    "rmse_pooled": 276.2815780328368,
+    "pinball_by_quantile": {
+      "0.05": 6.126351730253225,
+      "0.1": 10.181646007357998,
+      "0.5": 25.255153104881785,
+      "0.9": 22.09381382548296,
+      "0.95": 18.955574758471112
+    },
+    "quantile_score_proxy": 33.045015770578836,
+    "coverage_80": 0.8085535452694862,
+    "interval_width_80": 148.38066533710193,
+    "coverage_90": 0.9106310522610962,
+    "interval_width_90": 225.10035998768745
+  }
+}

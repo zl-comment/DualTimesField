@@ -1,0 +1,1349 @@
+{
+  "regions": {
+    "NSW1": {
+      "B_retrained": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 44.35192339139871,
+        "rmse_pooled": 398.7231534025784,
+        "pinball_by_quantile": {
+          "0.05": 4.321047060284447,
+          "0.1": 7.459310749907063,
+          "0.5": 22.175961695699353,
+          "0.9": 23.66007388010663,
+          "0.95": 20.59822255478986
+        },
+        "quantile_score_proxy": 31.28584637631494,
+        "coverage_80": 0.7175960276239941,
+        "interval_width_80": 78.21602725342727,
+        "coverage_90": 0.8370693263322109,
+        "interval_width_90": 130.55202531532765
+      },
+      "Anchor_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 45.686916315212315,
+        "rmse_pooled": 397.6923458310146,
+        "pinball_by_quantile": {
+          "0.05": 4.08290071638644,
+          "0.1": 7.107587209288317,
+          "0.5": 22.843458157606157,
+          "0.9": 24.729482035916792,
+          "0.95": 21.708296686676555
+        },
+        "quantile_score_proxy": 32.1886899223497,
+        "coverage_80": 0.7160074577174058,
+        "interval_width_80": 68.64475706155498,
+        "coverage_90": 0.8455020641896391,
+        "interval_width_90": 109.4432782736622
+      },
+      "Full_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 45.52739548200405,
+        "rmse_pooled": 397.76371901034855,
+        "pinball_by_quantile": {
+          "0.05": 4.0726807719147615,
+          "0.1": 7.08828611749637,
+          "0.5": 22.763697741002026,
+          "0.9": 24.705248051449285,
+          "0.95": 21.70525129793183
+        },
+        "quantile_score_proxy": 32.13406559191771,
+        "coverage_80": 0.7170443087342808,
+        "interval_width_80": 68.64475701132574,
+        "coverage_90": 0.84626543386032,
+        "interval_width_90": 109.44327819030977
+      },
+      "event_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 45.568392987634844,
+        "rmse_pooled": 398.6093718079185,
+        "pinball_by_quantile": {
+          "0.05": 4.030738178098371,
+          "0.1": 7.05725395797378,
+          "0.5": 22.784196493817422,
+          "0.9": 24.75636259671461,
+          "0.95": 21.7373312837593
+        },
+        "quantile_score_proxy": 32.146353004145396,
+        "coverage_80": 0.717569868538706,
+        "interval_width_80": 68.64475704718313,
+        "coverage_90": 0.847221429522668,
+        "interval_width_90": 109.44327823909325
+      },
+      "time_shift_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 45.439160865122545,
+        "rmse_pooled": 397.460457243398,
+        "pinball_by_quantile": {
+          "0.05": 4.066982760832509,
+          "0.1": 7.078171143387663,
+          "0.5": 22.719580432561273,
+          "0.9": 24.683443986461736,
+          "0.95": 21.68928431609142
+        },
+        "quantile_score_proxy": 32.094985055733844,
+        "coverage_80": 0.7173154119818123,
+        "interval_width_80": 68.64475702092217,
+        "coverage_90": 0.8465317809105264,
+        "interval_width_90": 109.4432782097436
+      },
+      "baseline_dlinear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.47163166105435383,
+        "point_definition": "rearranged_q50",
+        "mae": 56.46580927849862,
+        "rmse_pooled": 390.4661866917253,
+        "pinball_by_quantile": {
+          "0.05": 5.683645199805045,
+          "0.1": 9.871378840906099,
+          "0.5": 28.23290463924931,
+          "0.9": 25.67513934387755,
+          "0.95": 21.72774968716074
+        },
+        "quantile_score_proxy": 36.4763270843995,
+        "coverage_80": 0.6572945798375283,
+        "interval_width_80": 100.11750348810618,
+        "coverage_90": 0.8489241481650591,
+        "interval_width_90": 161.23013121793798
+      },
+      "baseline_full": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 58.5397719064341,
+        "rmse_pooled": 392.5438527319899,
+        "pinball_by_quantile": {
+          "0.05": 6.07110408077262,
+          "0.1": 10.261032878452546,
+          "0.5": 29.26988595321705,
+          "0.9": 25.253253544059096,
+          "0.95": 21.451046999273686
+        },
+        "quantile_score_proxy": 36.92252938231,
+        "coverage_80": 0.6664906873656374,
+        "interval_width_80": 107.19661437490419,
+        "coverage_90": 0.8468742271179347,
+        "interval_width_90": 175.75469549023018,
+        "native_point_diagnostic": {
+          "mae": 67.50431081435582,
+          "rmse_pooled": 383.92088823435637
+        }
+      },
+      "baseline_gatets_adapter": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.5863130909575176,
+        "point_definition": "rearranged_q50",
+        "mae": 53.019460264052086,
+        "rmse_pooled": 393.74045975626154,
+        "pinball_by_quantile": {
+          "0.05": 5.580308793649741,
+          "0.1": 9.506097400421309,
+          "0.5": 26.509730132026043,
+          "0.9": 25.572307942460096,
+          "0.95": 21.655211487388573
+        },
+        "quantile_score_proxy": 35.529462302378306,
+        "coverage_80": 0.6094615033388505,
+        "interval_width_80": 85.95772841060102,
+        "coverage_90": 0.7820567699712726,
+        "interval_width_90": 131.5146399273112
+      },
+      "baseline_lasso_arx72_cp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 70.84735617701725,
+        "rmse_pooled": 411.3076005544994,
+        "pinball_by_quantile": {
+          "0.05": 15.122893369398131,
+          "0.1": 20.97424624034705,
+          "0.5": 35.42367808850862,
+          "0.9": 35.344267234552184,
+          "0.95": 31.09957825761182
+        },
+        "quantile_score_proxy": 55.18586527616712,
+        "coverage_80": 0.9460052698666362,
+        "interval_width_80": 332.711383565267,
+        "coverage_90": 0.987365161805833,
+        "interval_width_90": 518.2557261149088,
+        "native_point_diagnostic": {
+          "mae": 70.84735617701725,
+          "rmse_pooled": 411.3076005544994
+        }
+      },
+      "baseline_lightgbm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.19316819816220535,
+        "point_definition": "rearranged_q50",
+        "mae": 44.3633237737048,
+        "rmse_pooled": 398.7511214969204,
+        "pinball_by_quantile": {
+          "0.05": 4.336232033332847,
+          "0.1": 7.483149421561608,
+          "0.5": 22.1816618868524,
+          "0.9": 23.688379441762063,
+          "0.95": 20.702663982208353
+        },
+        "quantile_score_proxy": 31.356834706286907,
+        "coverage_80": 0.716387953503415,
+        "interval_width_80": 77.87616248302152,
+        "coverage_90": 0.83640821490402,
+        "interval_width_90": 128.39629276449534,
+        "native_point_diagnostic": {
+          "mae": 44.3633237737048,
+          "rmse_pooled": 398.7511214969204
+        }
+      },
+      "baseline_linear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.48600964556817533,
+        "point_definition": "rearranged_q50",
+        "mae": 56.65637244724064,
+        "rmse_pooled": 391.4525813476756,
+        "pinball_by_quantile": {
+          "0.05": 5.646806020821167,
+          "0.1": 9.7853372156416,
+          "0.5": 28.32818622362032,
+          "0.9": 26.015513740896484,
+          "0.95": 21.884063155431598
+        },
+        "quantile_score_proxy": 36.66396254256447,
+        "coverage_80": 0.6427215912333771,
+        "interval_width_80": 98.15730837664158,
+        "coverage_90": 0.8463153739322337,
+        "interval_width_90": 157.60576861019052
+      },
+      "baseline_mlp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.09845090653121016,
+        "point_definition": "rearranged_q50",
+        "mae": 55.812092214225544,
+        "rmse_pooled": 396.9037268238752,
+        "pinball_by_quantile": {
+          "0.05": 5.064970089135046,
+          "0.1": 8.744254584740322,
+          "0.5": 27.906046107112772,
+          "0.9": 25.347521952698685,
+          "0.95": 21.270659071862127
+        },
+        "quantile_score_proxy": 35.33338072221957,
+        "coverage_80": 0.7034677434697411,
+        "interval_width_80": 107.61895785323992,
+        "coverage_90": 0.8438540418164869,
+        "interval_width_90": 157.10148290796604
+      },
+      "baseline_no_fields": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 59.24358531824622,
+        "rmse_pooled": 391.854184384224,
+        "pinball_by_quantile": {
+          "0.05": 5.857537554474734,
+          "0.1": 10.404163789410388,
+          "0.5": 29.62179265912311,
+          "0.9": 26.081956552056344,
+          "0.95": 22.7995901957345
+        },
+        "quantile_score_proxy": 37.90601630031963,
+        "coverage_80": 0.6527096056161178,
+        "interval_width_80": 97.20288560684914,
+        "coverage_90": 0.8255355478188079,
+        "interval_width_90": 154.34742521527437,
+        "native_point_diagnostic": {
+          "mae": 66.25086449251036,
+          "rmse_pooled": 384.5175326115161
+        }
+      },
+      "baseline_patchtst": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.3821961265528984,
+        "point_definition": "rearranged_q50",
+        "mae": 53.50143654770623,
+        "rmse_pooled": 393.1207306440351,
+        "pinball_by_quantile": {
+          "0.05": 5.551546548382488,
+          "0.1": 9.510855204840594,
+          "0.5": 26.750718273853114,
+          "0.9": 25.51003383337511,
+          "0.95": 21.858417338862385
+        },
+        "quantile_score_proxy": 35.672628479725475,
+        "coverage_80": 0.6504551680840135,
+        "interval_width_80": 92.57420951505964,
+        "coverage_90": 0.8245367463805339,
+        "interval_width_90": 143.9511186712186
+      },
+      "baseline_xgboost": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.30498877537431274,
+        "point_definition": "rearranged_q50",
+        "mae": 45.145121408791454,
+        "rmse_pooled": 399.277181086096,
+        "pinball_by_quantile": {
+          "0.05": 4.788208781635779,
+          "0.1": 7.991938266305615,
+          "0.5": 22.572560704395727,
+          "0.9": 24.641343400581686,
+          "0.95": 22.206032083687706
+        },
+        "quantile_score_proxy": 32.88003329464261,
+        "coverage_80": 0.711596084698362,
+        "interval_width_80": 78.6097296029196,
+        "coverage_90": 0.8326841123984552,
+        "interval_width_90": 143.00682206845408,
+        "native_point_diagnostic": {
+          "mae": 45.145121408791454,
+          "rmse_pooled": 399.277181086096
+        }
+      },
+      "baseline_pricefm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 59.07354224576068,
+        "rmse_pooled": 396.61921388000997,
+        "pinball_by_quantile": {
+          "0.05": 6.166825482441848,
+          "0.1": 10.351993285594258,
+          "0.5": 29.53677112288034,
+          "0.9": 27.572101688554543,
+          "0.95": 23.787057543345167
+        },
+        "quantile_score_proxy": 38.96589964912646,
+        "coverage_80": 0.6495514905922417,
+        "interval_width_80": 98.5008461922996,
+        "coverage_90": 0.7798974563856705,
+        "interval_width_90": 140.56172972904855
+      },
+      "baseline_timexer": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.03440395335121663,
+        "point_definition": "rearranged_q50",
+        "mae": 57.13761922021787,
+        "rmse_pooled": 401.6193261207643,
+        "pinball_by_quantile": {
+          "0.05": 6.252338833294524,
+          "0.1": 10.504808579500956,
+          "0.5": 28.568809610108936,
+          "0.9": 28.024371377662902,
+          "0.95": 25.291277372272532
+        },
+        "quantile_score_proxy": 39.45664230913594,
+        "coverage_80": 0.763983220135837,
+        "interval_width_80": 117.13460501139748,
+        "coverage_90": 0.8642581283412286,
+        "interval_width_90": 168.16505815854487
+      }
+    },
+    "QLD1": {
+      "B_retrained": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 38.282502890328175,
+        "rmse_pooled": 273.8347823021039,
+        "pinball_by_quantile": {
+          "0.05": 3.895944962417768,
+          "0.1": 6.780652105778712,
+          "0.5": 19.141251445164087,
+          "0.9": 17.612529804229784,
+          "0.95": 14.912114012473983
+        },
+        "quantile_score_proxy": 24.936996932025735,
+        "coverage_80": 0.7805680802085116,
+        "interval_width_80": 112.36933880091433,
+        "coverage_90": 0.9093183417993645,
+        "interval_width_90": 206.96681234813656
+      },
+      "Anchor_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 39.05976566451755,
+        "rmse_pooled": 273.7007196704479,
+        "pinball_by_quantile": {
+          "0.05": 3.82808470238736,
+          "0.1": 6.52461576031968,
+          "0.5": 19.529882832258775,
+          "0.9": 17.651135965072644,
+          "0.95": 14.113970422362739
+        },
+        "quantile_score_proxy": 24.659075872960482,
+        "coverage_80": 0.7033226794513251,
+        "interval_width_80": 84.6117746349419,
+        "coverage_90": 0.8596446169358675,
+        "interval_width_90": 151.04854228082007
+      },
+      "Full_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 38.99102568181822,
+        "rmse_pooled": 272.920201589576,
+        "pinball_by_quantile": {
+          "0.05": 3.825224757822449,
+          "0.1": 6.500761479613834,
+          "0.5": 19.49551284090911,
+          "0.9": 17.63149025589089,
+          "0.95": 14.10134172734368
+        },
+        "quantile_score_proxy": 24.621732424631983,
+        "coverage_80": 0.7033298137473127,
+        "interval_width_80": 84.61177463022493,
+        "coverage_90": 0.8591832657953313,
+        "interval_width_90": 151.048542294795
+      },
+      "event_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 38.98518151676883,
+        "rmse_pooled": 273.58147517869264,
+        "pinball_by_quantile": {
+          "0.05": 3.834856579644464,
+          "0.1": 6.526112592991466,
+          "0.5": 19.492590758384416,
+          "0.9": 17.640272649616065,
+          "0.95": 14.110465534474333
+        },
+        "quantile_score_proxy": 24.641719246044296,
+        "coverage_80": 0.7036223198828073,
+        "interval_width_80": 84.611774641341,
+        "coverage_90": 0.85954473679204,
+        "interval_width_90": 151.0485423219108
+      },
+      "time_shift_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 38.882163960461746,
+        "rmse_pooled": 272.5893022138567,
+        "pinball_by_quantile": {
+          "0.05": 3.8213503574989867,
+          "0.1": 6.494475617332365,
+          "0.5": 19.441081980230873,
+          "0.9": 17.61098797889195,
+          "0.95": 14.085989881369834
+        },
+        "quantile_score_proxy": 24.5815543261296,
+        "coverage_80": 0.7034867682590416,
+        "interval_width_80": 84.61177464057698,
+        "coverage_90": 0.8592617430511957,
+        "interval_width_90": 151.04854227950486
+      },
+      "baseline_dlinear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.5193624793105416,
+        "point_definition": "rearranged_q50",
+        "mae": 49.04167487039061,
+        "rmse_pooled": 264.89399340369766,
+        "pinball_by_quantile": {
+          "0.05": 4.902135202831341,
+          "0.1": 8.886637178034746,
+          "0.5": 24.520837435195304,
+          "0.9": 18.84874301611724,
+          "0.95": 15.234629511764451
+        },
+        "quantile_score_proxy": 28.95719293757723,
+        "coverage_80": 0.6857770675189773,
+        "interval_width_80": 109.75985864062685,
+        "coverage_90": 0.8795754618267603,
+        "interval_width_90": 176.65973027595228
+      },
+      "baseline_full": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 51.06215934344495,
+        "rmse_pooled": 257.8192597459549,
+        "pinball_by_quantile": {
+          "0.05": 5.170416129775248,
+          "0.1": 8.255418081446111,
+          "0.5": 25.531079671722473,
+          "0.9": 19.347396434521652,
+          "0.95": 14.916484719957431
+        },
+        "quantile_score_proxy": 29.288318014969168,
+        "coverage_80": 0.8655637045069726,
+        "interval_width_80": 170.74396800728334,
+        "coverage_90": 0.9594106120274718,
+        "interval_width_90": 267.0378392167747,
+        "native_point_diagnostic": {
+          "mae": 66.58345999189596,
+          "rmse_pooled": 264.1038515952099
+        }
+      },
+      "baseline_gatets_adapter": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.509895268534901,
+        "point_definition": "rearranged_q50",
+        "mae": 49.25139381060737,
+        "rmse_pooled": 266.07876234672045,
+        "pinball_by_quantile": {
+          "0.05": 4.91635214567024,
+          "0.1": 8.877629071482998,
+          "0.5": 24.625696905303684,
+          "0.9": 19.93308020171358,
+          "0.95": 16.05261988875776
+        },
+        "quantile_score_proxy": 29.762151285171303,
+        "coverage_80": 0.6523267317314461,
+        "interval_width_80": 99.65924051117408,
+        "coverage_90": 0.8413166105435382,
+        "interval_width_90": 164.38520226423816
+      },
+      "baseline_lasso_arx72_cp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 71.72963944280848,
+        "rmse_pooled": 290.9318678334292,
+        "pinball_by_quantile": {
+          "0.05": 14.042147106535307,
+          "0.1": 20.214481401046324,
+          "0.5": 35.86481972140424,
+          "0.9": 30.180123057802223,
+          "0.95": 24.852507831565767
+        },
+        "quantile_score_proxy": 50.06163164734154,
+        "coverage_80": 0.9503571904191161,
+        "interval_width_80": 343.8748387654623,
+        "coverage_90": 0.9865946578391644,
+        "interval_width_90": 501.3050544738769,
+        "native_point_diagnostic": {
+          "mae": 71.72963944280848,
+          "rmse_pooled": 290.9318678334292
+        }
+      },
+      "baseline_lightgbm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.23453046820006468,
+        "point_definition": "rearranged_q50",
+        "mae": 38.19753725355212,
+        "rmse_pooled": 273.71527567694574,
+        "pinball_by_quantile": {
+          "0.05": 3.8866705043951373,
+          "0.1": 6.751456080002548,
+          "0.5": 19.09876862677606,
+          "0.9": 17.590719936552855,
+          "0.95": 14.946516913771998
+        },
+        "quantile_score_proxy": 24.909652824599437,
+        "coverage_80": 0.7809509540931834,
+        "interval_width_80": 113.42649338420297,
+        "coverage_90": 0.909606091737534,
+        "interval_width_90": 208.99527362517733,
+        "native_point_diagnostic": {
+          "mae": 38.19753725355212,
+          "rmse_pooled": 273.71527567694574
+        }
+      },
+      "baseline_linear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.5037906892681163,
+        "point_definition": "rearranged_q50",
+        "mae": 49.12299606429628,
+        "rmse_pooled": 265.13581941322917,
+        "pinball_by_quantile": {
+          "0.05": 4.865012057143143,
+          "0.1": 8.677371434910121,
+          "0.5": 24.56149803214814,
+          "0.9": 18.971585135276104,
+          "0.95": 15.28968656879701
+        },
+        "quantile_score_proxy": 28.946061291309807,
+        "coverage_80": 0.6949232349751726,
+        "interval_width_80": 110.14123575330119,
+        "coverage_90": 0.8737562543994826,
+        "interval_width_90": 173.52024012568307
+      },
+      "baseline_mlp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.02469417651199513,
+        "point_definition": "rearranged_q50",
+        "mae": 52.18547652396367,
+        "rmse_pooled": 273.17381297254,
+        "pinball_by_quantile": {
+          "0.05": 4.835454256941756,
+          "0.1": 8.512466151188498,
+          "0.5": 26.092738261981836,
+          "0.9": 19.26094456835958,
+          "0.95": 14.762177012829321
+        },
+        "quantile_score_proxy": 29.385512100520398,
+        "coverage_80": 0.8084061031524076,
+        "interval_width_80": 137.75534615988443,
+        "coverage_90": 0.9320030249414988,
+        "interval_width_90": 202.25717516654677
+      },
+      "baseline_no_fields": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 48.438593145935556,
+        "rmse_pooled": 255.73145679478375,
+        "pinball_by_quantile": {
+          "0.05": 4.531762700295688,
+          "0.1": 7.693076184845629,
+          "0.5": 24.219296572967778,
+          "0.9": 19.63899914330674,
+          "0.95": 16.450275245747594
+        },
+        "quantile_score_proxy": 29.013363938865375,
+        "coverage_80": 0.869563666457394,
+        "interval_width_80": 165.80831643156554,
+        "coverage_90": 0.9645972452105093,
+        "interval_width_90": 288.37417369552685,
+        "native_point_diagnostic": {
+          "mae": 76.33229623948263,
+          "rmse_pooled": 264.8401402873567
+        }
+      },
+      "baseline_patchtst": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.13586553278922436,
+        "point_definition": "rearranged_q50",
+        "mae": 46.911822564834424,
+        "rmse_pooled": 265.8576940643516,
+        "pinball_by_quantile": {
+          "0.05": 4.7391674722166,
+          "0.1": 8.244938489051927,
+          "0.5": 23.455911282417212,
+          "0.9": 18.278252016466812,
+          "0.95": 14.843315133413725
+        },
+        "quantile_score_proxy": 27.82463375742651,
+        "coverage_80": 0.772282784468162,
+        "interval_width_80": 119.15320702488862,
+        "coverage_90": 0.8844648326769781,
+        "interval_width_90": 172.58261017470295
+      },
+      "baseline_xgboost": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.4114063124250899,
+        "point_definition": "rearranged_q50",
+        "mae": 39.445533886272166,
+        "rmse_pooled": 274.6073248104117,
+        "pinball_by_quantile": {
+          "0.05": 4.051830022231872,
+          "0.1": 7.203288846512912,
+          "0.5": 19.722766943136083,
+          "0.9": 19.396549135271666,
+          "0.95": 17.47159925865116
+        },
+        "quantile_score_proxy": 27.138413682321477,
+        "coverage_80": 0.7693957726918175,
+        "interval_width_80": 128.2141741888755,
+        "coverage_90": 0.9142695432148089,
+        "interval_width_90": 257.17500483490545,
+        "native_point_diagnostic": {
+          "mae": 39.445533886272166,
+          "rmse_pooled": 274.6073248104117
+        }
+      },
+      "baseline_pricefm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 58.600027370684145,
+        "rmse_pooled": 275.5132407131049,
+        "pinball_by_quantile": {
+          "0.05": 5.10341500476673,
+          "0.1": 8.972085338721797,
+          "0.5": 29.300013685342073,
+          "0.9": 21.146636755993793,
+          "0.95": 16.455939206025697
+        },
+        "quantile_score_proxy": 32.391235996340036,
+        "coverage_80": 0.7480784962806537,
+        "interval_width_80": 129.10253848011132,
+        "coverage_90": 0.8599609040579875,
+        "interval_width_90": 187.70519655752304
+      },
+      "baseline_timexer": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.09775887982040599,
+        "point_definition": "rearranged_q50",
+        "mae": 50.51030620976357,
+        "rmse_pooled": 276.2815780328368,
+        "pinball_by_quantile": {
+          "0.05": 6.126351730253225,
+          "0.1": 10.181646007357998,
+          "0.5": 25.255153104881785,
+          "0.9": 22.09381382548296,
+          "0.95": 18.955574758471112
+        },
+        "quantile_score_proxy": 33.045015770578836,
+        "coverage_80": 0.8085535452694862,
+        "interval_width_80": 148.38066533710193,
+        "coverage_90": 0.9106310522610962,
+        "interval_width_90": 225.10035998768745
+      }
+    },
+    "TAS1": {
+      "B_retrained": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 28.705249419595184,
+        "rmse_pooled": 158.71208845850256,
+        "pinball_by_quantile": {
+          "0.05": 3.878438326693465,
+          "0.1": 6.112541899103754,
+          "0.5": 14.352624709797592,
+          "0.9": 9.25502932760803,
+          "0.95": 7.20313515984145
+        },
+        "quantile_score_proxy": 16.32070776921772,
+        "coverage_80": 0.6784858170195766,
+        "interval_width_80": 61.166788248254385,
+        "coverage_90": 0.8082253676540533,
+        "interval_width_90": 86.99204318376428
+      },
+      "Anchor_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 28.47231746077805,
+        "rmse_pooled": 157.98218869478794,
+        "pinball_by_quantile": {
+          "0.05": 4.009439768840009,
+          "0.1": 6.3039262882657985,
+          "0.5": 14.236158730389025,
+          "0.9": 9.480178780356132,
+          "0.95": 7.351105672953908
+        },
+        "quantile_score_proxy": 16.552323696321952,
+        "coverage_80": 0.6952395220972928,
+        "interval_width_80": 66.86416105648648,
+        "coverage_90": 0.8197210965888553,
+        "interval_width_90": 94.70888044123458
+      },
+      "Full_joint": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 28.449478233871737,
+        "rmse_pooled": 157.97638643136088,
+        "pinball_by_quantile": {
+          "0.05": 4.014084769239212,
+          "0.1": 6.306713780637662,
+          "0.5": 14.224739116935869,
+          "0.9": 9.478958468558233,
+          "0.95": 7.351343669973915
+        },
+        "quantile_score_proxy": 16.550335922137958,
+        "coverage_80": 0.6954036109050092,
+        "interval_width_80": 66.86416105740133,
+        "coverage_90": 0.819732987082168,
+        "interval_width_90": 94.70888044978851
+      },
+      "event_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 28.449953017951298,
+        "rmse_pooled": 157.9767724845781,
+        "pinball_by_quantile": {
+          "0.05": 4.009698260196507,
+          "0.1": 6.302512195559964,
+          "0.5": 14.224976508975649,
+          "0.9": 9.47871324948727,
+          "0.95": 7.350983208373594
+        },
+        "quantile_score_proxy": 16.546753369037194,
+        "coverage_80": 0.695436904286285,
+        "interval_width_80": 66.86416105850469,
+        "coverage_90": 0.8197995738447197,
+        "interval_width_90": 94.70888044715835
+      },
+      "time_shift_off_same_head": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 28.461854595574195,
+        "rmse_pooled": 157.97935634678265,
+        "pinball_by_quantile": {
+          "0.05": 4.024857878425111,
+          "0.1": 6.317858133911635,
+          "0.5": 14.230927297787098,
+          "0.9": 9.48125708705035,
+          "0.95": 7.352740950170927
+        },
+        "quantile_score_proxy": 16.56305653893805,
+        "coverage_80": 0.6952157411106672,
+        "interval_width_80": 66.86416104890955,
+        "coverage_90": 0.8195522515838137,
+        "interval_width_90": 94.70888044449492
+      },
+      "baseline_dlinear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.12303093430740254,
+        "point_definition": "rearranged_q50",
+        "mae": 33.94480244601039,
+        "rmse_pooled": 162.70562595464293,
+        "pinball_by_quantile": {
+          "0.05": 4.949003721835736,
+          "0.1": 8.257447043409595,
+          "0.5": 16.972401223005196,
+          "0.9": 10.025965764804162,
+          "0.95": 7.434906299890979
+        },
+        "quantile_score_proxy": 19.05588962117827,
+        "coverage_80": 0.6923263512356601,
+        "interval_width_80": 77.95309735723097,
+        "coverage_90": 0.8501750280615642,
+        "interval_width_90": 115.32925559757165
+      },
+      "baseline_full": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.5399514578399,
+        "rmse_pooled": 160.11434425613365,
+        "pinball_by_quantile": {
+          "0.05": 4.408404471311263,
+          "0.1": 7.188315321495936,
+          "0.5": 17.26997572891995,
+          "0.9": 11.882565242443214,
+          "0.95": 9.315888647402435
+        },
+        "quantile_score_proxy": 20.026059764629117,
+        "coverage_80": 0.5676212354698171,
+        "interval_width_80": 65.3843825477939,
+        "coverage_90": 0.7096507999923901,
+        "interval_width_90": 96.84405693743103,
+        "native_point_diagnostic": {
+          "mae": 35.78283473623162,
+          "rmse_pooled": 160.42340716833615
+        }
+      },
+      "baseline_gatets_adapter": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.09473869451895821,
+        "point_definition": "rearranged_q50",
+        "mae": 34.930911212285,
+        "rmse_pooled": 159.85879829775385,
+        "pinball_by_quantile": {
+          "0.05": 4.494209384890574,
+          "0.1": 7.4546543016608275,
+          "0.5": 17.4654556061425,
+          "0.9": 10.097112702737395,
+          "0.95": 7.437745057730233
+        },
+        "quantile_score_proxy": 18.77967082126461,
+        "coverage_80": 0.6857580427296768,
+        "interval_width_80": 79.74738771021406,
+        "coverage_90": 0.8479919334893367,
+        "interval_width_90": 115.60877860028542
+      },
+      "baseline_lasso_arx72_cp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 34.57635446776382,
+        "rmse_pooled": 161.7798415304177,
+        "pinball_by_quantile": {
+          "0.05": 7.755481369727693,
+          "0.1": 10.70557667710311,
+          "0.5": 17.28817723388191,
+          "0.9": 11.94806385528452,
+          "0.95": 9.451064711746406
+        },
+        "quantile_score_proxy": 22.859345539097454,
+        "coverage_80": 0.9428447767440976,
+        "interval_width_80": 160.24546810785932,
+        "coverage_90": 0.9799383596826665,
+        "interval_width_90": 237.9414483785629,
+        "native_point_diagnostic": {
+          "mae": 34.57635446776382,
+          "rmse_pooled": 161.7798415304177
+        }
+      },
+      "baseline_lightgbm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.2821804311017255,
+        "point_definition": "rearranged_q50",
+        "mae": 28.706142718555505,
+        "rmse_pooled": 158.68789777607205,
+        "pinball_by_quantile": {
+          "0.05": 3.8818868385200567,
+          "0.1": 6.119433855983646,
+          "0.5": 14.353071359277752,
+          "0.9": 9.242361342412138,
+          "0.95": 7.214019178319721
+        },
+        "quantile_score_proxy": 16.324309029805327,
+        "coverage_80": 0.6803026843977703,
+        "interval_width_80": 61.22450027478426,
+        "coverage_90": 0.8092289252896524,
+        "interval_width_90": 87.13932941903177,
+        "native_point_diagnostic": {
+          "mae": 28.706142718555505,
+          "rmse_pooled": 158.68789777607205
+        }
+      },
+      "baseline_linear": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.11842217909936648,
+        "point_definition": "rearranged_q50",
+        "mae": 33.91787673244444,
+        "rmse_pooled": 162.30930801189345,
+        "pinball_by_quantile": {
+          "0.05": 5.0391150816054475,
+          "0.1": 8.26624614037568,
+          "0.5": 16.95893836622222,
+          "0.9": 10.158514669320805,
+          "0.95": 7.422426635581283
+        },
+        "quantile_score_proxy": 19.138096357242176,
+        "coverage_80": 0.6692373913208911,
+        "interval_width_80": 76.11343266281165,
+        "coverage_90": 0.8351716035994902,
+        "interval_width_90": 111.22638931046623
+      },
+      "baseline_mlp": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.027883206818484486,
+        "point_definition": "rearranged_q50",
+        "mae": 33.99385131380561,
+        "rmse_pooled": 159.672870924669,
+        "pinball_by_quantile": {
+          "0.05": 4.632605839600458,
+          "0.1": 7.430118733318944,
+          "0.5": 16.996925656902803,
+          "0.9": 12.962047611766202,
+          "0.95": 9.593484061776177
+        },
+        "quantile_score_proxy": 20.646072761345835,
+        "coverage_80": 0.4975101307003025,
+        "interval_width_80": 57.17675337915213,
+        "coverage_90": 0.6731303388314974,
+        "interval_width_90": 85.59646539164287
+      },
+      "baseline_no_fields": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 35.206416114099056,
+        "rmse_pooled": 160.14999461231716,
+        "pinball_by_quantile": {
+          "0.05": 3.944348283878772,
+          "0.1": 6.700655290499136,
+          "0.5": 17.603208057049528,
+          "0.9": 13.222440228526171,
+          "0.95": 9.356304435867857
+        },
+        "quantile_score_proxy": 20.330782518328586,
+        "coverage_80": 0.5587033654852273,
+        "interval_width_80": 66.4854988972069,
+        "coverage_90": 0.761802503662272,
+        "interval_width_90": 110.61942895081782,
+        "native_point_diagnostic": {
+          "mae": 39.89102099200352,
+          "rmse_pooled": 162.27169553618458
+        }
+      },
+      "baseline_patchtst": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.009053421608355688,
+        "point_definition": "rearranged_q50",
+        "mae": 32.44549756218692,
+        "rmse_pooled": 158.87670998738366,
+        "pinball_by_quantile": {
+          "0.05": 4.461888010025944,
+          "0.1": 7.2394241864779145,
+          "0.5": 16.22274878109346,
+          "0.9": 9.656109323547314,
+          "0.95": 7.300152813777467
+        },
+        "quantile_score_proxy": 17.95212924596884,
+        "coverage_80": 0.7644469493750357,
+        "interval_width_80": 85.20256103771312,
+        "coverage_90": 0.8806693872115366,
+        "interval_width_90": 118.58614917836532
+      },
+      "baseline_xgboost": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.4088332096722029,
+        "point_definition": "rearranged_q50",
+        "mae": 29.089034578655763,
+        "rmse_pooled": 158.89245763693344,
+        "pinball_by_quantile": {
+          "0.05": 3.8746870932242987,
+          "0.1": 6.169684856928055,
+          "0.5": 14.544517289327882,
+          "0.9": 9.826877582644471,
+          "0.95": 7.663385364360419
+        },
+        "quantile_score_proxy": 16.831660874594046,
+        "coverage_80": 0.6492138005821586,
+        "interval_width_80": 62.788391936857934,
+        "coverage_90": 0.8035405132888154,
+        "interval_width_90": 97.19845981381812,
+        "native_point_diagnostic": {
+          "mae": 29.089034578655763,
+          "rmse_pooled": 158.89245763693344
+        }
+      },
+      "baseline_pricefm": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0,
+        "point_definition": "rearranged_q50",
+        "mae": 35.63151367500499,
+        "rmse_pooled": 160.21914458634737,
+        "pinball_by_quantile": {
+          "0.05": 4.570280046941752,
+          "0.1": 7.548115769681659,
+          "0.5": 17.815756837502494,
+          "0.9": 11.309632460795278,
+          "0.95": 8.309744311063833
+        },
+        "quantile_score_proxy": 19.821411770394004,
+        "coverage_80": 0.6248430454882712,
+        "interval_width_80": 73.37782852670584,
+        "coverage_90": 0.7779664402716739,
+        "interval_width_90": 101.92359817116512
+      },
+      "baseline_timexer": {
+        "table": "Q",
+        "n_origins": 17521,
+        "horizon": 24,
+        "n_cells": 420504,
+        "crossing_rate": 0.0002877499381694348,
+        "point_definition": "rearranged_q50",
+        "mae": 33.846947096953826,
+        "rmse_pooled": 159.6318941161277,
+        "pinball_by_quantile": {
+          "0.05": 4.692556261731995,
+          "0.1": 7.730585402981527,
+          "0.5": 16.923473548476913,
+          "0.9": 10.292163266195063,
+          "0.95": 7.801912878007631
+        },
+        "quantile_score_proxy": 18.976276542957255,
+        "coverage_80": 0.7391630043947264,
+        "interval_width_80": 87.34644227205646,
+        "coverage_90": 0.8695922036413447,
+        "interval_width_90": 123.71124316683405
+      }
+    }
+  },
+  "macro": {
+    "B_retrained": {
+      "mae": 37.113225233774024,
+      "rmse_pooled": 277.09000805439496,
+      "quantile_score_proxy": 24.181183692519465,
+      "coverage_80": 0.7255499749506941,
+      "coverage_90": 0.8515376785952095,
+      "interval_width_80": 83.917384767532,
+      "interval_width_90": 141.50362694907616
+    },
+    "Anchor_joint": {
+      "mae": 37.7396664801693,
+      "rmse_pooled": 276.4584180654168,
+      "quantile_score_proxy": 24.46669649721071,
+      "coverage_80": 0.7048565530886747,
+      "coverage_90": 0.8416225925714539,
+      "interval_width_80": 73.37356425099445,
+      "interval_width_90": 118.40023366523894
+    },
+    "Full_joint": {
+      "mae": 37.655966465898,
+      "rmse_pooled": 276.22010234376177,
+      "quantile_score_proxy": 24.43537797956255,
+      "coverage_80": 0.7052592444622009,
+      "coverage_90": 0.8417272289126064,
+      "interval_width_80": 73.37356423298401,
+      "interval_width_90": 118.40023364496443
+    },
+    "event_off_same_head": {
+      "mae": 37.66784250745166,
+      "rmse_pooled": 276.72253982372973,
+      "quantile_score_proxy": 24.44494187307563,
+      "coverage_80": 0.7055430309025995,
+      "coverage_90": 0.8421885800531426,
+      "interval_width_80": 73.37356424900962,
+      "interval_width_90": 118.40023366938745
+    },
+    "time_shift_off_same_head": {
+      "mae": 37.59439314038617,
+      "rmse_pooled": 276.00970526801245,
+      "quantile_score_proxy": 24.413198640267165,
+      "coverage_80": 0.7053393071171737,
+      "coverage_90": 0.8417819251818454,
+      "interval_width_80": 73.37356423680289,
+      "interval_width_90": 118.40023364458112
+    },
+    "baseline_dlinear": {
+      "mae": 46.48409553163321,
+      "rmse_pooled": 272.68860201668866,
+      "quantile_score_proxy": 28.163136547718334,
+      "coverage_80": 0.6784659995307218,
+      "coverage_90": 0.8595582126844613,
+      "interval_width_80": 95.94348649532132,
+      "interval_width_90": 151.0730390304873
+    },
+    "baseline_full": {
+      "mae": 48.047294235906314,
+      "rmse_pooled": 270.15915224469285,
+      "quantile_score_proxy": 28.74563572063609,
+      "coverage_80": 0.6998918757808091,
+      "coverage_90": 0.8386452130459322,
+      "interval_width_80": 114.44165497666047,
+      "interval_width_90": 179.87886388147865
+    },
+    "baseline_gatets_adapter": {
+      "mae": 45.73392176231482,
+      "rmse_pooled": 273.2260068002453,
+      "quantile_score_proxy": 28.02376146960474,
+      "coverage_80": 0.6491820925999912,
+      "coverage_90": 0.8237884380013826,
+      "interval_width_80": 88.45478554399638,
+      "interval_width_90": 137.16954026394492
+    },
+    "baseline_lasso_arx72_cp": {
+      "mae": 59.05111669586318,
+      "rmse_pooled": 288.00643663944874,
+      "quantile_score_proxy": 42.70228082086871,
+      "coverage_80": 0.9464024123432834,
+      "coverage_90": 0.9846327264425546,
+      "interval_width_80": 278.9438968128629,
+      "interval_width_90": 419.1674096557829
+    },
+    "baseline_lightgbm": {
+      "mae": 37.08900124860414,
+      "rmse_pooled": 277.0514316499794,
+      "quantile_score_proxy": 24.196932186897225,
+      "coverage_80": 0.7258805306647895,
+      "coverage_90": 0.8517477439770689,
+      "interval_width_80": 84.17571871400291,
+      "interval_width_90": 141.51029860290149
+    },
+    "baseline_linear": {
+      "mae": 46.56574841466045,
+      "rmse_pooled": 272.96590292426606,
+      "quantile_score_proxy": 28.24937339703882,
+      "coverage_80": 0.6689607391764802,
+      "coverage_90": 0.8517477439770689,
+      "interval_width_80": 94.80399226425148,
+      "interval_width_90": 147.45079934877995
+    },
+    "baseline_mlp": {
+      "mae": 47.33047335066494,
+      "rmse_pooled": 276.58347024036146,
+      "quantile_score_proxy": 28.454988528028604,
+      "coverage_80": 0.6697946591074837,
+      "coverage_90": 0.8163291351964944,
+      "interval_width_80": 100.85035246409215,
+      "interval_width_90": 148.31837448871858
+    },
+    "baseline_no_fields": {
+      "mae": 47.629531526093615,
+      "rmse_pooled": 269.24521193044166,
+      "quantile_score_proxy": 29.083387585837865,
+      "coverage_80": 0.6936588791862465,
+      "coverage_90": 0.8506450988971963,
+      "interval_width_80": 109.83223364520718,
+      "interval_width_90": 184.44700928720636
+    },
+    "baseline_patchtst": {
+      "mae": 44.28625222490919,
+      "rmse_pooled": 272.6183782319235,
+      "quantile_score_proxy": 27.149797161040272,
+      "coverage_80": 0.7290616339757371,
+      "coverage_90": 0.8632236554230163,
+      "interval_width_80": 98.97665919255378,
+      "interval_width_90": 145.03995934142895
+    },
+    "baseline_xgboost": {
+      "mae": 37.89322995790646,
+      "rmse_pooled": 277.59232117781374,
+      "quantile_score_proxy": 25.616702617186046,
+      "coverage_80": 0.7100685526574461,
+      "coverage_90": 0.8501647229673598,
+      "interval_width_80": 89.87076524288433,
+      "interval_width_90": 165.7934289057259
+    },
+    "baseline_pricefm": {
+      "mae": 51.10169443048327,
+      "rmse_pooled": 277.45053305982077,
+      "quantile_score_proxy": 30.392849138620168,
+      "coverage_80": 0.6741576774537222,
+      "coverage_90": 0.805941600238444,
+      "interval_width_80": 100.32707106637226,
+      "interval_width_90": 143.39684148591223
+    },
+    "baseline_timexer": {
+      "mae": 47.164957508978425,
+      "rmse_pooled": 279.17759942324295,
+      "quantile_score_proxy": 30.49264487422401,
+      "coverage_80": 0.7705665899333498,
+      "coverage_90": 0.8814937947478899,
+      "interval_width_80": 117.62057087351862,
+      "interval_width_90": 172.32555377102213
+    }
+  },
+  "seed": 2026,
+  "test": "2023\u20132024"
+}
