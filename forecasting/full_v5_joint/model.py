@@ -48,16 +48,21 @@ class JointHistoryModel(nn.Module):
         self.register_buffer('lowpass', fourier @ torch.linalg.pinv(fourier))
         self.register_buffer('time_distance', ((time[:, None] - time[None]) / 6).square())
 
+    def calibrate_anchor(self, baseline, features):
+        """Return quantiles and location; retain the historical location coupling."""
+        calibration = self.calibration(features)
+        location = 150 * calibration[..., 0].tanh()
+        scale = 1 + .5 * calibration[..., 1].tanh()
+        anchor = baseline[..., 2:3] + location[..., None] + scale[..., None] * (baseline - baseline[..., 2:3])
+        return anchor, location
+
     def forward(self, batch, *, history_off=False, event_off=False, time_shift_off=False):
         b = batch
         n, k = b['mask'].shape
         current = self.state(b['history'], b['future'])
         memory = self.state(b['memory_history'].flatten(0, 1), b['memory_future'].flatten(0, 1)).reshape(n, k, 24, -1)
-        calibration = self.calibration(torch.cat((current, b['stats']), dim=-1))
-        location = 150 * calibration[..., 0].tanh()
-        scale = 1 + .5 * calibration[..., 1].tanh()
         baseline = b['baseline']
-        anchor = baseline[..., 2:3] + location[..., None] + scale[..., None] * (baseline - baseline[..., 2:3])
+        anchor, location = self.calibrate_anchor(baseline, torch.cat((current, b['stats']), dim=-1))
         fields = self.dual(b['memory_actual'].flatten(0, 1), b['memory_z'].flatten(0, 1),
                            b['memory_lags'].flatten(0, 1))
         trend = fields['trend'].reshape(n, k, 24) * 300
