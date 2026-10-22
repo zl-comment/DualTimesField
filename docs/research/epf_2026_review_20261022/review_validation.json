@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "input_records": 109,
+  "review_records": 109,
+  "evidence_counts": {
+    "全文": 62,
+    "摘要": 39,
+    "元数据": 3,
+    "前版全文/终版摘要": 2,
+    "正文片段": 3
+  },
+  "comparability_counts": {
+    "异市场需统一复现": 65,
+    "不同任务": 28,
+    "信息不足": 9,
+    "同市场需统一复现": 7
+  },
+  "australian_records": 11,
+  "evidence_links": 138,
+  "local_prediction_artifacts_rescored": 51,
+  "local_output_count": 17,
+  "baseline_recommendation_groups": 14,
+  "architecture_proposals": 7,
+  "sheet_names": [
+    "阅读与结论",
+    "本地同样本排名",
+    "分地区结果",
+    "三种子基线",
+    "新方案开发对照",
+    "109篇论文结果总表",
+    "澳洲市场重点",
+    "需补基线论文",
+    "新结构讨论",
+    "指标协议对齐",
+    "逐项证据",
+    "原始109条",
+    "审计信息"
+  ],
+  "outputs": [
+    {
+      "path": "/root/workspace/Code/DualTimesField/docs/research/epf_2026_review_20261022/2026电价论文_市场结果与基线结构总表.xlsx",
+      "bytes": 243758,
+      "sha256": "4b4067ddd092a7a2b08d56845a0806235d60bdbeb1164fea664a3f9355626984"
+    },
+    {
+      "path": "/root/workspace/Code/DualTimesField/docs/research/epf_2026_review_20261022/建议补充的基线论文_实施清单.xlsx",
+      "bytes": 36440,
+      "sha256": "fb46211418c0a78e91d6cb6e177e278bdd1c1c5cc61ea6af6778e29e69c6977f"
+    },
+    {
+      "path": "/root/workspace/Code/DualTimesField/docs/research/epf_2026_review_20261022/2026电价论文_对比结论与结构建议.docx",
+      "bytes": 56268,
+      "sha256": "d08bb2c65235928f26db5d3852fbfe6b1c565c446d56fc62316f433aeb5a6113"
+    },
+    {
+      "path": "/root/workspace/Code/DualTimesField/docs/research/epf_2026_review_20261022/2026电价论文_对比结论与结构建议.html",
+      "bytes": 44913,
+      "sha256": "f6d2d6a803437ddb00418fe4c12a123c7defd069ffc705e11c0c0441e69b5d19"
+    }
+  ],
+  "assertions": [
+    "all109IDsExactlyOnce",
+    "noExternalDirectRanking",
+    "localAuditPassed",
+    "excelReopened",
+    "docxReopened",
+    "noFormulaInjection"
+  ]
+}

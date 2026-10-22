@@ -1,0 +1,213 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font-family:system-ui,"Noto Sans CJK SC",sans-serif;background:#f3f6f8;color:#243746;margin:0;line-height:1.75}main{max-width:1120px;margin:auto;padding:40px;background:white}h1{color:#17324d;font-size:30px}h2{color:#087f8c;font-size:21px;margin-top:36px;border-bottom:1px solid #dbe5ea;padding-bottom:8px}p{margin:12px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.6}th{background:#17324d;color:white;text-align:left}td,th{padding:9px;border:1px solid #dbe5ea;vertical-align:top}tr:nth-child(even){background:#f3f7fa}.table-wrap{overflow:auto}a{color:#087f8c;overflow-wrap:anywhere}@media print{body{background:white}main{padding:0}h2{break-after:avoid}tr{break-inside:avoid}table{font-size:10px}}</style><main>
+<h1>2026电价论文：我们的定位、补充基线与结构选择</h1>
+<p>审查日期：2026-10-22。依据用户附件的109条记录，由3个文献审阅智能体分组核验，主代理核查关键原文并复算本地51份冻结预测。核验深度：全文62条、摘要39条、元数据3条、前版全文/终版摘要2条、正文片段3条。全文指相关方法与实验章节；外部论文未在本轮重新训练。</p>
+<h2>我们现在能排到哪里</h2>
+<p>旧 Full_joint：在“原12输出 + Full_joint”的13输出集合中 MAE/QS均第2；若加重训B和3个同检查点干预，17输出中均第4，RMSE第8。集合包含模型/消融/适配，并非13或17篇独立论文。</p>
+<p>Full_joint MAE 37.655966、QS5 24.435378；原LightGBM MAE 37.089001、QS5 24.196932。Full的MAE高1.53%，QS高0.99%，没有超过树的宏指标。</p>
+<p>这不是“在2026所有论文中第二名”。这109条记录涵盖不同市场和任务，也未证明穷尽全部2026研究。外部论文没有满足与本地同数据、同时间、同信息和同评分的直接排名条件。</p>
+<div class="table-wrap"><table><thead><tr><th>模型/输出</th><th>MAE</th><th>QS5</th><th>MAE名次 13/17</th><th>QS名次 13/17</th></tr></thead><tbody>
+<tr><td>LightGBM（原冻结基线）</td><td>37.0890</td><td>24.1969</td><td>1 / 1</td><td>1 / 2</td></tr>
+<tr><td>LightGBM（本轮重训 B）</td><td>37.1132</td><td>24.1812</td><td>— / 2</td><td>— / 1</td></tr>
+<tr><td>Full_joint：关闭时移分支</td><td>37.5944</td><td>24.4132</td><td>— / 3</td><td>— / 3</td></tr>
+<tr><td>我们的 Full_joint（旧联合模型）</td><td>37.6560</td><td>24.4354</td><td>2 / 4</td><td>2 / 4</td></tr>
+<tr><td>Full_joint：关闭事件分支</td><td>37.6678</td><td>24.4449</td><td>— / 5</td><td>— / 5</td></tr>
+<tr><td>Anchor_joint（关闭历史分支）</td><td>37.7397</td><td>24.4667</td><td>— / 6</td><td>— / 6</td></tr>
+<tr><td>XGBoost</td><td>37.8932</td><td>25.6167</td><td>3 / 7</td><td>3 / 7</td></tr>
+<tr><td>PatchTST（本地重写版）</td><td>44.2863</td><td>27.1498</td><td>4 / 8</td><td>4 / 8</td></tr>
+<tr><td>GateTS + 外生适配器</td><td>45.7339</td><td>28.0238</td><td>5 / 9</td><td>5 / 9</td></tr>
+<tr><td>DLinear（本地适配）</td><td>46.4841</td><td>28.1631</td><td>6 / 10</td><td>6 / 10</td></tr>
+<tr><td>Linear</td><td>46.5657</td><td>28.2494</td><td>7 / 11</td><td>7 / 11</td></tr>
+<tr><td>TimeXer（外生与分位适配）</td><td>47.1650</td><td>30.4926</td><td>8 / 12</td><td>12 / 16</td></tr>
+<tr><td>MLP</td><td>47.3305</td><td>28.4550</td><td>9 / 13</td><td>8 / 12</td></tr>
+<tr><td>早期模型 no_fields</td><td>47.6295</td><td>29.0834</td><td>10 / 14</td><td>10 / 14</td></tr>
+<tr><td>早期 Full</td><td>48.0473</td><td>28.7456</td><td>11 / 15</td><td>9 / 13</td></tr>
+<tr><td>PriceFM（单区从零训练适配）</td><td>51.1017</td><td>30.3928</td><td>12 / 16</td><td>11 / 15</td></tr>
+<tr><td>Lasso-ARX72 + CP</td><td>59.0511</td><td>42.7023</td><td>13 / 17</td><td>13 / 17</td></tr>
+</tbody></table></div>
+<p>13输出集合仍含早期模型及消融，不是13篇独立论文；17输出多了重训B、Anchor_joint、event_off、time_shift_off。后三个是同检查点关闭干预。完整分地区数据和旧12基线三种子均值见Excel，后者未与单种子Full_joint混排。</p>
+<p>Full_joint 在 TAS1 的 MAE 为28.4495，优于原树28.7061；NSW1和QLD1分别45.5274/38.9910，差于原树44.3633/38.1975。RMSE在17输出中第8；它使用中位数预测评分，不能据此推断均值预测的最优性。</p>
+<p>本地评分：澳洲NEM三个地区，原始RRP（AUD/MWh），小时级，72小时历史预测未来24小时，逐小时滚动，2023–2024，每区17,521个起点。Full使用额外成熟历史/误差，其他基线未全部获得等价的长期信息和在线校准机会；系统等预算调参也未完成。因此这是一份同样本、同评分的描述性排序。</p>
+<h2>新方案的结果与旧模型必须分开</h2>
+<p>当前平衡损失与架构候选只完成2021/2022开发筛选：6方案×3地区×2年度，36次拟合、216轮，单种子、每模型6轮。没有候选通过全部预注册标准，尚无新方案在2023–2024上的正式排名。</p>
+<div class="table-wrap"><table><thead><tr><th>开发候选（guarded）</th><th>2021 MAE / QS</th><th>2022 MAE / QS</th></tr></thead><tbody>
+<tr><td>balanced</td><td>27.9864 / 20.0043</td><td>69.8167 / 42.3091</td></tr>
+<tr><td>identity_anchor</td><td>28.0355 / 19.8562</td><td>67.9517 / 42.0644</td></tr>
+<tr><td>location_only</td><td>27.9831 / 19.7507</td><td>68.2492 / 41.9440</td></tr>
+<tr><td>separate_heads</td><td>27.9772 / 20.0794</td><td>69.9407 / 42.3309</td></tr>
+<tr><td>staged</td><td>28.1070 / 20.0203</td><td>70.9352 / 42.9836</td></tr>
+<tr><td>wide_head</td><td>28.1090 / 20.0673</td><td>69.6912 / 42.2681</td></tr>
+</tbody></table></div>
+<p>仅位置校正结合既定选择/收缩流程是值得继续验证的候选，但TAS1/2021相对B的MAE增加约0.03887，未通过全部条件；raw结果也不是每年MAE与QS同时改善。选择的检查点和收缩系数可能变化，不能单独归因为“关闭尺度解决了问题”。独立头、加宽头、3+3分阶段也未给出跨年一致胜出证据。</p>
+<h2>为什么外部论文数字不能直接插入我们的榜</h2>
+<div class="table-wrap"><table><thead><tr><th>记录</th><th>市场/任务与测试</th><th>原文核验结果</th><th>比较限制</th></tr></thead><tbody>
+<tr><td>P20</td><td>澳大利亚NEM NSW/QLD/VIC/SA/TAS RRP；2025-01-01–06-30；2023–24按70/30训练验证；24h=48步；48h=96步</td><td>v2 TableIV 24h：QLD Transformer MAE54.938；NSW CNN-LSTM82.409；TAS Mamba46.071。5区Mamba平均69.920，非我们3区宏平均；核验版本：<a href="https://arxiv.org/html/2602.01157v2">https://arxiv.org/html/2602.01157v2</a></td><td>与本地NEM小时RRP逐小时rolling24h、原价五分位协议不同；同市场最直接文献锚点；应重跑代表模型而不是把纸上数值插本地排名</td></tr>
+<tr><td>P11</td><td>澳大利亚NEM NSW/QLD/VIC/SA/TAS；2025-03-01–03-28四个周；168h，历史336h</td><td>TablesI–II：总体MAE26.17/RMSE81.90；XGB29.49/90.05。NSW35.53、QLD22.57、TAS23.78；核验版本：<a href="https://arxiv.org/html/2605.22387v1">https://arxiv.org/html/2605.22387v1</a></td><td>与本地NEM小时RRP逐小时rolling24h、原价五分位协议不同；同市场有价值但168h不同任务；现有XGB＋小MLP集成应先于完整KAN</td></tr>
+<tr><td>E07</td><td>澳洲NSW、QLD AEMO；2022（样本截止10月）；Table3输出X(t+1)，§3.6 one-step；非24小时完整轨迹</td><td>Table6 SSA-NBEATS QLD MAE3.494/RMSE5.571、NSW3.784/5.749；原NBEATS QLD41.190/70.092、NSW41.124/65.597。</td><td>同货币也不可直接排名：30分钟一步 vs1–24h，2022前10月 vs跨年，分解可用性不同</td></tr>
+<tr><td>J09</td><td>澳大利亚 NEM；区域未核明；正文图示 10 月与 11 月局部测试；全测试精确边界尚待核；明确输入 48 步=24 小时；完整输出步长未核，不可据此称 24 小时预测</td><td>Table 4 周围正文：模型 MAE 8.23，RMSE 13.45，MAPE 6.90%；测试对象含异常值处理，不能与原始尖峰结果排名。</td><td>同为 NEM，但 2019、30 分钟分辨率、区域和预测步长未对齐，且清洗可能移除真实尖峰。</td></tr>
+<tr><td>J30</td><td>澳大利亚维多利亚 VIC；2019-08-13 至 2020-10-06（末 20%）；日频预测；精确多步设置需代码复核</td><td>Table 2，50 次均值：SSA-GWO-ELM MAE 2.477、RMSE 3.573、SMAPE 5.346、R² 0.989；SSA-ELM 3.378 / 5.595；ELM 15.659 / 22.930。</td><td>虽同属澳洲，但预测 VIC 日序列，平均掉大量小时尖峰；2.477 不能与小时 RRP MAE 比较。</td></tr>
+<tr><td>P04</td><td>德国/波兰/西班牙日前；2021–2025；24h</td><td>德国Table3：TabPFN3 MAE12.59/CRPS9.15；DDNN-JSU14.58/10.70；Chronos2 16.13/11.80；LEAR+CP15.93/12.23；核验版本：<a href="https://arxiv.org/html/2609.00089v1">https://arxiv.org/html/2609.00089v1</a></td><td>与本地NEM小时RRP逐小时rolling24h、原价五分位协议不同；必须补有协变量的TabPFN及DDNN-JSU，才能支持领域强基线比较</td></tr>
+<tr><td>E04</td><td>德国、比利时日前；2023-10-01至2024-09-30；次日24小时×99分位</td><td>TableII QNBM：DE MAE10.411/文称CRPS3.789，BE12.826/4.653；NBMLSS分别10.230/3.728、12.758/4.644；QNBM并非各指标最佳。</td><td>分位网格99 vs5、CRPS倍数口径、周重训/5种子ensemble和市场均不同</td></tr>
+<tr><td>J34</td><td>德国 EPEX/SMARD 日前价格；2023-12-01 至 2024-11-30；验证前一年；24 小时，每日一次</td><td>正式 2026 版 §IV-E / Table I：XGBoost MAE 12.020 €/MWh，RMSE 20.534；CRPS：XGB-GARCH 4.492、XGB-CP 4.493、XGB-QRA 4.503；XGB-CP MAACE 1.090，LEAR-CP 1.305。不能与早期预印本 LEAR CRPS 4.662 混用。</td><td>尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。</td></tr>
+<tr><td>P23</td><td>欧洲24国38区日前；2025三折4个月；96步=24h</td><td>v4 TableII full-shot MAE14.28/AQL5.80；TableIII leave-one-region-out16.83/6.85；两者不可合并排名；核验版本：<a href="https://arxiv.org/html/2508.04875v4">https://arxiv.org/html/2508.04875v4</a></td><td>与本地NEM小时RRP逐小时rolling24h、原价五分位协议不同；已有单节点从零版不足代表原文；要声明完整多区PriceFM或明确本地适配</td></tr>
+<tr><td>P30</td><td>EPF NP/PJM/BE/FR/DE＋7能源/水文集；按时间70/10/20；绝对测试日期未核；24/360h；历史168/720h</td><td>v1 Table1：NP MSE.282/MAE.299；PJM.085/.178；BE.420/.273；FR.410/.216；DE.349/.369；核验版本：<a href="https://arxiv.org/html/2609.34939">https://arxiv.org/html/2609.34939</a></td><td>与本地NEM小时RRP逐小时rolling24h、原价五分位协议不同；与历史检索机制最接近的必讨论/优先复现基线；官方实现可得性是前置</td></tr>
+</tbody></table></div>
+<p>例如P20的NSW 24h结果82.409不能因为大于我们的45.527就判定我们胜出：其2025H1、半小时48步、历史长度和输入条件均不同。E07的NSW MAE3.784也不能证明其强于我们：它是半小时一步并有不同测试期和选择流程。完整109条的数值、缺失项、版本与出处在Excel。</p>
+<h2>计算公式：有的同名指标并不相同</h2>
+<p>令 u=y−ŷq，pinball损失 ρq(u)=u·(q−1[u&lt;0])。我们的 QS5=2×mean(ρq)，平均覆盖起点、24个horizon与Q={0.05,0.10,0.50,0.90,0.95}，最后三地区等权。这个五点分数不能写成精确CRPS。</p>
+<p>连续CRPS(F,y)=2∫₀¹ρq(y−F⁻¹(q))dq。E04和J34用99分位平均pinball并省略2倍；PriceFM v4用另7个分位的AQL。即使补上系数，分位网格、权重和任务仍不同；五点输出也不足以无假设还原密网格积分。</p>
+<p>覆盖率需要与区间宽度一起比较；90%区间覆盖98%未必更好。负价/零价市场的MAPE、归一化误差、分类Accuracy，以及策略利润也不能与原价MAE混排。</p>
+<div class="table-wrap"><table><thead><tr><th>核对项</th><th>本地与差异</th><th>需要怎么统一</th></tr></thead><tbody>
+<tr><td>市场与价格机制</td><td>NEM NSW1/QLD1/TAS1；RRP，AUD/MWh；欧洲日前拍卖、美国 LMP、澳洲短期 RRP 不是相同目标；不能跨币种/波动强度排绝对 MAE。</td><td>同市场/地区/产品；跨市场只报各自实验或严格同协议的相对技能。</td></tr>
+<tr><td>测试年份与极端事件</td><td>2023–2024；每地区 17,521 origins；2025 半年、2009年第四季度、2019 短窗口与两年测试的难度不同。</td><td>固定起止时间、缺失处理、极端价保留，逐 origin 对齐。</td></tr>
+<tr><td>时间分辨率与跨度</td><td>小时数据；72h→未来24h；半小时一步、15分钟一步、日均1日、小时一周均不可替代。</td><td>明确 Δt、horizon步数和真实时长；所有horizon相同聚合。</td></tr>
+<tr><td>预测起点</td><td>逐小时滚动；同日目标会被多个origin预测；每日一次预测全天24h与逐小时滚动的可用信息不同。</td><td>明确发布时间、origin频率、每步可用标签；重叠样本显著性使用日/周块或匹配损失序列。</td></tr>
+<tr><td>价格尺度</td><td>逆变换后的原价；保留负价与尖峰；归一化MAE、asinh/r次根尺度误差、剔除异常值结果不能与原价比较。</td><td>所有预测逆变换至原价后计分；单列稳健/裁剪结果而不混排。</td></tr>
+<tr><td>点预测身份</td><td>排序后的 q0.5 用于 MAE 与 RMSE；均值通常更适合平方误差；中位数更适合绝对误差，不能只按RMSE评价中位数能力。</td><td>明确 mean/median；如能输出两者，分别按对应目标计分。</td></tr>
+<tr><td>pinball 与 QS</td><td>ρq(y−ŷ)=(y−ŷ)(q−1[y&lt;ŷ])；QS5=2·平均ρq，q∈{.05,.10,.50,.90,.95}；AQL可能不乘2、分位集合也不同；网格权重改变会改变模型排序。</td><td>保留原生评分，同时从统一预测文件重算共同分位的QS；不可只乘2就宣称可比。</td></tr>
+<tr><td>CRPS</td><td>当前只是五分位 QS 代理，不是精确CRPS；CRPS(F,y)=2∫₀¹ρq(y−F⁻¹(q))dq；有限网格是近似。E04/J34的99均值还省略2倍。</td><td>使用同一密网格/积分规则或可解析CRPS；没有尾部输出不能假装已有完整分布。</td></tr>
+<tr><td>MAPE/sMAPE/R²</td><td>不作为本地主要排名；零价/负价使MAPE解释不稳定；R²随目标方差改变；分类accuracy/F1应另列；名为ACC的回归指标须先查公式。</td><td>主报原价MAE/RMSE与概率评分；说明零值规则；分类单独轨道。</td></tr>
+<tr><td>覆盖率与宽度</td><td>C80/C90；标称80%/90%；覆盖98%不必优于90%，可能区间过宽；没有宽度无法判断区间质量。</td><td>一起报覆盖误差、平均宽度、interval/Winkler score及尾部校准。</td></tr>
+<tr><td>空间/种子聚合</td><td>三地区等权；单种子2026主榜；旧12基线三种子另表；分地区均值RMSE不等于全样本 pooled RMSE；平均分数不等于集成预测分数。</td><td>保持地区权重、样本权重、seed汇总方法一致；避免混用单种子与集成成绩。</td></tr>
+<tr><td>信息集与更新</td><td>Full额外读取成熟历史/误差；参数冻结，记忆因果更新；原12基线未全部获得相同长期记忆/在线校正机会；现在是同评分描述性榜。</td><td>设置72h公共信息与扩展长期信息两条轨道；给强基线等信息在线更新机会。</td></tr>
+<tr><td>未来外生可用性</td><td>档案 available_at 代理，未独立认证首次发布；真实未来负荷/风光、全序列分解/标准化可能带来不可用信息。</td><td>逐变量记录发布时刻；只fit train统计量；分解和检索按origin因果构建。</td></tr>
+<tr><td>训练与调参预算</td><td>固定配置；系统等预算HPO未完成；日/周重训、数千trial、跨区预训练、单次训练成本不同。</td><td>报告算力/更新次数/调参trial；同预算主表，原生最优配置补表。</td></tr>
+<tr><td>预训练与版本</td><td>现有PriceFM是单区从零训练适配；PriceFM v4欧洲训练年份与本地测试年份重叠，但不等于见过NEM标签；Chronos/TabPFN也需核训练范围；论文版本结果会变。</td><td>锁定论文版本与checkpoint；未知重叠标注风险，必要时选未来留出期。</td></tr>
+<tr><td>统计结论与留出</td><td>本轮重评分未训练；2023–2024已被查看；新结构仅开发筛选；单种子/短窗优势不等于显著；不能把已用于选择的时期再称盲测。</td><td>预注册阈值和预算；多种子、配对块bootstrap/适用DM/GW并控制多重比较；未来真实留出另报。</td></tr>
+</tbody></table></div>
+<h2>已有“复现”的准确身份</h2>
+<div class="table-wrap"><table><thead><tr><th>实现</th><th>当前身份与限制</th></tr></thead><tbody>
+<tr><td>PriceFM（单区从零训练适配）</td><td>官方 2026 MoE 路径移植 PyTorch；单节点、未使用 38 区预训练；不能代表论文中 PriceFM 基础模型</td></tr>
+<tr><td>TimeXer（外生与分位适配）</td><td>官方历史路径；新增未来外生 token 与五分位头，72h 上下文；不等同原论文结果</td></tr>
+<tr><td>GateTS + 外生适配器</td><td>官方骨干 + 五分位头 + 外生线性支路；不是原论文配置；不可据此宣称稀疏计算加速</td></tr>
+<tr><td>PatchTST（本地重写版）</td><td>不是原论文结果复现；官方权重映射一致性尚未完成</td></tr>
+<tr><td>Lasso-ARX72 + CP</td><td>不是官方 LEAR：标准 7 日滞后需要扩展 72h 信息协议</td></tr>
+<tr><td>MLP</td><td>普通 MLP 不能替代 DDNN-JSU 分布回归基线</td></tr>
+</tbody></table></div>
+<p>建议论文中使用“在统一本地协议下的适配实现”这类准确命名。官方骨干对齐、实现移植通过局部测试、原论文完整实验复现是不同层次。尤其不能用当前PriceFM成绩宣称优于完整跨区预训练基础模型。</p>
+<h2>需要补哪些基线论文</h2>
+<p>P0表示当前研究主张所需的优先对照，P1为第二批，P2为目标扩展或高成本项目；这是结合本项目资源的综合判断，不等于论文质量排名。完整论文题名、链接、代码可用性和实施要求另见Excel的“需补基线论文”。</p>
+<h2>P0 · LEAR + CP；DDNN-JSU（P04, J34）</h2>
+<p>补齐电价专用的统计与概率强基线；普通 Lasso 和 MLP 不能替代它们。 新增正式实现；保留当前 Lasso-ARX72+CP 并明确命名。</p>
+<p>对齐要求：官方 LEAR 1/2/3/7 日滞后需要至少 168h；在扩展信息轨道给所有模型同等访问权限。保留原论文逐日预测/重训轨道。 成本：中；DDNN-JSU 原文大规模调参应设统一预算，另报忠实复现预算。风险：不要把 72h 裁剪版称为官方 LEAR；JSU 的位置参数不一定就是所需点预测。</p>
+<h2>P0 · LightGBM/XGBoost + CP 或 QRA；B + 简单因果残差校正（J34）</h2>
+<p>直接回答：复杂 Anchor 与历史分支是否优于便宜的树后校准？这是机制归因的关键对照。 在已有树上新增校准对照。</p>
+<p>对齐要求：同一冻结 B；相同成熟误差、选择期和更新机会；CP/QRA 只用当时已知标签。简单残差校正是本项目建议，不冒称论文原模型。 成本：低到中。风险：CP 的有效性依赖数据与更新协议；时间序列非交换性下不可直接许诺名义覆盖。</p>
+<h2>P0 · XMatch（P30）</h2>
+<p>树状外生模式检索与历史支持度建模，直接挑战“检索历史是否提供独立增益”。 新增最接近历史检索机制的对照。</p>
+<p>对齐要求：相同外生变量、历史库和候选长度；未来外生只能用 origin 时可得预测；本轮未确认作者实现可访问。 成本：中到高；代码可得性待确认。风险：不能把文末其他基线的代码仓库当成 XMatch 官方实现；原文确定性指标不等于本地概率指标。</p>
+<h2>P0 · NBEATSx / NHITS+QRA（首批择一）；TFT 为后续（J18, P08, P16）</h2>
+<p>现有列表偏树与 Transformer，缺少电价常用的外生前馈/层次残差模型；P16 的 NHITS + QRA 也是损失校准对照。 补充成熟的外生概率神经基线。</p>
+<p>对齐要求：接入同一历史/未来外生；保留NHITS的原生MC-dropout+QRA两阶段对照。换成统一五分位神经头时标为适配版；早停/调参预算一致。 成本：中。风险：结构、损失和校准头同时变化会混淆归因；TFT 特征与位置索引需审计。</p>
+<h2>P0 · TabPFN-2 / TabPFN-3（P04）</h2>
+<p>2026 对照中表现强，能检验本任务是否更适合表格先验而非继续扩大时序骨干。 新增强表格预训练基线，版本独立。</p>
+<p>对齐要求：固定版本、上下文样本数、特征与目标变换；按实际许可/资源运行；严格记录预训练重叠风险。 成本：中到高，取决于版本与上下文规模。风险：P04 不代表所有市场均最优；商业/API 与本地版本不得混为一个可复现模型。</p>
+<h2>P1 · Chronos-2 + 可用外生；零样本与微调分开（P06, P04）</h2>
+<p>弥补当前 PriceFM 从零训练适配版无法代表基础模型的问题；论文提示外生依赖与污染风险。 新增真正的预训练时间序列基线。</p>
+<p>对齐要求：锁定 checkpoint、发布时间/训练截止、上下文和外生可用性；预训练覆盖 2023–2024 不明时另设不受污染的新时间轨道。 成本：中。风险：不能默认旧测试年份未进入预训练；不能用真实未来负荷/风光代替发布时预测。</p>
+<h2>P1 · NBMLSS / QNBM / QR-DNN（E04）</h2>
+<p>可加性基函数和非对称分位结构值得借鉴；原文 QNBM 并非总是优于 NBMLSS。 新增可解释概率基线，先 NBMLSS + QNBM。</p>
+<p>对齐要求：重新计算公共 QS5 与一致密网格；单种子 vs 论文分位集成分开；统一周重训或冻结参数协议。 成本：中。风险：论文“CRPS”为 99 个 pinball 的平均且省略 2 倍；不能直接照抄数字进本地榜。</p>
+<h2>P1 · RLin / MLP+RLin+BOA；LEM/KF/RNN（P14, E01）</h2>
+<p>区分收益来自额外成熟信息与在线适应，还是来自神经检索结构。 择一个在线残差/线性结构强对照；P14为RLin/BOA，E01为LEM/KF/RNN。</p>
+<p>对齐要求：所有模型使用相同可用输入与成熟标签；E01 燃料特征不对称必须消除；每一步更新的成本单列。 成本：低到中。风险：不同特征集合、调参预算和更新频率不能解释成纯架构优势。</p>
+<h2>P1 · CING-LEAR；Chronos-2有外生 + CING-LEAR简单均值集成（P06, P10）</h2>
+<p>两篇原文中简单组合优于单模型，能检验复杂联合网络是否胜过强模型的便宜融合。 单列强领域模型与低复杂度组合。</p>
+<p>对齐要求：单模型及组合分别报告；固定组合规则，不按测试选权重；模型使用相同可用外生与校准窗。 成本：低到中；若Chronos-2已接入则增量较低。风险：平均分位曲线是分位组合，不自动等于混合分布分位；预训练范围和训练窗仍须审计。</p>
+<h2>P1 · NEM 多模型公开基准配置（P20）</h2>
+<p>与我们最接近的澳洲多区 24h/48h benchmark；可获得真正有解释力的文献定位。 建立第二条文献复现轨道，不是另造一个模型。</p>
+<p>对齐要求：精确复现半小时、2025 上半年、48/96 步和原文输入；再把我们的模型迁移到该轨道。不得与主榜混排。 成本：中；需准备对应年份/分辨率数据。风险：当前 2023–2024 小时级主榜不能直接与其 Table IV 比高低。</p>
+<h2>P2 · PriceFM 完整跨区预训练模型（P23）</h2>
+<p>当前只有单区从零训练版本，无法验证跨区预训练/图结构的论文贡献。 先更名现有适配，再考虑完整复现。</p>
+<p>对齐要求：使用作者对应版本、完整数据和图；欧洲训练时段2022–2025与本地2023–2024重叠，历史可部署性需核；这不证明NEM测试标签被使用。需历史截止checkpoint或另选未来留出。 成本：高。风险：必须审计训练数据与截止时间；时段重叠是风险标记，不能直接认定NEM目标泄漏。</p>
+<h2>P2 · MODR（P25）</h2>
+<p>联合分布与跨时依赖不能被五个边际分位完整刻画；适合作为情景预测对照。 若需要联合概率情景，再引入。</p>
+<p>对齐要求：新增 Energy/Variogram score、价差/策略评价与成本约束；与边际点预测主榜并列而不混为单一评分。 成本：中到高。风险：更低 MAE 不保证更高利润；边际 QS 更好也不证明联合路径正确。</p>
+<h2>P1 · THieF / Spread THieF（E03, C01）</h2>
+<p>原文已有小时级MAE/RMSE改善；聚合或价差约束可检验24h形状一致性，不以交易任务为前置。 加入模型外点轨迹协调对照。</p>
+<p>对齐要求：相同小时目标；协调权重只用历史/OOF误差估计；另训聚合/价差头的成本计入；先评价点预测。 成本：中；E03有作者Julia代码，C01作者实现未核到。风险：分位的差不是价差的分位；点协调不能自动产生合法联合概率分布。</p>
+<h2>P2 · DiTS（v2）（P29）</h2>
+<p>未来外生调制的生成骨干是另一类结构；原文也有EPF点预测，不以交易任务为前置。 成本允许时加入生成式点/概率基线。</p>
+<p>对齐要求：锁定v2与输入/采样预算；点指标与概率指标分开，未来外生只能用当时可得值。 成本：高；需要生成式训练与采样。风险：结构与版本有变化；原文部分对照数字来自既有文献，须逐项区分是否同运行重测。</p>
+<p>另保留日/周季节性Naive和B+简单残差校正作为便宜机制对照。周季节项也需要168h信息，在扩展信息轨道统一提供；不要只给某个基线额外数据。无需把所有2026年分解+群智能调参混合网络都加入：优先覆盖强统计、树后校准、外生神经、预训练和检索机制。</p>
+<h2>新结构：从哪个问题出发、怎样证伪</h2>
+<h2>A. 中位数锚定 + 上下尾独立的单调分位残差头（E04, P22, P23）</h2>
+<p>借鉴基函数/分位参数化；这里的残差头是我们提出的组合，不是论文已证明的改进。 一个公共 s 只能同时拉伸上下尾，不能分别修正低价/负价与正尖峰；分离中位数和各尾间距增加可表达的校正形状。</p>
+<p>改动：替换当前 Anchor 的公共尺度头；保留 B、编码器与历史分支。当前：A_q = B_0.5 + δ + s(B_q − B_0.5)。候选：m=B_0.5+δ；对排序后的B，正间距用 g_i=g_i^B·exp(clip(ε_i))；零间距需另设可学习非负增量，避免乘法无法打开。从m向两侧累加得到单调分位；δ及所有间距校正为0时恢复B。</p>
+<p>对照：固定 B/输入/候选历史池，比较仅 δ、公共 s、上下尾两尺度、四间距；保持总预算和损失一致；多种子并报每年每区。</p>
+<p>证据与风险：仅位置 + 既定收缩流程在开发宏指标上较好，但未通过全部标准；这是试验动机，尚不是公共尺度为根因的证据。 自由度增加可能过拟合尾部；损失仍会经共享编码器耦合；极窄区间和过宽区间均需检查。</p>
+<p>采纳条件：同时改善原价 MAE/QS，覆盖率接近标称且宽度不过度膨胀；必须保留失败地区/季节。</p>
+<h2>B. 根据相似度和有效历史支持度控制检索权重（P30, J21）</h2>
+<p>XMatch 的外生原型与历史支持度思想；J21摘要另提示状态约束相似日，但全文尚未核。本项目拟加入成熟历史检索可靠性门。 “相似”不代表“有足够证据”；稀疏尖峰或失配情景下，强制历史修正可能伤害已有好树。</p>
+<p>改动：历史检索权重/门控；不必先换大骨干。F_q = A_q + g(z, support, age)·Δ_q(history)；支持度低时使 g 接近 0；具体形式需在开发期冻结。</p>
+<p>对照：同一候选库比较无历史、最近邻、现有注意力、支持度门控；报告有效邻居数、收益随支持度变化和延迟。</p>
+<p>证据与风险：论文提供机制灵感；当前尚未完成本地 XMatch 复现，不能承诺改善。 原型构建、尺度归一化和标签成熟必须因果；不能把 query 的未来真实外生/电价用于检索。</p>
+<p>采纳条件：超过 B + 简单残差校正，并且低支持样本退化减少；门控不能仅靠常年关闭制造表面安全。</p>
+<h2>C. 因果在线偏差/波动校正与多时间窗口（P14, E01, P25）</h2>
+<p>在线线性/滤波/分布回归启发；先检验适应机制，再决定是否需要更深网络。 我们的模型额外读取成熟误差，优势有可能来自在线适应；应与等信息的简单在线校正比较。</p>
+<p>改动：B→Anchor 的偏差/尺度统计，或历史分支的状态更新。只在 y 成熟后更新状态；短/长窗口或滤波状态控制偏差与不确定度，更新规则在开发期固定。</p>
+<p>对照：相同成熟标签下比较固定校正、滚动中位残差、双窗口、滤波校正、神经 Anchor；逐年记录恢复速度。</p>
+<p>证据与风险：在线学习文献提供候选；E01 的燃料信息不对称不能直接当成纯结构证据。 长窗口滞后、短窗口追噪声；突发尖峰后不宜机械追涨；需报告所有更新预算。</p>
+<p>采纳条件：跨漂移年度稳定超过同信息树校准，且不损伤极端价格区间。</p>
+<h2>D. Johnson SU / Student-t 等分布型 Anchor（P04, E04）</h2>
+<p>DDNN-JSU/NBMLSS 的分布参数化，作为有负价、偏态与厚尾的候选。 为尾部形状提供结构约束；可在公共更密分位网格上评价，减少任意分位交叉。</p>
+<p>改动：将五分位自由输出替换为可取分位的参数分布，或作为独立基线。网络预测合法分布参数，再取同一 Q={.05,.10,.50,.90,.95}；点指标使用分布中位数。</p>
+<p>对照：同编码器比较五分位头、单调分位头、JSU/Student-t；明确 NLL、pinball 或 CRPS 的训练目标。</p>
+<p>证据与风险：论文中的 DDNN-JSU 是强概率基线；并不意味着分布假设一定符合澳洲尖峰。 分布失配、数值稳定、极端尾部梯度；不要把分布位置参数误当均值或中位数。</p>
+<p>采纳条件：概率评分与尾部校准改善且训练稳定；用相同数据预算确认。</p>
+<h2>E. 面向联合概率路径的生成/分布层（P25, P29）</h2>
+<p>多元分布回归、未来外生调制生成模型；DiTS也有点预测用途，这里讨论其联合情景价值。 若应用是储能/套利，同日小时之间的排序、价差和相关性可能比单小时误差更重要。</p>
+<p>改动：Full 输出端增加联合样本轨迹；可能需要改变目标。预测24h联合分布并生成路径；五个边际分位不定义完整的跨时依赖。</p>
+<p>对照：同样本比较独立边际采样与联合路径；报告ES/VS，若有交易任务再报固定策略收益。</p>
+<p>证据与风险：相关论文有联合/经济任务结果；不是当前 MAE/QS 平衡失配的已证实直接修复。 成本高、场景评估复杂；策略挑选会污染收益结论；低误差不自动转化为盈利。</p>
+<p>采纳条件：只有当联合/经济指标在相同约束下改善，才值得纳入主架构。</p>
+<h2>F. 外生可用性、绝对位置与分布外特征审计（J26, P06）</h2>
+<p>从 TFT 的绝对索引外推失败及基础模型污染研究得到的检查项。 有时退化来自输入/协议而非校正网络容量；先排除非结构性的偏移来源。</p>
+<p>改动：输入编码和数据流水线。区分周期日历编码与不断增大的绝对索引；所有未来外生附 available_at；预训练信息单独登记。</p>
+<p>对照：只改一个输入族；检查训练/评估分位范围、缺失、异常值、发布时间；可得预测与真实未来外生分轨。</p>
+<p>证据与风险：J26 的特定 TFT 失败不证明我们也有相同错误；本地发布时间目前仍是档案代理。 回看测试后修改特征会产生新的选择偏差；必须把 2023–2024 标为回顾性。</p>
+<p>采纳条件：能复现故障并在预先固定的开发/未来留出中消除，才认定为具体原因。</p>
+<h2>G. 小时—聚合—价差的点预测协调（E03, C01）</h2>
+<p>THieF/Spread THieF用多尺度或价差预测约束最终24h点轨迹；这是点预测协调，不是联合概率生成。 检验各小时独立修正是否忽略整体形状；无需先引入交易任务。</p>
+<p>改动：对24h点预测增加聚合/价差辅助头与历史误差协调层。同时预测小时值与聚合块或同日价差，通过预先估计的历史误差权重协调。</p>
+<p>对照：同一B比较原点输出、加辅助头不协调、协调后；固定额外预算；从OOF历史估计协方差。</p>
+<p>证据与风险：E03/C01原文已有小时MAE/RMSE改善；不能将跨尺度最大改善率套到所有小时/模型。 分位数不服从简单求和/差分规则；先做点预测，概率扩展需另行设计和验证。</p>
+<p>采纳条件：同小时目标MAE/RMSE与价差误差改善；利润可选，不以ES/VS评价没有联合分布的点预测。</p>
+<p>关于创新性：历史检索与外生条件的组合已有相关研究，P30和J21（目前仅摘要）尤其接近。我们的贡献需要落在明确的因果信息协议、校正或检索机制，以及超过强对照的可验证增益，不能仅凭组合了这些模块就宣称新颖。</p>
+<p>不建议直接把当前损失替换成Chung校准损失。P16中NHITS+QRA pinball的CRPS为16.87，Chung为21.74，且两组同时更换线性/神经头；这既没有证明替换有效，也不是隔离损失效应的纯对照。</p>
+<h2>下一轮实验应该如何组织</h2>
+<p>第一步，冻结两条协议：A为当前NEM滚动24h轨道，按72h公共输入与长期成熟信息分别报告；B为文献对齐轨道，例如P20的2025H1半小时24h，或epftoolbox的日前任务。各轨道单独排名。</p>
+<p>第二步，先加入等信息的树后校准、正式LEAR/DDNN-JSU和一个NBEATSx/NHITS强神经基线；TabPFN、Chronos-2/CING-LEAR与XMatch按代码和预训练审计结果推进。所有方法记录调参、重训、上下文和推断成本。</p>
+<p>第三步，只改变一个机制：以balanced、仅位置为对照测试非对称单调头，再单独测试支持度门控。相同B、历史池、总训练预算和选择规则；采用多种子并保留全部地区/季节门槛，不因本次观察临时放宽。</p>
+<p>第四步，2023–2024已经看过，后续可继续作回顾性诊断但不能叫盲测。正式新结论需要预先冻结的未来留出或尚未参与选择的数据；统计检验应处理重叠预测的时间相关，报告差异的不确定性而非只报名次。</p>
+<h2>证据、版本与交付文件</h2>
+<p>109条全部有逐项记录。摘要或元数据不可获得的切分、误差、代码被留作“未核”，没有估算名次。部分论文有日期/版本和实验描述冲突，已逐行记录；风险标记不等于认定泄漏或不当行为。原附件保留为独立工作表。</p>
+<p>审阅覆盖：{&quot;全文&quot;: 62, &quot;摘要&quot;: 39, &quot;元数据&quot;: 3, &quot;前版全文/终版摘要&quot;: 2, &quot;正文片段&quot;: 3}；可比性分类：{&quot;异市场需统一复现&quot;: 65, &quot;不同任务&quot;: 28, &quot;信息不足&quot;: 9, &quot;同市场需统一复现&quot;: 7}。</p>
+<p>[C01] Stealing profits: Spread-based temporal hierarchy forecasting for day-ahead electricity markets。<a href="https://arxiv.org/html/2609.23223v1">https://arxiv.org/html/2609.23223v1</a> | §5–6 Table1</p>
+<p>[E01] Recurrent neural networks with linear structures for electricity price forecasting。<a href="https://arxiv.org/html/2512.04690v1">https://arxiv.org/html/2512.04690v1</a> | §3、§5、§6.2.1 Table3<br><a href="https://github.com/souhirbenamor/RNN-for-EPF">https://github.com/souhirbenamor/RNN-for-EPF</a> | 作者仓库README及文件目录；论文§1代码脚注</p>
+<p>[E03] Stealing accuracy: Predicting day-ahead electricity prices with temporal hierarchy forecasting (THieF)。<a href="https://arxiv.org/html/2508.11372v2">https://arxiv.org/html/2508.11372v2</a> | §2、§4、§5 Table1<br><a href="https://github.com/lipiecki/thief">https://github.com/lipiecki/thief</a> | 作者仓库README、src及Project.toml；论文Data and code availability</p>
+<p>[E04] From Distributional to Quantile Neural Basis Models: The case of electricity price forecasting。<a href="https://arxiv.org/html/2509.14113v1">https://arxiv.org/html/2509.14113v1</a> | §III TableII及其后CRPS定义段</p>
+<p>[E07] Explainable Singular Spectrum Analysis deep learning model for half-hourly electricity price prediction。<a href="https://burjcdigital.urjc.es/bitstreams/cabaab01-e931-4174-bdbb-609fb34b5e4a/download">https://burjcdigital.urjc.es/bitstreams/cabaab01-e931-4174-bdbb-609fb34b5e4a/download</a> | §4.1–4.5、Algorithm2、Tables3/6，PDF已保存</p>
+<p>[J09] An improved iTransformer and BiLSTM hybrid model improves the accuracy of short term electricity price forecasting for the Australian National Electricity Market。<a href="https://link.springer.com/article/10.1007/s44163-026-01705-2">https://link.springer.com/article/10.1007/s44163-026-01705-2</a> | Dataset / Table 4 / Limitations</p>
+<p>[J18] Deep Learning for Cross-Border Electricity Price Forecasting: A Comparative Study。<a href="https://publikationen.bibliothek.kit.edu/1000196543">https://publikationen.bibliothek.kit.edu/1000196543</a> | KIT 机构论文存档<br><a href="https://publikationen.bibliothek.kit.edu/1000196543/188355012">https://publikationen.bibliothek.kit.edu/1000196543/188355012</a> | 作者接受稿 Tables 2–4<br><a href="https://github.com/SaiShadow/Cross-Border-Electricity-Price-Forecasting-with-Deep-Learning">https://github.com/SaiShadow/Cross-Border-Electricity-Price-Forecasting-with-Deep-Learning</a> | README / configs</p>
+<p>[J21] Real-Time Electricity Price Forecasting in Renewable-dominated markets: A Market-Regime-Aware Dual-Stage Stacked Learning Framework。<a href="https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2026.1997040/abstract">https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2026.1997040/abstract</a> | Accepted article abstract</p>
+<p>[J26] From Linear Regression to Temporal Fusion Transformers: Benchmarking Electricity Price Forecasting Models in Markets with Different Renewable Energy Shares。<a href="https://www.mdpi.com/2673-4826/7/4/116">https://www.mdpi.com/2673-4826/7/4/116</a> | 原站检索可读正文 §2 / Discussion<br><a href="https://zenodo.org/records/21859907">https://zenodo.org/records/21859907</a> | 作者代码存档 v1</p>
+<p>[J30] A Novel Hybrid Approach for Non-Stationary Electricity Price Forecasting。<a href="https://www.mdpi.com/2227-9717/14/9/1372">https://www.mdpi.com/2227-9717/14/9/1372</a> | 原站入口<br><a href="https://www.researchgate.net/publication/404168633_A_Novel_Hybrid_Approach_for_Non-Stationary_Electricity_Price_Forecasting">https://www.researchgate.net/publication/404168633_A_Novel_Hybrid_Approach_for_Non-Stationary_Electricity_Price_Forecasting</a> | 出版社版全文 Dataset / Table 2<br><a href="https://github.com/Prediction-code/SSA-GWO-ELM">https://github.com/Prediction-code/SSA-GWO-ELM</a> | 作者仓库</p>
+<p>[J34] Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting。<a href="https://ieeexplore.ieee.org/document/11430173/">https://ieeexplore.ieee.org/document/11430173/</a> | 正式论文标识<br><a href="https://www.researchgate.net/publication/402014541_Analyzing_Uncertainty_Quantification_in_Statistical_and_Deep_Learning_Models_for_Probabilistic_Electricity_Price_Forecasting">https://www.researchgate.net/publication/402014541_Analyzing_Uncertainty_Quantification_in_Statistical_and_Deep_Learning_Models_for_Probabilistic_Electricity_Price_Forecasting</a> | 正式出版社版全文 §IV-D / §IV-E / Table I<br><a href="https://arxiv.org/abs/2509.19417">https://arxiv.org/abs/2509.19417</a> | 版本历史<br><a href="https://github.com/lebeand/uq-epf">https://github.com/lebeand/uq-epf</a> | README / src / notebooks</p>
+<p>[P04] Foundation models for electricity price forecasting and battery arbitrage: Can they replace market-specific forecasting models?。<a href="https://arxiv.org/html/2609.00089v1">https://arxiv.org/html/2609.00089v1</a> | §§4–6; Table3</p>
+<p>[P06] Evaluating Time Series Foundation Models for Electricity Price Forecasting: Contamination Risk, Distributional Shifts, and Covariate Dependence。<a href="https://arxiv.org/html/2607.02623v2">https://arxiv.org/html/2607.02623v2</a> | §2.3–2.4; Table1; AppendixA.2/A.3</p>
+<p>[P08] Assessing the Performance–Efficiency Trade-off of Foundation Models in Probabilistic Electricity Price Forecasting。<a href="https://arxiv.org/html/2604.14739v1">https://arxiv.org/html/2604.14739v1</a> | §§3–4; Tables1–2; AppendixE</p>
+<p>[P10] Day-Ahead Electricity Price Forecasting Using a Multivariate Group Lasso Method。<a href="https://arxiv.org/html/2605.27781v3">https://arxiv.org/html/2605.27781v3</a> | §2; §3.3; §4; Table1</p>
+<p>[P11] Hybrid Kolmogorov-Arnold Network and XGBoost Framework for Week-Ahead Price Forecasting in Australia’s National Electricity Market。<a href="https://arxiv.org/html/2605.22387v1">https://arxiv.org/html/2605.22387v1</a> | §III; TablesI–II</p>
+<p>[P14] Electricity Price Forecasting: Bridging Linear Models, Neural Networks and Online Learning。<a href="https://arxiv.org/html/2601.02856">https://arxiv.org/html/2601.02856</a> | §4.3; Tables1–3</p>
+<p>[P16] Investigating Calibration Challenges in Probabilistic Electricity Price Forecasting。<a href="https://arxiv.org/html/2606.09517v1">https://arxiv.org/html/2606.09517v1</a> | §2; Table1<br><a href="https://arxiv.org/html/2604.14739v1">https://arxiv.org/html/2604.14739v1</a> | §3 Data and protocol</p>
+<p>[P20] Deep Time‑Series Models Meet Volatility: Multi‑Horizon Electricity Price Forecasting in the Australian National Electricity Market。<a href="https://arxiv.org/html/2602.01157v2">https://arxiv.org/html/2602.01157v2</a> | v2 §III-B–F; TableIV</p>
+<p>[P22] OrderFusion: Encoding Orderbook for End-to-End Probabilistic Intraday Electricity Price Forecasting。<a href="https://arxiv.org/html/2502.06830v5">https://arxiv.org/html/2502.06830v5</a> | v5 §V; TablesI–II</p>
+<p>[P23] PriceFM: Foundation Model for Probabilistic Electricity Price Forecasting。<a href="https://arxiv.org/html/2508.04875v4">https://arxiv.org/html/2508.04875v4</a> | v4 §III,IV-C,V-D,VII; TablesII–III</p>
+<p>[P25] Online Multivariate Regularized Distributional Regression for High-dimensional Probabilistic Electricity Price Forecasting。<a href="https://arxiv.org/html/2504.02518v4">https://arxiv.org/html/2504.02518v4</a> | v4 §3.1–3.3; Tables3–4</p>
+<p>[P29] DiTS: Multimodal Diffusion Transformers Are Time Series Forecasters。<a href="https://arxiv.org/html/2602.06597v2">https://arxiv.org/html/2602.06597v2</a> | v2 §3–4; Tables1–3,13; AppendixA/B</p>
+<p>[P30] XMatch: Enhancing Covariate-Aware Time Series Forecasting through Tree-Structured Exogenous Matching。<a href="https://arxiv.org/html/2609.34939">https://arxiv.org/html/2609.34939</a> | v1 §3–4; Tables1–5; AppendixA.4</p>
+<p>[R01] 官方 epftoolbox：LEAR、DNN 与电价评价工具；不是2026新增论文。<a href="https://github.com/jeslago/epftoolbox">https://github.com/jeslago/epftoolbox</a>；README / models / evaluation</p>
+<p>[R02] 官方 Chronos：Chronos-2 与未来外生输入接口。<a href="https://github.com/amazon-science/chronos-forecasting">https://github.com/amazon-science/chronos-forecasting</a>；README / Chronos2Pipeline 示例</p>
+<p>本地可复核：/root/workspace/Code/DualTimesField/docs/research/epf_2026_review_20261022/local_audit.json；/root/workspace/Code/DualTimesField/logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/report.md；/root/workspace/Code/DualTimesField/logs/forecasting/v5_anchor_architecture_20261022/interpretation.md</p>
+</main></html>

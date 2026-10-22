@@ -1,0 +1,1217 @@
+[
+  {
+    "id": "J01",
+    "title_verified": "Electricity price forecasting with ensemble meta-models and SHAP explainers: a PCA-driven approach",
+    "evidence_status": "全文",
+    "market_verified": "西班牙",
+    "task_verified": "短期点预测；一小时提前",
+    "data_period": "2015–2019",
+    "test_period": "2018-07 至 2019-12",
+    "resolution": "小时",
+    "horizon": "1 小时",
+    "origin_protocol": "文中描述扩展窗逐步预测；训练 2015–2017，验证 2018 上半年",
+    "target_transform": "PCA 特征；超过 3 倍标准差的价格使用滚动中位数平滑，真实尖峰保留情况需审计",
+    "metrics_definition": "MAE、RMSE、MAPE、R²；实际目标经过异常值处理",
+    "reported_results": "Table 3 / 结论：MetaLinear ensemble RMSE 1.939032；weighted ensemble 2.126761；XGBoost 2.225155；LSTM 2.194644；CNN-LSTM 2.226790；Stacked LSTM 3.948107。不能与未平滑原价误差排名。",
+    "paper_baselines": "XGBoost、LSTM、Stacked LSTM、CNN、CNN-LSTM、TimeDistributed、Encoder–Decoder、weighted ensemble",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "西班牙一小时点预测且平滑异常值；本地为澳洲原价滚动 24 小时五分位。",
+    "baseline_priority": "P2",
+    "baseline_reason": "OOF 线性集成可作为低成本对照；不必复现全部架构变体。",
+    "architecture_idea": "将不同分支预测送入简单线性元学习器，作为复杂门控的成本下界。",
+    "architecture_risk": "元学习器须使用时间顺序 OOF 预测；不能在测试数据拟合权重。",
+    "sources": [
+      {
+        "url": "https://www.nature.com/articles/s41598-026-35839-1?error=cookies_not_supported&code=1",
+        "location": "Data preprocessing / Table 3 / Conclusions",
+        "support": "标题、市场、划分、平滑处理与结果"
+      }
+    ],
+    "notes": "2026-01-28；全文可读。报告的较低误差有目标处理和预测步长条件。"
+  },
+  {
+    "id": "J02",
+    "title_verified": "A novel reinforcement learning-based approach for short-term load and price forecasting in energy markets",
+    "evidence_status": "全文",
+    "market_verified": "PJM；真实负荷及价格数据与人为增加的价格波动混合描述",
+    "task_verified": "负荷与电价联合短期预测，DQN 动态预测策略",
+    "data_period": "2021–2023；文中约 32,000 条与三年小时数不一致",
+    "test_period": "2023；精确起止未核",
+    "resolution": "小时",
+    "horizon": "下一时间步；是否完整 24 输出未核",
+    "origin_protocol": "70%/15%/15% 划分，年份描述存在重叠，需获取索引",
+    "target_transform": "归一化；结果讨论明确提到模拟价格中人为增加波动",
+    "metrics_definition": "MAE、MAPE；负荷 MW 与价格 $/MWh 分开",
+    "reported_results": "正文：价格 MAE 56.7 $/MWh，负荷 MAE 2247 MW；摘要声称相对 ARIMA/LSTM/XGBoost MAPE 改善 15–20%。不把模拟与真实误差合并。",
+    "paper_baselines": "ARIMA、LSTM、XGBoost",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "负荷价格联合任务且真实/模拟价格处理不清，不能直接比较纯原价概率预测。",
+    "baseline_priority": "不作为主基线",
+    "baseline_reason": "先解决数据和实验口径不一致；普通监督基线更容易审计。",
+    "architecture_idea": "根据已成熟预测误差调整分支权重。",
+    "architecture_risk": "RL 奖励只能使用已观测标签；额外复杂度未必超过普通门控。",
+    "sources": [
+      {
+        "url": "https://www.nature.com/articles/s41598-026-37366-5?error=cookies_not_supported&code=1",
+        "location": "Dataset / Results discussion",
+        "support": "PJM、年份、模拟波动与 MAE"
+      }
+    ],
+    "notes": "2026-01-30；原文可读，但数据量与模拟波动说明需要作者澄清。"
+  },
+  {
+    "id": "J03",
+    "title_verified": "Short-Term Electricity Price Forecasting via a Reinforcement Learning-Based Dynamic Soft Ensemble Strategy",
+    "evidence_status": "全文",
+    "market_verified": "PJM",
+    "task_verified": "短期点预测；Q-learning 动态软集成",
+    "data_period": "2023–2024",
+    "test_period": "2024-10-01 至 2024-12-31，2208 小时",
+    "resolution": "小时",
+    "horizon": "未核；不能把输入窗当预测窗",
+    "origin_protocol": "训练 2023-01 至 2024-06；验证 2024 第三季度；测试第四季度",
+    "target_transform": "原文报告 $/MWh；标准化拟合边界需代码复核",
+    "metrics_definition": "MAE、RMSE、MAPE",
+    "reported_results": "Table 2：Soft Ensemble MAE 1.735 $/MWh，RMSE 2.562，MAPE 6.544%；Transformer 2.048 / 3.120；TCN 2.342 / 3.586；CNN-LSTM-Attention 2.156 / 3.245（MAE/RMSE）。",
+    "paper_baselines": "CNN-LSTM-Attention、Transformer、TCN；软集成与固定组合对照",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "与 Anchor / 历史分支融合相关；优先做简单误差门控再决定是否加入 Q-learning。",
+    "architecture_idea": "以市场状态及近期成熟残差选择分支融合权重。",
+    "architecture_risk": "滚动预测时奖励与状态存在标签时延；不能用同一时刻未来误差更新权重。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/1996-1073/19/3/761",
+        "location": "原站入口",
+        "support": "标题核对；原站读取受限"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/400413878_Short-Term_Electricity_Price_Forecasting_via_a_Reinforcement_Learning-Based_Dynamic_Soft_Ensemble_Strategy",
+        "location": "出版社版全文，数据划分和 Table 2",
+        "support": "PJM 年份、测试窗口、数值结果"
+      }
+    ],
+    "notes": "2026-02-01；通过出版社版全文镜像读取，MDPI 原站限流。"
+  },
+  {
+    "id": "J04",
+    "title_verified": "Short-term Electricity Price Prediction Based on Maximal Information Coefficient and Improved FCM-VMD-TCN",
+    "evidence_status": "全文",
+    "market_verified": "波兰电力交易所",
+    "task_verified": "价格状态分类及分解后的点预测",
+    "data_period": "2017-04-10 至 2021-04-10；35,064 小时",
+    "test_period": "未核实",
+    "resolution": "小时",
+    "horizon": "未核",
+    "origin_protocol": "7:3 划分出现在分类环节；不可自动视为最终预测测试划分",
+    "target_transform": "[0,1] 归一化、异常值邻域平滑、VMD 分解",
+    "metrics_definition": "nRMSE、nMAE、nMAPE；归一化指标不能视为原价误差",
+    "reported_results": "Table 6 数值未独立读到；不转录附件中的结果。",
+    "paper_baselines": "分类 CNN/LSTM；预测 ELM/GRU 等对照",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "分解、聚类与调参环节较多；先用简洁 TCN/GRU 对照即可。",
+    "architecture_idea": "因果多尺度编码加通道/时间注意力；单独验证状态分组。",
+    "architecture_risk": "VMD 和异常值平滑可能利用预测起点之后的数据；必须逐起点因果构造。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s44196-026-01212-3",
+        "location": "Dataset / Evaluation / Table 6 说明",
+        "support": "市场、时段、归一化指标与处理流程"
+      }
+    ],
+    "notes": "2026-03-05；可读正文，未取得结果表格数值。"
+  },
+  {
+    "id": "J05",
+    "title_verified": "Enhancing Electricity Price Prediction Accuracy With an Attention Mechanism-LSTM Hybrid Model",
+    "evidence_status": "全文",
+    "market_verified": "澳大利亚 NEM；未核明区域",
+    "task_verified": "注意力 LSTM 单步点预测",
+    "data_period": "2009 全年；17,520 条",
+    "test_period": "2009-10 至 2009-12；图例另选 10 月及 11 月局部日期",
+    "resolution": "30 分钟",
+    "horizon": "单步 30 分钟；48 步为 24 小时输入窗",
+    "origin_protocol": "训练 1–9 月、验证 9 月、测试 10–12 月的描述存在训练/验证边界重叠",
+    "target_transform": "MinMax、Z-score 异常值处理；统计量拟合日期的文字前后不一致",
+    "metrics_definition": "MAE、RMSE；与原始未清洗 RRP 评价并不等价",
+    "reported_results": "Table 3：ATT-LSTM MAE 8.3932，RMSE 15.8845；LSTM 8.7595 / 18.9294；BPNN 9.4201 / 25.9148。",
+    "paper_baselines": "BPNN、LSTM",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "同市场需统一复现",
+    "comparability_reason": "同属 NEM，但区域、2009 年价格制度、30 分钟单步、异常值处理与本地任务不同。",
+    "baseline_priority": "P2",
+    "baseline_reason": "可用作注意力 LSTM 的补充来源；优先级低于有代码的概率基线。",
+    "architecture_idea": "历史序列时间注意力作为轻量 Anchor 状态编码器对照。",
+    "architecture_risk": "注意力本身不能解决训练损失与评价目标失配；先统一原价尺度。",
+    "sources": [
+      {
+        "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/eng2.70657",
+        "location": "§5.4–5.5 / Table 3",
+        "support": "2009 数据、单步预测、划分与基线误差"
+      }
+    ],
+    "notes": "2026-03-06 发表；不是 2026 市场数据。不能把 48 步输入误读为未来 24 小时预测。"
+  },
+  {
+    "id": "J06",
+    "title_verified": "Machine learning-based price forecasting and risk management in renewable energy markets",
+    "evidence_status": "全文",
+    "market_verified": "CAISO 与 PJM；日前/实时市场均有讨论",
+    "task_verified": "价格点预测及 VaR/CVaR 风险管理",
+    "data_period": "数据节称 2016–2023、约 70,000 条；另有三年数据描述，需澄清",
+    "test_period": "实验关注 2023；精确划分未核",
+    "resolution": "小时",
+    "horizon": "未核",
+    "origin_protocol": "未核实",
+    "target_transform": "数据处理与风险层并行；最终逐市场原价评价尺度未核",
+    "metrics_definition": "MAE、RMSE、MAPE、VaR/CVaR；不同风险指标不能用于价格误差排序",
+    "reported_results": "摘要：RMSE 最多下降 18%，MAPE < 5%，下行风险减少 12%；逐市场绝对结果表未核。",
+    "paper_baselines": "Persistence、ARIMA(3,1,2)、Random Forest、XGBoost、LSTM、GRU、TCN",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "已有树模型/序列基线可覆盖主要家族；避免重复增加通用名称。",
+    "architecture_idea": "将风险评价作为附加业务指标，保持预测指标独立。",
+    "architecture_risk": "交易风险改善可能来自策略与头寸控制，不能归因于预测结构。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1186/s40807-025-00234-3",
+        "location": "Dataset / Experimental setup / Abstract",
+        "support": "市场、数据期不一致、基线和相对改善"
+      }
+    ],
+    "notes": "在线发表 2026-04-01；DOI 中 2025 不等于发表年份。正文可读，结果数值仅核到摘要相对量。"
+  },
+  {
+    "id": "J07",
+    "title_verified": "Transfer learning based CEEMDAN-VMD secondary decomposition and multi-scale modeling for short-term electricity market price trend forecasting",
+    "evidence_status": "全文",
+    "market_verified": "PJM、澳洲 NSW；第三数据集被称为 GEFCom2019",
+    "task_verified": "分解、迁移学习、多尺度点预测",
+    "data_period": "PJM 2017–2024；NSW 2015–2024；所谓 GEFCom2019 数据期为 2022–2023，身份需要核实",
+    "test_period": "PJM 与 NSW 主测试 2024",
+    "resolution": "文中称小时；部分样本数不吻合标准历年小时数",
+    "horizon": "未核；168 小时滚动窗不能当作预测期",
+    "origin_protocol": "PJM 训练 2017–2023、测试 2024；10 次运行；各数据集对齐与迁移边界待核",
+    "target_transform": "CEEMDAN–VMD 分解与归一化；需查完整序列分解是否泄漏",
+    "metrics_definition": "RMSE、sMAPE、MASE；MASE 分母须保持训练集季节性基准一致",
+    "reported_results": "Table 2 周围正文：NSW RMSE 9.021 vs BiLSTM 16.807；sMAPE 9.360 vs 14.458；MASE 0.426 vs 0.836。MAE 未核。",
+    "paper_baselines": "ARIMAX、BPNN、BiLSTM、Transformer、TFT、N-BEATS",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "同市场需统一复现",
+    "comparability_reason": "NSW 可作候选同市场方法，但数据身份、分解因果性、预测步长与指标仍不一致。",
+    "baseline_priority": "P2",
+    "baseline_reason": "先厘清 GEFCom 名称及样本数矛盾，再投入高成本分解复现。",
+    "architecture_idea": "历史多尺度编码及跨市场预训练。",
+    "architecture_risk": "离线全序列 CEEMDAN/VMD 会带来未来信息；迁移优势应与预训练数据量控制对比。",
+    "sources": [
+      {
+        "url": "https://www.nature.com/articles/s41598-026-55401-3?error=cookies_not_supported&code=1",
+        "location": "Data description / Table 2 / Results",
+        "support": "实际市场、年份、NSW 结果及数据身份异常"
+      }
+    ],
+    "notes": "2026-06-04；不能照附件将第三市场当作已核实的新疆数据。存在样本量、竞赛名称与年份不一致。"
+  },
+  {
+    "id": "J08",
+    "title_verified": "Transformer-GNN fusion with gradient surgery for electricity price forecasting",
+    "evidence_status": "全文",
+    "market_verified": "PJM 价格 + 人工 IEEE 39-bus PMU 辅助流",
+    "task_verified": "多模态价格点预测，PCGrad 梯度投影融合",
+    "data_period": "PJM 2010–2020",
+    "test_period": "2019-01 至 2020-12",
+    "resolution": "小时价格；PMU 为合成并对齐的辅助输入",
+    "horizon": "未核",
+    "origin_protocol": "训练 2010–2017、验证 2018、测试 2019–2020；5 次运行；train-only 标准化",
+    "target_transform": "训练集拟合标准化；所报小数误差的尺度须按原表/代码再核，不能直接称美元",
+    "metrics_definition": "MSE、MAE、RMSE、R²；分别报告 PJM-only 与 PJM+PMU 条件",
+    "reported_results": "Table 4 周围正文：融合模型 MSE 0.1439，MAE 0.1384，RMSE 0.3793，R² 0.9076；同输入 LSTM+GCN MSE 0.1619；5 次运行配对 t 检验 p=0.0038。绝非已核实原价 $/MWh。",
+    "paper_baselines": "SVR、CNN、LSTM、GRU、Transformer、LSTM+GCN；PCGrad 对照",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "额外合成 PMU 模态不在本地输入中；只适合迁移梯度协调机制。",
+    "baseline_priority": "P1",
+    "baseline_reason": "优先级针对 PCGrad 机制消融，而非整套合成电网模型主排名。",
+    "architecture_idea": "记录 Anchor loss 与最终预测 loss 的共享参数梯度夹角，确有负冲突后再试 PCGrad。",
+    "architecture_risk": "梯度冲突与目标尺度失配不同；PCGrad 不能替代正确的损失、校准或原价评价。",
+    "sources": [
+      {
+        "url": "https://www.nature.com/articles/s41598-026-54787-4?error=cookies_not_supported&code=1",
+        "location": "Implementation configuration / Table 4 / Limitations",
+        "support": "合成 PMU、划分、PCGrad 和结果"
+      }
+    ],
+    "notes": "2026-06-12；作者明确 PMU 不代表实际 PJM 拓扑。应分开架构收益与额外输入收益。"
+  },
+  {
+    "id": "J09",
+    "title_verified": "An improved iTransformer and BiLSTM hybrid model improves the accuracy of short term electricity price forecasting for the Australian National Electricity Market",
+    "evidence_status": "全文",
+    "market_verified": "澳大利亚 NEM；区域未核明",
+    "task_verified": "iTransformer–BiLSTM 点预测，移动窗 Isolation Forest 预处理",
+    "data_period": "2019 全年，17,520 条",
+    "test_period": "正文图示 10 月与 11 月局部测试；全测试精确边界尚待核",
+    "resolution": "30 分钟",
+    "horizon": "明确输入 48 步=24 小时；完整输出步长未核，不可据此称 24 小时预测",
+    "origin_protocol": "10 次运行；固定拆分；精确训练/验证边界待核",
+    "target_transform": "MW-Isolation Forest 异常检测、MinMax；正文承认可能滤掉真实极端事件",
+    "metrics_definition": "MAE、RMSE、MAPE；单位及逆变换细节需代码补核",
+    "reported_results": "Table 4 周围正文：模型 MAE 8.23，RMSE 13.45，MAPE 6.90%；测试对象含异常值处理，不能与原始尖峰结果排名。",
+    "paper_baselines": "BPNN、LSTM、BiLSTM、Attention-LSTM、iTransformer、LightGBM",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "同市场需统一复现",
+    "comparability_reason": "同为 NEM，但 2019、30 分钟分辨率、区域和预测步长未对齐，且清洗可能移除真实尖峰。",
+    "baseline_priority": "P1",
+    "baseline_reason": "可作为 NEM 相关新结构代表，使用本地原价保留尖峰、24 输出及相同输入重训。",
+    "architecture_idea": "用变量维注意力及轻量序列编码器替换平铺状态输入。",
+    "architecture_risk": "不沿用测试集极端值删除；BiLSTM 只能双向处理已知历史窗，不能看到未来标签。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s44163-026-01705-2",
+        "location": "Dataset / Table 4 / Limitations",
+        "support": "2019 NEM、48 步输入、结果、真实异常值被过滤风险"
+      }
+    ],
+    "notes": "2026-07-09；原站全文可读。原始未处理价格上的收益尚未证明。"
+  },
+  {
+    "id": "J10",
+    "title_verified": "A spatiotemporal deep learning framework for electricity price linkage forecasting using graph attention and reinforcement learning",
+    "evidence_status": "摘要",
+    "market_verified": "10 个市场区域；具体名单未从可读摘要核实",
+    "task_verified": "价格回归与方向/趋势分类的多任务预测",
+    "data_period": "2020–2022；约 26,000 小时，25,977 个 24 小时窗口样本",
+    "test_period": "未核实",
+    "resolution": "小时",
+    "horizon": "有长/中期描述；准确预测长度未核",
+    "origin_protocol": "未核实",
+    "target_transform": "未核",
+    "metrics_definition": "回归 R²；分类 accuracy/F1；两类指标必须分列",
+    "reported_results": "摘要：回归 R²=0.880±0.006；分类 accuracy 92.4±0.5%，F1 88.4±0.6%；无可核原价 MAE。",
+    "paper_baselines": "ARIMA、RF、LSTM、GCN、BaseTCN、N-BEATSx、TFT、TimesNet、DLinear、NLinear、PatchTST、Informer、STGCN（摘要列出）",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "跨区域联动及分类辅助任务；分类 92.4% 不能作为电价误差比较。",
+    "baseline_priority": "P2",
+    "baseline_reason": "先覆盖标准 TFT/N-BEATSx 等；图模型需实际跨区输入。",
+    "architecture_idea": "跨区图注意力与价格状态辅助分类。",
+    "architecture_risk": "跨区域时区、可用时点与物理联络线信息要审计。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s44163-026-01885-x",
+        "location": "Abstract / Early access metadata",
+        "support": "标题、2020–2022 样本、任务和结果"
+      }
+    ],
+    "notes": "2026-08-04；当前读到早期版本摘要，未核结果表或完整市场名单。"
+  },
+  {
+    "id": "J11",
+    "title_verified": "Adaptive online learning with LSTM networks for energy price prediction",
+    "evidence_status": "全文",
+    "market_verified": "CAISO NP15；IISE 2024 challenge 数据",
+    "task_verified": "日更新 LSTM 的未来 24 小时价格预测",
+    "data_period": "2020 至 2024 年中",
+    "test_period": "2024 部分年份；确切截止待核",
+    "resolution": "小时",
+    "horizon": "24 小时",
+    "origin_protocol": "每天新标签成熟后更新；以 24 小时验证块及阈值决定更新",
+    "target_transform": "标准化与复合损失；JSD 通过 24 小时 softmax 分布比较形状",
+    "metrics_definition": "MAE、MSE、RMSE；训练还用 JSD/平滑损失，不能等同分位数损失",
+    "reported_results": "摘要：在线更新相对固定模型 MSE 改善约 23%，MAE 3.4%，RMSE 12.2%；Table 4 绝对值尚未核。",
+    "paper_baselines": "静态/动态 LSTM、SVR、Decision Tree Regression、Gradient Boosting Regression、ARIMA、SARIMA、MARIMA",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "优先复现在线更新协议作为冻结模型对照，架构可复用现有实现。",
+    "architecture_idea": "对 Anchor/校准层使用低频、小步在线更新或滚动重估。",
+    "architecture_risk": "更新仅使用已完成预测期的标签；各方法须匹配更新频率及计算预算。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s41060-026-01251-1",
+        "location": "Dataset / Online learning / Results",
+        "support": "CAISO、24 小时滚动更新与改善"
+      }
+    ],
+    "notes": "2026-08-11；全文可读；需要单独核对发电结构输入为预测值还是实际值。"
+  },
+  {
+    "id": "J12",
+    "title_verified": "Long-memory functional time series modeling for electricity spot price forecasting using fractionally integrated functional autoregression",
+    "evidence_status": "摘要",
+    "market_verified": "仿真函数型电价；未提供真实市场实证",
+    "task_verified": "模拟数据上的长记忆函数型点/概率预测",
+    "data_period": "合成序列",
+    "test_period": "仿真测试",
+    "resolution": "函数型日内曲线；实际频率未核",
+    "horizon": "未核",
+    "origin_protocol": "未核实",
+    "target_transform": "GAM 季节项、FPCA、分数阶差分",
+    "metrics_definition": "摘要提及 RMSE、MAE、MASE、sMAPE、区间覆盖、CRPS；公式和结果未核",
+    "reported_results": "仅核到摘要所述仿真优于 FAR/FARX；没有可用于真实市场排名的数值。",
+    "paper_baselines": "FAR(1)、FARX(1)、季节性及函数型神经基线（具体实现未核）",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "纯模拟曲线不能与真实 NEM 预测误差排位。",
+    "baseline_priority": "不作为主基线",
+    "baseline_reason": "作为长记忆建模背景引用，待真实数据验证。",
+    "architecture_idea": "低频趋势分支引入长记忆或分数差分特征。",
+    "architecture_risk": "实际价格非平稳与负价尖峰可能违反模拟假设；分数阶参数只能训练集估计。",
+    "sources": [
+      {
+        "url": "https://www.nature.com/articles/s41598-026-68484-9?error=cookies_not_supported&code=1",
+        "location": "Accepted manuscript abstract",
+        "support": "仿真设定与 FFAR/FFARX"
+      }
+    ],
+    "notes": "2026-08-27；仅可读接受稿摘要。不能称已在真实市场获胜。"
+  },
+  {
+    "id": "J13",
+    "title_verified": "Improving multi-horizon LSTM-based electricity price forecasting through outlier handling and advanced optimization",
+    "evidence_status": "全文",
+    "market_verified": "意大利 PUN",
+    "task_verified": "LSTM Seq2Seq 多步点预测与异常值处理/优化",
+    "data_period": "2017–2020，35,064 小时",
+    "test_period": "2020 全年",
+    "resolution": "小时",
+    "horizon": "1、24、168 小时",
+    "origin_protocol": "2017–2019 训练/验证；2020 测试",
+    "target_transform": "训练集 winsorization / 动态阈值；原文称保持测试集原始价格",
+    "metrics_definition": "MAE、MAPE、相关性等；不同 horizon 分列",
+    "reported_results": "正文实验：MSADBO 未预处理 MAE=3.699(1h)、4.288(24h)、4.974(168h)；加入 winsorization 3.539(1h)、4.232(24h)；普通 LSTM 4.085(1h)、6.926(168h)。",
+    "paper_baselines": "普通 LSTM 及多种优化算法；部分 SVM/线性结果来自前文献，非同一次重训",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "通用 Seq2Seq 可覆盖结构；不建议叠加大量元启发式搜索器作为独立基线。",
+    "architecture_idea": "仅训练端稳健化，保留原价测试；点损失与多步训练可分别消融。",
+    "architecture_risk": "调参预算不等会夸大优化算法收益；不能裁掉测试尖峰来换误差改善。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s12667-026-00831-1",
+        "location": "Dataset / Outlier handling / Results",
+        "support": "PUN、2020 holdout、多步 MAE 与仅训练处理"
+      }
+    ],
+    "notes": "2026-09-30；正文可读；完整搜索预算及种子需要复现配置。"
+  },
+  {
+    "id": "J14",
+    "title_verified": "Less Is More: Data-Driven Day-Ahead Electricity Price Forecasting with Short Training Windows",
+    "evidence_status": "摘要",
+    "market_verified": "希腊、比利时、爱尔兰",
+    "task_verified": "日前价格预测，短滚动训练窗比较",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未在作者摘要独立核实",
+    "horizon": "日前；精确输出维度待全文",
+    "origin_protocol": "7–90 天训练窗口；作者项目摘要称 45–60 天最好",
+    "target_transform": "使用 ENTSO-E 预测输入；处理细节未核",
+    "metrics_definition": "未核完整公式",
+    "reported_results": "作者项目摘要：LightGBM 优于 LSTM/XGBoost/CatBoost，45–60 天窗效果较好；绝对误差与逐市场表未核。",
+    "paper_baselines": "LightGBM、XGBoost、CatBoost、LSTM（作者摘要）",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "新增重点是短窗滚动协议，可复用现有 LightGBM，而非再重复新增算法名称。",
+    "architecture_idea": "将长期历史结构与短期校准/残差拟合分开；45/60/90 天预注册候选。",
+    "architecture_risk": "最优短窗依市场状态而变；不能在最终测试集选择窗长。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/1996-1073/19/2/376",
+        "location": "MDPI 入口",
+        "support": "原站限流"
+      },
+      {
+        "url": "https://cretevalley.eu/less-is-more-a-new-approach-to-forecasting-electricity-prices/",
+        "location": "作者项目文章",
+        "support": "三市场、短窗范围、模型比较摘要"
+      }
+    ],
+    "notes": "2026 期刊条目；本轮读到作者项目摘要，未读全实验表，不能继承附件全文等级。"
+  },
+  {
+    "id": "J15",
+    "title_verified": "Data-Driven Forecasting of Electricity Prices in Chile Using Machine Learning",
+    "evidence_status": "全文",
+    "market_verified": "智利 NES；28 个母线，重点 Crucero/Alto Jahuel/Puerto Montt",
+    "task_verified": "小时价格单步点预测及空间特征选择",
+    "data_period": "2024",
+    "test_period": "未核实",
+    "resolution": "小时",
+    "horizon": "1 小时",
+    "origin_protocol": "两套特征模型 M1 全空间滞后、M2 相关区域子集；精确时间划分未核",
+    "target_transform": "处理细节未完整核验",
+    "metrics_definition": "MAE 等；原文价格单位 USD/MWh",
+    "reported_results": "可检索原文提及 Puerto Montt 平均 MAE 约 19 USD/MWh；这是描述性均值，不是已核最佳模型成绩；完整结果矩阵未核。",
+    "paper_baselines": "Linear Regression、Bayesian Ridge、ARD、Decision Tree、Random Forest、SVR",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "RF/SVR 已覆盖方法家族；空间特征选择可做独立消融。",
+    "architecture_idea": "按可用滞后相关性筛选区域历史特征。",
+    "architecture_risk": "相关性筛选须仅用训练期；节点价格不等于 NEM 区域 RRP。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2076-3417/16/3/1318",
+        "location": "原站检索可读正文：Data / Model comparison",
+        "support": "市场、2024 数据、单步及基线"
+      }
+    ],
+    "notes": "本轮通过搜索读取原站正文片段，直接页面限流；并未读取全部表格，结果均有范围说明。"
+  },
+  {
+    "id": "J16",
+    "title_verified": "Week-Ahead Electricity Price Forecasting for Battery Arbitrage: Benchmarking ML/DL Models and Interpreting Feature Importance Through Merit-Order Pricing in Spain",
+    "evidence_status": "摘要",
+    "market_verified": "西班牙 MIBEL",
+    "task_verified": "周前价格点预测及储能套利",
+    "data_period": "主验证 2024，外样本 2025；更早训练期未核",
+    "test_period": "2024；另有 2025 外样本",
+    "resolution": "小时",
+    "horizon": "168 小时，另比较 24 小时",
+    "origin_protocol": "周滚动、轮换起始星期；对比递归与直接 CatBoost",
+    "target_transform": "内生特征、完美天气与运行可用天气分条件",
+    "metrics_definition": "价格误差与套利收益分开；oracle 收益比例不是预测准确率",
+    "reported_results": "摘要：运行天气恢复完美天气改善的 84%；168h 策略达 oracle 收益 89%，24h 达 87%，长前视额外收益约 2.4%；未核 MAE 表。",
+    "paper_baselines": "Seasonal naive、weekday persistence、LEAR、CatBoost、Random Forest、LSTM、GRU、CNN、CNN-LSTM",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "168 小时周前及储能经济指标不能与 24 小时五分位直接比较。",
+    "baseline_priority": "P1",
+    "baseline_reason": "CatBoost 与 LEAR 可补足统计/树强基线；储能业务指标可列为次级验证。",
+    "architecture_idea": "将未来外生驱动编码为单独分支，并验证可用天气预测贡献。",
+    "architecture_risk": "真实未来天气与当时发布的天气预报条件要严格区分。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2571-9394/8/4/61",
+        "location": "原站入口",
+        "support": "直接访问受限"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/410659117_Week-Ahead_Electricity_Price_Forecasting_for_Battery_Arbitrage_Benchmarking_MLDL_Models_and_Interpreting_Feature_Importance_Through_Merit-Order_Pricing_in_Spain",
+        "location": "作者摘要，DOI 10.3390/forecast8040061",
+        "support": "任务、市场、168 小时和套利结果"
+      }
+    ],
+    "notes": "2026 条目；仅摘要可读，未核完整结果表与准确首发日期。"
+  },
+  {
+    "id": "J17",
+    "title_verified": "Research on Day-Ahead Electricity Price Forecasting Method for New Energy Power Market Based on Hyperparameter Adaptation",
+    "evidence_status": "全文",
+    "market_verified": "PJM",
+    "task_verified": "相似日检索、CEEMDSE 分解、IBA-LSTM 日前点预测",
+    "data_period": "2023 选定案例",
+    "test_period": "案例日；非已核完整年度 holdout",
+    "resolution": "未独立核实",
+    "horizon": "日前；输出维度待核",
+    "origin_protocol": "RF-IAGIV 筛选相似度前 20 日；阈值敏感性测试与主结果关系需澄清",
+    "target_transform": "分解与特征筛选；部分预测误差型特征须审计在起点是否可用",
+    "metrics_definition": "MAE、RMSE、MAPE",
+    "reported_results": "案例结果：MAE 1.95 USD/MWh，RMSE 3.57，MAPE 3.73%；Table 4 为阈值敏感性，不能当全年平均。",
+    "paper_baselines": "ELM、BP、CNN 及分解/优化消融",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "相似日检索有相关性，但选定案例证据弱于全年公开基准。",
+    "architecture_idea": "以外生可用状态筛选历史相似日，再输入残差校正器。",
+    "architecture_risk": "相似日池必须标签已成熟；查询不能使用未来价格或未来预测误差。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/1996-1073/19/12/2932",
+        "location": "原站入口",
+        "support": "原站读取受限"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/407620807_Research_on_Day-Ahead_Electricity_Price_Forecasting_Method_for_New_Energy_Power_Market_Based_on_Hyperparameter_Adaptation",
+        "location": "出版社版全文：Case study / Table 4",
+        "support": "PJM、相似日设置及案例误差"
+      }
+    ],
+    "notes": "2026-06-21；已读出版社版全文镜像，未把案例误差扩大为年度成绩。"
+  },
+  {
+    "id": "J18",
+    "title_verified": "Deep Learning for Cross-Border Electricity Price Forecasting: A Comparative Study",
+    "evidence_status": "全文",
+    "market_verified": "欧洲 15 个竞价区域；重点 DE-LU",
+    "task_verified": "跨境迁移与 zero/one/few-shot 日前点预测",
+    "data_period": "候选训练起始年 2018/2020/2023；测试 2024",
+    "test_period": "2024",
+    "resolution": "小时",
+    "horizon": "24 小时；输入 168 小时",
+    "origin_protocol": "各模型训练窗可单独选择；迁移设定分别报告，不能混作相同训练条件",
+    "target_transform": "特征条件与归一化需按作者配置复现",
+    "metrics_definition": "MAE、RMSE；不同迁移和特征设置分别比较",
+    "reported_results": "Table 2：前一天持久性 MAE 27.85 / RMSE 44.35；Table 3 价格+日历：TFT 21.69 / 36.13，N-BEATSx 22.10 / 37.48，N-HiTS 21.90 / 37.42，Mamba 22.72 / 39.31。Table 4 附加外生条件：N-BEATSx+gas 20.90 / 35.81；N-HiTS+gas+synthetic+CO2 20.20 / 35.11。不同特征和训练起始年不能混为等条件排名。",
+    "paper_baselines": "N-BEATSx、N-HiTS、TFT、Mamba、LSTM、Vanilla Transformer、前一天持久性等",
+    "code_url": "https://github.com/SaiShadow/Cross-Border-Electricity-Price-Forecasting-with-Deep-Learning",
+    "reproduction_feasibility": "较高：作者公开代码、数据抓取和配置；仍需映射本地信息集与量化输出",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P0",
+    "baseline_reason": "优先补齐公开实现的 TFT、N-BEATSx、N-HiTS，覆盖外生条件、多尺度残差与注意力结构。",
+    "architecture_idea": "用已知未来外生变量和市场嵌入条件化多尺度残差预测；先复现 canonical 版本。",
+    "architecture_risk": "现有同名近似实现不能自动称论文忠实复现；模型专属训练窗与跨区数据量要统一控制。",
+    "sources": [
+      {
+        "url": "https://publikationen.bibliothek.kit.edu/1000196543",
+        "location": "KIT 机构论文存档",
+        "support": "身份、2026 DOI"
+      },
+      {
+        "url": "https://publikationen.bibliothek.kit.edu/1000196543/188355012",
+        "location": "作者接受稿 Tables 2–4",
+        "support": "DE-LU 2024、24 小时、价格/日历与外生特征分条件结果"
+      },
+      {
+        "url": "https://github.com/SaiShadow/Cross-Border-Electricity-Price-Forecasting-with-Deep-Learning",
+        "location": "README / configs",
+        "support": "作者实现及数据入口"
+      }
+    ],
+    "notes": "DOI 10.1109/ACCESS.2026.3727000；接受稿页眉含旧模板 2024 字样，不应误判真实发表年。"
+  },
+  {
+    "id": "J19",
+    "title_verified": "Day-Ahead Electricity Price Forecasting Using the XGBoost Algorithm: An Application to the Turkish Electricity Market",
+    "evidence_status": "全文",
+    "market_verified": "土耳其 EXIST",
+    "task_verified": "XGBoost 日前点预测",
+    "data_period": "2023，8760 小时",
+    "test_period": "时间顺序后 20%；具体边界待按代码核实",
+    "resolution": "小时",
+    "horizon": "日前；是否严格 24 输出未核",
+    "origin_protocol": "80/20 顺序划分；训练内 5-fold 是否时间序列折未明确",
+    "target_transform": "原价 TRY/MWh；未来发电特征的实时可得性需审计",
+    "metrics_definition": "MAE、RMSE、R²；训练耗时",
+    "reported_results": "摘要/结果：MAE 144.8 TRY/MWh，RMSE 201.8，R² 0.923；训练约 94 秒。",
+    "paper_baselines": "SVM、LSTM、Random Forest、Gradient Boosting Machine",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "已有 XGBoost 家族可覆盖；J34 更适合作为概率版强基线来源。",
+    "architecture_idea": "树模型为外生非线性残差校正下界。",
+    "architecture_risk": "土耳其货币误差不能与澳元直接比较；不可简单汇率换算后排名。",
+    "sources": [
+      {
+        "url": "https://www.techscience.com/cmc/v86n1/64421/html",
+        "location": "Issue metadata / Abstract / Experiments",
+        "support": "2025 首发、2026 卷期、数据和误差"
+      }
+    ],
+    "notes": "卷期为 2026 v86n1，但页面明确 Issue published 2025-11-10；DOI 10.32604/cmc.2025.068440。不是严格 2026 首发。"
+  },
+  {
+    "id": "J20",
+    "title_verified": "Day-Ahead Forecasting of Wind Power Generation and Electricity Market Prices Using Machine Learning",
+    "evidence_status": "摘要",
+    "market_verified": "可读摘要未说明；不能从作者单位推断市场",
+    "task_verified": "先预测风电，再预测日前价格的两阶段梯度提升",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "日前；输出长度未核",
+    "origin_protocol": "未核实",
+    "target_transform": "未核实；不可默认原价格尺度",
+    "metrics_definition": "R²；绝对误差未核",
+    "reported_results": "摘要：风电 R² 约 0.88，价格 R² 约 0.84；未核 MAE/RMSE 及公平基线矩阵。",
+    "paper_baselines": "未独立核实",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "信息不足",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "取得完整市场、时间划分与结果后再决定；现阶段无需新增同名 GBM。",
+    "architecture_idea": "显式预测未来外生驱动后输入价格网络。",
+    "architecture_risk": "外生模型应 OOF 训练；测试阶段只用真正可用的风电预测，不能用实际风电。",
+    "sources": [
+      {
+        "url": "https://onlinelibrary.wiley.com/doi/10.1002/ente.70680",
+        "location": "Abstract / Publication metadata",
+        "support": "2026-09-29、两阶段方法与 R²"
+      }
+    ],
+    "notes": "2026-09-29；仅摘要，数据按作者要求提供；未核市场。"
+  },
+  {
+    "id": "J21",
+    "title_verified": "Real-Time Electricity Price Forecasting in Renewable-dominated markets: A Market-Regime-Aware Dual-Stage Stacked Learning Framework",
+    "evidence_status": "摘要",
+    "market_verified": "中国湖北",
+    "task_verified": "市场状态识别、相似日检索与两阶段实时电价预测",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "小时",
+    "horizon": "未核",
+    "origin_protocol": "未核时间切分与更新协议",
+    "target_transform": "BHO-VMD 分解、MIC 特征选择；状态与相似日检索",
+    "metrics_definition": "MAE、RMSE、WMAPE；摘要仅相对改善",
+    "reported_results": "摘要：加入状态识别 MAE/RMSE/WMAPE 分别改善 13.40%/13.73%/13.40%；对各状态最强基线 MAE 在新能源富余/供给稀缺场景降低 22.83%/18.66%；绝对值未核。",
+    "paper_baselines": "摘要仅能核 TimeMixer、CNN、MLP、TCN 组件/消融，主基线列表未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "状态约束相似日与分离历史/未来外生分支，直接对应本地检索/Anchor 问题。",
+    "architecture_idea": "Stage I 历史 TimeMixer，Stage II 外生 CNN/MLP 和相似价格形状 TCN，最后元学习融合；可先实现轻量双分支状态门控。",
+    "architecture_risk": "状态分类的标签、VMD 和相似日都需因果生成；不能只因摘要改善幅度就引入整套复杂管线。",
+    "sources": [
+      {
+        "url": "https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2026.1997040/abstract",
+        "location": "Accepted article abstract",
+        "support": "湖北、两阶段结构、相对改善与接受日期"
+      }
+    ],
+    "notes": "Received 2026-09-13，Accepted 2026-10-20；截至审查日为接受稿摘要，完整可复现实验尚未取得。"
+  },
+  {
+    "id": "J22",
+    "title_verified": "Hybrid-Attention-Multi-Size Depthwise CNN-BiGRU for Short-Term Electricity Price Forecasting Under High Renewable Energy Integration",
+    "evidence_status": "摘要",
+    "market_verified": "西班牙",
+    "task_verified": "多尺度 depthwise CNN–BiGRU–多头注意力短期点预测",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "小时",
+    "horizon": "未核实",
+    "origin_protocol": "未核实",
+    "target_transform": "RF 插补/异常值处理、两级特征降维、贝叶斯调参；细节待全文",
+    "metrics_definition": "MAE、RMSE、R²",
+    "reported_results": "摘要：MAE 2.34 €/MWh，RMSE 3.31 €/MWh，R² 0.912；划分和 horizon 未核，不能直接排序。",
+    "paper_baselines": "完整表未获取，不继承附件列出的基线名称为已核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "低成本多核卷积可作为编码器消融；先覆盖标准 TCN/GRU。",
+    "architecture_idea": "不同核大小的深度可分离卷积处理日内多尺度历史。",
+    "architecture_risk": "异常值插补不能删掉真实价格尖峰；超参数搜索预算应对齐。",
+    "sources": [
+      {
+        "url": "https://ietresearch.onlinelibrary.wiley.com/doi/abs/10.1049/gtd2.70278?af=R",
+        "location": "Abstract / 可检索方法片段",
+        "support": "西班牙、结构与摘要误差"
+      }
+    ],
+    "notes": "2026-03-24；摘要和局部方法内容可读，未独立核验完整数据期与结果表。"
+  },
+  {
+    "id": "J23",
+    "title_verified": "Real-Time Electricity Price Forecasting with Dynamic Graph Convolution and Adaptive Temporal Fusion",
+    "evidence_status": "全文",
+    "market_verified": "中国山东",
+    "task_verified": "动态图卷积、门控 Transformer 和 BiGRU 实时价格点预测",
+    "data_period": "2025-01-01 至 2025-08-31",
+    "test_period": "2025-06 至 2025-08；训练 2025-01 至 2025-05",
+    "resolution": "小时",
+    "horizon": "未核实",
+    "origin_protocol": "固定按月拆分；预测输出长度和验证集未从正文明确核实",
+    "target_transform": "§3.1 明确价格归一化至 [0,1]；有异常值删除/插补；MAE/MSE 不可当原价单位",
+    "metrics_definition": "式(8)(9) MAE/MSE；式(10) ACC=1−mean(|y−ŷ|/y)，不是分类 accuracy；归一化 y=0 附近的分母处理未说明",
+    "reported_results": "Table 1：归一化 MAE 0.071、MSE 0.009、ACC 88.2%；BiLSTM 0.148/0.031，LSTM 0.119/0.020，Transformer 0.124/0.021，GCN-LSTM 0.130/0.026，GNN-Transformer 0.108/0.017（MAE/MSE）。",
+    "paper_baselines": "BiLSTM、LSTM、Transformer、GCN-LSTM、GNN-Transformer；Table 1 另有 TMIT、GAT-Informer",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "图结构是否需要额外变量须先核；优先做普通 TCN/Transformer 公平对照。",
+    "architecture_idea": "变量动态关系图和时间门控分开建模。",
+    "architecture_risk": "数据相关图须训练期构建或因果更新；动态图并不自动代表真实电网拓扑。",
+    "sources": [
+      {
+        "url": "https://publications.eai.eu/index.php/ew/article/view/15087",
+        "location": "Publisher landing / Abstract",
+        "support": "2026-09-18、山东与摘要结果"
+      },
+      {
+        "url": "https://publications.eai.eu/index.php/ew/article/download/15087/4343/37725",
+        "location": "出版社 PDF §3.1 / §3.2 / Table 1",
+        "support": "2025 数据划分、小时频率、[0,1] 尺度、ACC 定义及完整模型比较表"
+      }
+    ],
+    "notes": "2026-09-18；原始 PDF 全文已下载。§3.1 明确归一化，已纠正仅看摘要时的尺度未知；真实外生运行量何时可用和 horizon 仍需核实。"
+  },
+  {
+    "id": "J24",
+    "title_verified": "A Novel Probabilistic Electricity Price Forecasting Framework with Multi-Factorial Cross-Correlation Embedding and Patch Processing",
+    "evidence_status": "全文",
+    "market_verified": "中国陕西",
+    "task_verified": "CrossEP 概率区间预测；单步 15 分钟",
+    "data_period": "2025 年 1 月和 4 月；每组 2016 点",
+    "test_period": "每组最后 192 点=2 天；训练 1824 点",
+    "resolution": "15 分钟",
+    "horizon": "target length=1，即 15 分钟；96 为输入窗",
+    "origin_protocol": "两季分别顺序拆分；验证协议和调参边界需补核",
+    "target_transform": "Isolation Forest 修正、ReliefF；尾部幅度加权分位数损失",
+    "metrics_definition": "PICP、MPIW、AIS，名义 85%/90%/95%；AIS 越接近 0 越好，不能当 CRPS 或 QS",
+    "reported_results": "Table 5：90% 区间 Data1 PICP 0.9844、MPIW 375.46、AIS -9.21；Data2 0.9792、200.79、-6.14。Data1 85% 区间宽 245.78，95% 宽 353.96（小于 90% 宽，区间嵌套一致性需核）。覆盖高于名义值不等于更好校准。",
+    "paper_baselines": "CNN、LSTM、MLP、Transformer、DLinear、Informer、iTransformer、5-seed ensemble MLP",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "15 分钟单步、每季 2 天测试、加权分位训练及 AIS 与本地 rolling24h 五分位 QS 不一致。",
+    "baseline_priority": "P1",
+    "baseline_reason": "概率结构可参考；作为主基线前须延长外样本并用统一未加权 proper score。",
+    "architecture_idea": "MLP 趋势分支 + 外生交叉相关卷积 + patch 处理，可作为 Anchor 条件编码器候选。",
+    "architecture_risk": "按目标幅度加权 pinball 会改变最优条件分位数；要防止过覆盖和分位交叉，不能将它作为纯校准改进。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/1996-1073/19/10/2438",
+        "location": "原站入口",
+        "support": "原站限流"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/405024728_A_Novel_Probabilistic_Electricity_Price_Forecasting_Framework_with_Multi-Factorial_Cross-Correlation_Embedding_and_Patch_Processing",
+        "location": "出版社版全文，实验配置 / Table 5",
+        "support": "陕西、15 分钟、target=1、192 测试点、区间结果"
+      }
+    ],
+    "notes": "2026 年 5 月，DOI 10.3390/en19102438；全文镜像核实。区间宽度及过覆盖需与概率排序分开讨论。"
+  },
+  {
+    "id": "J25",
+    "title_verified": "A Multi-Stage Digital Paradigm Framework for Electricity Price Forecasting: Integrating Structural Break Analysis and Hybrid Deep Learning",
+    "evidence_status": "全文",
+    "market_verified": "西班牙",
+    "task_verified": "结构断点、CEEMDAN、CNN-SE-LSTM 与 TTL 残差校正的点预测",
+    "data_period": "2014–2023",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "Algorithm A1 为单步",
+    "origin_protocol": "未核实",
+    "target_transform": "ICSS/Chow 状态断点；CEEMDAN；正文称 train-only normalizer，训练/测试独立分解",
+    "metrics_definition": "MAPE 等；绝对值与零负价格处理未完整核实",
+    "reported_results": "摘要：相对 naive，低价状态 MAPE 改善 58.48%，高价状态 48.97%；完整绝对误差表未独立核验。",
+    "paper_baselines": "Naive 与多个深度基线；完整表名未逐一复核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "与残差校正相近，但多阶段搜索/分解成本高，优先抽取残差和状态消融。",
+    "architecture_idea": "先基础价格预测，再针对未解释部分训练 TCN/Transformer/LSTM 残差校正。",
+    "architecture_risk": "Algorithm A1 先对整个 P 找断点再切分，存在未来状态信息风险；测试段独立分解仍不等于逐起点因果分解。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2071-1050/18/12/6293",
+        "location": "原站入口",
+        "support": "原站读取受限"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/407320453_A_Multi-Stage_Digital_Paradigm_Framework_for_Electricity_Price_Forecasting_Integrating_Structural_Break_Analysis_and_Hybrid_Deep_Learning",
+        "location": "出版社版全文 Abstract / Algorithm A1",
+        "support": "结构、相对改善、断点与分解流程"
+      }
+    ],
+    "notes": "2026-06-18；要区分论文声称无泄漏与实际逐起点信息约束。"
+  },
+  {
+    "id": "J26",
+    "title_verified": "From Linear Regression to Temporal Fusion Transformers: Benchmarking Electricity Price Forecasting Models in Markets with Different Renewable Energy Shares",
+    "evidence_status": "全文",
+    "market_verified": "斯洛伐克、西班牙、丹麦、德国",
+    "task_verified": "全球 TFT 与 OLS/RF/持久性日前基准",
+    "data_period": "数据收集 2015-01 至 2025-12；评估终点早于全数据终点",
+    "test_period": "2024-10 至 2025-09；每市场 8759 个评价小时",
+    "resolution": "小时",
+    "horizon": "24 小时；TFT 输入 168 小时",
+    "origin_protocol": "TFT 全球国家嵌入、7 分位、5 种子；OLS 按月扩展重估；RF 预测相对前日价格残差",
+    "target_transform": "TFT GroupNormalizer；RF 以 y_t−y_(t−24) 为目标；去除绝对 decoder time-index 的消融",
+    "metrics_definition": "点 MAE/RMSE 等与分位数输出分开；完整数值表尚未核",
+    "reported_results": "已核方法与讨论，绝对误差表未独立读到。论文发现绝对时间索引外推与偏差/尾部压缩相关，移除后改善；不能据此断言本地 Anchor 已确认同一根因。",
+    "paper_baselines": "前日持久性、OLS、Random Forest、TFT",
+    "code_url": "https://zenodo.org/records/21859907",
+    "reproduction_feasibility": "较高：作者 Zenodo 提供 v1、约 40.2 MB 代码包；需核它与期刊终版配置一致",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P0",
+    "baseline_reason": "有数据代码与明确 24h 基准；用来补齐 canonical TFT、滚动 OLS/RF 及时间索引消融。",
+    "architecture_idea": "优先检查绝对时间索引、局部归一化/反变换和长期外推；采用周期时间特征与残差预测。",
+    "architecture_risk": "主实验用实际未来负荷/新能源，属于完美预知条件；另有运行预测输入对照，但不能将主结果当完全可部署信息集。残差 RF 并不理论保证不劣于持久性。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2673-4826/7/4/116",
+        "location": "原站检索可读正文 §2 / Discussion",
+        "support": "市场、评估时间、TFT 配置、未来实际值与时间索引问题"
+      },
+      {
+        "url": "https://zenodo.org/records/21859907",
+        "location": "作者代码存档 v1",
+        "support": "2026-08 上传的可复现材料"
+      }
+    ],
+    "notes": "2026 期刊条目；本轮原站通过搜索读取长正文片段，直接页面限流，未取得所有表格。Zenodo 版本需与终稿逐项对照。"
+  },
+  {
+    "id": "J27",
+    "title_verified": "AI-Driven Probabilistic Day-Ahead Electricity Price Forecasting With Tail Risk Mitigation via Dynamic Spike Calibration",
+    "evidence_status": "摘要",
+    "market_verified": "中国广西",
+    "task_verified": "日前概率预测与极端价格动态校准",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "日前；确切输出维度待核",
+    "origin_protocol": "未核实",
+    "target_transform": "滑动分位阈值、GEV 尾部建模、稳健 Box–Cox / Huber 与动态尖峰校准",
+    "metrics_definition": "极端样本 R² 改善；80%/90%/95% 区间覆盖误差；不是本地五分位 QS",
+    "reported_results": "摘要：极端预测 R² 增量 0.46；80%/90%/95% 覆盖误差分别 6.00%/3.57%/2.98%。0.46 是增量，不能当绝对 R²。",
+    "paper_baselines": "Transformer、TCN 为所用 backbone；完整比较清单未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "与尖峰校准直接相关，取得全文后可做独立后校准模块对照。",
+    "architecture_idea": "保留基础分布预测，使用成熟尾部残差进行有限幅度校准；分开中心与尾部指标。",
+    "architecture_risk": "Box–Cox 处理负价需要明确平移或改用 Yeo–Johnson/asinh；GEV 小样本稳定性与校准期泄漏需检查。",
+    "sources": [
+      {
+        "url": "https://ieeexplore.ieee.org/abstract/document/11457995/metrics",
+        "location": "IEEE abstract / Metadata",
+        "support": "2026-03-30 在线、广西、方法与覆盖误差"
+      }
+    ],
+    "notes": "DOI 10.1109/TCE.2026.3679105；正式卷期 72(3), 2026-08；本轮仅摘要与元数据，不能称已复核结果表。"
+  },
+  {
+    "id": "J28",
+    "title_verified": "An interpretable machine learning approach for forecasting the occurrence of extreme electricity prices in the day-ahead market",
+    "evidence_status": "摘要",
+    "market_verified": "可读作者机构摘要未说明具体市场",
+    "task_verified": "高/低极端价格发生事件分类",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "未核实",
+    "origin_protocol": "未核实",
+    "target_transform": "小波 DWT 动态阈值定义极端标签；加权 XGBoost",
+    "metrics_definition": "分类指标，完整公式与阈值未核",
+    "reported_results": "未核验数值结果；不能用分类 accuracy/F1 排原价预测。",
+    "paper_baselines": "完整表未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "预测事件是否发生，而非价格点值或分位数。",
+    "baseline_priority": "不作为主基线",
+    "baseline_reason": "可作为辅助状态/尾部事件分类参考，不是连续价格主基线。",
+    "architecture_idea": "辅助训练 spike/negative gate，并用 SHAP 检验是否依赖合理可用特征。",
+    "architecture_risk": "标签阈值必须训练期或过去窗口估计；事件预测能力不自动提升 proper scoring rule。",
+    "sources": [
+      {
+        "url": "https://www.tandfonline.com/doi/full/10.1080/01605682.2026.2660989",
+        "location": "出版社入口",
+        "support": "直接读取受限"
+      },
+      {
+        "url": "https://research.manchester.ac.uk/en/publications/an-interpretable-machine-learning-approach-for-forecasting-the-oc/",
+        "location": "作者机构摘要 / Metadata",
+        "support": "2026-05-18、DWT 与加权 XGBoost 分类任务"
+      }
+    ],
+    "notes": "仅作者机构摘要可读；原表“电价预测”分类应细分为事件分类。"
+  },
+  {
+    "id": "J29",
+    "title_verified": "Ce-nbeatsx: A context-enhanced electricity price forecasting model based on a TCN context encoder and an MHCA mechanism",
+    "evidence_status": "摘要",
+    "market_verified": "德国 DE-I / DE-II 与美国 PJM",
+    "task_verified": "Ce-nbeatsx 点预测，外生上下文 TCN + 多头交叉注意力",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "未核实",
+    "origin_protocol": "未核实",
+    "target_transform": "未核完整实现",
+    "metrics_definition": "MAE 相对改善；绝对值与 horizon 未核",
+    "reported_results": "摘要：相对 5 个基线 MAE 改善范围 DE-I 14.92–37.99%，PJM 10.70–16.68%，DE-II 3.21–28.53%；这是不同基线相对幅度，不能当跨市场排名。",
+    "paper_baselines": "摘要只称 5 个基线，名称未全部核验",
+    "code_url": "",
+    "reproduction_feasibility": "中低：数据需向作者请求，代码可用性写 Not applicable；缺少终版结构超参数",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P1",
+    "baseline_reason": "作为新结构讨论优先；只有全文/配置齐备后才声称忠实复现。",
+    "architecture_idea": "用 TCN 编码未来已知外生上下文，再通过交叉注意力条件化 N-BEATSx 双残差块；可移植到 Anchor 状态编码器。",
+    "architecture_risk": "只改编码器不能纠正损失失配；应固定检索、损失、训练预算后比较 MLP/TCN/交叉注意力。",
+    "sources": [
+      {
+        "url": "https://link.springer.com/article/10.1007/s00202-026-03767-y",
+        "location": "Abstract / Data and code availability",
+        "support": "2026-09-01、三组数据、相对 MAE 与结构"
+      }
+    ],
+    "notes": "订阅正文未取得；本轮摘要、数据可用性和元数据核实，不将百分比推算成绝对误差。"
+  },
+  {
+    "id": "J30",
+    "title_verified": "A Novel Hybrid Approach for Non-Stationary Electricity Price Forecasting",
+    "evidence_status": "全文",
+    "market_verified": "澳大利亚维多利亚 VIC",
+    "task_verified": "日均价格序列点预测，SSA–GWO–ELM",
+    "data_period": "2015-01-01 至 2020-10-06；2106 条日数据",
+    "test_period": "2019-08-13 至 2020-10-06（末 20%）",
+    "resolution": "日，不是小时",
+    "horizon": "日频预测；精确多步设置需代码复核",
+    "origin_protocol": "80/20 划分；50 次运行均值",
+    "target_transform": "SSA 分解；需审计是否先对全序列分解",
+    "metrics_definition": "MAE、RMSE、SMAPE、R²；对日数据评价",
+    "reported_results": "Table 2，50 次均值：SSA-GWO-ELM MAE 2.477、RMSE 3.573、SMAPE 5.346、R² 0.989；SSA-ELM 3.378 / 5.595；ELM 15.659 / 22.930。",
+    "paper_baselines": "ELM、GWO-ELM，EMD/LMD/CEEMDAN/SSA 与 ELM/GWO-ELM 组合",
+    "code_url": "https://github.com/Prediction-code/SSA-GWO-ELM",
+    "reproduction_feasibility": "有公开代码、SSA/ELM/GWO 与数据文件；从日频改成小时24步属于本地适配",
+    "comparability": "不同任务",
+    "comparability_reason": "虽同属澳洲，但预测 VIC 日序列，平均掉大量小时尖峰；2.477 不能与小时 RRP MAE 比较。",
+    "baseline_priority": "P2",
+    "baseline_reason": "日序列+大量分解搜索变体不应挤占当前小时概率任务的主基线预算。",
+    "architecture_idea": "可用低频趋势分量作为附加因果特征。",
+    "architecture_risk": "SSA 全序列分解、日聚合与测试尖峰丢失会显著降低任务难度。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2227-9717/14/9/1372",
+        "location": "原站入口",
+        "support": "直接读取受限"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/404168633_A_Novel_Hybrid_Approach_for_Non-Stationary_Electricity_Price_Forecasting",
+        "location": "出版社版全文 Dataset / Table 2",
+        "support": "日频、日期、50 次结果"
+      },
+      {
+        "url": "https://github.com/Prediction-code/SSA-GWO-ELM",
+        "location": "作者仓库",
+        "support": "复现脚本和数据"
+      }
+    ],
+    "notes": "2026-04-24；期号 14(9) 不能误读为 9 月。原数据来自 Kaggle daily demand 系列。"
+  },
+  {
+    "id": "J31",
+    "title_verified": "Short-term Electricity Price Forecasting with Constrained Regressors",
+    "evidence_status": "全文",
+    "market_verified": "CAISO NP15（2024 报告前版）；2026 摘要同为 CAISO",
+    "task_verified": "测试期价格历史不可用的受限回归变量 24h 预测；SEED-Forecaster",
+    "data_period": "前版约三年，具体年份未给；2026 版未核",
+    "test_period": "前版约 293 天；训练约 700 天、验证 100 天",
+    "resolution": "小时（前版）",
+    "horizon": "24 小时；过去 48 小时其他变量输入（前版）",
+    "origin_protocol": "前版每天 08:00 发布；测试阶段不使用测试电价滞后；因果 1-NN 检索",
+    "target_transform": "前版 r 次根 + z-score，并明确在变换尺度报告；§5.3 称全序列计算标准化统计量",
+    "metrics_definition": "前版 MAE/RMSE 为变换尺度；2026 终版公式/结果未独立取得",
+    "reported_results": "仅前版 Table 2：SEED MAE 0.78、RMSE 1.41；DLinear 1.41 / 2.50；MLP 2.36 / 4.24。不是 $/MWh，且不能当作已核 2026 终版成绩。",
+    "paper_baselines": "前版 DLinear、MLP；2026 终版完整表未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "测试期禁用价格历史且用变换尺度评分，与本地可用历史价格、原价概率任务不同。",
+    "baseline_priority": "P1",
+    "baseline_reason": "因果近邻 + DLinear 融合与检索分支最相关，适合作为机制对照；先获取 2026 版并修正缩放边界。",
+    "architecture_idea": "当前外生序列与因果 1-NN 历史序列分别编码后 MLP 融合，作为复杂 retrieval 的简单基线。",
+    "architecture_risk": "r 次根需要负价定义；全序列归一化应改为 train-only；不能把前版误当2026唯一首发。",
+    "sources": [
+      {
+        "url": "https://scholarworks.utrgv.edu/cs_fac/222/",
+        "location": "机构存档 / 2026 abstract",
+        "support": "2026 GreenTech 版本 DOI 10.1109/GreenTech68285.2026.11471580"
+      },
+      {
+        "url": "https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_98400.pdf",
+        "location": "INL/CON-24-77208-Revision-0，2024-04；§5.1–5.3 / Table 2",
+        "support": "早期全文、受限输入、变换尺度结果、标准化问题"
+      }
+    ],
+    "notes": "全文证据仅针对明确标注 2024-04 的前版；2026 会议版只有摘要。标题同但作者与版本不同，不能自动合并结果。"
+  },
+  {
+    "id": "J32",
+    "title_verified": "Day-Ahead Electricity Price Forecasting Using Gradient Boosting Models Decision Tree Models: A Case Study of the Croatian Market",
+    "evidence_status": "全文",
+    "market_verified": "克罗地亚",
+    "task_verified": "LightGBM/XGBoost 日前点预测",
+    "data_period": "2022–2024",
+    "test_period": "2024",
+    "resolution": "小时",
+    "horizon": "日前；作者版设定需补核确切起点",
+    "origin_protocol": "未核实",
+    "target_transform": "未来负荷/发电输入可用性需核",
+    "metrics_definition": "MAE/RMSE 等，完整结果值未核",
+    "reported_results": "作者版 Table 2，2024 测试：XGBoost MAE 24.62、RMSE 41.84、R² 0.59；LightGBM MAE 25.20、RMSE 41.42、R² 0.60。XGB 的 MAE 较低，LightGBM 的 RMSE 较低，不能统称一个模型全面胜出。",
+    "paper_baselines": "LightGBM、XGBoost；其余未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "两类树模型已有相同家族；可借鉴日前输入表，不必重复列不同论文作为多个算法。",
+    "architecture_idea": "树模型外生驱动预测作为复杂网络的低成本对照。",
+    "architecture_risk": "作者稿 DOI/年份模板占位不能当正式 DOI；未来实际外生变量与预报值需区分。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2673-4591/155/1/8",
+        "location": "MDPI 会议论文入口",
+        "support": "原站限流"
+      },
+      {
+        "url": "https://flexsys.fesb.unist.hr/assets/files/Jakus_FINAL.pdf",
+        "location": "作者稿，2026-01-30，Table 2 / Results",
+        "support": "克罗地亚、2022–2024 数据、2024 测试及两模型 MAE/RMSE/R²"
+      }
+    ],
+    "notes": "作者版正文与 Table 2 已取得；页眉包含占位 DOI 10.3390/1010000，不采用该占位标识。正式刊版与作者稿版本一致性待核。"
+  },
+  {
+    "id": "J33",
+    "title_verified": "Day-Ahead Electricity Price Forecasting via Multi-Granularity Feature Alignment and Large Language Models",
+    "evidence_status": "元数据",
+    "market_verified": "未核",
+    "task_verified": "标题指日前预测与多粒度对齐/大语言模型；机制和数据未核",
+    "data_period": "未核实",
+    "test_period": "未核实",
+    "resolution": "未核实",
+    "horizon": "未核实",
+    "origin_protocol": "未核实",
+    "target_transform": "未核实；不可默认原价格尺度",
+    "metrics_definition": "未核实",
+    "reported_results": "未获得可核全文/摘要结果，不根据标题推测性能。",
+    "paper_baselines": "未核",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "信息不足",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P2",
+    "baseline_reason": "先取得全文、数据和代码；不能仅因使用 LLM 就作为必需强基线。",
+    "architecture_idea": "多粒度历史与外生变量对齐值得研究；具体 LLM 接口尚无证据。",
+    "architecture_risk": "参数预算、预训练信息和推理成本必须控制；当前证据不足以建议直接替换 Anchor。",
+    "sources": [
+      {
+        "url": "https://ieeexplore.ieee.org/document/11572089/",
+        "location": "IEEE 文献号及可检索标题",
+        "support": "标题/2026 文献元数据；正文访问未成功"
+      }
+    ],
+    "notes": "本轮只核对标题与 IEEE 条目；市场、年份窗口、结果和模型细节全部保留未核。"
+  },
+  {
+    "id": "J34",
+    "title_verified": "Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting",
+    "evidence_status": "全文",
+    "market_verified": "德国 EPEX/SMARD 日前价格",
+    "task_verified": "点预测 + 18 种统计/深度概率模型与不确定性校准",
+    "data_period": "2018-10-12 至 2024-11-30",
+    "test_period": "2023-12-01 至 2024-11-30；验证前一年",
+    "resolution": "小时",
+    "horizon": "24 小时，每日一次",
+    "origin_protocol": "LEAR 56/84/1092/1461 天滚动窗；逐小时 CP 用成熟残差；神经网络多种子",
+    "target_transform": "标准化、缺失日处理和 DST 插值；需在复现时固定训练统计量与测试日期",
+    "metrics_definition": "MAE/RMSE、MAACE；文中 CRPS 实现为 99 分位平均 pinball，并明确省略理论系数 2；不是本地 5 分位 QS=2×平均 pinball",
+    "reported_results": "正式 2026 版 §IV-E / Table I：XGBoost MAE 12.020 €/MWh，RMSE 20.534；CRPS：XGB-GARCH 4.492、XGB-CP 4.493、XGB-QRA 4.503；XGB-CP MAACE 1.090，LEAR-CP 1.305。不能与早期预印本 LEAR CRPS 4.662 混用。",
+    "paper_baselines": "LEAR、XGBoost、浅/深神经网络；QRA、CP、GARCH、分布式/证据式及集成不确定性方案",
+    "code_url": "https://github.com/lebeand/uq-epf",
+    "reproduction_feasibility": "较高：作者公开代码及 SMARD 数据处理；需锁定正式版提交并统一分位点/系数/划分",
+    "comparability": "异市场需统一复现",
+    "comparability_reason": "尚无同市场、同时间窗、同预测起点、同评价尺度的证据，不能直接排名。",
+    "baseline_priority": "P0",
+    "baseline_reason": "最优先新增 XGBoost-CP、LEAR-QRA/CP；直接检验复杂模型是否超过强点模型加校准。",
+    "architecture_idea": "将位置预测与不确定性校准拆开；对既有中位数/残差做逐 horizon、严格时序的校准层对照。",
+    "architecture_risk": "不同分位网格和省略系数会制造假排名；仅把 CRPS 乘 2 仍不能与 5 分位 QS 或不同市场比较。",
+    "sources": [
+      {
+        "url": "https://ieeexplore.ieee.org/document/11430173/",
+        "location": "正式论文标识",
+        "support": "DOI 10.1109/ACCESS.2026.3672716"
+      },
+      {
+        "url": "https://www.researchgate.net/publication/402014541_Analyzing_Uncertainty_Quantification_in_Statistical_and_Deep_Learning_Models_for_Probabilistic_Electricity_Price_Forecasting",
+        "location": "正式出版社版全文 §IV-D / §IV-E / Table I",
+        "support": "正式版指标定义、系数省略及结果"
+      },
+      {
+        "url": "https://arxiv.org/abs/2509.19417",
+        "location": "版本历史",
+        "support": "2025-09 首版，不与 2026 正式结果混用"
+      },
+      {
+        "url": "https://github.com/lebeand/uq-epf",
+        "location": "README / src / notebooks",
+        "support": "作者实现"
+      }
+    ],
+    "notes": "正式在线 2026-03-11，当前版日期 2026-04-08；初版 arXiv 2025-09-23、v3 2025-10-08。日期/结果按版本分列。"
+  },
+  {
+    "id": "J35",
+    "title_verified": "Predicting Negative Day-Ahead Electricity Prices Across 12 European Bidding Zones: A Gate-Closure-Audited Explainable Machine Learning Framework",
+    "evidence_status": "全文",
+    "market_verified": "欧洲 12 竞价区：AT、BE、CH、CZ、DE-LU、DK1、DK2、FR、HR、IE-SEM、SI、SK",
+    "task_verified": "日前负电价 P<0 事件分类，含 gate-closure 审计",
+    "data_period": "2019–2025；IE-SEM 主面板主要 2019–2020",
+    "test_period": "2024 测试；2025 外部验证",
+    "resolution": "小时；2025-10 起 15 分钟转小时均值，另定义 any/all-negative",
+    "horizon": "日前分类",
+    "origin_protocol": "训练 2019–2022；2023 Q1 模型选择、Q2 isotonic 校准、H2 阈值；固定后测试",
+    "target_transform": "P<0 二分类；不同时间聚合的负价标签不同",
+    "metrics_definition": "PR-AUC、Brier skill、校准与分类 F1；不是价格 MAE/RMSE/QS",
+    "reported_results": "正文样本说明：736,416 个样本、13,194 个负价=1.792%；未独立核验完整测试指标矩阵，样本负价率不是模型准确率。",
+    "paper_baselines": "正则 Logistic Regression、Histogram Gradient Boosting、XGBoost；固定交互项 Logistic 对照",
+    "code_url": "",
+    "reproduction_feasibility": "需要全文、数据划分及实现细节后判断",
+    "comparability": "不同任务",
+    "comparability_reason": "预测负价发生，而非连续价格/分位数；类别不平衡的 accuracy 不能用作价格预测排名。",
+    "baseline_priority": "不作为主基线",
+    "baseline_reason": "作为特征可用性审计和辅助负价分类参考，不列连续价格主排名。",
+    "architecture_idea": "单独训练负价门控并做校准；使用可追溯发布时间的信息集设计。",
+    "architecture_risk": "部分新能源预报在闭市后发布；actual exchanges 属事后信息。归档 vintage 缺失时不能声称完全运行级验证。",
+    "sources": [
+      {
+        "url": "https://www.mdpi.com/2076-3417/16/18/9063",
+        "location": "原站检索可读正文 Data / Gate-closure audit / Experimental protocol",
+        "support": "市场、划分、标签与可用性审计"
+      },
+      {
+        "url": "https://www.mdpi.com/2076-3417/16/18/9063/notes",
+        "location": "版本与发表记录",
+        "support": "2026-09-11 发布，2026-09-12 更新"
+      }
+    ],
+    "notes": "原站正文通过搜索分段读取；完整结果表未取得。输入可用性审计是最可迁移的价值。"
+  }
+]
