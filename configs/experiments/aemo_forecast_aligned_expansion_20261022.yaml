@@ -1,6 +1,4 @@
-# 2026-10-22 第一批公平基线扩展矩阵（5 模型 × 3 地区 × 3 seed = 45 格）
-# Shared sections are item-for-item identical to configs/experiments/aemo_forecast_aligned_20261012.yaml.
-# Runs through forecasting.aligned_expansion prepare/run with --extend-from the frozen 90-cell parent.
+# Model learning-rate declarations corrected to the effective training.learning_rate.
 data:
   timezone: Australia/Brisbane
   delivery_column: delivery_start_aest
@@ -215,8 +213,8 @@ experiment:
     gpu_max_initial_used_mib: 4096
   neural:
     learning_rates:
-      ddnn_jsu: 0.001
-      nhits_qra: 0.001
+      ddnn_jsu: 0.0003
+      nhits_qra: 0.0003
   baseline_parameters:
     lightgbm_cp: &id001
       calibration_formula: absolute_residual_type7_per_horizon

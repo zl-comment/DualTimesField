@@ -37,8 +37,6 @@ from ..common.frozen_base import _expansion_artifacts
 from ..common.native_trainer import block_tensors, train_native
 
 MIN_SCALE = 0.1     # softplus floor on sigma_w and lambda
-ARG_CLAMP = 12.0    # bounds pre-convergence sinh arguments; converged fits
-                    # (sigma_w ~ 1-4) never reach it at the five common levels
 
 
 class JohnsonSUHead(nn.Module):
@@ -115,14 +113,28 @@ def jsu_quantiles(mu: torch.Tensor, sigma: torch.Tensor, xi: torch.Tensor, lam: 
                   levels: torch.Tensor) -> torch.Tensor:
     """Analytic quantiles x_q = xi + lambda*sinh(mu + sigma*Phi^-1(q)); [N, H, Q].
 
-    Supports negative prices by construction. The sinh argument is clamped to
-    ±12 so pre-convergence parameter outliers stay finite and selectable;
-    converged fits (sigma_w ~ 1-4) never reach the clamp at q in {.05, .95}.
+    Compute the unbounded inverse CDF in float64, including Phi^-1. Returning
+    float64 avoids casting finite tails back into float32 overflow. No argument
+    or prediction clipping is permitted: selection and export must describe
+    the same Johnson SU distribution as the training likelihood. Invalid
+    parameters or unrepresentable results fail explicitly.
     """
+    if levels.ndim != 1 or not levels.numel():
+        raise ValueError('JSU levels must be a nonempty vector')
+    if not bool(torch.isfinite(levels).all() and ((levels > 0) & (levels < 1)).all()):
+        raise ValueError('JSU levels must be finite and strictly between zero and one')
+    if not all(bool(torch.isfinite(value).all()) for value in (mu, sigma, xi, lam)):
+        raise ValueError('JSU parameters must be finite')
+    if not bool((sigma > 0).all() and (lam > 0).all()):
+        raise ValueError('JSU sigma and lambda must be positive')
+    mu, sigma, xi, lam = (value.to(torch.float64) for value in (mu, sigma, xi, lam))
+    levels = levels.to(device=mu.device, dtype=torch.float64)
     z = torch.erfinv(2.0 * levels - 1.0) * math.sqrt(2.0)  # [Q] -> Phi^-1(q)
     argument = mu.unsqueeze(-1) + sigma.unsqueeze(-1) * z.view(*[1] * mu.dim(), -1)
-    argument = torch.clamp(argument, -ARG_CLAMP, ARG_CLAMP)
-    return xi.unsqueeze(-1) + lam.unsqueeze(-1) * torch.sinh(argument)  # [N, H, Q]
+    quantiles = xi.unsqueeze(-1) + lam.unsqueeze(-1) * torch.sinh(argument)
+    if not bool(torch.isfinite(quantiles).all()):
+        raise FloatingPointError('Unbounded JSU inverse CDF exceeded float64; refusing to clip predictions')
+    return quantiles  # [N, H, Q]
 
 
 class DDNNJSU(nn.Module):
@@ -159,19 +171,19 @@ def run_expansion(context: Any) -> BaselinePrediction:
     train, selection, test = context.splits["train"], context.splits["selection"], context.splits["test"]
     horizon = train.target.shape[1]
     train_tensors = block_tensors(train, device, include_target=True)
-    selection_tensors = block_tensors(selection, device, include_target=True)
+    selection_tensors = block_tensors(selection, device, include_target=False)
     input_dim = _flatten(train_tensors).shape[1]
     model = DDNNJSU(input_dim, horizon, params).to(device)
     mean, std = float(train.metadata["target_mean"]), float(train.metadata["target_std"])
-    levels = torch.tensor(QUANTILE_LEVELS, dtype=torch.float32, device=device)
+    levels = torch.tensor(QUANTILE_LEVELS, dtype=torch.float64, device=device)
 
     def compute_loss(batch: dict[str, torch.Tensor]) -> torch.Tensor:
-        gamma, delta, xi, lam = model(_flatten(batch))
-        return jsu_negative_log_likelihood(batch["target"], gamma, delta, xi, lam)
+        mu, sigma, xi, lam = model(_flatten(batch))
+        return jsu_negative_log_likelihood(batch["target"], mu, sigma, xi, lam)
 
     def predict_std_quantiles(tensors: dict[str, torch.Tensor]) -> torch.Tensor:
-        gamma, delta, xi, lam = model(_flatten(tensors))
-        return jsu_quantiles(gamma, delta, xi, lam, levels)
+        mu, sigma, xi, lam = model(_flatten(tensors))
+        return jsu_quantiles(mu, sigma, xi, lam, levels)
 
     def predict_raw(tensors: dict[str, torch.Tensor]) -> np.ndarray:
         return predict_std_quantiles(tensors).cpu().numpy().astype(np.float64) * std + mean
@@ -200,6 +212,8 @@ def run_expansion(context: Any) -> BaselinePrediction:
             "normal-transform: x_q=xi+lambda*sinh(mu_w+sigma_w*Phi^-1(q)); "
             "equivalent to gamma=-mu_w/sigma_w, delta=1/sigma_w",
         "native_training_objective": "exact_jsu_negative_log_likelihood",
+        "inverse_cdf": {"precision": "float64", "argument_clipping": False,
+                        "prediction_clipping": False, "nonfinite_policy": "raise"},
         "selection_metric": "raw_price_common_five_quantile_qs5",
         "paper_selection_difference": "J34 selects by validation NLL and tunes hyperparameters; "
                                       "this adaptation selects by the public raw-price QS with fixed parameters",

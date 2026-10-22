@@ -86,7 +86,7 @@ def test_jsu_median_and_affine_equivariance_and_negative_support():
     levels = torch.tensor([0.05, 0.5, 0.95])
     q = jsu_quantiles(mu, sigma, xi, lam, levels)
     assert q.shape == (1, 1, 3)
-    expected_median = xi + lam * torch.sinh(mu)  # Phi^-1(0.5) = 0
+    expected_median = xi.double() + lam.double() * torch.sinh(mu.double())  # Phi^-1(0.5) = 0
     assert torch.allclose(q[0, 0, 1], expected_median[0, 0])
     # Affine equivariance: raw = std * standardized + mean must commute exactly.
     raw = 10.0 * q + 50.0
