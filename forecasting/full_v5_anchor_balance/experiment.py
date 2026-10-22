@@ -131,9 +131,9 @@ def save_checkpoint(path, model, variant, seed, selection):
     temporary.replace(path)
 
 
-def restore_checkpoint(path):
+def restore_checkpoint(path, model_builder=build_model):
     saved = torch.load(path, map_location='cpu', weights_only=True)
-    model = build_model(saved['variant'], saved['seed'])
+    model = model_builder(saved['variant'], saved['seed'])
     model.load_state_dict(saved['state_dict'])
     return model, saved['selection']
 
@@ -226,7 +226,7 @@ def evaluation_groups(origins, baseline):
     return groups
 
 
-def evaluate(store, rows, variant, cfg, output):
+def evaluate(store, rows, variant, cfg, output, model_builder=build_model):
     ids = rows['evaluation']
     origins, actual, baseline = store.origins[ids], store.a['actual'][ids], store.a['baseline'][ids]
     groups = evaluation_groups(origins, baseline)
@@ -236,7 +236,9 @@ def evaluate(store, rows, variant, cfg, output):
               'B': {g: dict(**counts[g], **score(actual[m], baseline[m]))
                     for g, m in groups.items() if m.any()}}
     for mode in ('raw', 'guarded'):
-        model, selection = restore_checkpoint(output / f'{mode}.pt')
+        checkpoint = output / f'{mode}.pt'
+        model, selection = (restore_checkpoint(checkpoint) if model_builder is build_model else
+                            restore_checkpoint(checkpoint, model_builder=model_builder))
         raw = predict(model, store, ids, cfg['batch_size'])
         chosen = {k: blend(baseline, q, selection['alpha']) for k, q in raw.items()}
         result[mode] = dict(selection=selection,

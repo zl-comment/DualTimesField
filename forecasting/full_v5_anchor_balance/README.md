@@ -39,3 +39,21 @@ The completed first screen is archived in
 and [the interpretation](../../logs/forecasting/v5_anchor_balance_20261022/interpretation.md).
 It improved on guarded legacy training in both years, but did not pass all
 preregistered checks. The original forecasting pipeline remains the default.
+
+The subsequent [architecture protocol](../../docs/v5_anchor_architecture_20261022.md)
+compares balanced and identity controls with location-only calibration, separate
+location/scale heads, staged training, and a wider calibration head. All six
+use six epochs (staged: three Anchor + three history) and the same screen
+sampling. Unlike the first screen, identity also uses the balanced objective.
+
+```bash
+.venv/bin/python -m forecasting.full_v5_anchor_balance.architecture_experiment \
+  --development --workers 3 --seed 2026 --tree-seed 2026 \
+  --output outputs/forecasting/v5_anchor_architecture_screen_20261022_r1
+```
+
+Three region workers train independently; evaluation waits for all 36 fits.
+The staged history phase verifies that both the shared encoder and calibration
+head, and the Anchor predictions on a fixed probe, remain exactly unchanged.
+Summarize a completed run with
+`logs/forecasting/v5_anchor_architecture_20261022/summarize_run.py RUN_DIRECTORY`.
