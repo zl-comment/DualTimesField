@@ -1,0 +1,74 @@
+{
+  "reviewed_commit": "b364c89",
+  "reviewed_branch": "research/fair-baseline-expansion-20261022",
+  "related_tests_passed": 124,
+  "completed_cells": 153,
+  "expected_cells": 153,
+  "independent_rescore_exact_match": true,
+  "cross_run_alignment_validation": "passed_all_153_artifacts",
+  "new_model_count": 5,
+  "source_runs": {
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012": {
+      "run_id": "aligned_baselines_20261012",
+      "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+      "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86",
+      "cache_hashes": {
+        "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+        "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+        "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+      },
+      "models": [
+        "full",
+        "xgboost",
+        "lightgbm",
+        "linear",
+        "dlinear",
+        "patchtst",
+        "gatets_adapter",
+        "mlp",
+        "no_fields",
+        "lasso_arx72_cp"
+      ],
+      "jobs_hash": "4baaaa3122eeafd268c083671d77b3befd8dfe6754a56ae21198ca116ce779a1",
+      "scope": "aligned_full_data_fixed_configuration_not_hpo_not_blind"
+    },
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension": {
+      "run_id": "aligned_baselines_20261013_extension",
+      "source_hash": "aa8ad471145bb525b7ec6b0044ff1386510f507e1aa72f35129ba79ce647be46",
+      "config_hash": "b3ae7006d8c50f992d7b3cdafb3b87952575d45ce30b7c2dc02844502267bdab",
+      "cache_hashes": {
+        "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+        "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+        "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+      },
+      "models": [
+        "timexer",
+        "pricefm"
+      ],
+      "jobs_hash": "874d2d37a7e8db9c25fc6406246e8306a5c4217ca2e898b7d1b6a6ca5d58d84c",
+      "scope": "aligned_full_data_fixed_configuration_not_hpo_not_blind"
+    },
+    "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1": {
+      "run_id": "aligned_expansion_20261022_r1",
+      "source_hash": "a97871e2007bbdfcf4eb143c47e29b041876db80de3386b37bce63bde215e481",
+      "config_hash": "e4f137ff6861e7e712389834e88db814d888704831e72376614e99b6c1e61819",
+      "cache_hashes": {
+        "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+        "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+        "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+      },
+      "models": [
+        "lightgbm_cp",
+        "lightgbm_qra",
+        "xgboost_cp",
+        "ddnn_jsu",
+        "nhits_qra"
+      ],
+      "jobs_hash": "018389cbe45273dc328c9c2c8d0b9579750df10efe647abca6622fc4fbe5678a",
+      "scope": "registered_expansion_fixed_configuration_not_hpo_not_blind"
+    }
+  },
+  "blocking_issue": "DDNN-JSU clips inverse-CDF sinh arguments; finite uncapped formal predictions materially change QS",
+  "scientific_interpretation": "QRA and Anchor degradation is a shared observation, not yet evidence of identical causal mechanisms",
+  "integration_status": "not_merged_pending_DDNN_correction_and_revalidation"
+}
