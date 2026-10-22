@@ -40,7 +40,7 @@
 
 ```bash
 .venv/bin/python -m forecasting.full_v5_anchor_balance.aligned_final \
-  --output outputs/forecasting/v5_latest_aligned_20261023_r1 \
+  --output outputs/forecasting/v5_latest_aligned_20261023_r2 \
   --devices cuda:3 cuda:6 cuda:7
 ```
 

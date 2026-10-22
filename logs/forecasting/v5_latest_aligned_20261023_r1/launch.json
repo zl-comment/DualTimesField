@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-23T00:18:52.600704+08:00",
+  "pid": 754216,
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-u",
+    "-m",
+    "forecasting.full_v5_anchor_balance.aligned_final",
+    "--output",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r1",
+    "--devices",
+    "cuda:3",
+    "cuda:6",
+    "cuda:7"
+  ],
+  "commit": "c51d23db8a90a7f7558f0785ca2ee6ec76b19808",
+  "output": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r1",
+  "log": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r1.runner.log",
+  "expected_fits": 9,
+  "epochs_per_fit": 20,
+  "neural_seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "tree_seed": 2026,
+  "state": "launched",
+  "targeted_tests_passed": 43
+}

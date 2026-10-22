@@ -82,9 +82,9 @@ def verify_manifest(manifest):
 
 
 def prepare(output, cfg, bundles, resume):
-    path = output / 'manifest.json'
+    manifest_path = output / 'manifest.json'
     if resume:
-        manifest = json.loads(path.read_text())
+        manifest = json.loads(manifest_path.read_text())
         if (manifest['config'] != cfg or manifest['bundle_root'] != str(bundles)
                 or c.fingerprint({k: v for k, v in manifest.items() if k != 'run_id'}) != manifest['run_id']):
             raise ValueError('Resume identity changed')
@@ -107,15 +107,15 @@ def prepare(output, cfg, bundles, resume):
         store, paths = c.base.load_store(bundles, region, cfg['tree_seed'])
         rows = training_rows(store.origins, cfg)
         manifest['samples'][region] = {role: c.base.sample_manifest(store.origins, ids) for role, ids in rows.items()}
-        for path in paths:
-            meta = json.loads(path.with_suffix('.json').read_text())
-            evidence = [path, path.with_suffix('.json'), path.parent / 'config.json']
-            evidence += [path.parent / name for name in meta['model_files']]
+        for bundle_path in paths:
+            meta = json.loads(bundle_path.with_suffix('.json').read_text())
+            evidence = [bundle_path, bundle_path.with_suffix('.json'), bundle_path.parent / 'config.json']
+            evidence += [bundle_path.parent / name for name in meta['model_files']]
             manifest['inputs_sha256'].update({str(p.resolve()): c.base.digest(p) for p in evidence})
         cache_manifest = PARENT / 'data_cache' / region / 'hashes.json'
         manifest['inputs_sha256'][str(cache_manifest.resolve())] = c.base.digest(cache_manifest)
     manifest['run_id'] = c.fingerprint(manifest)
-    atomic_json(path, manifest)
+    atomic_json(manifest_path, manifest)
     return manifest
 
 

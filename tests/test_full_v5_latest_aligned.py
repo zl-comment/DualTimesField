@@ -92,3 +92,39 @@ def test_latest_run_lock_prevents_duplicate_writer(tmp_path):
         with pytest.raises(RuntimeError, match='active runner'):
             e.main(['--output', str(output), '--devices', 'cpu', 'cpu', 'cpu'])
     assert not output.exists()
+
+
+def test_prepare_writes_manifest_only_in_output_and_preserves_all_inputs(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    monkeypatch.chdir(tmp_path)
+    protocol = tmp_path / 'protocol.md'
+    protocol.write_text('frozen protocol')
+    monkeypatch.setattr(e, 'PROTOCOL', protocol)
+    parent = tmp_path / 'parent'
+    cache = parent / 'data_cache/NSW1/hashes.json'
+    cache.parent.mkdir(parents=True)
+    cache.write_text('{}')
+    monkeypatch.setattr(e, 'PARENT', parent)
+    source = tmp_path / 'forecasting/source.py'
+    source.parent.mkdir()
+    source.write_text('# frozen source')
+    bundle = tmp_path / 'bundles/NSW1/2022H2/bundle.npz'
+    bundle.parent.mkdir(parents=True)
+    bundle.write_bytes(b'fixture original binary bundle')
+    tree = bundle.parent / 'tree.txt'
+    tree.write_text('frozen tree')
+    config = bundle.parent / 'config.json'
+    config.write_text('{}')
+    bundle.with_suffix('.json').write_text(json.dumps(dict(model_files={'tree.txt': e.c.base.digest(tree)})))
+    protected = {p: p.read_bytes() for p in (bundle, bundle.with_suffix('.json'), tree, config, cache, source, protocol)}
+    store = SimpleNamespace(origins=np.array([timestamp('2018-01-01'), timestamp('2022-01-01')]))
+    monkeypatch.setattr(e.c.base, 'load_store', lambda *a: (store, [bundle]))
+    monkeypatch.setattr(e.subprocess, 'check_output', lambda *a, **k: 'fixture-commit\n')
+    cfg = e.configuration(['cpu'] * 3)
+    cfg['regions'] = ['NSW1']
+    output = tmp_path / 'new-run'
+    manifest = e.prepare(output, cfg, bundle.parent, False)
+    assert json.loads((output / 'manifest.json').read_text()) == manifest
+    assert all(path.read_bytes() == expected for path, expected in protected.items())
+    assert manifest['inputs_sha256'][str(bundle)] == e.c.base.digest(bundle)
+    assert e.prepare(output, cfg, bundle.parent, True) == manifest
