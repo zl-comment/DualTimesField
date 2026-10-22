@@ -3,7 +3,7 @@
 本轮以用户明确的边界为准：统一预测样本/标签、模型入口的数据及公共预处理、输出评分；模型内部变换、结构、融合方式和原生拟合策略由各模型自行决定。完成共同接口验收后建立核心基线的位置并筛查 Full 的互补价值；独立预测与集成增量是两条研究目标，最终结论允许是局部优势、预算内未改善或不支持领先。
 
 - 修订依据：分支 `diag/full-underperformance-zl`，起点 `af546fa3b1fd75852075460015810f745fd2fd74`；2026-10-12 在 `/root/workspace/Code/DualTimesField` 复核。
-- 状态：共同输入/评分代码及 LightGBM、Lasso-ARX72+CP、独立 MLP 已接入新路径，见 §8.6；全量固定配置 90 格已完成并整理结果，作为后续比较起点，见 §8.7。此前结果仅归档，不进入新主表。公平调参草案尚未执行，基础模型仍待接入。
+- 状态（2026-10-22）：原 90 格仍是冻结起点（§8.7）；后续 TimeXer/PriceFM 与五个新基线已完成，DDNN 已按未截断 JSU 修复复跑，当前静态比较为 17 模型、153 格。[主表入口](../logs/forecasting/main_comparison_20261022/README.md)另列含 Full_joint 的 22 行 seed 2026 比较。Anchor 四方案的 72 次开发确认已完成，但均未通过两个年份全部门槛，未替换正式表中的 Full_joint。公平调参草案尚未执行，其他基础模型仍待接入。
 - 本计划由已查看的历史结果形成，属于事后研究计划；冻结只能约束后续选择，不能把 2023–2024 或已研究的 2025 变回盲测。
 - 数值配置见 [协议草案](../configs/fair_sota/protocol_v1.draft.yaml)。草案目前没有执行器读取；文中实现项、预算和晋级阈值均不是已完成实验。
 - 历史参考：[冻结实验及限制](../logs/forecasting/exploration_20261011/README.md)、[原诊断报告](full_underperformance_diagnosis_zl.md)、[历次实验](../logs/forecasting/EXPERIMENT_RESULTS.md)。原诊断的本机缺文件、纯线性头等判断由本计划替代。

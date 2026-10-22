@@ -1,8 +1,10 @@
 # TimeXer / PriceFM 同协议扩展（2026-10-13）
 
+> 当前比较已更新至[2026-10-22 主表入口](../main_comparison_20261022/README.md)：含 Full_joint 的 seed 2026 表为 22 行，三 seed 静态基线为 17 模型、153 格，DDNN 使用未截断修复结果。本页的 17 行单种子表及 108 格基线档案保留为历史记录。
+
 本次新增两个模型、三个地区 NSW1/QLD1/TAS1、三个 seed 2026/2027/2028，共 18 格；与 `aligned_baselines_20261012` 原有 90 格联合后为 12 个模型、108 格。比较的是共同任务下的适配版本，不是原论文数据集上的分数复现，也不是完成超参搜索后的 SOTA 认证。
 
-## 最新比较：联合历史双场 V5，seed 2026（2026-10-20）
+## 历史比较：联合历史双场 V5，seed 2026（2026-10-20）
 
 本表统一使用原协议 **2023—2024 测试集**，每地区 17,521 个预测起点、未来 24 小时，原始价格空间、排序后 q50 的 MAE，以及共同五分位 QS。原有 12 个基线仅取 seed 2026 重新评分，加入本轮 5 个输出，共 17 行、51 个地区结果。下方原三 seed 档案保持不变，不能将本表与三 seed 均值混排。
 
@@ -32,7 +34,7 @@
 
 本轮 LightGBM 的宏 MAE 37.089001，Full_joint 为 37.655966（高 1.53%，NSW1/QLD1 变差，TAS1 改善）。历史分支相对 Anchor_joint 降低宏 MAE 0.083700，但尚未抵消联合校正相对基础树的损失，不能宣称完整方法优于 LightGBM。
 
-- [最新 seed 2026 主表](results/main_seed2026.csv) · [51 行分地区表](results/regional_seed2026.csv)
+- [历史 seed 2026 主表](results/main_seed2026.csv) · [51 行分地区表](results/regional_seed2026.csv)
 - [完整最终测试报告](../v5_joint_history_20261020_final_seed2026_r1/report.md) · [原始汇总指标](../v5_joint_history_20261020_final_seed2026_r1/summary.json)
 - [冻结检查点及源码哈希](../v5_joint_history_20261020_final_seed2026_r1/freeze.json) · [归档来源与哈希](../v5_joint_history_20261020_final_seed2026_r1/archive_provenance.json)
 

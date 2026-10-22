@@ -1,0 +1,495 @@
+{
+  "seed": 2026,
+  "test_period": "2023-2024",
+  "output_rows": 22,
+  "regional_rows": 66,
+  "baseline_models": 17,
+  "joint_outputs": 5,
+  "rescored_artifacts": 66,
+  "same_samples_labels_preprocessing_and_scoring": true,
+  "identical_information_scope": false,
+  "historical_17_rows_exactly_unchanged": true,
+  "old_clipped_ddnn_excluded": true,
+  "anchor_development_results_excluded": true,
+  "new_training": false,
+  "baseline_source_audit": "passed_all_162_artifacts",
+  "metric_max_abs_difference": 0.0,
+  "input_sha256": {
+    "logs/forecasting/ddnn_jsu_unclipped_20261022_r1/combined_report.json": "d126c4910e7fa4b667e77b91a84d43213cb22c89e24b79cc8b2243f54a90345e",
+    "logs/forecasting/ddnn_jsu_unclipped_20261022_r1/combined_report_tables/per_seed.csv": "72b210c863441c11226a326948cbe0d618d0e62c8a1174e6c736c6b6b3b94a81",
+    "logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/summary.json": "ba4cd1b875c85173b3161813759cb83c7ec9e0d452609bb160fe5a181e2d157b",
+    "logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/freeze.json": "7b3671d14098395d49e36298cbf50867b26ae9b1c34ed8c86f58a72493595958",
+    "logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/archive_provenance.json": "2fe22f2f18fda363980228ad51dca858c1e62b0231d4101c192b813f02ff704c",
+    "logs/forecasting/aligned_baselines_20261013_extension/results/main_seed2026.csv": "82e95b4b0c5b4bd65d0dd078ef8d68abbaae290f7518f71bcab5a20975b4d431",
+    "logs/forecasting/aligned_baselines_20261013_extension/results/regional_seed2026.csv": "f098d905c451c1f49deb8d931d29c3252ad82ec43dd20b16104fd72b059e334c"
+  },
+  "generator_sha256": "f4c76816178a5d91de0f945826a27dfd290796a1d68db191143fb91cbfccacb3",
+  "artifacts": [
+    {
+      "model": "baseline_dlinear",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/dlinear/seed2026/NSW1/test.npz",
+      "sha256": "e60cba26f79370adf3205a57ed2c3899a79f6106ceaa909bb42f0f359a9c4635"
+    },
+    {
+      "model": "baseline_full",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/full/seed2026/NSW1/test.npz",
+      "sha256": "2a4518dcea0f5dfe1d25b1fd06c00933d2d930453442edf270a0c544a9aac3de"
+    },
+    {
+      "model": "baseline_gatets_adapter",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/gatets_adapter/seed2026/NSW1/test.npz",
+      "sha256": "d73e66392c285d3e1524665d4fcd95d4c17495cbf25463537346187484e9d05f"
+    },
+    {
+      "model": "baseline_lasso_arx72_cp",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lasso_arx72_cp/seed2026/NSW1/test.npz",
+      "sha256": "aff8247cfb2360ed93eedefe15168750e17f9910de2560f862c51d594e6e4f55"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/test.npz",
+      "sha256": "639568368494182adea5aea0dedf5f373840c7887ae3df5bb69786d8e951dcdc"
+    },
+    {
+      "model": "baseline_linear",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/linear/seed2026/NSW1/test.npz",
+      "sha256": "1b75ec6e0b6c37a24adb5803c2f1a73ea37c05ddeaa12177d05bfac5b538fc69"
+    },
+    {
+      "model": "baseline_mlp",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/mlp/seed2026/NSW1/test.npz",
+      "sha256": "c5b577dc3e1a5d6b77927852682de1acc0547eca12cfb980e3914dfb28ca206b"
+    },
+    {
+      "model": "baseline_no_fields",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/no_fields/seed2026/NSW1/test.npz",
+      "sha256": "f076e377a7c61ff930a2abb00c112901aa05a40ed91b105aa53f1c1d0adb50a5"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/NSW1/test.npz",
+      "sha256": "b30d454818ffec01bc1bd5dbfa1f72a265d3e85df00bb19552c2009c234862a3"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/NSW1/test.npz",
+      "sha256": "c1315075dff6993724c91d5e5ed428abe215bf508fad3cd19cc1bcdc5fb8fa9a"
+    },
+    {
+      "model": "baseline_pricefm",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/pricefm/seed2026/NSW1/test.npz",
+      "sha256": "a58cc4b5bdd7725de63a88f4b11ac3dcae05f8b28eddf7f022e1a4b896b45ceb"
+    },
+    {
+      "model": "baseline_timexer",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/timexer/seed2026/NSW1/test.npz",
+      "sha256": "8dfb4187bf14faa2582f44b2278d12e1cbe1ea65bfb3b28fb32be392e21526a1"
+    },
+    {
+      "model": "baseline_lightgbm_cp",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_cp/seed2026/NSW1/test.npz",
+      "sha256": "1c4a42e1d1fcf249665a01c83e92a0279c0324f9107636a1f217ff2e8c5f102e"
+    },
+    {
+      "model": "baseline_lightgbm_qra",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_qra/seed2026/NSW1/test.npz",
+      "sha256": "11a1fefe13befaca0d64fa86741bebe68c1615a5244c691ed62365c09e951720"
+    },
+    {
+      "model": "baseline_nhits_qra",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/nhits_qra/seed2026/NSW1/test.npz",
+      "sha256": "4786c305206857799365c1be2fc257de0b2147d354d1f8e6dd1710adee1a7c83"
+    },
+    {
+      "model": "baseline_xgboost_cp",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/xgboost_cp/seed2026/NSW1/test.npz",
+      "sha256": "a50a9756571bb926170dc1ef0870763e3cd1b846d0863c23feae11b3893556f8"
+    },
+    {
+      "model": "baseline_ddnn_jsu",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/ddnn_jsu_unclipped_20261022_r1/runs/ddnn_jsu/seed2026/NSW1/test.npz",
+      "sha256": "21139edd636cf4ac8d22f247f0df943dc0c6492ea6eb06c1f62735caf994298e"
+    },
+    {
+      "model": "B_retrained",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/NSW1/B_retrained.npz",
+      "sha256": "c8ee90df8b32e07e07a629170c0772bf3870cf14f549218cd13feb7483cb5862"
+    },
+    {
+      "model": "Full_joint",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/NSW1/Full_joint.npz",
+      "sha256": "2343b3ef421dc6c497c3a2378b8f3a1f16c28fa808214d7fe123d1b89c992909"
+    },
+    {
+      "model": "Anchor_joint",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/NSW1/Anchor_joint.npz",
+      "sha256": "fe676fd4f1c4fcecbfe68c942d2ec1653594122ca53fc35bcc9fb16fa7ec29a8"
+    },
+    {
+      "model": "event_off_same_head",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/NSW1/event_off_same_head.npz",
+      "sha256": "0b773c404b299840f407f70876083d15d41033d3e3630ac85dbd05ad15dd3a85"
+    },
+    {
+      "model": "time_shift_off_same_head",
+      "region": "NSW1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/NSW1/time_shift_off_same_head.npz",
+      "sha256": "99af419e270381d215d76c6f2f59d8ea1d926ffe58e0ff49628b4a0168d8c31a"
+    },
+    {
+      "model": "baseline_dlinear",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/dlinear/seed2026/QLD1/test.npz",
+      "sha256": "af33298eabf8bbb33708172d8318a8cfbe88e6b4af27aea4209a87694310e8e7"
+    },
+    {
+      "model": "baseline_full",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/full/seed2026/QLD1/test.npz",
+      "sha256": "5ff028e15cfa6ee150d0d1a6f81d931b6a56328be637a4873f7df3f8db433537"
+    },
+    {
+      "model": "baseline_gatets_adapter",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/gatets_adapter/seed2026/QLD1/test.npz",
+      "sha256": "1ce00de1d41118b288c6b56c967aa547c84cfe3e627b3759e91ebd5164354616"
+    },
+    {
+      "model": "baseline_lasso_arx72_cp",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lasso_arx72_cp/seed2026/QLD1/test.npz",
+      "sha256": "77478b5d7d78a144490cdfbcd790efe5805e3c6527f3434ff754185aff1247d7"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/test.npz",
+      "sha256": "e0122a237e10fc9df00665d236cadb850b08f582e6527f9c1d38554eb4c7ee7c"
+    },
+    {
+      "model": "baseline_linear",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/linear/seed2026/QLD1/test.npz",
+      "sha256": "7504e5bb609fbb213528232503cc83d0c4b07a61086585462bfda53e8ff55526"
+    },
+    {
+      "model": "baseline_mlp",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/mlp/seed2026/QLD1/test.npz",
+      "sha256": "fbdef9a63f3b4d32bb8a3a0ee44c9e7224c3ac67ee28a098a175052bcc79ad4d"
+    },
+    {
+      "model": "baseline_no_fields",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/no_fields/seed2026/QLD1/test.npz",
+      "sha256": "5082c98eb47cfec708ab4f892fcb21fc4cc6ff03591e896c1aa7713848b31e28"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/QLD1/test.npz",
+      "sha256": "e51e1ef8fec6a33f3a5c3800425b959cde6286a63395412f4bc6fccee2618790"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/QLD1/test.npz",
+      "sha256": "0509c95c2ac1a4b5bba3301fdc3a5f7aa58f62b7efce65f0a20912a45093d132"
+    },
+    {
+      "model": "baseline_pricefm",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/pricefm/seed2026/QLD1/test.npz",
+      "sha256": "37261926005655ea97a9af9aa4aef6036644747a474b3ffb70c628ff0cb12fce"
+    },
+    {
+      "model": "baseline_timexer",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/timexer/seed2026/QLD1/test.npz",
+      "sha256": "ea06a12b536f1b81b38123f440c7b558dff845d12efb6466639b9d06b2398474"
+    },
+    {
+      "model": "baseline_lightgbm_cp",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_cp/seed2026/QLD1/test.npz",
+      "sha256": "1419242b6712af9b3d85d8d1e329f20fbce0614575acf0755ee596e8debea8ea"
+    },
+    {
+      "model": "baseline_lightgbm_qra",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_qra/seed2026/QLD1/test.npz",
+      "sha256": "fb4793b8ff4e8d5f96b0daea078af53fb4c0b1b0f302fc58afc70290abb27c1f"
+    },
+    {
+      "model": "baseline_nhits_qra",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/nhits_qra/seed2026/QLD1/test.npz",
+      "sha256": "3c0c8befdef05ee72761be343f46f9afc967d2abed0dc61cd8a87c4bf39efb16"
+    },
+    {
+      "model": "baseline_xgboost_cp",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/xgboost_cp/seed2026/QLD1/test.npz",
+      "sha256": "c9f467ced867b97877349de91e6bd9def0196fc08d8b15f65c5d9096f171453a"
+    },
+    {
+      "model": "baseline_ddnn_jsu",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/ddnn_jsu_unclipped_20261022_r1/runs/ddnn_jsu/seed2026/QLD1/test.npz",
+      "sha256": "972bef9193637123bf8b9f95c06687d1a18b04e651ef9136495d457acdb49999"
+    },
+    {
+      "model": "B_retrained",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/QLD1/B_retrained.npz",
+      "sha256": "d00c675a483f65e8c29c7d8819587175e23a1a90ae6732afbeeb34837765fa47"
+    },
+    {
+      "model": "Full_joint",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/QLD1/Full_joint.npz",
+      "sha256": "ebc31933f3cf9906222944d5f2d3b729b136f167a2f1579cdebd644efeca6d86"
+    },
+    {
+      "model": "Anchor_joint",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/QLD1/Anchor_joint.npz",
+      "sha256": "1db34977560a40660ca9ded39d67c466b98921eadda18333d7a0a52388e948a2"
+    },
+    {
+      "model": "event_off_same_head",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/QLD1/event_off_same_head.npz",
+      "sha256": "4416876b1b4de9541f8ca4f5e6ee32bb4f39a6be3659ab4e73fa8b18d6cb21c6"
+    },
+    {
+      "model": "time_shift_off_same_head",
+      "region": "QLD1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/QLD1/time_shift_off_same_head.npz",
+      "sha256": "7b0235601248c4117d02c6e422a195566c3ae056276caeae9b7506cf3946f735"
+    },
+    {
+      "model": "baseline_dlinear",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/dlinear/seed2026/TAS1/test.npz",
+      "sha256": "265e98acb4be6da441ddb0adbb555e84f8a448e30f414247d59ffcbef2404e44"
+    },
+    {
+      "model": "baseline_full",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/full/seed2026/TAS1/test.npz",
+      "sha256": "91069d644a8ddad40067ad4f80e59941aa6d009fd57d5107a3544810eb218edf"
+    },
+    {
+      "model": "baseline_gatets_adapter",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/gatets_adapter/seed2026/TAS1/test.npz",
+      "sha256": "9f20706bba6e4d1e67b378f85739eca95bce781dd74df619db1c15b31ef86f98"
+    },
+    {
+      "model": "baseline_lasso_arx72_cp",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lasso_arx72_cp/seed2026/TAS1/test.npz",
+      "sha256": "70ae278837e5970348d68eb6cda5f970c666a848b1971fbd2cc2732adcabd32f"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/TAS1/test.npz",
+      "sha256": "79c663eefb59edc9c908f97510ec86a92b0e731241b29f20b2e63a683b8792f5"
+    },
+    {
+      "model": "baseline_linear",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/linear/seed2026/TAS1/test.npz",
+      "sha256": "141dc30560960d8dbfc044e03953de1a2b0712e5e60a4ae030e84f6ae7145688"
+    },
+    {
+      "model": "baseline_mlp",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/mlp/seed2026/TAS1/test.npz",
+      "sha256": "04757a8bbf403b286d62be965bc9c606123110db72a9a8d41812e0d75f7ac337"
+    },
+    {
+      "model": "baseline_no_fields",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/no_fields/seed2026/TAS1/test.npz",
+      "sha256": "c165192ace06bba6c305a974e437f1dc1e138e1a1faa9dfcf1c49dbed3a5f6de"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/TAS1/test.npz",
+      "sha256": "9b1ddde1145a99216c12756297715fb868b6743962437a3bdfcf189eb7259bed"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/TAS1/test.npz",
+      "sha256": "63f5ed5a1cf62b0c1d5bb8569dff13efd4b43a81b17efc900e383b13b01d21b6"
+    },
+    {
+      "model": "baseline_pricefm",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/pricefm/seed2026/TAS1/test.npz",
+      "sha256": "0c72e31261003ac1c252b29ce7f18e1cc6ca602e9186211065d21c73f374630f"
+    },
+    {
+      "model": "baseline_timexer",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261013_extension/runs/timexer/seed2026/TAS1/test.npz",
+      "sha256": "e4f79c55f6786351bdc16b63fa5324480965a0fc7a281308bf6d31c7d71ca9dd"
+    },
+    {
+      "model": "baseline_lightgbm_cp",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_cp/seed2026/TAS1/test.npz",
+      "sha256": "a305980b2434b3372fd7f8d24753451e4eeb7898b6dda063b12cb063f25773db"
+    },
+    {
+      "model": "baseline_lightgbm_qra",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/lightgbm_qra/seed2026/TAS1/test.npz",
+      "sha256": "db844d0a658684f910bc108533bbb316800e5140a8545252df288a9efa8d0fd2"
+    },
+    {
+      "model": "baseline_nhits_qra",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/nhits_qra/seed2026/TAS1/test.npz",
+      "sha256": "9bb1fc4339050af7568502f8a9cd2b0dc1d8a779c9de3fcbf4750d33e707c27d"
+    },
+    {
+      "model": "baseline_xgboost_cp",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/aligned_expansion_20261022_r1/runs/xgboost_cp/seed2026/TAS1/test.npz",
+      "sha256": "7311687cefbc03fa34027baf73b0db030927ab6606b726c49511bc59d5307323"
+    },
+    {
+      "model": "baseline_ddnn_jsu",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField-fair-baselines/outputs/forecasting/ddnn_jsu_unclipped_20261022_r1/runs/ddnn_jsu/seed2026/TAS1/test.npz",
+      "sha256": "87af9ca4ae72a87f5f3eb495ccdb1bc1caf010614b63aa97f55daba785294404"
+    },
+    {
+      "model": "B_retrained",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/TAS1/B_retrained.npz",
+      "sha256": "7a74708977b4e10b520c9cabcc4b132fe1159b3ca01eb0db8ece5c3673166010"
+    },
+    {
+      "model": "Full_joint",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/TAS1/Full_joint.npz",
+      "sha256": "e415b3cd97efdb93275eebb136d0d998c6edd4a92b08a1c041e9655739c13950"
+    },
+    {
+      "model": "Anchor_joint",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/TAS1/Anchor_joint.npz",
+      "sha256": "e3170e6cbdf2c6fbab93911a327814472ee8b0e713d39defd04dc8cff7b203a5"
+    },
+    {
+      "model": "event_off_same_head",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/TAS1/event_off_same_head.npz",
+      "sha256": "a83f7404ce7f59335b69569d0bed15f712b6667ef9b4db3707deeb2149bb0b04"
+    },
+    {
+      "model": "time_shift_off_same_head",
+      "region": "TAS1",
+      "seed": 2026,
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/TAS1/time_shift_off_same_head.npz",
+      "sha256": "dddf030095928469871824996fb2694791cfe512de4230840d474bf3c38e0a4b"
+    }
+  ],
+  "output_sha256": {
+    "main_seed2026.csv": "2cd64630a601e86d56f437d380f5bcd21f97bcdec54204a494bd453daee2872c",
+    "regional_seed2026.csv": "2d6da48905e296ef88d4a02def00ba53d1bf93fd2e0b68aec3e204bd9bc20f7e"
+  }
+}
