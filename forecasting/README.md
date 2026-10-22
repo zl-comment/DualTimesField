@@ -2,12 +2,14 @@
 
 各模型实现、来源说明分别位于以下独立目录；配置位于对应的 `configs/<目录>/aligned.yaml`。
 
-当前结果见[主比较入口](../logs/forecasting/main_comparison_20261022/README.md)：三 seed 静态基线已完成 17 模型、153 格；含 Full_joint 的 seed 2026 比较单独列出 22 个输出。
+当前结果见[主比较入口](../logs/forecasting/main_comparison_20261023/README.md)：新版 Full_joint 已完成三神经种子同协议评估，当前主表为 21 个输出、189 格，包含 15 个静态基线和新版联合方法的 6 个输出。旧静态 Full/no_fields 的 18 格移入历史附表。原 17 模型、153 格静态基线档案保留不变。
+
+当前 Full_joint 使用[平衡损失与非对称 Anchor 尺度头](full_v5_anchor_balance/README.md)，通过 `forecasting.full_v5_anchor_balance.aligned_final` 训练/评估；下方 `full/` 为历史静态结构，不是当前完整方法。
 
 | 目录 | 实验模型 ID | 实现类型 |
 | --- | --- | --- |
-| [full/](full/README.md) | `full` | 本地实现 |
-| [no_fields/](no_fields/README.md) | `no_fields` | 本地实现 |
+| [full/](full/README.md) | `full` | 本地实现，历史结构对照 |
+| [no_fields/](no_fields/README.md) | `no_fields` | 本地实现，历史结构对照 |
 | [mlp/](mlp/README.md) | `mlp` | 本地实现 |
 | [linear/](linear/README.md) | `linear` | 本地实现 |
 | [dlinear/](dlinear/README.md) | `dlinear` | 本地实现（参考模型） |

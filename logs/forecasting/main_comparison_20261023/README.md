@@ -1,0 +1,45 @@
+# 当前主表：最新 Full_joint 与三个 seed 的基线（2026-10-23）
+
+所有当前输出均在 2023—2024 年、同三地区、同一测试起点与共同评分下汇总。每个 seed 分别评分，先做三地区等权宏平均，再报告三个 seed 的均值 ± 样本标准差；没有先平均预测。
+
+新版 Full_joint 为平衡损失＋非对称 Anchor 尺度头，主输出采用选择期冻结的 guarded checkpoint/alpha。Full_joint_raw 使用独立按选择期 QS 选定的 checkpoint；Anchor_joint/event_off/time_shift_off 是新版 guarded 同检查点关闭干预。全部替换此前只完成 seed 2026 的旧联合模型，版本号为 asymmetric_balance_20261023。
+
+**种子范围：**基线沿用原来的 2026/2027/2028；联合方法改变神经初始化和训练顺序，树固定 seed 2026。B_retrained 重复同一冻结树，不能视为三个独立随机训练。联合方法还使用因果成熟历史与误差，信息范围大于静态基线；这是回顾性比较，不是盲测或显著性认证。
+
+当前表共 21 个输出、189 格，包括 15 个静态基线以及新版的 6 个输出。旧静态 baseline_full、baseline_no_fields 的 18 格移入历史结构对照附表，不占当前主表行。连同该附表，共核验 23 个来源输出、207 格。最近四方案的 2021/2022 开发分数保留原档，不混入本表；选择最新结构不代表它已通过开发验收。
+
+| 输出 | 宏 MAE（均值 ± SD） | 宏 QS（均值 ± SD） | 地区平均 RMSE | 回退格/9 |
+|---|---:|---:|---:|---:|
+| baseline_lightgbm | 37.1014 ± 0.0147 | 24.1913 ± 0.0049 | 277.0644 | 0 |
+| baseline_lightgbm_cp | 37.1014 ± 0.0147 | 30.9729 ± 0.0205 | 277.0644 | 0 |
+| B_retrained | 37.1132 ± 0.0000 | 24.1812 ± 0.0000 | 277.0900 | 0 |
+| event_off_same_head | 37.7541 ± 0.4537 | 24.3977 ± 0.1964 | 275.9623 | 0 |
+| time_shift_off_same_head | 37.7768 ± 0.4185 | 24.3839 ± 0.1782 | 275.1735 | 0 |
+| Full_joint | 37.7828 ± 0.4389 | 24.3922 ± 0.1875 | 275.3973 | 0 |
+| Anchor_joint | 37.9078 ± 0.3528 | 24.4671 ± 0.1420 | 275.9668 | 0 |
+| Full_joint_raw | 37.9299 ± 0.4978 | 24.5265 ± 0.2617 | 275.4223 | 0 |
+| baseline_xgboost | 37.9302 ± 0.0741 | 25.6221 ± 0.0191 | 277.5939 | 0 |
+| baseline_xgboost_cp | 37.9302 ± 0.0741 | 31.3246 ± 0.1586 | 277.5939 | 0 |
+| baseline_lightgbm_qra | 41.5765 ± 0.1498 | 27.1606 ± 0.0258 | 269.4659 | 0 |
+| baseline_patchtst | 44.7637 ± 0.4562 | 27.4834 ± 0.3155 | 272.8338 | 0 |
+| baseline_gatets_adapter | 46.0963 ± 0.3261 | 27.8420 ± 0.1911 | 273.1000 | 0 |
+| baseline_timexer | 46.6241 ± 0.4701 | 30.0139 ± 0.4154 | 279.1178 | 0 |
+| baseline_linear | 46.8231 ± 0.3102 | 28.0897 ± 0.2692 | 272.4531 | 0 |
+| baseline_dlinear | 46.8976 ± 0.3968 | 28.0447 ± 0.1985 | 272.2094 | 0 |
+| baseline_mlp | 47.7055 ± 1.4845 | 28.8841 ± 0.7190 | 276.7383 | 0 |
+| baseline_pricefm | 51.1624 ± 0.1215 | 30.9386 ± 0.5489 | 278.1004 | 0 |
+| baseline_ddnn_jsu | 57.2755 ± 0.9506 | 140.8608 ± 90.7574 | 416.8118 | 0 |
+| baseline_lasso_arx72_cp | 59.0511 ± 0.0000 | 42.7023 ± 0.0000 | 288.0064 | 0 |
+| baseline_nhits_qra | 60.7455 ± 0.6074 | 36.4980 ± 0.2259 | 302.5933 | 0 |
+
+MAE 使用排序后的 q50；QS=2×公共五分位平均 pinball。RMSE 为地区各自 pooled RMSE 的算术平均。“回退”只适用于 guarded 联合输出，表示选择期 alpha=0，不能作为结构有效的证据。
+
+预算边界：raw 有 2/9、guarded 有 2/9 次选择落在最后两轮，本轮仍保留预定 20 轮预算，不能宣称已经收敛。
+
+- [21 行三 seed 主表](main.csv) · [63 行地区汇总](regional.csv)
+- [63 行各 seed 宏平均](macro_per_seed.csv) · [189 格原始评分](per_seed.csv)
+- [旧静态 Full/no_fields 历史对照](historical_controls.csv) · [历史对照的 18 格评分](historical_controls_per_seed.csv)
+- [来源、选择与重评分核验](verification.json) · [训练和冻结档案](../v5_latest_aligned_20261023_r2/README.md)
+- [上一版单 seed 比较（历史）](../main_comparison_20261022/README.md) · [四方案开发确认](../v5_anchor_confirmation_20261022/README.md)
+
+复算：`PYTHONPATH=. .venv/bin/python scripts/update_latest_main_comparison.py`。未完成九格训练/选择或任意预测来源/分数不一致时拒绝更新。

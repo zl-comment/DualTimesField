@@ -2,7 +2,7 @@
 
 电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
 
-最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261022/README.md) · [含 Full_joint 的 seed 2026 主表（22 行）](logs/forecasting/main_comparison_20261022/main_seed2026.csv) · [三 seed 公平基线表（17 模型、153 格）](logs/forecasting/ddnn_jsu_unclipped_20261022_r1/combined_report_tables/main.csv)。
+最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261023/README.md) · [三 seed 主表（新版 Full_joint，21 个输出）](logs/forecasting/main_comparison_20261023/main.csv) · [验证记录](logs/forecasting/main_comparison_20261023/VALIDATION.md)。联合方法的三个 seed 改变神经初始化与训练顺序，树 seed 固定 2026。
 
 **Rethinking Time Series as Continuous-Time Trends and Events**
 

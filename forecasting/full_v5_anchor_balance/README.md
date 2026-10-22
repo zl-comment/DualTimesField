@@ -1,9 +1,30 @@
-# Anchor balance development experiment
+# Anchor development and latest Full_joint
+
+The current Full_joint uses the balanced objective and the asymmetric location/
+lower-scale/upper-scale head from `confirmation_model.AsymmetricScaleModel`.
+Its three-neural-seed aligned evaluation entry point is `aligned_final`, with
+the [frozen training, selection and test protocol](../../docs/v5_latest_aligned_20261023.md).
+The tree seed stays 2026; neural seeds are 2026/2027/2028. Main results use the
+validation-selected guarded output, with independently selected raw output and
+same-checkpoint interventions reported separately. All nine fits freeze before
+the common 2023–2024 test cache can be opened.
+
+```bash
+.venv/bin/python -m forecasting.full_v5_anchor_balance.aligned_final \
+  --devices cuda:3 cuda:6 cuda:7 --output outputs/forecasting/NEW_RUN
+```
+
+The output must be new; use `--resume` only for that same frozen run. The four
+development candidates did not pass all predeclared gates; evaluating the newest
+structure does not establish a stable improvement.
+
+## Historical development experiments
 
 See [the design and preregistered interpretation](../../docs/v5_anchor_balance_20261022.md)
 and [the two-round ZCode discussion](../../logs/forecasting/v5_anchor_balance_20261022/discussion.md).
-This package reuses the original joint model and authenticated OOF bundles. It
-does not replace the original forecasting entry points or evaluate 2023–2024.
+The development entry points below reuse the original joint model and authenticated
+OOF bundles. They remain restricted to development years; only `aligned_final`
+implements the separate frozen 2023–2024 evaluation described above.
 
 From the repository root, run the complete screening comparison:
 
@@ -38,7 +59,8 @@ The completed first screen is archived in
 [the result summary](../../logs/forecasting/v5_anchor_balance_20261022/summary.md)
 and [the interpretation](../../logs/forecasting/v5_anchor_balance_20261022/interpretation.md).
 It improved on guarded legacy training in both years, but did not pass all
-preregistered checks. The original forecasting pipeline remains the default.
+preregistered checks. Those historical results are preserved separately from the
+current asymmetric Full_joint evaluation.
 
 The subsequent [architecture protocol](../../docs/v5_anchor_architecture_20261022.md)
 compares balanced and identity controls with location-only calibration, separate

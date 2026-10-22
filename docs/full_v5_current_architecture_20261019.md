@@ -1,4 +1,6 @@
-# 最新 TE_full：实际架构、数据流、训练与预测结果
+# 历史 TE_full（2026-10-19）：实际架构、数据流、训练与预测结果
+
+本文保留当时冻结版本。当前 Full_joint 已采用联合训练、平衡损失及非对称 Anchor 尺度头，入口与协议见[最新方法说明](../forecasting/full_v5_anchor_balance/README.md)和[三神经种子同协议评估](v5_latest_aligned_20261023.md)。下文的 C_roll/冻结历史双场属于历史结构，不代表当前方法。
 
 核对日期：2026-10-19。模型冻结提交：`a013fd9f1f4c1c85fec3665c640195ac74bf750f`。
 分支：`research/v5-conditional-event-transfer-20261017`。

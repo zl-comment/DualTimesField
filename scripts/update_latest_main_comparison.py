@@ -107,6 +107,8 @@ def main():
         require(min((row['guarded'] for row in log), key=selection_key) == record['selection']['guarded'],
                 'Guarded selection does not match validation-only rule')
         training[str(path.relative_to(RUN))] = log
+    boundary = {mode: sum(record['selection'][mode]['epoch'] >= manifest['config']['epochs'] - 1
+                           for record in selections.values()) for mode in ('raw', 'guarded')}
 
     report = read(BASELINES / 'combined_report.json')
     require(report['comparison_available'] and report['progress']['completed_cells'] == 153,
@@ -173,13 +175,24 @@ def main():
         for metric in METRICS:
             require(np.isclose(new[metric + '_mean'], float(old[metric]), rtol=0, atol=1e-12),
                     'Baseline aggregate changed beyond summation rounding')
+    historical = [r for r in main_rows if r['role'] == 'historical_structure_control']
+    historical_cells = [r for r in per_seed if r['role'] == 'historical_structure_control']
+    main_rows = [r for r in main_rows if r['role'] != 'historical_structure_control']
+    regional = [r for r in regional if r['role'] != 'historical_structure_control']
+    macro = [r for r in macro if r['role'] != 'historical_structure_control']
+    per_seed = [r for r in per_seed if r['role'] != 'historical_structure_control']
+    require(len(main_rows) == 21 and len(per_seed) == 189 and len(historical_cells) == 18,
+            'Unexpected current/historical table partition')
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for filename, rows in (('main.csv', main_rows), ('regional.csv', regional),
-                           ('macro_per_seed.csv', macro), ('per_seed.csv', per_seed)):
+                           ('macro_per_seed.csv', macro), ('per_seed.csv', per_seed),
+                           ('historical_controls.csv', historical), ('historical_controls_per_seed.csv', historical_cells)):
         write_csv(OUTPUT / filename, rows)
-    audit = dict(state='complete', outputs=23, cells=207, neural_fits=9, latest_artifacts=54,
+    audit = dict(state='complete', outputs=21, cells=189, source_outputs=23, source_cells=207,
+        historical_control_outputs=2, historical_control_cells=18, neural_fits=9, latest_artifacts=54,
         baseline_cells=153, baseline_cell_scores_exactly_unchanged=True, metric_max_abs_difference=0.0,
         all_three_seeds_complete=True, raw_and_guarded_selection_independently_verified=True,
+        selected_in_last_two_epochs=boundary,
         old_joint_outputs_replaced=True, tree_seed=2026, neural_seeds=list(SEEDS),
         identical_information_scope=False, generator_sha256=digest(Path(__file__)),
         run_manifest_sha256=digest(RUN / 'manifest.json'), selection_sha256=digest(RUN / 'selection_complete.json'),
@@ -205,8 +218,9 @@ def main():
         '**种子范围：**基线沿用原来的 2026/2027/2028；联合方法改变神经初始化和训练顺序，树固定 seed 2026。'
         'B_retrained 重复同一冻结树，不能视为三个独立随机训练。'
         '联合方法还使用因果成熟历史与误差，信息范围大于静态基线；这是回顾性比较，不是盲测或显著性认证。', '',
-        '表中 23 个输出、207 格，包括 17 个原静态基线以及新版的 6 个输出。'
-        'baseline_full、baseline_no_fields 是明确标注的历史结构对照，不代表当前 Full_joint。'
+        '当前表共 21 个输出、189 格，包括 15 个静态基线以及新版的 6 个输出。'
+        '旧静态 baseline_full、baseline_no_fields 的 18 格移入历史结构对照附表，不占当前主表行。'
+        '连同该附表，共核验 23 个来源输出、207 格。'
         '最近四方案的 2021/2022 开发分数保留原档，不混入本表；选择最新结构不代表它已通过开发验收。', '',
         '| 输出 | 宏 MAE（均值 ± SD） | 宏 QS（均值 ± SD） | 地区平均 RMSE | 回退格/9 |',
         '|---|---:|---:|---:|---:|']
@@ -216,8 +230,11 @@ def main():
             f"{row['rmse_pooled_mean']:.4f} | {row['fallback_cells']} |")
     lines += ['', 'MAE 使用排序后的 q50；QS=2×公共五分位平均 pinball。RMSE 为地区各自 pooled RMSE 的算术平均。'
         '“回退”只适用于 guarded 联合输出，表示选择期 alpha=0，不能作为结构有效的证据。', '',
-        '- [23 行三 seed 主表](main.csv) · [69 行地区汇总](regional.csv)',
-        '- [69 行各 seed 宏平均](macro_per_seed.csv) · [207 格原始评分](per_seed.csv)',
+        f"预算边界：raw 有 {boundary['raw']}/9、guarded 有 {boundary['guarded']}/9 次选择落在最后两轮，"
+        '本轮仍保留预定 20 轮预算，不能宣称已经收敛。', '',
+        '- [21 行三 seed 主表](main.csv) · [63 行地区汇总](regional.csv)',
+        '- [63 行各 seed 宏平均](macro_per_seed.csv) · [189 格原始评分](per_seed.csv)',
+        '- [旧静态 Full/no_fields 历史对照](historical_controls.csv) · [历史对照的 18 格评分](historical_controls_per_seed.csv)',
         '- [来源、选择与重评分核验](verification.json) · [训练和冻结档案](../v5_latest_aligned_20261023_r2/README.md)',
         '- [上一版单 seed 比较（历史）](../main_comparison_20261022/README.md) · [四方案开发确认](../v5_anchor_confirmation_20261022/README.md)', '',
         '复算：`PYTHONPATH=. .venv/bin/python scripts/update_latest_main_comparison.py`。'

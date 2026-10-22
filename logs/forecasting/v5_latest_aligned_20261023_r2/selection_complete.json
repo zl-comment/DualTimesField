@@ -1,0 +1,965 @@
+{
+  "QLD1/2026": {
+    "fit_id": "1a9f22198f9b325e25175da83048860fb053894a397101ba2ec33cba45a6b2e1",
+    "selection": {
+      "raw": {
+        "epoch": 20,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 105.72521845874532,
+          "qs": 68.7278333631302,
+          "coverage_80": 0.7386091820987655,
+          "coverage_90": 0.8861689814814815,
+          "bias": -80.33939191879371
+        },
+        "full": {
+          "mae": 106.22167071628357,
+          "qs": 68.67633408036797,
+          "coverage_80": 0.7350308641975308,
+          "coverage_90": 0.8839795524691358,
+          "bias": -77.25385446659438
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -1.9389605706100923,
+            "full_minus_anchor": 0.49645225753825173,
+            "full_minus_B": -1.4425083130718406
+          },
+          "qs": {
+            "anchor_minus_B": -4.223506511995524,
+            "full_minus_anchor": -0.051499282762236476,
+            "full_minus_B": -4.27500579475776
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 20,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 105.72521845874532,
+          "qs": 68.7278333631302,
+          "coverage_80": 0.7386091820987655,
+          "coverage_90": 0.8861689814814815,
+          "bias": -80.33939191879371
+        },
+        "full": {
+          "mae": 106.22167071628357,
+          "qs": 68.67633408036797,
+          "coverage_80": 0.7350308641975308,
+          "coverage_90": 0.8839795524691358,
+          "bias": -77.25385446659438
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2026/raw.pt": "593a9d8c512669c9bd7d9a47a7b6479c054c7eb0ea012d0b7d1122ebc07875e5",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2026/guarded.pt": "78c862efa267f515b0a72f9a99042d4343c4cbe022eabdeef634166e5e21a7f9"
+    }
+  },
+  "QLD1/2027": {
+    "fit_id": "aa4b9269d96c8dec1acb7065cc19e3862cdbf60fa486115b59a94685609083a6",
+    "selection": {
+      "raw": {
+        "epoch": 20,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 105.12711603964253,
+          "qs": 69.96269033665837,
+          "coverage_80": 0.7431905864197531,
+          "coverage_90": 0.8785686728395061,
+          "bias": -82.3444937106495
+        },
+        "full": {
+          "mae": 105.3564524898501,
+          "qs": 69.92120387716061,
+          "coverage_80": 0.741136188271605,
+          "coverage_90": 0.8772569444444445,
+          "bias": -79.63993476448942
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -2.5370629897128794,
+            "full_minus_anchor": 0.229336450207569,
+            "full_minus_B": -2.3077265395053104
+          },
+          "qs": {
+            "anchor_minus_B": -2.9886495384673566,
+            "full_minus_anchor": -0.04148645949776153,
+            "full_minus_B": -3.030135997965118
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 20,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 105.12711603964253,
+          "qs": 69.96269033665837,
+          "coverage_80": 0.7431905864197531,
+          "coverage_90": 0.8785686728395061,
+          "bias": -82.3444937106495
+        },
+        "full": {
+          "mae": 105.3564524898501,
+          "qs": 69.92120387716061,
+          "coverage_80": 0.741136188271605,
+          "coverage_90": 0.8772569444444445,
+          "bias": -79.63993476448942
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2027/raw.pt": "bc83ebc6424db9d4563b095cad518f0db00159f2b2b5951d441db04076832709",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2027/guarded.pt": "b8d339dfdcaf3d17552d7f06ee6447e815cdb9f0aa6ad74e6362901bd8cdae93"
+    }
+  },
+  "QLD1/2028": {
+    "fit_id": "e57d2ecc40f1e633e9f9d299263c0f03e2f02a0d4632179995ed4dbd66d0578e",
+    "selection": {
+      "raw": {
+        "epoch": 18,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 100.9698389178655,
+          "qs": 70.17701722374602,
+          "coverage_80": 0.7688368055555556,
+          "coverage_90": 0.8945698302469136,
+          "bias": -76.43565910497672
+        },
+        "full": {
+          "mae": 97.15818193008474,
+          "qs": 69.25338896413587,
+          "coverage_80": 0.7673900462962963,
+          "coverage_90": 0.8888695987654321,
+          "bias": -66.38155474639296
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -6.6943401114899075,
+            "full_minus_anchor": -3.811656987780765,
+            "full_minus_B": -10.505997099270672
+          },
+          "qs": {
+            "anchor_minus_B": -2.7743226513797055,
+            "full_minus_anchor": -0.9236282596101546,
+            "full_minus_B": -3.69795091098986
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 18,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573,
+          "coverage_80": 0.834230324074074,
+          "coverage_90": 0.9293595679012345,
+          "bias": -94.90397314378804
+        },
+        "anchor": {
+          "mae": 100.9698389178655,
+          "qs": 70.17701722374602,
+          "coverage_80": 0.7688368055555556,
+          "coverage_90": 0.8945698302469136,
+          "bias": -76.43565910497672
+        },
+        "full": {
+          "mae": 97.15818193008474,
+          "qs": 69.25338896413587,
+          "coverage_80": 0.7673900462962963,
+          "coverage_90": 0.8888695987654321,
+          "bias": -66.38155474639296
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2028/raw.pt": "d3f6ca4b54e40852e8b37736e5b85c4017b1ed99df6ad954afece1d14757daf5",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/QLD1/seed2028/guarded.pt": "a633ec30fdeee798b2ae67a5b02c015b724829cc42910205feda74733c3620e3"
+    }
+  },
+  "NSW1/2026": {
+    "fit_id": "1a9f22198f9b325e25175da83048860fb053894a397101ba2ec33cba45a6b2e1",
+    "selection": {
+      "raw": {
+        "epoch": 2,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 62.53937451349295,
+          "qs": 37.58387660252456,
+          "coverage_80": 0.7011766975308642,
+          "coverage_90": 0.876707175925926,
+          "bias": -51.951337458918815
+        },
+        "full": {
+          "mae": 62.8870601881008,
+          "qs": 37.50469326165859,
+          "coverage_80": 0.7024112654320988,
+          "coverage_90": 0.8774112654320988,
+          "bias": -49.98045574862303
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -4.9644139746135,
+            "full_minus_anchor": 0.3476856746078454,
+            "full_minus_B": -4.616728300005654
+          },
+          "qs": {
+            "anchor_minus_B": -1.651074802314163,
+            "full_minus_anchor": -0.07918334086597412,
+            "full_minus_B": -1.7302581431801372
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 2,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 62.53937451349295,
+          "qs": 37.58387660252456,
+          "coverage_80": 0.7011766975308642,
+          "coverage_90": 0.876707175925926,
+          "bias": -51.951337458918815
+        },
+        "full": {
+          "mae": 62.8870601881008,
+          "qs": 37.50469326165859,
+          "coverage_80": 0.7024112654320988,
+          "coverage_90": 0.8774112654320988,
+          "bias": -49.98045574862303
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2026/raw.pt": "987f11a72c6087ba154a81b8ab831ad930e74b83e1bb8a890470ff98930ef521",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2026/guarded.pt": "bbd6360a12d3435473f472142025f30582d6d5666654d9f94359e1430ba84a64"
+    }
+  },
+  "NSW1/2027": {
+    "fit_id": "aa4b9269d96c8dec1acb7065cc19e3862cdbf60fa486115b59a94685609083a6",
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 60.55424463149321,
+          "qs": 36.98590043064737,
+          "coverage_80": 0.6842881944444444,
+          "coverage_90": 0.8561728395061728,
+          "bias": -52.246564220166825
+        },
+        "full": {
+          "mae": 60.151011970655325,
+          "qs": 36.67638335910509,
+          "coverage_80": 0.6875675154320988,
+          "coverage_90": 0.8574363425925926,
+          "bias": -49.51569407264943
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -6.949543856613239,
+            "full_minus_anchor": -0.40323266083788667,
+            "full_minus_B": -7.352776517451126
+          },
+          "qs": {
+            "anchor_minus_B": -2.2490509741913556,
+            "full_minus_anchor": -0.30951707154228103,
+            "full_minus_B": -2.5585680457336366
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 1,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 60.55424463149321,
+          "qs": 36.98590043064737,
+          "coverage_80": 0.6842881944444444,
+          "coverage_90": 0.8561728395061728,
+          "bias": -52.246564220166825
+        },
+        "full": {
+          "mae": 60.151011970655325,
+          "qs": 36.67638335910509,
+          "coverage_80": 0.6875675154320988,
+          "coverage_90": 0.8574363425925926,
+          "bias": -49.51569407264943
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2027/raw.pt": "6a1f413139e0d414804dda48ef129e6295bc2809f4f93d262522086ad91bc6d0",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2027/guarded.pt": "e18e67ec195071d5af99d2b907459eccf002a82783c56355f6812124e8ea0efa"
+    }
+  },
+  "NSW1/2028": {
+    "fit_id": "e57d2ecc40f1e633e9f9d299263c0f03e2f02a0d4632179995ed4dbd66d0578e",
+    "selection": {
+      "raw": {
+        "epoch": 6,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 59.40575776685742,
+          "qs": 37.00557581812699,
+          "coverage_80": 0.6954185956790123,
+          "coverage_90": 0.862451774691358,
+          "bias": -45.02366640077858
+        },
+        "full": {
+          "mae": 59.81180961955867,
+          "qs": 36.94097347862789,
+          "coverage_80": 0.697704475308642,
+          "coverage_90": 0.8633680555555555,
+          "bias": -42.339548329561715
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -8.098030721249032,
+            "full_minus_anchor": 0.4060518527012533,
+            "full_minus_B": -7.691978868547778
+          },
+          "qs": {
+            "anchor_minus_B": -2.2293755867117326,
+            "full_minus_anchor": -0.06460233949910332,
+            "full_minus_B": -2.293977926210836
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 6,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725,
+          "coverage_80": 0.7012152777777778,
+          "coverage_90": 0.8687982253086419,
+          "bias": -60.23693500159676
+        },
+        "anchor": {
+          "mae": 59.40575776685742,
+          "qs": 37.00557581812699,
+          "coverage_80": 0.6954185956790123,
+          "coverage_90": 0.862451774691358,
+          "bias": -45.02366640077858
+        },
+        "full": {
+          "mae": 59.81180961955867,
+          "qs": 36.94097347862789,
+          "coverage_80": 0.697704475308642,
+          "coverage_90": 0.8633680555555555,
+          "bias": -42.339548329561715
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2028/raw.pt": "73508bd94e7850497641a51d6c38bd220c05920e4fcf6418052d90a618182d19",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/NSW1/seed2028/guarded.pt": "25a89ad9ced9af43a5e3d781b116e09fea76f07ce55b1618193683730d1e51e1"
+    }
+  },
+  "TAS1/2026": {
+    "fit_id": "1a9f22198f9b325e25175da83048860fb053894a397101ba2ec33cba45a6b2e1",
+    "selection": {
+      "raw": {
+        "epoch": 7,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 48.59300260135881,
+          "qs": 31.335391591115304,
+          "coverage_80": 0.6777199074074074,
+          "coverage_90": 0.7944637345679012,
+          "bias": -28.818138771297203
+        },
+        "full": {
+          "mae": 48.12468958386755,
+          "qs": 31.157848157879478,
+          "coverage_80": 0.6814621913580247,
+          "coverage_90": 0.7963445216049383,
+          "bias": -27.98730006244258
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -1.9384815836872207,
+            "full_minus_anchor": -0.468313017491262,
+            "full_minus_B": -2.4067946011784827
+          },
+          "qs": {
+            "anchor_minus_B": -0.02362013158355225,
+            "full_minus_anchor": -0.1775434332358259,
+            "full_minus_B": -0.20116356481937814
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 7,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 49.38609138154091,
+          "qs": 31.183066886691236,
+          "coverage_80": 0.7001736111111111,
+          "coverage_90": 0.8185667438271605,
+          "bias": -31.798970880953313
+        },
+        "full": {
+          "mae": 49.118528144353576,
+          "qs": 31.081828431188658,
+          "coverage_80": 0.7018518518518518,
+          "coverage_90": 0.819164737654321,
+          "bias": -31.383551526526002
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2026/raw.pt": "cce1c09368a9351eebf8a88b7b32d93cc6da1f47353b78788d6411c25c9b726d",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2026/guarded.pt": "42712957d85f2efd67abc2ac64ab2921787178363b41d82830e4405b2ba30353"
+    }
+  },
+  "TAS1/2027": {
+    "fit_id": "aa4b9269d96c8dec1acb7065cc19e3862cdbf60fa486115b59a94685609083a6",
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 50.3487884470986,
+          "qs": 31.32889395202454,
+          "coverage_80": 0.7142361111111111,
+          "coverage_90": 0.8294753086419753,
+          "bias": -33.88963671934526
+        },
+        "full": {
+          "mae": 49.83977755767956,
+          "qs": 31.14072187012006,
+          "coverage_80": 0.716772762345679,
+          "coverage_90": 0.8304976851851852,
+          "bias": -33.06482243829724
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.18269573794743366,
+            "full_minus_anchor": -0.5090108894190379,
+            "full_minus_B": -0.6917066273664716
+          },
+          "qs": {
+            "anchor_minus_B": -0.03011777067431609,
+            "full_minus_anchor": -0.18817208190447943,
+            "full_minus_B": -0.21828985257879552
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 12,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 48.50346509367813,
+          "qs": 30.953694335224256,
+          "coverage_80": 0.7037037037037037,
+          "coverage_90": 0.8225019290123456,
+          "bias": -30.980586571322313
+        },
+        "full": {
+          "mae": 48.553893853404475,
+          "qs": 30.98514832532116,
+          "coverage_80": 0.702488425925926,
+          "coverage_90": 0.8211323302469136,
+          "bias": -30.812146398240028
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2027/raw.pt": "e7b3de1711cc1b514db91edbcd3c1065d902f6617cb7ce03ca84ced7625dcc5e",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2027/guarded.pt": "e9f14703ad8a67e2d720f49848d0554e40be4cac9623413f5e51ee85eea8c034"
+    }
+  },
+  "TAS1/2028": {
+    "fit_id": "e57d2ecc40f1e633e9f9d299263c0f03e2f02a0d4632179995ed4dbd66d0578e",
+    "selection": {
+      "raw": {
+        "epoch": 8,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 4320,
+        "n_cells": 103680,
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 47.71624054602681,
+          "qs": 30.82462285349303,
+          "coverage_80": 0.7159336419753086,
+          "coverage_90": 0.8263503086419753,
+          "bias": -28.300354156218308
+        },
+        "full": {
+          "mae": 47.10722689177844,
+          "qs": 30.601317748308862,
+          "coverage_80": 0.7165412808641975,
+          "coverage_90": 0.8273823302469135,
+          "bias": -26.43950572210942
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -2.815243639019222,
+            "full_minus_anchor": -0.609013654248372,
+            "full_minus_B": -3.424257293267594
+          },
+          "qs": {
+            "anchor_minus_B": -0.5343888692058272,
+            "full_minus_anchor": -0.22330510518416702,
+            "full_minus_B": -0.7576939743899942
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 11,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856,
+          "coverage_80": 0.7103684413580247,
+          "coverage_90": 0.8330922067901234,
+          "bias": -34.779802990609426
+        },
+        "anchor": {
+          "mae": 48.40667458185621,
+          "qs": 30.676018349291645,
+          "coverage_80": 0.7214602623456791,
+          "coverage_90": 0.835204475308642,
+          "bias": -30.88884706062809
+        },
+        "full": {
+          "mae": 47.88467841632562,
+          "qs": 30.491089580401983,
+          "coverage_80": 0.7234085648148149,
+          "coverage_90": 0.8366030092592592,
+          "bias": -29.86421691800709
+        }
+      }
+    },
+    "parameters": {
+      "alignment_key": {
+        "total": 576,
+        "trainable": 576
+      },
+      "alignment_query": {
+        "total": 576,
+        "trainable": 576
+      },
+      "calibration": {
+        "total": 867,
+        "trainable": 867
+      },
+      "dual": {
+        "total": 962,
+        "trainable": 962
+      },
+      "gates": {
+        "total": 890,
+        "trainable": 890
+      },
+      "match": {
+        "total": 1826,
+        "trainable": 1826
+      },
+      "state": {
+        "total": 22752,
+        "trainable": 22752
+      }
+    },
+    "epochs_completed": 20,
+    "checkpoints": {
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2028/raw.pt": "56630fcd499e8984c2ad366055f05112119ec543c6b3e2a553fb1cc22aa436de",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_latest_aligned_20261023_r2/fits/TAS1/seed2028/guarded.pt": "9322ee83e8af9d497d5824dd76a1232750f06cb5f7b2c094b9b1ae4e7f1aaa02"
+    }
+  }
+}
