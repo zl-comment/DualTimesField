@@ -3,10 +3,14 @@
 Method reimplementation. The J34 companion repository (lebeand/uq-epf) ships a
 DDNN with a Normal parameterization; the Johnson SU parameterization follows
 the paper's distributional formulation implemented locally from its
-parametrization:
+normal-transform representation:
 
-    z = gamma + delta * asinh((x - xi) / lambda),  z ~ N(0, 1)
-    x_q = xi + lambda * sinh((Phi^-1(q) - gamma) / delta)
+    W ~ N(mu_w, sigma_w^2),   X = xi + lambda * sinh(W)
+    x_q = xi + lambda * sinh(mu_w + sigma_w * Phi^-1(q))
+
+(equivalent to the classic gamma/delta form with gamma = -mu_w/sigma_w and
+delta = 1/sigma_w; chosen because its degenerate direction collapses tails
+instead of exploding them).
 
 The network shape follows the official ddnn_normal.py pattern (Kaiming-hidden /
 Xavier-output MLP, optional batch-norm/dropout, Adam). Training maximizes the
@@ -32,11 +36,21 @@ from ..aligned_scoring import QUANTILE_LEVELS
 from ..common.frozen_base import _expansion_artifacts
 from ..common.native_trainer import block_tensors, train_native
 
-MIN_SHAPE = 1e-4  # softplus floor keeping delta and lambda strictly positive
+MIN_SCALE = 0.1     # softplus floor on sigma_w and lambda
+ARG_CLAMP = 12.0    # bounds pre-convergence sinh arguments; converged fits
+                    # (sigma_w ~ 1-4) never reach it at the five common levels
 
 
 class JohnsonSUHead(nn.Module):
-    """MLP emitting (gamma, log-unconstrained delta, xi, log-unconstrained lambda) per horizon."""
+    """MLP emitting the normal-transform parameters (mu_w, sigma_w, xi, lambda).
+
+    Johnson SU is parameterized through its underlying normal: with
+    W ~ N(mu_w, sigma_w^2), X = xi + lambda * sinh(W). This is algebraically
+    identical to the classic (gamma, delta) form with gamma = -mu_w/sigma_w and
+    delta = 1/sigma_w, but numerically far safer: the degenerate training
+    direction (sigma_w -> 0) collapses the tails instead of exploding them as
+    delta -> 0 does, and tail growth with sigma_w is smooth (sinh(1.645*sigma_w)).
+    """
 
     def __init__(self, input_dim: int, horizon: int, *, hidden_dims: list[int],
                  use_batch_norm: bool, dropout_rate: float):
@@ -58,40 +72,56 @@ class JohnsonSUHead(nn.Module):
             previous = width
         output = nn.Linear(previous, 4 * horizon)
         nn.init.xavier_uniform_(output.weight)
+        # Shrink the head so the initial distribution sits near the bias-set
+        # prior (mu~0, sigma/lambda ~ softplus(1) ~ 1.3): a full-variance Xavier
+        # head scatters raw outputs across +-3 and starts a subset of cells
+        # deep in the sinh-sensitive regime.
+        with torch.no_grad():
+            output.weight.mul_(0.1)
         nn.init.constant_(output.bias, 0.0)
+        with torch.no_grad():
+            output.bias.view(horizon, 4)[:, 1] = 1.0
+            output.bias.view(horizon, 4)[:, 3] = 1.0
         self.hidden = nn.Sequential(*layers) if layers else nn.Identity()
         self.output = output
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, ...]:
         raw = self.output(self.hidden(x)).view(-1, self.horizon, 4)
-        gamma, delta_t, xi, lam_t = raw.unbind(dim=-1)
-        delta = torch.nn.functional.softplus(delta_t) + MIN_SHAPE
-        lam = torch.nn.functional.softplus(lam_t) + MIN_SHAPE
-        return gamma, delta, xi, lam
+        mu, sigma_t, xi, lam_t = raw.unbind(dim=-1)
+        sigma = torch.nn.functional.softplus(sigma_t) + MIN_SCALE
+        lam = torch.nn.functional.softplus(lam_t) + MIN_SCALE
+        return mu, sigma, xi, lam
 
 
-def jsu_negative_log_likelihood(target: torch.Tensor, gamma: torch.Tensor, delta: torch.Tensor,
+def jsu_negative_log_likelihood(target: torch.Tensor, mu: torch.Tensor, sigma: torch.Tensor,
                                 xi: torch.Tensor, lam: torch.Tensor) -> torch.Tensor:
-    """Exact JSU NLL, numerically stabilized; mean over all origin/horizon cells."""
-    z = gamma + delta * torch.asinh((target - xi) / lam)
-    log_phi = -0.5 * (z * z + math.log(2.0 * math.pi))
+    """Exact JSU NLL in the normal-transform parameterization; mean over cells.
+
+    With w = (asinh((x - xi)/lambda) - mu)/sigma ~ N(0, 1):
+        -log f(x) = -log phi(w) + log sigma + log lambda + log cosh(asinh-term)
+    The Jacobian term is log lambda + log cosh(w_transformed); all pieces are
+    computed through log-space stabilizations, so extreme standardized prices
+    yield finite losses and gradients.
+    """
+    transformed = torch.asinh((target - xi) / lam)
+    w = (transformed - mu) / sigma
+    log_phi = -0.5 * (w * w + math.log(2.0 * math.pi))
     # log cosh(u) = logaddexp(u, -u) - log 2, stable for extreme u.
-    log_cosh = torch.logaddexp(z, -z) - math.log(2.0)
-    return (-log_phi + torch.log(delta) - torch.log(lam) + log_cosh).mean()
+    log_cosh = torch.logaddexp(transformed, -transformed) - math.log(2.0)
+    return (-log_phi + torch.log(sigma) + torch.log(lam) + log_cosh).mean()
 
 
-def jsu_quantiles(gamma: torch.Tensor, delta: torch.Tensor, xi: torch.Tensor, lam: torch.Tensor,
+def jsu_quantiles(mu: torch.Tensor, sigma: torch.Tensor, xi: torch.Tensor, lam: torch.Tensor,
                   levels: torch.Tensor) -> torch.Tensor:
-    """Analytic quantiles via the standard-normal inverse CDF; supports negative prices.
+    """Analytic quantiles x_q = xi + lambda*sinh(mu + sigma*Phi^-1(q)); [N, H, Q].
 
-    The sinh argument is clamped to ±30: float32 sinh overflows to inf beyond
-    |arg| ~ 89, which early-training parameter outliers can produce. The clamp
-    engages only far outside the operating regime and keeps every quantile
-    finite; nothing is silently clipped in the normal range.
+    Supports negative prices by construction. The sinh argument is clamped to
+    ±12 so pre-convergence parameter outliers stay finite and selectable;
+    converged fits (sigma_w ~ 1-4) never reach the clamp at q in {.05, .95}.
     """
     z = torch.erfinv(2.0 * levels - 1.0) * math.sqrt(2.0)  # [Q] -> Phi^-1(q)
-    argument = (z.view(*[1] * gamma.dim(), -1) - gamma.unsqueeze(-1)) / delta.unsqueeze(-1)
-    argument = torch.clamp(argument, -30.0, 30.0)
+    argument = mu.unsqueeze(-1) + sigma.unsqueeze(-1) * z.view(*[1] * mu.dim(), -1)
+    argument = torch.clamp(argument, -ARG_CLAMP, ARG_CLAMP)
     return xi.unsqueeze(-1) + lam.unsqueeze(-1) * torch.sinh(argument)  # [N, H, Q]
 
 
@@ -167,7 +197,8 @@ def run_expansion(context: Any) -> BaselinePrediction:
     metadata = {
         "model": "ddnn_jsu", "task": "quantile", "seed": context.seed,
         "distribution": "johnson_su", "distribution_parametrization":
-            "z=gamma+delta*asinh((x-xi)/lambda); quantiles via analytic inverse CDF",
+            "normal-transform: x_q=xi+lambda*sinh(mu_w+sigma_w*Phi^-1(q)); "
+            "equivalent to gamma=-mu_w/sigma_w, delta=1/sigma_w",
         "native_training_objective": "exact_jsu_negative_log_likelihood",
         "selection_metric": "raw_price_common_five_quantile_qs5",
         "paper_selection_difference": "J34 selects by validation NLL and tunes hyperparameters; "

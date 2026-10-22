@@ -59,18 +59,21 @@ def make_context(tmp_path, model_id, splits, seed=2026):
 def test_jsu_quantiles_match_scipy_johnsonsu():
     from forecasting.ddnn_jsu.model import jsu_quantiles
 
-    # Two horizons, one origin, double precision.
-    gamma = torch.tensor([[0.3, -0.8]], dtype=torch.float64)
-    delta = torch.tensor([[1.4, 0.9]], dtype=torch.float64)
+    # Two horizons, one origin, double precision; the head outputs the
+    # normal-transform parameters (mu_w, sigma_w), mapped to scipy's
+    # a=gamma=-mu/sigma, b=delta=1/sigma.
+    mu = torch.tensor([[0.3, -0.8]], dtype=torch.float64)
+    sigma = torch.tensor([[1.4, 0.9]], dtype=torch.float64)
     xi = torch.tensor([[-5.0, 12.0]], dtype=torch.float64)
     lam = torch.tensor([[2.0, 4.0]], dtype=torch.float64)
     levels = torch.tensor([0.02, 0.05, 0.25, 0.5, 0.75, 0.95, 0.98], dtype=torch.float64)
-    ours = jsu_quantiles(gamma, delta, xi, lam, levels).numpy()
+    ours = jsu_quantiles(mu, sigma, xi, lam, levels).numpy()
     assert ours.shape == (1, 2, 7)
     from scipy.stats import johnsonsu
 
     for h in range(2):
-        expected = johnsonsu.ppf(levels.numpy(), a=float(gamma[0, h]), b=float(delta[0, h]),
+        expected = johnsonsu.ppf(levels.numpy(), a=float(-mu[0, h] / sigma[0, h]),
+                                 b=float(1.0 / sigma[0, h]),
                                  loc=float(xi[0, h]), scale=float(lam[0, h]))
         np.testing.assert_allclose(ours[0, h], expected, rtol=1e-8, atol=1e-10)
 
@@ -78,12 +81,12 @@ def test_jsu_quantiles_match_scipy_johnsonsu():
 def test_jsu_median_and_affine_equivariance_and_negative_support():
     from forecasting.ddnn_jsu.model import jsu_quantiles
 
-    gamma = torch.tensor([[1.1]]); delta = torch.tensor([[0.7]])
+    mu = torch.tensor([[1.1]]); sigma = torch.tensor([[0.7]])
     xi = torch.tensor([[-3.0]]); lam = torch.tensor([[1.5]])
     levels = torch.tensor([0.05, 0.5, 0.95])
-    q = jsu_quantiles(gamma, delta, xi, lam, levels)
+    q = jsu_quantiles(mu, sigma, xi, lam, levels)
     assert q.shape == (1, 1, 3)
-    expected_median = xi + lam * torch.sinh(-gamma / delta)
+    expected_median = xi + lam * torch.sinh(mu)  # Phi^-1(0.5) = 0
     assert torch.allclose(q[0, 0, 1], expected_median[0, 0])
     # Affine equivariance: raw = std * standardized + mean must commute exactly.
     raw = 10.0 * q + 50.0
@@ -94,18 +97,18 @@ def test_jsu_median_and_affine_equivariance_and_negative_support():
 def test_jsu_nll_finite_with_gradients_at_extreme_values():
     from forecasting.ddnn_jsu.model import jsu_negative_log_likelihood
 
-    gamma_raw = torch.tensor([[0.5, -1.0]], requires_grad=True)
-    delta_raw = torch.tensor([[0.8, 0.6]], requires_grad=True)
+    mu_raw = torch.tensor([[0.5, -1.0]], requires_grad=True)
+    sigma_raw = torch.tensor([[0.8, 0.6]], requires_grad=True)
     xi = torch.tensor([[0.0, 2.0]], requires_grad=True)
     lam_raw = torch.tensor([[1.0, 3.0]], requires_grad=True)
-    delta = torch.nn.functional.softplus(delta_raw) + 1e-4
-    lam = torch.nn.functional.softplus(lam_raw) + 1e-4
-    gamma = gamma_raw
+    sigma = torch.nn.functional.softplus(sigma_raw) + 0.1
+    lam = torch.nn.functional.softplus(lam_raw) + 0.1
+    mu = mu_raw
     target = torch.tensor([[-40.0, 60.0]])  # extremes on both sides
-    loss = jsu_negative_log_likelihood(target, gamma, delta, xi, lam)
+    loss = jsu_negative_log_likelihood(target, mu, sigma, xi, lam)
     assert torch.isfinite(loss)
     loss.backward()
-    leaves = (gamma_raw, delta_raw, xi, lam_raw)
+    leaves = (mu_raw, sigma_raw, xi, lam_raw)
     assert all(leaf.grad is not None and torch.isfinite(leaf.grad).all() for leaf in leaves)
     assert all(float(leaf.grad.abs().max()) > 0 for leaf in leaves)
 
