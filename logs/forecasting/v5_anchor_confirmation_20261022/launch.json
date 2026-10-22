@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-10-22T10:57:41.969715+00:00",
+  "pid": 482793,
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-u",
+    "-m",
+    "forecasting.full_v5_anchor_balance.confirmation_experiment",
+    "--development",
+    "--devices",
+    "cuda:3",
+    "cuda:6",
+    "cuda:7",
+    "--output",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_anchor_confirmation_20261022_r1"
+  ],
+  "commit": "c1c546e80600ae80ee2576d6c54bef22bc762400",
+  "output": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_anchor_confirmation_20261022_r1",
+  "log": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_anchor_confirmation_20261022_r1/runner.log",
+  "validation": "76 distinct targeted tests passed across regression and new confirmation suites",
+  "expected_fits": 72,
+  "epochs_per_fit": 20,
+  "state": "launched_not_yet_completed",
+  "manifest_sha256": "c57dda4d99c78f6d5186ca1c397a02d45e1eb7b30900012cd33bfe20ba38a7b4",
+  "run_id": "b1f1b57758a6a686dd8975ede940e4568e7a493122f4fce9bb77d2eeaa7c17f7"
+}
