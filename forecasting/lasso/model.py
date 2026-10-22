@@ -1,29 +1,10 @@
 """本地 Lasso ARX72 + CP 适配；不等同于论文 LEAR。来源见 README.md。"""
-from typing import Any
 import numpy as np
 DEFAULT_QUANTILES = (0.05, 0.10, 0.50, 0.90, 0.95)
 
-
-def absolute_residual_cp(point: np.ndarray, calibration_point: np.ndarray,
-                         calibration_actual: np.ndarray,
-                         quantile_levels: Any = DEFAULT_QUANTILES) -> np.ndarray:
-    """Author-style symmetric CP, per horizon, with type-7 interpolation.
-
-    This reproduces the absolute-residual formula, not a finite-sample coverage
-    guarantee under overlapping hourly observations. Calibration must be OOS;
-    its chronological checks are enforced by ``fit_predict``.
-    Reference: lipiecki/PostForecasts.jl src/models/cp.jl at 589f940.
-    """
-    from ..aligned_baselines import _levels
-    q = _levels(quantile_levels)
-    point, predicted, actual = map(lambda x: np.asarray(x, dtype=float),
-                                   (point, calibration_point, calibration_actual))
-    if point.ndim != 2 or predicted.ndim != 2 or predicted.shape != actual.shape or not len(actual) or predicted.shape[1] != point.shape[1]:
-        raise ValueError("CP requires matching nonempty [origin, horizon] calibration arrays")
-    if not all(np.isfinite(x).all() for x in (point, predicted, actual)):
-        raise ValueError("CP inputs must be finite")
-    widths = np.quantile(np.abs(actual - predicted), np.abs(2 * q - 1), axis=0, method="linear").T
-    return point[..., None] + widths[None, ...] * np.sign(q - 0.5)
+# Moved verbatim to forecasting/common/calibration.py; re-exported so every
+# existing import path and the numerical behaviour stay unchanged.
+from ..common.calibration import absolute_residual_cp  # noqa: F401,E402
 
 
 def fit_lasso(train, selection, evaluation, calibration, *, x_train, x_select, x_eval, q, task, metric, p, mean, std, metadata, artifacts):

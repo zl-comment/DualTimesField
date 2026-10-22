@@ -1,5 +1,10 @@
 # zcode 第一批基线交付：Codex 独立验收
 
+后续状态：已取消 DDNN-JSU 分位钳位，按原实际预算重跑9格并完成独立验证。
+修复结果与当前153格总表见
+[DDNN-JSU 修复报告](../logs/forecasting/ddnn_jsu_unclipped_20261022_r1/README.md)。
+以下保留修复前的验收记录，原钳位结果只作历史审计。
+
 审查分支 `research/fair-baseline-expansion-20261022`，提交 `b364c89`。
 结论：45 格新增实验确实全部完成；153 格归档分数可独立复算。
 但 DDNN-JSU 的概率结果受未如实披露的逆 CDF 钳位影响，暂不能将整批交付无条件验收为标准方法对照。

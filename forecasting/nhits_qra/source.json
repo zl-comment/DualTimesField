@@ -1,0 +1,18 @@
+{
+  "implementation": "官方源码移植 + 本地训练适配（vendor）",
+  "experiment_model_id": "nhits_qra",
+  "in_completed_baseline": false,
+  "paper_reference": "P08 Assessing the Performance–Efficiency Trade-off of Foundation Models in Probabilistic EPF; P16 Investigating Calibration Challenges in Probabilistic EPF; NHITS 原文 Challu et al., AAAI 2023",
+  "paper_url": "https://arxiv.org/html/2604.14739v1",
+  "repository": "https://github.com/Nixtla/neuralforecast",
+  "upstream_commit": "6c11accfbcfdd62a40ef69a7c81e3d9c7f272682",
+  "vendor_provenance": "forecasting/nhits_qra/vendor/PROVENANCE.md（Apache-2.0，逐条修改清单）",
+  "input_adaptation": "insample_y=价格历史；hist=需求+历史日历；futr=未来日历+future/ctf/quantile 外生（仅预测期长度，见 PROVENANCE 修改1）；stat=origin_context；官方 DataFrame 协议与日期切分未使用",
+  "output_target_transform": "点头 MAE 训练于标准化空间；MC 样本经验分位为 QRA 特征；QRA 输出为原始 RRP 五分位",
+  "native_training_objective": "上游默认 MAE（标准化空间，点头 n_out=1），Adam，共享预算",
+  "selection_metric": "选择期原始价格 MAE（eval 模式点预测，配置预声明）",
+  "calibration": "冻结骨干后 MC-dropout（K=20，固定种子 job_seed+7919/2*7919，仅 dropout 层 train 模式）经验 type-7 分位 → 2022H2 标签 QRA（alpha=0 精确 LP）",
+  "dependency_versions": {"torch": "2.5.1+cu124", "neuralforecast": "vendored@6c11accf"},
+  "license": "Apache-2.0（vendor 文件保留上游许可）；本地适配部分 MIT",
+  "differences_from_paper": "骨干为官方源码移植但训练/采样管线本地化；P08/P16 的完整对比流程未复现；MC 样本数与 dropout 为固定第一版参数，未做其调参"
+}

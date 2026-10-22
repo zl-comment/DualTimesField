@@ -1,0 +1,19 @@
+{
+  "implementation": "本地适配（冻结基座复用 + 线性分位回归平均）",
+  "experiment_model_id": "lightgbm_qra",
+  "in_completed_baseline": false,
+  "paper_reference": "QRA 谱系（Nowotarski & Weron 2015 等）+ J34 对照建议；见 docs/research/epf_2026_review_20261022/baseline_recommendations.json",
+  "paper_url": "https://ieeexplore.ieee.org/document/11430173/",
+  "repository": null,
+  "upstream_commit": null,
+  "solver": "scikit-learn QuantileRegressor（精确线性规划，solver=highs，alpha=0，无随机性）",
+  "frozen_base": "父运行 aligned_baselines_20261012 的 lightgbm 检查点（只读复用，不重训；booster/manifest 哈希逐格记录）",
+  "input_adaptation": "无新增输入；QRA 特征为冻结基座排序后五分位预测 + 截距",
+  "output_target_transform": "原始 RRP 空间输出五分位；点预测为 QRA 输出重排后 q50（可改变中心）",
+  "native_training_objective": "逐 horizon 逐水平 pinball 线性回归（calibration 段拟合一次，测试期系数冻结）",
+  "selection_metric": "不适用（无超参选择；alpha/solver 预先固定）",
+  "calibration": "仅 2022H2 标签拟合 QRA 系数",
+  "dependency_versions": {"lightgbm": "4.7.0", "scikit-learn": "1.9.1", "numpy": "2.4.6"},
+  "license": "MIT（仓库自身实现）",
+  "differences_from_paper": "明确的本地 QRA 适配：单一冻结基座、固定特征集与固定正则，不复现任何论文完整设计"
+}
