@@ -1,0 +1,2373 @@
+{
+  "scope": "retrospective_development_not_final_test",
+  "config": {
+    "profile": "screen",
+    "epochs": 6,
+    "seed": 2026,
+    "batch_size": 16,
+    "cpu_threads": 2,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "reconstruction_weight": 0.05,
+    "gate_penalty": 0.001,
+    "weights": {
+      "anchor": 0.5,
+      "median": 0.5,
+      "identity": 0.01
+    },
+    "alphas": [
+      0,
+      0.25,
+      0.5,
+      1
+    ],
+    "device": "cpu",
+    "tree_seed": 2026,
+    "candidates": 16,
+    "history_days": 730,
+    "variants": [
+      "balanced",
+      "identity_anchor",
+      "location_only",
+      "separate_heads",
+      "staged",
+      "wide_head"
+    ],
+    "diagnostic_price_edges": [
+      "-inf",
+      0,
+      50,
+      100,
+      150,
+      300,
+      "inf"
+    ],
+    "diagnostic_grouping": "origin AEST season crossed with mean of B q50 across 24h; left-closed bands; reporting only",
+    "sampling": "train daily rotating24h; selection/eval daily4 rotating6h",
+    "experiment": "anchor_architectures_v1",
+    "workers": 3,
+    "all_variants_objective": "balance_loss; staged epochs1..3 anchor_pretrain_loss",
+    "staged_schedule": {
+      "anchor_epochs": [
+        1,
+        2,
+        3
+      ],
+      "history_epochs": [
+        4,
+        5,
+        6
+      ],
+      "anchor_end": "fixed epoch3 without selection",
+      "optimizer_reset": true
+    },
+    "baseline_schedule": "original seven chronological OOF tree folds; neural checkpoints and alpha freeze before evaluation"
+  },
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "folds": {
+    "2021": [
+      "2018-01-01",
+      "2020-01-01",
+      "2021-01-01",
+      "2022-01-01"
+    ],
+    "2022": [
+      "2018-01-01",
+      "2021-01-01",
+      "2022-01-01",
+      "2023-01-01"
+    ]
+  },
+  "parent_commit": "f9517808fa7b249aa181dbdcf0b7841f1f18c0bb",
+  "source_sha256": {
+    "forecasting/full_v5/__init__.py": "078738c5314735359ea23c65bdf9e63c8d2bbb650ba48321ac4d6e1ea7b81b8e",
+    "forecasting/full_v5/adaptive_dual_experiment.py": "de0972120a9fba78edd2cef75af63525d9b919f57a587c23635a3002e2137849",
+    "forecasting/full_v5/adaptive_dual_history.py": "cdc93dbe8e545b05014b0f4b13e3b174007c2cb5dd95f6211c51312fad298603",
+    "forecasting/full_v5/calibrator.py": "3cfd189f662c53bbfb97cab5d8ad7997bb91c9dce738c7773ca4c32f5639ff52",
+    "forecasting/full_v5/conditional_event_experiment.py": "2c3a8e0111492962486a5b8e52318ed72a1d700d75da37dc1a4edd4cf6f147cf",
+    "forecasting/full_v5/conditional_event_memory.py": "bef222951cf19abb595b6a97093a1019f9ef62608c49b64b408f02096cefbff5",
+    "forecasting/full_v5/conditional_transfer_gate.py": "a297d5ab270a7cfadabcdcba4ccd7e8de9aea12b6f3eb50f68f32b57637c9956",
+    "forecasting/full_v5/controls.py": "acba0db456be299abb0648c5f798eaad7d26b0293970b64c41c2c54ac998ca91",
+    "forecasting/full_v5/data.py": "2e63a80a5c59e72b50ab1195531f13495614516b05e91b6c9d8f04ef4f77880b",
+    "forecasting/full_v5/diagnostics.py": "8c900d4f7860cbffcd9f3c5dd4b20e944c0db4f1603c5863bc1799066981db31",
+    "forecasting/full_v5/dual_history_experiment.py": "864297dafa8f6ed3b8cf065af5d8fcb269b2c4879f635c2a4add8fc5fc2bb74f",
+    "forecasting/full_v5/dual_history_memory.py": "a91b875757e644a1e4971abcb54dc95553186eee01ada4d8ba0556e347d9cc25",
+    "forecasting/full_v5/dual_history_model.py": "f2d666cd6a1b1aece327acbc00fecc9de4261bd3cc68fed0160eefc5d8bbb3c6",
+    "forecasting/full_v5/experiment.py": "bf914ced2e80073c2a0ec1da0af0b26bb41c46e7f131dc032821bb6db6c00143",
+    "forecasting/full_v5/history.py": "68bf6855a2989f2e45498d55131198235901c3b33011509f44ef0e0c9951d826",
+    "forecasting/full_v5/history_correction.py": "e84f7e3505f0f934cb69e04f4a88ef20df12258d04831e34ce4953c94b619836",
+    "forecasting/full_v5/history_quickcheck.py": "86bae059adba532a0e80829d27b8cf6e447b1d7a44969fb556b98d0a5a5dd433",
+    "forecasting/full_v5/report.py": "a31f05795917fdfb2a43948af0ce0a48c9d08abdf6fe7a444806eea3f6615de4",
+    "forecasting/full_v5/schema.py": "33a0789f0e56301fb9484d9363f68205a6d18c3717c2b4d5475fc86433be0b3e",
+    "forecasting/full_v5_anchor_balance/__init__.py": "b480b6240e30922638284cf86145a54cdd0ad46a9882c4bcfa61cb5bebf30677",
+    "forecasting/full_v5_anchor_balance/architecture.py": "29c858ee83033675c49cd3daaea503d4262a3c72e7e3f9fa977d4971725f03b1",
+    "forecasting/full_v5_anchor_balance/architecture_experiment.py": "25e564c39a583a275a74bf321cd36f106a41cd6040276c0c9960066ac4778da8",
+    "forecasting/full_v5_anchor_balance/experiment.py": "b26ade69c3d72c938519d433d866bb73793bb67a67097199ab9e656befbffce5",
+    "forecasting/full_v5_anchor_balance/objective.py": "1a8837e363439e1443ed8e48e9f43687e996adc6d38564b183079c3f27721983",
+    "forecasting/full_v5_anchor_balance/selection.py": "2fd11e010aaffc33d2082ef317be723cf54dbabde951c0df84abb8a68f3b24f1",
+    "forecasting/full_v5_joint/__init__.py": "8f3715d9a99dbac7350d9085a6a4aaab71c71f10648aaa48a7418b970f203fd0",
+    "forecasting/full_v5_joint/data.py": "247f37fae7ede80a237731c65a590ba5d6a471b36b1390fe0a6d5653a3e9a2b2",
+    "forecasting/full_v5_joint/final_test.py": "771facc50bf0b0173be0fb2560120f5fd797be3276c3b1251b17036311beab3d",
+    "forecasting/full_v5_joint/model.py": "8f1def290164ccbcffc8ccb2d76bb03f8c20f6de11bf851143aa329481616953",
+    "forecasting/full_v5_joint/prepare.py": "896ffd653dc7b866fc1f17631837a94546cb3b65a3086230100cba34c32f88c5",
+    "forecasting/full_v5_joint/protocol.py": "416d96b80c308b09b4f7b2674c747f69e9ce73c4915f6fb73aeead1aa5b32bd0",
+    "forecasting/full_v5_joint/run.py": "7f071bb38bbd9c72e85d000c2ebcf84b1e2d8df0000019c36ca15f1737d9ad26",
+    "forecasting/full_v5_joint/smoke.py": "54df9d17d25dbd70e839f6711d869371355c76f1776511bee71a5eb7f0abe1a7",
+    "forecasting/full_v5_joint/train.py": "ca57fdd1854749e1f8a118431bbe383460067e7f8f7f91a3ea222580a4cd3af7"
+  },
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "protocol_sha256": "a2bc7a5546c4f0188a647f4c7dfbfaca505b27002a26358f45e93e0d25150909",
+  "bundles": {
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz": "d384ada342ef6134c6e6dd37659797dac00df2a528242bbf9cdd600300cb4e79",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz": "9b609d5af86988d656ceba8c6eab472a3284ff5370d14bf194884460e3cb485b",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz": "7350a9e5b51ff8218140e0e113d695e4c989e8854e7c7efd780a32a1e959c7bc",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz": "359117f99ebc6cb2112383b04e229bc258ebcd35b77806fbd454f00699718e04",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz": "a70adbaf2bd7fb05c166c521dbbe40651f9d546ee285f0c15292aaf027f529c8",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz": "96ab3fe6c9eb73dcdd6b3b5dd14c3751b2ba31e40bb4de3e7daddde18f7daa64",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz": "d86f5a9ccee980b8096ed427bf4ef31f5e1e9d2e574ad616ec0f22ccb8696fbd",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz": "33cbf6cd60c147e48db8d1726b6c31353ab299ecd98d433b34f9f3b610e6c68a",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz": "9e8927a0218f85e489407eb667d93d38a6990adcc0dbee4162aee50221caae05",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz": "70ca6ed11e2d54e2194fa30ed9a17d2d755cdd71734cd0301d9469fea6ff4813",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz": "d3283f489b590496b5c6613c0f61c70b3ab35d38dd7f050ddefbbc64d933bd5f",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz": "f7b1ee3a63a6c07352a0e5bef25bcb27787d02392dd756fb6ccae8fc69e13e79",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz": "1a39320bfc086e1a08b1355af9b96fe7d855459b34cf3e3c528ff1d7681e3b93",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz": "3b672bb139fbec77608cfd6d2450f5bbea362b335e6285b485625258f5dec248",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz": "5eb6b7c97245ab71a4251df21b1fe30c6eff912789d435a4bb6422498082bf7f",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz": "785e761f7977b3b432d77d02a36991874c42a3f29a2da78df6dccc71d9cef73f",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz": "adfe4373e41fa342ebd7889ef5cabe7016971363a1c05d8012d0b1962a6ad18b",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz": "2ac5fca056beffb467fbb595508383ce0e64e09b176262035352c0e314ec70c2",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz": "ff3c3a92443f0fd110f87ed3f9d3433d7941660f9e03eba9e443e09cb5b7d86c",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz": "cee1192ba6040d76333bccb67aad7a1505202e6a086aa946b07bbff840d8474f",
+    "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz": "1bb3bb6e11eb2ec1ddb13673569a8f94d8c701169f8906994fbe2cd63ddb034c"
+  },
+  "samples": {
+    "NSW1/2021": {
+      "train": {
+        "count": 728,
+        "origin_sha256": "43acfc1d3ae3118589b116185834877b00d7e6cc158ff86c539807163114dd0c",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2019-12-30T20:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30
+        },
+        "hours": {
+          "0": 30,
+          "1": 30,
+          "2": 30,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 30,
+          "9": 30,
+          "10": 30,
+          "11": 30,
+          "12": 31,
+          "13": 31,
+          "14": 31,
+          "15": 31,
+          "16": 30,
+          "17": 31,
+          "18": 31,
+          "19": 31,
+          "20": 31,
+          "21": 30,
+          "22": 30,
+          "23": 30
+        }
+      },
+      "selection": {
+        "count": 1460,
+        "origin_sha256": "66dff44972fe7972179e300b1a8a04afcd5c4bb03d0a6dbecb9860aa9d40285a",
+        "first_local": "2020-01-01T04:00:00",
+        "last_local": "2020-12-30T20:00:00",
+        "months": {
+          "2020-01": 124,
+          "2020-02": 116,
+          "2020-03": 124,
+          "2020-04": 120,
+          "2020-05": 124,
+          "2020-06": 120,
+          "2020-07": 124,
+          "2020-08": 124,
+          "2020-09": 120,
+          "2020-10": 124,
+          "2020-11": 120,
+          "2020-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 61,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 61,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 61,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 61,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    },
+    "NSW1/2022": {
+      "train": {
+        "count": 1093,
+        "origin_sha256": "7e30e63db93d1f37783d4186c7632c7176c344aa3bf7ac03d68914f7eeb774e8",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2020-12-30T02:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30,
+          "2020-01": 31,
+          "2020-02": 29,
+          "2020-03": 31,
+          "2020-04": 30,
+          "2020-05": 31,
+          "2020-06": 30,
+          "2020-07": 31,
+          "2020-08": 31,
+          "2020-09": 30,
+          "2020-10": 31,
+          "2020-11": 30,
+          "2020-12": 30
+        },
+        "hours": {
+          "0": 46,
+          "1": 46,
+          "2": 46,
+          "3": 45,
+          "4": 45,
+          "5": 45,
+          "6": 45,
+          "7": 45,
+          "8": 45,
+          "9": 45,
+          "10": 45,
+          "11": 45,
+          "12": 46,
+          "13": 46,
+          "14": 46,
+          "15": 46,
+          "16": 45,
+          "17": 46,
+          "18": 46,
+          "19": 46,
+          "20": 46,
+          "21": 45,
+          "22": 46,
+          "23": 46
+        }
+      },
+      "selection": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1452,
+        "origin_sha256": "d7dd733860bb172cbd2a6e91669cbb8c5e0fa77d26d39426345bf4597219fa0d",
+        "first_local": "2022-01-01T03:00:00",
+        "last_local": "2022-12-30T18:00:00",
+        "months": {
+          "2022-01": 124,
+          "2022-02": 112,
+          "2022-03": 124,
+          "2022-04": 120,
+          "2022-05": 124,
+          "2022-06": 116,
+          "2022-07": 124,
+          "2022-08": 124,
+          "2022-09": 120,
+          "2022-10": 124,
+          "2022-11": 120,
+          "2022-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 60,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 60,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 60,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 60,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    },
+    "QLD1/2021": {
+      "train": {
+        "count": 728,
+        "origin_sha256": "43acfc1d3ae3118589b116185834877b00d7e6cc158ff86c539807163114dd0c",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2019-12-30T20:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30
+        },
+        "hours": {
+          "0": 30,
+          "1": 30,
+          "2": 30,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 30,
+          "9": 30,
+          "10": 30,
+          "11": 30,
+          "12": 31,
+          "13": 31,
+          "14": 31,
+          "15": 31,
+          "16": 30,
+          "17": 31,
+          "18": 31,
+          "19": 31,
+          "20": 31,
+          "21": 30,
+          "22": 30,
+          "23": 30
+        }
+      },
+      "selection": {
+        "count": 1460,
+        "origin_sha256": "66dff44972fe7972179e300b1a8a04afcd5c4bb03d0a6dbecb9860aa9d40285a",
+        "first_local": "2020-01-01T04:00:00",
+        "last_local": "2020-12-30T20:00:00",
+        "months": {
+          "2020-01": 124,
+          "2020-02": 116,
+          "2020-03": 124,
+          "2020-04": 120,
+          "2020-05": 124,
+          "2020-06": 120,
+          "2020-07": 124,
+          "2020-08": 124,
+          "2020-09": 120,
+          "2020-10": 124,
+          "2020-11": 120,
+          "2020-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 61,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 61,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 61,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 61,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    },
+    "QLD1/2022": {
+      "train": {
+        "count": 1093,
+        "origin_sha256": "7e30e63db93d1f37783d4186c7632c7176c344aa3bf7ac03d68914f7eeb774e8",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2020-12-30T02:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30,
+          "2020-01": 31,
+          "2020-02": 29,
+          "2020-03": 31,
+          "2020-04": 30,
+          "2020-05": 31,
+          "2020-06": 30,
+          "2020-07": 31,
+          "2020-08": 31,
+          "2020-09": 30,
+          "2020-10": 31,
+          "2020-11": 30,
+          "2020-12": 30
+        },
+        "hours": {
+          "0": 46,
+          "1": 46,
+          "2": 46,
+          "3": 45,
+          "4": 45,
+          "5": 45,
+          "6": 45,
+          "7": 45,
+          "8": 45,
+          "9": 45,
+          "10": 45,
+          "11": 45,
+          "12": 46,
+          "13": 46,
+          "14": 46,
+          "15": 46,
+          "16": 45,
+          "17": 46,
+          "18": 46,
+          "19": 46,
+          "20": 46,
+          "21": 45,
+          "22": 46,
+          "23": 46
+        }
+      },
+      "selection": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1452,
+        "origin_sha256": "d7dd733860bb172cbd2a6e91669cbb8c5e0fa77d26d39426345bf4597219fa0d",
+        "first_local": "2022-01-01T03:00:00",
+        "last_local": "2022-12-30T18:00:00",
+        "months": {
+          "2022-01": 124,
+          "2022-02": 112,
+          "2022-03": 124,
+          "2022-04": 120,
+          "2022-05": 124,
+          "2022-06": 116,
+          "2022-07": 124,
+          "2022-08": 124,
+          "2022-09": 120,
+          "2022-10": 124,
+          "2022-11": 120,
+          "2022-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 60,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 60,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 60,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 60,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    },
+    "TAS1/2021": {
+      "train": {
+        "count": 728,
+        "origin_sha256": "43acfc1d3ae3118589b116185834877b00d7e6cc158ff86c539807163114dd0c",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2019-12-30T20:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30
+        },
+        "hours": {
+          "0": 30,
+          "1": 30,
+          "2": 30,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 30,
+          "9": 30,
+          "10": 30,
+          "11": 30,
+          "12": 31,
+          "13": 31,
+          "14": 31,
+          "15": 31,
+          "16": 30,
+          "17": 31,
+          "18": 31,
+          "19": 31,
+          "20": 31,
+          "21": 30,
+          "22": 30,
+          "23": 30
+        }
+      },
+      "selection": {
+        "count": 1460,
+        "origin_sha256": "66dff44972fe7972179e300b1a8a04afcd5c4bb03d0a6dbecb9860aa9d40285a",
+        "first_local": "2020-01-01T04:00:00",
+        "last_local": "2020-12-30T20:00:00",
+        "months": {
+          "2020-01": 124,
+          "2020-02": 116,
+          "2020-03": 124,
+          "2020-04": 120,
+          "2020-05": 124,
+          "2020-06": 120,
+          "2020-07": 124,
+          "2020-08": 124,
+          "2020-09": 120,
+          "2020-10": 124,
+          "2020-11": 120,
+          "2020-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 61,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 61,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 61,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 61,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    },
+    "TAS1/2022": {
+      "train": {
+        "count": 1093,
+        "origin_sha256": "7e30e63db93d1f37783d4186c7632c7176c344aa3bf7ac03d68914f7eeb774e8",
+        "first_local": "2018-01-01T12:00:00",
+        "last_local": "2020-12-30T02:00:00",
+        "months": {
+          "2018-01": 31,
+          "2018-02": 28,
+          "2018-03": 31,
+          "2018-04": 30,
+          "2018-05": 31,
+          "2018-06": 30,
+          "2018-07": 31,
+          "2018-08": 31,
+          "2018-09": 30,
+          "2018-10": 31,
+          "2018-11": 30,
+          "2018-12": 30,
+          "2019-01": 31,
+          "2019-02": 28,
+          "2019-03": 31,
+          "2019-04": 30,
+          "2019-05": 31,
+          "2019-06": 30,
+          "2019-07": 31,
+          "2019-08": 31,
+          "2019-09": 30,
+          "2019-10": 31,
+          "2019-11": 30,
+          "2019-12": 30,
+          "2020-01": 31,
+          "2020-02": 29,
+          "2020-03": 31,
+          "2020-04": 30,
+          "2020-05": 31,
+          "2020-06": 30,
+          "2020-07": 31,
+          "2020-08": 31,
+          "2020-09": 30,
+          "2020-10": 31,
+          "2020-11": 30,
+          "2020-12": 30
+        },
+        "hours": {
+          "0": 46,
+          "1": 46,
+          "2": 46,
+          "3": 45,
+          "4": 45,
+          "5": 45,
+          "6": 45,
+          "7": 45,
+          "8": 45,
+          "9": 45,
+          "10": 45,
+          "11": 45,
+          "12": 46,
+          "13": 46,
+          "14": 46,
+          "15": 46,
+          "16": 45,
+          "17": 46,
+          "18": 46,
+          "19": 46,
+          "20": 46,
+          "21": 45,
+          "22": 46,
+          "23": 46
+        }
+      },
+      "selection": {
+        "count": 1456,
+        "origin_sha256": "91e38e5c661f0e8e81705d3f9bcfdc6b7f65a48c068828e6a1ff91d318195744",
+        "first_local": "2021-01-01T04:00:00",
+        "last_local": "2021-12-30T19:00:00",
+        "months": {
+          "2021-01": 124,
+          "2021-02": 112,
+          "2021-03": 124,
+          "2021-04": 120,
+          "2021-05": 124,
+          "2021-06": 120,
+          "2021-07": 124,
+          "2021-08": 124,
+          "2021-09": 120,
+          "2021-10": 124,
+          "2021-11": 120,
+          "2021-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 61,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 61,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 61,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 61,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      },
+      "evaluation": {
+        "count": 1452,
+        "origin_sha256": "d7dd733860bb172cbd2a6e91669cbb8c5e0fa77d26d39426345bf4597219fa0d",
+        "first_local": "2022-01-01T03:00:00",
+        "last_local": "2022-12-30T18:00:00",
+        "months": {
+          "2022-01": 124,
+          "2022-02": 112,
+          "2022-03": 124,
+          "2022-04": 120,
+          "2022-05": 124,
+          "2022-06": 116,
+          "2022-07": 124,
+          "2022-08": 124,
+          "2022-09": 120,
+          "2022-10": 124,
+          "2022-11": 120,
+          "2022-12": 120
+        },
+        "hours": {
+          "0": 61,
+          "1": 60,
+          "2": 60,
+          "3": 60,
+          "4": 61,
+          "5": 61,
+          "6": 61,
+          "7": 60,
+          "8": 60,
+          "9": 60,
+          "10": 61,
+          "11": 61,
+          "12": 61,
+          "13": 60,
+          "14": 60,
+          "15": 60,
+          "16": 61,
+          "17": 61,
+          "18": 61,
+          "19": 60,
+          "20": 60,
+          "21": 60,
+          "22": 61,
+          "23": 61
+        }
+      }
+    }
+  },
+  "oof_stage_mapping": {
+    "NSW1/2021": {
+      "train": {
+        "n_origins": 728,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1460,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 1460,
+            "first_origin": 1577815200,
+            "last_origin": 1609322400,
+            "first_local": "2020-01-01T04:00:00",
+            "last_local": "2020-12-30T20:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      }
+    },
+    "NSW1/2022": {
+      "train": {
+        "n_origins": 1093,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 365,
+            "first_origin": 1577880000,
+            "last_origin": 1609257600,
+            "first_local": "2020-01-01T22:00:00",
+            "last_local": "2020-12-30T02:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1452,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/NSW1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2022"
+            ],
+            "trained_before": 1625061600,
+            "selected_before": 1640955600,
+            "n_origins": 720,
+            "first_origin": 1640970000,
+            "last_origin": 1656496800,
+            "first_local": "2022-01-01T03:00:00",
+            "last_local": "2022-06-29T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2022H2"
+            ],
+            "trained_before": 1640959200,
+            "selected_before": 1656594000,
+            "n_origins": 732,
+            "first_origin": 1656612000,
+            "last_origin": 1672387200,
+            "first_local": "2022-07-01T04:00:00",
+            "last_local": "2022-12-30T18:00:00"
+          }
+        ]
+      }
+    },
+    "QLD1/2021": {
+      "train": {
+        "n_origins": 728,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1460,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 1460,
+            "first_origin": 1577815200,
+            "last_origin": 1609322400,
+            "first_local": "2020-01-01T04:00:00",
+            "last_local": "2020-12-30T20:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      }
+    },
+    "QLD1/2022": {
+      "train": {
+        "n_origins": 1093,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 365,
+            "first_origin": 1577880000,
+            "last_origin": 1609257600,
+            "first_local": "2020-01-01T22:00:00",
+            "last_local": "2020-12-30T02:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1452,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/QLD1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2022"
+            ],
+            "trained_before": 1625061600,
+            "selected_before": 1640955600,
+            "n_origins": 720,
+            "first_origin": 1640970000,
+            "last_origin": 1656496800,
+            "first_local": "2022-01-01T03:00:00",
+            "last_local": "2022-06-29T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2022H2"
+            ],
+            "trained_before": 1640959200,
+            "selected_before": 1656594000,
+            "n_origins": 732,
+            "first_origin": 1656612000,
+            "last_origin": 1672387200,
+            "first_local": "2022-07-01T04:00:00",
+            "last_local": "2022-12-30T18:00:00"
+          }
+        ]
+      }
+    },
+    "TAS1/2021": {
+      "train": {
+        "n_origins": 728,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1460,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 1460,
+            "first_origin": 1577815200,
+            "last_origin": 1609322400,
+            "first_local": "2020-01-01T04:00:00",
+            "last_local": "2020-12-30T20:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      }
+    },
+    "TAS1/2022": {
+      "train": {
+        "n_origins": 1093,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2018"
+            ],
+            "trained_before": 1498831200,
+            "selected_before": 1514725200,
+            "n_origins": 364,
+            "first_origin": 1514772000,
+            "last_origin": 1546146000,
+            "first_local": "2018-01-01T12:00:00",
+            "last_local": "2018-12-30T15:00:00"
+          },
+          {
+            "oof_folds": [
+              "2019"
+            ],
+            "trained_before": 1530367200,
+            "selected_before": 1546261200,
+            "n_origins": 364,
+            "first_origin": 1546326000,
+            "last_origin": 1577700000,
+            "first_local": "2019-01-01T17:00:00",
+            "last_local": "2019-12-30T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2020"
+            ],
+            "trained_before": 1561903200,
+            "selected_before": 1577797200,
+            "n_origins": 365,
+            "first_origin": 1577880000,
+            "last_origin": 1609257600,
+            "first_local": "2020-01-01T22:00:00",
+            "last_local": "2020-12-30T02:00:00"
+          }
+        ]
+      },
+      "selection": {
+        "n_origins": 1456,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2021"
+            ],
+            "trained_before": 1593525600,
+            "selected_before": 1609419600,
+            "n_origins": 1456,
+            "first_origin": 1609437600,
+            "last_origin": 1640854800,
+            "first_local": "2021-01-01T04:00:00",
+            "last_local": "2021-12-30T19:00:00"
+          }
+        ]
+      },
+      "evaluation": {
+        "n_origins": 1452,
+        "every_row_cutoffs_strictly_before_origin": true,
+        "original_oof_catalog": [
+          {
+            "fold": "2017",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2017/bundle.npz",
+            "trained_before": 1467295200,
+            "selected_before": 1483189200
+          },
+          {
+            "fold": "2018",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2018/bundle.npz",
+            "trained_before": 1498831200,
+            "selected_before": 1514725200
+          },
+          {
+            "fold": "2019",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2019/bundle.npz",
+            "trained_before": 1530367200,
+            "selected_before": 1546261200
+          },
+          {
+            "fold": "2020",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2020/bundle.npz",
+            "trained_before": 1561903200,
+            "selected_before": 1577797200
+          },
+          {
+            "fold": "2021",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2021/bundle.npz",
+            "trained_before": 1593525600,
+            "selected_before": 1609419600
+          },
+          {
+            "fold": "2022",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022/bundle.npz",
+            "trained_before": 1625061600,
+            "selected_before": 1640955600
+          },
+          {
+            "fold": "2022H2",
+            "bundle": "outputs/forecasting/v5_joint_history_20261019_full_r1/oof/TAS1/2022H2/bundle.npz",
+            "trained_before": 1640959200,
+            "selected_before": 1656594000
+          }
+        ],
+        "cutoff_groups": [
+          {
+            "oof_folds": [
+              "2022"
+            ],
+            "trained_before": 1625061600,
+            "selected_before": 1640955600,
+            "n_origins": 720,
+            "first_origin": 1640970000,
+            "last_origin": 1656496800,
+            "first_local": "2022-01-01T03:00:00",
+            "last_local": "2022-06-29T20:00:00"
+          },
+          {
+            "oof_folds": [
+              "2022H2"
+            ],
+            "trained_before": 1640959200,
+            "selected_before": 1656594000,
+            "n_origins": 732,
+            "first_origin": 1656612000,
+            "last_origin": 1672387200,
+            "first_local": "2022-07-01T04:00:00",
+            "last_local": "2022-12-30T18:00:00"
+          }
+        ]
+      }
+    }
+  },
+  "availability_audit": "archive_timestamp_proxies_only",
+  "evaluation_policy": "all selected region/fold/variant fits complete before any evaluation scoring"
+}

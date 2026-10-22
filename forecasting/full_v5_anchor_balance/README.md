@@ -57,3 +57,8 @@ The staged history phase verifies that both the shared encoder and calibration
 head, and the Anchor predictions on a fixed probe, remain exactly unchanged.
 Summarize a completed run with
 `logs/forecasting/v5_anchor_architecture_20261022/summarize_run.py RUN_DIRECTORY`.
+The completed screen's [summary](../../logs/forecasting/v5_anchor_architecture_20261022/summary.md)
+and [interpretation](../../logs/forecasting/v5_anchor_architecture_20261022/interpretation.md)
+report all six variants. No candidate passed every preregistered check; location-only
+with selection-time shrinkage improved both annual macro metrics but retained a
+TAS1/2021 MAE regression. This does not establish architecture as the sole cause.
