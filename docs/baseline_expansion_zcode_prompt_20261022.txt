@@ -1,0 +1,302 @@
+可直接交给 zcode 的实施提示词：在现有公平框架内补充强基线
+编写日期：2026-10-22
+
+你将在 /root/workspace/Code/DualTimesField-fair-baselines 中工作，使用分支 research/fair-baseline-expansion-20261022。
+这是基线工作的独立 worktree。/root/workspace/Code/DualTimesField 留给 Codex 继续修改 Full/Anchor；不要在那个目录切换分支、修改代码或安装依赖。
+请先审查代码，再按本提示词实施第一批基线；不要另建一套数据集、训练结果格式或评分体系。
+
+一、目标与本次范围
+
+我要比较的是不同模型在同一预测任务、公共输入边界和评分规则下的能力。
+各模型可以采用不同骨干、内部表示、训练损失、优化器和原生拟合策略；公共数据处理、时间切分、预测样本、可用信息和结果评价必须沿用现有 aligned 框架。
+每个实验基线必须有自己的实现目录和配置目录。不要把所有新增模型塞进一个大文件，也不要用已有 MLP 换名字冒充论文模型。
+
+本次正式实施范围：
+  阶段0：核对公平协议与扩展入口，形成执行清单。
+  阶段1：补齐最少必要的模型注册、校准和原生训练接入能力。
+  阶段2：依次完成下面第一批5个基线的代码、有效测试和小规模运行。
+  阶段3：在各模型通过验收、配置冻结后，运行第一批正式矩阵并生成公共报告。
+  后续基线本次仅登记优先级、依赖和接口要求，不自动扩大为所有论文全量复现。
+  本次不修改 Full/Anchor 的模型结构、损失权重或已有实验结论。
+
+共同起点：research/v5-anchor-calibration-fix 中包含本提示词的提交，其父提交为研究归档 1e962ea。
+独立分支与worktree由Codex准备。先检查实际HEAD、工作区、本地AGENTS.md及 git worktree list；确认处于指定目录和分支后继续，不重复创建或重置已有分支。
+若在另一台机器尚无此worktree，先找到包含本提示词的共同起点，再通过git worktree创建独立目录；不要在Codex的活动目录checkout基线分支。
+基线实施期间以共同起点及本分支提交为准，不自动追随另一个活动分支反复变更源码。最终由Codex合并并运行兼容性回归。
+本任务由 zcode 按阶段实施并记录提交；这份提示词本身不表示下面的代码、接口或实验已经存在。
+
+并行工作边界：
+  - zcode负责新增基线目录/配置/专属测试，以及必要的aligned注册、调度、校准和报告接入。
+  - Codex负责 forecasting/full_v5_joint/、forecasting/full_v5_anchor_balance/ 及其对应模型配置和实验。
+  - AlignedSplit、公共输入定义、预测文件契约和评分公式保持不变；公共入口新增能力保持向后兼容。
+  - 共享接口变更需在提交说明中列出影响、迁移及回归结果，便于后续合并；不覆盖另一分支工作。
+  - worktree的data可链接到原目录数据，已有两个aligned运行可通过独立链接复用；它们只能作为只读输入，不修改数据、冻结源码、manifest、父运行状态或已有结果。
+  - 符号链接本身不提供系统级只读保护；禁止对共享目标写入、chmod或清理。不要把整个outputs目录链接到Codex目录。
+  - 新运行写入基线worktree自己的outputs目录。Python环境和新增依赖也在此worktree独立建立，不向Codex的.venv安装或升级依赖。
+  - GPU是机器共享资源，启动任务前检查占用，避免抢占另一任务；代码目录隔离不等于算力隔离。
+
+二、必须先读的现有实现与证据
+
+在项目根目录下读取以下相对路径：
+  forecasting/README.md
+  configs/README.md
+  forecasting/aligned_inputs.py
+  forecasting/common/cache.py
+  forecasting/aligned_baselines.py
+  forecasting/aligned_runner.py
+  forecasting/aligned_experiment.py
+  forecasting/aligned_extension.py
+  forecasting/aligned_scoring.py
+  forecasting/aligned_report.py
+  forecasting/common/neural.py
+  forecasting/lasso/model.py
+  forecasting/lightgbm/model.py 及其已有冻结预测加载代码
+  forecasting/xgboost/model.py
+  configs/lightgbm/aligned.yaml
+  configs/experiments/aemo_forecast_aligned_20261012.yaml
+  configs/experiments/aemo_forecast_aligned_20261013_extension.yaml
+  tests/test_model_layout.py
+  tests/test_aligned_inputs.py
+  tests/test_aligned_baselines.py
+  tests/test_aligned_scoring.py
+  tests/test_aligned_experiment.py
+  tests/test_aligned_extension.py
+  tests/test_aligned_report.py
+  docs/research/epf_2026_review_20261022/README.txt
+  docs/research/epf_2026_review_20261022/baseline_recommendations.json
+  docs/research/epf_2026_review_20261022/all_reviews.json
+
+docs/fair_sota_plan_zl.md 和 configs/fair_sota/protocol_v1.draft.yaml 是背景与后续HPO草案。
+不可把其中尚未执行的 D1/D2、预算或切分覆盖到已经运行的静态 aligned 协议；本次以实际配置、缓存和冻结产物为准。
+
+当前已知的接入限制，实施前请核实：
+  1. aligned_experiment.validate_config 的模型集合和 single_model 白名单是固定的。
+  2. aligned_extension 目前专门校验“原10模型90格 + TimeXer/PriceFM18格”，不是通用任意模型扩展器。
+  3. aligned_runner 对多数非Full神经模型使用公共 pinball 训练，不能直接冒充 DDNN-JSU 的原生似然训练。
+  4. worker 目前仅向 lasso_arx72_cp 传 calibration，并把输出固定写成 quantile；新增模型需正确声明校准需求、输出类型和资源。
+  5. common/cache.py 已有单 split 读取，可用于隔离拟合、选择、校准与评价阶段。
+
+三、公共公平边界：必须保持
+
+1. 数据与预测任务
+  市场：AEMO NEM 的 NSW1、QLD1、TAS1。
+  时区：Australia/Brisbane。
+  任务：小时数据，72小时历史，24小时预测，逐小时滚动起点。
+  拟合：2015-01-01 至 2022-01-01，不含右端点。
+  选择：2022-01-01 至 2022-07-01，不含右端点。
+  校准：2022-07-01 至 2023-01-01，不含右端点。
+  测试：2023-01-01 至 2025-01-01，不含右端点。
+  正式种子：2026、2027、2028；每模型3地区×3种子，共9个任务。
+  完整目标窗必须落在相应 split 内，边界 purge/标签成熟遵循现有实现。
+  预计每地区测试17,521个起点，以原冻结样本、时间戳和缓存哈希核对为准；不允许补行、删行来凑数。
+
+2. 公共输入
+  所有模型接收同一个 AlignedSplit 的七块输入，顺序与定义以 INPUT_KEYS 为准：
+    history_values
+    history_calendar
+    future_calendar
+    origin_context
+    future_exogenous
+    ctf_exogenous
+    quantile_exogenous
+  输入数据应来自 build_aligned_splits 或已验证的公共冻结缓存。
+  模型目录内不另写读取原CSV、切分日期、补缺失、构造发布时间、重新采样或公共标准化的流水线。
+  可在 adapter 内做 flatten、patch、token、原生外生变量布局转换；转换必须可追溯到七块公共输入。
+  不得为适配官方库而静默丢弃、置零某个输入块。无法接入全部信息时，单列受限输入适配版本，不能作为完整同输入主榜结果。
+  训练用标准化和模型内部有状态变换仅在 train 拟合；逐样本无标签归一化属于内部实现，需说明规则。
+  不得修改公共数组、根据测试分布重算统计量、用未来实际负荷/风光代替当时可得预测。
+  现有 available_at 是档案可用性代理，不得把它描述为已独立认证的真实首次发布时间。
+
+3. 阶段隔离
+  train 拟合骨干；selection 选择骨干检查点/固定候选；冻结骨干后，calibration 拟合预先声明的校准器；最后预测并评分 test。
+  模型训练与选择阶段不得读取 test.actual/test.target。prepare 可按旧框架构建并哈希测试缓存，但模型拟合不得消费这些标签。
+  使用单 split 加载或等效隔离，并以测试验证，不要只依靠代码注释。
+  不得先在2022H2拟合校准器，再回到2022H1评价并选择“最佳校准器”。
+  校准器第一版采用预先固定参数；如需选择其参数，必须另设开发期内严格有序的训练/选择设计，不挪用测试标签。
+  本次主轨参数与校准器在测试期间固定。滚动CP、成熟误差更新、长历史检索属于另行声明的在线/扩展信息轨道。
+
+4. 输出和评分
+  使用 make_prediction_artifact / save_prediction_artifact / load_prediction_artifact / score_predictions。
+  概率输出统一形状 [N,24,5]，分位点 [.05,.10,.50,.90,.95]；价格逆变换回原始 RRP，AUD/MWh。
+  点输出 [N,24]；只有点输出的模型进入 P 表，禁止复制成5列伪造有效概率预测。
+  保留重排前分位输出，以公共评分器计算重排前交叉率，再排序取q50用于MAE/RMSE。
+  QS5=2×五分位平均pinball；称QS或CRPS代理，不称精确/99分位CRPS。
+  报MAE、pooled RMSE、QS5、各分位pinball、80/90%覆盖率与宽度、交叉率，保留地区和种子明细。
+  不裁剪实际电价或最终预测来改善主评分；公共特征裁剪规则仍完全沿用已有配置。
+  若原生分布支持密集分位或场景，可另报辅助指标；不能替换主表五分位评分。
+  缺少q05/q95的模型不得静默外推尾部、夹断分位后冒充完整Q模型。
+  三种子先分别评分再汇总；三地区等权。不要把种子平均分数、预测集成、地区平均RMSE与全局pooled RMSE混为一谈。
+
+5. 可比性与旧结果
+  复用 assert_comparable，并逐项检查 protocol_id、input_hash、sample_hash、preprocessing_hash、origins、target_time_unix、actual。
+  每个新增实验使用新run目录、独立源码/配置快照与manifest，保留原实验源码和预测。
+  不改旧模型ID、旧BASE_MODELS/EXTENSION_MODELS含义、旧90/18格manifest和已完成结果。
+  第一批对齐原12个aligned输出；Full_joint含额外成熟历史/误差，只能明确标成扩展信息参考，不冒称等信息对照。
+  如以后给新基线同等长期历史或在线状态，需公共构造、全模型同等访问，并使用新协议ID及独立排名。
+  已查看的2023—2024是回顾性测试，不称新盲测。本次不是已经完成的公平HPO，更不能声称全球SOTA。
+
+四、第一批基线：按以下顺序实施
+
+P0-1：lightgbm_cp
+  独立目录 forecasting/lightgbm_cp/；配置 configs/lightgbm_cp/aligned.yaml。
+  复用同地区/种子原冻结LightGBM和其排序后q50，使用2022H2样本外绝对残差做逐horizon静态CP。
+  优先复用 forecasting/lasso/model.py 的已核CP公式，可将通用函数提取到 common/calibration.py，但保留原导入兼容和数值行为。
+  现有公式是绝对残差 + type-7插值，不得宣称重叠时间序列下必然满足有限样本覆盖保证。
+  此对照的q50应与所用树的q50完全一致；它检验不确定性校准，不能把它当成已经修复中心偏差。
+  树模型/预测/校准残差来源需记录hash。缺少冻结模型时明确报阻断；如改为重训，必须另用模型ID，不能伪装复用原B。
+
+P0-2：lightgbm_qra
+  独立目录 forecasting/lightgbm_qra/；配置 configs/lightgbm_qra/aligned.yaml。
+  同样复用冻结B，第一版固定以该B的5个分位预测作为逐horizon QRA特征，在calibration拟合分位线性回归。
+  特征排序、截距、正则化、求解器容差预先固定；校准标签仅来自calibration，逆变换规则统一。
+  保存全部QRA系数、拟合范围和收敛状态；输出由公共评分器重排。
+  这是明确的本地QRA适配，不能说完整复现了J34的全部设计。
+  与lightgbm_cp一起检验：复杂Anchor是否优于简单的不确定性校准和可改变中心预测的校准。
+
+P0-3：xgboost_cp
+  独立目录 forecasting/xgboost_cp/；配置 configs/xgboost_cp/aligned.yaml。
+  与lightgbm_cp相同的公共校准协议，基座换成同地区/种子的冻结XGBoost。
+  两个模型共享校准工具，不复制同一份CP公式；各自拥有清晰的adapter、配置、来源与结果。
+
+P0-4：ddnn_jsu
+  独立目录 forecasting/ddnn_jsu/；配置 configs/ddnn_jsu/aligned.yaml。
+  依据P04/J34及相应原方法核实官方实现/公式，使用真正的Johnson SU分布参数网络，记录来源和改动。
+  网络输出合法位置、尺度和形状参数，通过分布分位函数得到公共5个分位；支持负价。
+  原生训练损失可用NLL，不能为了套现有runner直接换成普通MLP五分位头仍称DDNN-JSU。
+  第一版选择指标固定为原始价格公共五分位pinball/QS等价排序，并明确与原论文选择方式的差异。
+  参数位置不一定等于所需中位数；MAE使用真实q50。
+  保存模型内部变换及逆变换，保证似然定义、尺度约束和分位计算数值稳定；不静默裁剪异常输出。
+
+P0-5：nhits_qra
+  独立目录 forecasting/nhits_qra/；配置 configs/nhits_qra/aligned.yaml。
+  依据P08/P16核实NHITS、MC-dropout和QRA的组合，保留层次插值/多尺度骨干，不用普通MLP替代。
+  骨干接入公共历史、未来外生及静态上下文；官方库的数据frame只是adapter表示，禁止启动另一套日期切分或val_size默认切分。
+  骨干train拟合、selection选检查点；在calibration生成冻结骨干的MC预测并拟合QRA；再对test输出。
+  骨干选择所用原生/MC评分需在配置中预先声明，不能使用未来校准器回评selection。
+  固定MC样本数、随机种子规则；dropout采样不应更新其他层的训练状态；全部采样开销纳入成本。
+  如需要先实现直接五分位头，只能命名 nhits_quantile_adapter 并单独登记，不算nhits_qra已完成。
+
+以上5个基线都通过后，正式矩阵为45个新增任务。不要在编码未验收时一次性启动45格。
+确定性校准步骤可复用计算，但manifest必须能解释每个seed的基座来源及预测hash；不得把相同预测重复3次当作3份独立证据。
+
+五、每个基线的目录规范
+
+沿用现有 forecasting/<模型>/ 与 configs/<模型>/ 风格，建议如下：
+
+  forecasting/<model_id>/
+    __init__.py
+    model.py          # 原生骨干、分布或校准实现/调用
+    adapter.py        # AlignedSplit输入映射、阶段管理、原价输出
+    trainer.py        # 仅有必要时：原生训练循环；不重新造公共数据/评分
+    source.json       # 论文、官方repo/commit、许可证、实现身份和差异
+    README.md         # 方法、输入块映射、限制、运行方法
+    vendor/           # 仅需要固定官方源码时；附来源、版本及许可证
+  configs/<model_id>/aligned.yaml
+  tests/test_<model_id>_baseline.py
+
+不要为了形式堆空文件；各模型实现目录必须独立，公用逻辑只维护一份。
+公共校准可放 forecasting/common/calibration.py；模型注册可放 forecasting/common/baseline_registry.py。
+这两个路径是建议新增，不是当前已经存在的接口。只做接入所需的最小扩展，不趁机全面重构旧框架。
+
+source.json至少记录：experiment_model_id、paper_url/版本、implementation身份、repository、upstream_commit、依赖版本、license、输入适配、输出/目标变换、原生训练目标、选择指标、校准方式。
+使用预训练模型时另记权重名称/hash、训练范围/截止时间、许可证和可验证的污染风险。
+官方代码、官方库调用、移植、方法重实现和本地适配需准确区分；代码缺失要如实标记。
+
+六、框架接入设计要求
+
+1. 模型注册和原生拟合
+  在公共入口登记模型能力：原生训练策略、是否需要calibration、输出P/Q、CPU/GPU资源、save/load方式。
+  由adapter/策略处理分布NLL、两阶段QRA、官方库fit等差异；公共层负责阶段隔离、元数据、评分和产物审计。
+  可以复用现有BaselinePrediction接口；扩展必须向后兼容，不要求每个模型都套同一神经循环。
+  延迟导入可选依赖，缺一个模型的包不应使旧LightGBM/报告模块无法导入。
+  不允许NotImplementedError、伪造随机预测或空壳adapter被登记为implemented/available。
+
+2. 任意新增模型的实验范围
+  不把旧固定BASE_MODELS/EXTENSION_MODELS改成随时变化的列表来绕过验证。
+  新增明确的注册模型/扩展scope与schema版本，或兼容性良好的等价机制；它必须复用aligned公共缓存、快照、worker、预测文件与报告流程。
+  单模型正式运行仍要求3地区×3种子，smoke明确另标，不能降低正式校验来接受单seed。
+  合并旧90格、旧18格与新增45格时，各自保留source_hash/config_hash及父运行来源；跨run逐模型/地区/seed检查样本与评分契约。
+  不能直接用现有 --extend-from 假装已经支持任意新增模型；先实现并测试其扩展语义，再给出可执行命令。
+  公共协议内容与旧run一致时复用其protocol_id；模型实现变化由source/config等记录。改变信息集/时间长度/评分时必须新建protocol_id。
+  若原框架暂不支持跨run合并，明确交付兼容扩展报告器，不手拼CSV绕开assert_comparable。
+
+3. 配置与预算
+  单模型aligned.yaml沿用完整展开的公共配置，不在运行时隐式继承另一个可变文件。
+  公共数据段、预测段和所有公共外生段必须与父协议逐项相等；另用测试保证公共段不漂移。
+  第一版采用单个明确配置；不能依据2023—2024结果反复改结构、选择正则或权重。
+  神经骨干的初始上限沿用当前固定预算（100 epochs、patience15、batch256），学习率与原生优化器在配置中显式声明。
+  如原生方法必须采用不同预算或校准/采样阶段，记录原因与全部成本；旧SHARED_TRAINING不兼容时独立标记预算差异，不删除比较校验，也不声称完全等算力。
+  未实施的公平HPO继续标为未实施；后续HPO另立等预算方案。
+  记录实际epochs、样本覆盖、峰值内存/显存、训练/校准/推断时间、调参次数、MC样本数和冻结基座复用成本。
+
+七、验收：必须能发现真实错误
+
+通用契约测试至少覆盖：
+  - 七块输入的数值、顺序、形状和来源保持一致；adapter转换可追溯，且不修改公共缓存。
+  - 在公共输入固定时，打乱/替换evaluation.actual不改变模型参数、选择检查点、校准器或预测，仅改变最终评分。
+  - calibration标签不得影响已经选择的骨干；不使用校准的模型也不能因其改变而变动预测。
+  - fit阶段不读取test标签；train-only变换不会因selection/calibration/test分布改变而重新拟合。
+  - source/config/cache哈希改变会被拒绝；样本、实际值、时间戳不一致的结果不能合并。
+  - 对模型输出原价逆变换、5分位位置、P/Q标识、metadata、保存/加载等做有效断言。
+  - 保存后重载预测应在预先说明的数值容差内一致；模型依赖缺失时明确报告pending/blocked。
+  - incomplete/failed/smoke不能进入正式排名；不得跳过失败地区形成漂亮均值。
+  - 旧测试与旧模型布局保持兼容，不让新模型安装成为运行旧基线的条件。
+
+特有测试：
+  - CP手算残差/分位例子及q50不变，校准窗口成熟边界；迁移旧CP工具时验证旧数值不变。
+  - QRA设计矩阵、拟合/推断时间边界、系数存储、确定性和收敛失败处理。
+  - JSU分位与可信分布实现对照、合法参数、负价/极端值、NLL有限性和有效梯度。
+  - NHITS关键骨干结构及官方实现对齐证据、未来外生映射、固定随机种子MC预测、QRA仅在冻结骨干之后拟合。
+
+不写只重复实现的空泛测试，也不把随机数据shape通过当作论文实现正确。
+
+八、执行顺序与产物
+
+阶段0输出简短状态：
+  当前HEAD；公共协议字段；冻结缓存/模型是否可用；每模型来源与实现身份；需要扩展的最少接口；实际资源。
+  先读一条原LightGBM冻结结果，用公共评分器确认当前环境和评分入口正常。
+
+阶段1—2：
+  先实现公共接入和lightgbm_cp，再lightgbm_qra/xgboost_cp，最后ddnn_jsu/nhits_qra。
+  每个模型先跑单元/契约测试，再用train/selection/calibration的明确小样本做端到端smoke，不拿test表现挑实现。
+  smoke输出单独目录，标记smoke=true/max_origins/临时预算，不写入正式榜。
+  小规模运行验收后冻结版本、参数和配置；通过的工作按阶段提交。
+
+阶段3：
+  在新目录 outputs/forecasting/aligned_expansion_20261022_<run>/ 执行完整矩阵；自动调度实际空闲设备，不硬编码认为GPU 5/6/7始终空闲。
+  复用父缓存只读链接或相同哈希副本。资源不足的任务保持pending并记录可恢复状态，不自动缩小正式任务。
+  保留每个任务的checkpoint/模型文件、progress、status、预测NPZ、metrics、源码/配置/依赖/hash。
+  正式分数由公共评分器从NPZ重算；全部预先声明任务完成后，再发布该矩阵的完整排序。
+  用已有报告方式提供公共结果：每地区每seed、各地区三seed、三地区宏均值/种子离散程度、相对原LightGBM及匹配旧基线的增量与成本。
+  部分完成时只报进度/审计状态，不把成功子集称完整第一批榜单。
+  跨时间重叠样本不能当IID。没有做配对块统计检验，就不要宣称显著胜出。
+  追踪到 logs/forecasting/<run>/ 的轻量摘要和hash；大模型权重/NPZ仍遵守仓库已有忽略规则。
+
+交付必须包括：
+  1. 5个独立模型目录、完整配置、来源说明和实际生效的注册/调度。
+  2. 可复制执行的prepare/run/report命令。命令必须与实现后的 --help 核对，不使用尚不存在的参数。
+  3. 测试结果、smoke证据、正式任务状态和报告路径。
+  4. 每模型“官方实现/适配/重实现”身份，及与论文、父公平协议的差异清单。
+  5. 已提交的commit列表；存在外部依赖或算力阻断时，具体说明缺什么，已完成什么，不虚报训练完成。
+
+九、第二批与独立轨道：登记，第一批完成前不抢跑
+
+P1，同72h公共输入轨道可优先评估：
+  - TabPFN-2、TabPFN-3：分别独立目录/版本；核实权重与接口，完整七块输入映射。内部上下文/训练样本子集及成本必须明示，不声称与全样本拟合量相同。
+  - NBEATSx、TFT：独立目录，原生骨干；不能用实际未来外生取代公开预测。
+  - NBMLSS、QNBM：分别独立目录，共享公共数据和评分；不用其原文99分位“CRPS”直接替换本地QS。
+  - Chronos-2：零样本/微调分别登记；核实权重、预训练时间范围及全部外生支持。
+  - XMatch：先确认官方源码可得性，再决定官方适配或明确的方法重实现；不得把论文引用的baseline仓库当成其代码。
+
+P1，但必须另设信息协议：
+  - 官方LEAR+CP及CING-LEAR：标准7日价格滞后需要至少168h；不得把当前Lasso-ARX72+CP改名成LEAR。
+    如建立168h轨道，公共builder统一提供新输入、全部参评模型重跑/对齐、新protocol_id与独立主表；不借用原72h模型成绩混排。
+    提供168h公共输入仍不自动等于完整复现欧洲固定时点日前协议，命名必须准确。
+  - Chronos-2+CING-LEAR简单组合：两成员先在同一轨道验收，组合规则预先固定，分位平均不自动等于混合分布分位。
+  - 在线残差/CP及Full_joint成熟记忆对照：等信息、等更新时点，另行登记状态成熟规则和成本。
+
+P2：THieF/Spread THieF点预测协调、MODR联合概率、DiTS、完整多区PriceFM。
+  点轨迹协调使用小时MAE/RMSE/价差指标；联合概率另需ES/VS等，不能混用评价对象。
+  基础模型预训练年份重叠只构成需审计的时点/信息风险，不直接等于见过NEM测试标签。
+
+最终原则：让方法内部有差异，让公共比较边界保持一致；输出可以表明新方法无改善或某个适配暂不可比，不以“必须胜过旧基线”为验收标准。
