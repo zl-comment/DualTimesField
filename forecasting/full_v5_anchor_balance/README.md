@@ -1,0 +1,41 @@
+# Anchor balance development experiment
+
+See [the design and preregistered interpretation](../../docs/v5_anchor_balance_20261022.md)
+and [the two-round ZCode discussion](../../logs/forecasting/v5_anchor_balance_20261022/discussion.md).
+This package reuses the original joint model and authenticated OOF bundles. It
+does not replace the original forecasting entry points or evaluate 2023–2024.
+
+From the repository root, run the complete screening comparison:
+
+```bash
+.venv/bin/python -m forecasting.full_v5_anchor_balance.experiment \
+  --region all --fold all --profile screen --seed 2026 --tree-seed 2026 \
+  --development --output outputs/forecasting/v5_anchor_balance_screen_20261022_r1
+```
+
+The output directory must not exist. `--fold 2021` means train 2018–2019,
+select 2020, evaluate 2021; `--fold 2022` means train 2018–2020, select 2021,
+evaluate 2022. `screen` uses rotating daily origins and 3 epochs. For full
+hourly coverage and 20 epochs, use `--profile full` and a fresh output directory.
+`--seed` controls neural training; `--tree-seed` checks archived tree provenance.
+
+The three variants are `legacy`, `balanced`, and `identity_anchor`. Every
+variant records both the original Full-QS checkpoint selection (`raw`) and the
+shared-alpha selection with explicit baseline fallback (`guarded`). Compare
+like selection rules when attributing changes to the objective.
+
+Outputs include `manifest.json` (config, source/data/sample hashes, OOF mapping),
+`source/`, per-variant training logs and checkpoints, `selection_complete.json`,
+prediction NPZ files, and `report.json` / `report.md`. All selection finishes
+before evaluation scoring begins. `report.json` also includes quarters,
+Australian seasons, forecast-price groups, coverage and group sample counts.
+
+The selection guard is not a future-performance guarantee. A fallback to B
+is reported as fallback, not as evidence of a learned improvement. Screening
+results do not establish convergence or statistical significance.
+
+The completed first screen is archived in
+[the result summary](../../logs/forecasting/v5_anchor_balance_20261022/summary.md)
+and [the interpretation](../../logs/forecasting/v5_anchor_balance_20261022/interpretation.md).
+It improved on guarded legacy training in both years, but did not pass all
+preregistered checks. The original forecasting pipeline remains the default.

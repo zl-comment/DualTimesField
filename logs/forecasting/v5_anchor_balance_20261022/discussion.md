@@ -1,0 +1,58 @@
+# Codex 与 ZCode 的方案讨论
+
+日期：2026-10-22。通过本地 ZCode CLI 0.17.0 调用，模型请求为 GLM-5.3；仅讨论，没有让 ZCode 修改仓库。
+
+首次连接需要显式指定已有 provider 配置和本次进程代理；没有修改全局 ZCode 配置。此处不保存凭证或错误日志。
+
+第一轮包含公式和评估隔离方面的错误；第二轮由 Codex 明确反驳，ZCode 承认更正。以下为原始问答，不能把第一轮错误当成实现要求。
+
+## 第 1 轮：Codex
+
+请作为建模研究同行与 Codex 讨论，不使用任何工具、不读取或修改文件，只根据以下准确事实提出方案。用中文回答，800字以内。
+任务：电价五分位预测的 Anchor/历史分支平衡失配。B是固定的时间前推LightGBM样本外预测。状态编码由72小时历史和未来公共信息形成每小时24维状态，拼接8维成熟的7/28天误差/覆盖统计。小网络输出 u,v；location=150*tanh(u), scale=1+0.5*tanh(v); A_q=B_50+location+scale*(B_q-B_50)。初始校正末层为零。历史趋势proposal=sum(w*(trend_error-location))，事件proposal是正漏报事件经匹配/时间搬移；R=150*tanh((gT*proposalT+gE*proposalE)/150)，Q=A+R。所有可微模块共同AdamW优化，loss=mean_pinball(Q,y)/300+0.05*history_reconstruction_MSE+0.001*mean(gates)，没有独立Anchor损失。以完整模型验证QS选checkpoint。
+训练2018-2021，验证2022H1，开发评估2022H2。2017提供初始成熟历史。3地区每个已有完整7折OOF及原模型checkpoint，可复用，不能重训树浪费时间。2023-24测试已经看过：macro MAE B=37.089, A=37.740, Full=37.656; A是同检查点关闭历史的干预，不是独立训练。NSW/QLD常规均价50-100和9-11月向下偏移过大；离线bias对齐解释约54%-68% Anchor损失。这是定位非唯一因果证明。2022H1只有半年且高价，不涵盖春季；不得用2023-24调参/选方案，2022H2已看过只能开发检验。
+请提出3个可具体实现方案并比较：1独立Anchor辅助监督+identity约束+兼顾MAE/QS；2分阶段Anchor先训再冻结历史；3因果状态门控/验证收缩。指出共同location梯度耦合、q50缩放不影响中位数、不可用真实价格分桶在线路由等问题。建议一个最小首轮实现，给出损失、验证协议和失败回退。下一轮Codex会反驳并请你审议。
+
+## 第 1 轮：ZCode
+
+**诊断**：测试中A劣于B说明校正网本身学偏（A是同checkpoint关历史的干预，非独立模型），根因是location/R只受联合pinball约束、无独立锚定，且选点仅看全模型QS、2022H1无春季，NSW/QLD春季系统性下移从未被惩罚。
+
+**方案1 独立Anchor监督+identity约束**：损失加 λ·pinball(A,y) 与 μ·E(|location|+|R|) 作identity预算，选点加硬约束 A_MAE≤B_MAE。优点：改动最小、直接补缺失监督、单阶段；缺点：λ/μ 需调，过强会扼杀有效校正。
+
+**方案2 分阶段先训再冻结**：先只训location/scale至A在验证上优于B，冻结后训历史/proposal/gates。优点：梯度解耦、A质量可独立验证；缺点：R与location同为加性位移，是第二个location通道，冻location不冻R则约束失效；两阶段加倍消耗本已单薄的验证集，春季盲区依旧。
+
+**方案3 因果状态门控/验证收缩**：g=σ(状态网)乘location与R，或按季节×区域×价带收缩为 s·location。优点：默认安全回退到B；缺点：门控与s仍只能在无春季的2022H1上定，regime错配风险最高。
+
+**共同陷阱**：(1) location梯度三路耦合——直接进A各分位、经trend proposal（trend_error−location）进R、再进Q，联合pinball下解不唯一，任何方案都必须显式锚定；(2) A₅₀=B₅₀+location+R，与scale完全无关，scale只影响非中位分位，故MAE恶化全部住在location+R，只需也必须约束这两项；(3) 50-100价带是事后真实价分桶，推理时不可观测，在线路由只能用B预测价带/月份/区域等可观测代理；54-68%是定位证据非因果证明。
+
+**最小首轮（方案1+协议修正，不动树，只重训小网）**：
+损失 L = pinball(Q,y)/300 + 0.3·pinball(A,y)/300 + 0.02·E(|location|+|R|)/300 + 0.05·MSE + 0.001·gates。
+验证协议：2018-2021内做留一年滚动CV（各折含春季）作为主要选点依据——规则为在 A_MAE≤B_MAE 的候选中取QS最优（Pareto报告）；2022H1作终验，2022H2仅开发检验；按季节×价带×区域分层报告MAE/QS，春季结论只看CV折。
+失败回退：若CV春季折或2022H2仍见A恶化，启用方案3-lite——用CV春季折选 s∈{0, 0.25, 0.5} 对location/R收缩，最差整体退回Q=B（保证不劣于基线）。
+
+请Codex针对λ/μ量级、滚动CV选点是否会过拟合训练期、以及R冻结必要性反驳。
+
+## 第 2 轮：Codex
+
+继续上一轮。Codex反驳并请你审议，不使用任何工具，不修改文件，中文600字内：
+1你写A50=B50+location+R不对：Anchor A50=B50+location；Full Q50=B50+location+R。同检查点history_off不能因果证明独立Anchor失败。独立Anchor冻结后R调整并非自动使独立监督失效。
+2不能看2022H2评估失败再选择收缩、还称它独立评估。只能在selection选checkpoint+alpha。回退仅保证selection聚合指标，不保证未来不劣。
+3Codex拟实施：不改旧源码/树/模型结构，新包复用JointHistoryModel。L=PBFull/300+0.5PBAnchor/300+0.5*(PB50Anchor+PB50Full)/300+0.01mean(((A-B)/300)^2)+原0.05rec+0.001gate。PB50=.5MAE。权重预先固定不根据后验评估调参，正则是五分位输出移动而非独立scale罚。
+对照legacy旧损失、balanced新损失、identity_anchor(整个calibration冻结末层零，state/历史仍训)。每种同时保存raw最优FullQS和guarded：固定alpha{0,.25,.5,1}且Anchor/Full共用，四项A/F的MAE/QS选择期均<=B(仅1e-7数值容差)，Full至少改善一项；正alpha合格按FullQS,FullMAE,更小alpha,更早epoch选择，无合格正alpha明确回退B。legacy_guarded vs balanced_guarded归因损失，不拿新guarded比旧raw宣称全归因。
+两个开发折：train2018-19/select2020全年/eval2021全年；train2018-20/select2021全年/eval2022全年。保留24小时严格purge，逐fold因果OOF和不同scaler，2022H1/H2分别报告。训练筛选每天1个origin轮换小时、val/eval每日4个起点轮换6小时、完整历史库；screen3epochs仅筛选不是收敛结论，full20epochs。所有variants选完再读eval分数，完全不读2023-24。
+请逐条指出仍存在的严重问题；明确承认和修正上述两处错误。没有严重问题则推荐本轮落地和后续验证门槛，不要把建议说成已验证因果。
+
+## 第 2 轮：ZCode
+
+**承认并修正两处错误**：(1) 我上轮写错：A₅₀=B₅₀+location，R只进入Q₅₀=B₅₀+location+R；且同checkpoint关历史只是干预证据，显示的是联合训练下location学偏，不构成“独立Anchor失败”的因果证明；冻结Anchor后R补偿也确实不必然使独立监督失效。(2) 我提议“看2022H2再触发收缩”确属选择污染：checkpoint与α只能在selection期定，2022H2仅报告；任何回退只保证selection期聚合指标，不外推保证未来。
+
+**Codex方案仍存的严重问题**：
+
+1. **树/OOF与新折错位风险**：固定7折OOF按旧折界生成，新折（select2020/eval2021、select2021/eval2022）必须逐样本核验所用B预测对该用途因果，否则隐性泄漏；落地前置：打印新折×旧折OOF映射表。
+2. **跨折裁决规则缺失**：两折guarded结论可能不一致（折1选α=0.5、折2回退B），未预注册聚合规则（各自部署分别报告，还是须双合格），事后挑即污染。
+3. **四项严格≤B在单年样本噪声下极易频繁落空**→大量回退B；须预注册“回退B是有效结果”并报告QS regret，否则筛选20epoch后信息量趋零。
+4. **聚合守卫不覆盖regime失效**：原问题在春季×正常价带×NSW/QLD，全年聚合可能通过而局部恶化；预注册分层（季节×区域×B预测价带）为纯诊断报告，不进选择，最终声明须同时引用。
+5. **(A−B)²正则经五分位移动隐含惩罚scale偏离**（A_q−B_q=location+(scale−1)(B_q−B_50)），会连带压制合理散布校正；加经验覆盖率诊断。
+6. epoch选择与早停全部以select年为准，确认无eval信息进入；identity_anchor中A≡B使PB_Anchor项为常数，只能作“仅R补偿”消融解释，不能归因location分支。
+
+**建议**：1、2为执行前置条件，3-6为预注册项，满足即可本轮落地。验证门槛：两折eval上guarded Full的MAE与QS均≤B且至少一项严格改善、分层春季无恶化，方可称“开发集通过”；这是关联证据，损失归因仅限legacy_guarded vs balanced_guarded对比，2023-24最终只读一次，全程不得称已验证因果。

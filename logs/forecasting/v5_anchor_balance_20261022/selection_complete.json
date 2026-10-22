@@ -1,0 +1,1352 @@
+{
+  "NSW1/2021/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.66639666897436,
+          "qs": 16.21630889699091,
+          "coverage_80": 0.6871575342465753,
+          "coverage_90": 0.8192066210045662,
+          "bias": -10.971564895459812
+        },
+        "full": {
+          "mae": 20.813756652372852,
+          "qs": 16.32553256873477,
+          "coverage_80": 0.6774543378995433,
+          "coverage_90": 0.8095319634703196,
+          "bias": -10.752656884308582
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.08408490713328476,
+            "full_minus_anchor": 0.14735998339849132,
+            "full_minus_B": 0.23144489053177608
+          },
+          "qs": {
+            "anchor_minus_B": 0.07237811863041799,
+            "full_minus_anchor": 0.10922367174385883,
+            "full_minus_B": 0.18160179037427682
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.25,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.505981255032665,
+          "qs": 16.13382473237891,
+          "coverage_80": 0.7142408675799087,
+          "coverage_90": 0.8361586757990868,
+          "bias": -11.361690479061954
+        },
+        "full": {
+          "mae": 20.51606243984119,
+          "qs": 16.141957818000932,
+          "coverage_80": 0.7134417808219178,
+          "coverage_90": 0.8352454337899543,
+          "bias": -11.332949222706803
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/legacy/raw.pt": "f73ef567753e2a1b774e66f99428dc77bce307e28af29d92fb3cc580736ab02c",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/legacy/guarded.pt": "116a8a9bd3f91601827e2109182c6e949009447be885ea0b687ee9a17d18f3a5"
+    }
+  },
+  "NSW1/2021/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 2,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.548870847131802,
+          "qs": 16.14835851858927,
+          "coverage_80": 0.6956906392694064,
+          "coverage_90": 0.8230593607305936,
+          "bias": -11.99387026015567
+        },
+        "full": {
+          "mae": 20.78163395017709,
+          "qs": 16.33854477746924,
+          "coverage_80": 0.6858732876712329,
+          "coverage_90": 0.8120719178082192,
+          "bias": -11.6609886055404
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.03344091470927424,
+            "full_minus_anchor": 0.23276310304528636,
+            "full_minus_B": 0.19932218833601212
+          },
+          "qs": {
+            "anchor_minus_B": 0.004427740228777566,
+            "full_minus_anchor": 0.19018625887997231,
+            "full_minus_B": 0.19461399910874988
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.0,
+        "epoch": 1,
+        "fallback": true,
+        "reason": "no_positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "full": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/balanced/raw.pt": "11ce0240278f098c10f3517c97b3db8703df234dc1fca26be14b339927ea5da8",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/balanced/guarded.pt": "a8e68a441a9d1fe94cc181d3a67577f55071205abd99f3a2e93bca3ff6f12b33"
+    }
+  },
+  "NSW1/2021/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "full": {
+          "mae": 20.682740727977905,
+          "qs": 16.215004325610014,
+          "coverage_80": 0.7015410958904109,
+          "coverage_90": 0.8269977168949771,
+          "bias": -10.968035206267585
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": 0.10042896613682828,
+            "full_minus_B": 0.10042896613682828
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": 0.0710735472495223,
+            "full_minus_B": 0.0710735472495223
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.0,
+        "epoch": 1,
+        "fallback": true,
+        "reason": "no_positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "anchor": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        },
+        "full": {
+          "mae": 20.582311761841076,
+          "qs": 16.14393077836049,
+          "coverage_80": 0.7073630136986301,
+          "coverage_90": 0.8339897260273973,
+          "bias": -11.100863613522522
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/identity_anchor/raw.pt": "70055052ea583ede9582c0b00e80ac50233f7c4122615bcfdb4674717f40969a",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2021/identity_anchor/guarded.pt": "bc3bfbca8d736730bd36f5c7027f9a06b82cb92f5738e919c7ccc9bf14cdc62b"
+    }
+  },
+  "NSW1/2022/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 26.00555799828694,
+          "qs": 17.481163098204032,
+          "coverage_80": 0.7150869963369964,
+          "coverage_90": 0.8417467948717948,
+          "bias": -15.142339044565679
+        },
+        "full": {
+          "mae": 25.95604768445444,
+          "qs": 17.447152543671287,
+          "coverage_80": 0.7154876373626373,
+          "coverage_90": 0.8419184981684982,
+          "bias": -15.012139290998922
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.03826836406529566,
+            "full_minus_anchor": -0.049510313832499264,
+            "full_minus_B": -0.011241949767203607
+          },
+          "qs": {
+            "anchor_minus_B": -0.19932781018495405,
+            "full_minus_anchor": -0.034010554532745374,
+            "full_minus_B": -0.23333836471769942
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 25.842109020958457,
+          "qs": 17.512717963578048,
+          "coverage_80": 0.7366929945054945,
+          "coverage_90": 0.8468692765567766,
+          "bias": -13.959263179565085
+        },
+        "full": {
+          "mae": 25.818863723736218,
+          "qs": 17.496555935560945,
+          "coverage_80": 0.7366929945054945,
+          "coverage_90": 0.8470123626373627,
+          "bias": -13.894163302781704
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/legacy/raw.pt": "be17c89ec9dc88332eba85fb8cecdef31b8f00df0af86d9a145aa16e7203ae26",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/legacy/guarded.pt": "93473c11551da88ad4be8be664ff087f851224b57363f83dcf5e50a76f8ca683"
+    }
+  },
+  "NSW1/2022/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 25.943654834878316,
+          "qs": 17.538861341837425,
+          "coverage_80": 0.7240155677655677,
+          "coverage_90": 0.8445226648351648,
+          "bias": -15.20242473315712
+        },
+        "full": {
+          "mae": 25.877389565228327,
+          "qs": 17.49262372122038,
+          "coverage_80": 0.7242731227106227,
+          "coverage_90": 0.8442078754578755,
+          "bias": -15.0152666297389
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.023634799343327018,
+            "full_minus_anchor": -0.06626526964998902,
+            "full_minus_B": -0.08990006899331604
+          },
+          "qs": {
+            "anchor_minus_B": -0.14162956655156123,
+            "full_minus_anchor": -0.046237620617045394,
+            "full_minus_B": -0.18786718716860662
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 25.943654834878316,
+          "qs": 17.538861341837425,
+          "coverage_80": 0.7240155677655677,
+          "coverage_90": 0.8445226648351648,
+          "bias": -15.20242473315712
+        },
+        "full": {
+          "mae": 25.877389565228327,
+          "qs": 17.49262372122038,
+          "coverage_80": 0.7242731227106227,
+          "coverage_90": 0.8442078754578755,
+          "bias": -15.0152666297389
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/balanced/raw.pt": "71a8e059049f7abf73a1552b405d33c67567ced8be484a60a5de3174b53fa3b6",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/balanced/guarded.pt": "2b9b5b254f0f615931d19b4d23089abb33a5c36fd6cb3a2ab1a08ef88d1bf5cb"
+    }
+  },
+  "NSW1/2022/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "full": {
+          "mae": 25.85901991881971,
+          "qs": 17.603706193919567,
+          "coverage_80": 0.7324004120879121,
+          "coverage_90": 0.8403159340659341,
+          "bias": -13.06936817656266
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.10826971540193497,
+            "full_minus_B": -0.10826971540193497
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.0767847144694187,
+            "full_minus_B": -0.0767847144694187
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "anchor": {
+          "mae": 25.967289634221643,
+          "qs": 17.680490908388986,
+          "coverage_80": 0.727878891941392,
+          "coverage_90": 0.8374828296703297,
+          "bias": -12.776187314564488
+        },
+        "full": {
+          "mae": 25.85901991881971,
+          "qs": 17.603706193919567,
+          "coverage_80": 0.7324004120879121,
+          "coverage_90": 0.8403159340659341,
+          "bias": -13.06936817656266
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/identity_anchor/raw.pt": "0e3ee110fa75d4f53e2d524f837ff7f2bd0401d3d984079b1f4c57fb1b28f144",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/NSW1/2022/identity_anchor/guarded.pt": "1cba89ace902eb55f39d0b1e313c36dc5986c95104d5f345a316cf4bf9821ce6"
+    }
+  },
+  "QLD1/2021/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.258361239504648,
+          "qs": 7.526763906725518,
+          "coverage_80": 0.6882990867579909,
+          "coverage_90": 0.8234874429223744,
+          "bias": -2.497055030646883
+        },
+        "full": {
+          "mae": 11.241622320172636,
+          "qs": 7.519173006476161,
+          "coverage_80": 0.6886415525114156,
+          "coverage_90": 0.8233162100456621,
+          "bias": -2.4928131679340892
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.11768339954010365,
+            "full_minus_anchor": -0.016738919332011548,
+            "full_minus_B": -0.1344223188721152
+          },
+          "qs": {
+            "anchor_minus_B": -0.5811928349635069,
+            "full_minus_anchor": -0.00759090024935638,
+            "full_minus_B": -0.5887837352128633
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.258361239504648,
+          "qs": 7.526763906725518,
+          "coverage_80": 0.6882990867579909,
+          "coverage_90": 0.8234874429223744,
+          "bias": -2.497055030646883
+        },
+        "full": {
+          "mae": 11.241622320172636,
+          "qs": 7.519173006476161,
+          "coverage_80": 0.6886415525114156,
+          "coverage_90": 0.8233162100456621,
+          "bias": -2.4928131679340892
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/legacy/raw.pt": "b93e9809b732827e7f7c21dc2f3313c32ef6b034365916f64e41e70d1b0e3155",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/legacy/guarded.pt": "cebf71d89fe26f2ee48b4e45258b321a7064a908bc9e373e268f6ac720514782"
+    }
+  },
+  "QLD1/2021/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.2299747699995,
+          "qs": 7.7193289456152145,
+          "coverage_80": 0.6587899543378996,
+          "coverage_90": 0.7954623287671233,
+          "bias": -0.9609305500733287
+        },
+        "full": {
+          "mae": 11.174162994098497,
+          "qs": 7.677308378166714,
+          "coverage_80": 0.66212899543379,
+          "coverage_90": 0.7982020547945206,
+          "bias": -1.104375210501781
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.14606986904525243,
+            "full_minus_anchor": -0.05581177590100239,
+            "full_minus_B": -0.20188164494625482
+          },
+          "qs": {
+            "anchor_minus_B": -0.38862779607381004,
+            "full_minus_anchor": -0.04202056744850058,
+            "full_minus_B": -0.4306483635223106
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.2299747699995,
+          "qs": 7.7193289456152145,
+          "coverage_80": 0.6587899543378996,
+          "coverage_90": 0.7954623287671233,
+          "bias": -0.9609305500733287
+        },
+        "full": {
+          "mae": 11.174162994098497,
+          "qs": 7.677308378166714,
+          "coverage_80": 0.66212899543379,
+          "coverage_90": 0.7982020547945206,
+          "bias": -1.104375210501781
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/balanced/raw.pt": "2066cde7135364f5e9a7a9bb84c9925affed84f587a1bd855924739d9aa2d4f7",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/balanced/guarded.pt": "f85f5e029472fcf698976ba59aa3b49946c2ad8abe5a12f1ebd885829486c227"
+    }
+  },
+  "QLD1/2021/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "full": {
+          "mae": 11.06213711363106,
+          "qs": 7.798703971087058,
+          "coverage_80": 0.7302511415525114,
+          "coverage_90": 0.8468607305936073,
+          "bias": -0.4586128675251281
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.3139075254136916,
+            "full_minus_B": -0.3139075254136916
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.309252770601967,
+            "full_minus_B": -0.309252770601967
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "anchor": {
+          "mae": 11.376044639044752,
+          "qs": 8.107956741689025,
+          "coverage_80": 0.7261415525114155,
+          "coverage_90": 0.8402111872146119,
+          "bias": 0.9713312920757047
+        },
+        "full": {
+          "mae": 11.06213711363106,
+          "qs": 7.798703971087058,
+          "coverage_80": 0.7302511415525114,
+          "coverage_90": 0.8468607305936073,
+          "bias": -0.4586128675251281
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/identity_anchor/raw.pt": "49bb1764b4319d1caff0a477e2aaf419ec7937648e5ce9f4635a16494584b91f",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2021/identity_anchor/guarded.pt": "84cfd4072c502df5231d302920021c8c1bb306f9ca94da0f6c33dc4c32e8fd99"
+    }
+  },
+  "QLD1/2022/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.27600357058915,
+          "qs": 34.48551905260034,
+          "coverage_80": 0.6891311813186813,
+          "coverage_90": 0.8249198717948718,
+          "bias": -30.52847246367592
+        },
+        "full": {
+          "mae": 45.171984372141395,
+          "qs": 34.42203763017422,
+          "coverage_80": 0.6846096611721612,
+          "coverage_90": 0.8217147435897436,
+          "bias": -29.940356502727184
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.2511805878514437,
+            "full_minus_anchor": -0.10401919844775165,
+            "full_minus_B": -0.35519978629919535
+          },
+          "qs": {
+            "anchor_minus_B": 0.21890582140027703,
+            "full_minus_anchor": -0.06348142242611488,
+            "full_minus_B": 0.15542439897416216
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.0,
+        "epoch": 1,
+        "fallback": true,
+        "reason": "no_positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "full": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/legacy/raw.pt": "72b2187096784b8c8c2635aabd92c09afcbd1eae9e67661a905cdbe2cea10707",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/legacy/guarded.pt": "ac0a773fc4e6a6932f4512c0fba42c47f663ab0d0b61767453caf85b18daa60f"
+    }
+  },
+  "QLD1/2022/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.3611013850417,
+          "qs": 34.39146315532825,
+          "coverage_80": 0.7113381410256411,
+          "coverage_90": 0.8444940476190477,
+          "bias": -30.682129059485504
+        },
+        "full": {
+          "mae": 45.248204486103766,
+          "qs": 34.34867778896115,
+          "coverage_80": 0.7072744963369964,
+          "coverage_90": 0.8389136904761905,
+          "bias": -30.005357880022395
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.166082773398891,
+            "full_minus_anchor": -0.11289689893793309,
+            "full_minus_B": -0.2789796723368241
+          },
+          "qs": {
+            "anchor_minus_B": 0.12484992412819196,
+            "full_minus_anchor": -0.04278536636710584,
+            "full_minus_B": 0.08206455776108612
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.0,
+        "epoch": 1,
+        "fallback": true,
+        "reason": "no_positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "full": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/balanced/raw.pt": "008a9325d8dc8f250602f0a04955d8fd5f696a2d23fc0aa86a0fd536b95285d7",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/balanced/guarded.pt": "bf7491c6117ee06089c1f062289630f5d364d82672f88d091ad0307195db8124"
+    }
+  },
+  "QLD1/2022/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "full": {
+          "mae": 45.05021942967061,
+          "qs": 34.17819927490823,
+          "coverage_80": 0.729080815018315,
+          "coverage_90": 0.8573145604395604,
+          "bias": -30.76402901874008
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.4769647287699783,
+            "full_minus_B": -0.4769647287699783
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.08841395629183069,
+            "full_minus_B": -0.08841395629183069
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "anchor": {
+          "mae": 45.52718415844059,
+          "qs": 34.26661323120006,
+          "coverage_80": 0.73211423992674,
+          "coverage_90": 0.8603766025641025,
+          "bias": -29.488072740147956
+        },
+        "full": {
+          "mae": 45.194427669785554,
+          "qs": 34.17684206290808,
+          "coverage_80": 0.7324290293040293,
+          "coverage_90": 0.8600618131868132,
+          "bias": -30.12605087944402
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/identity_anchor/raw.pt": "7507178a959ca5e1f4c3ef93e93c0f895f93be499b3376b7930a6fac72a581ba",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/QLD1/2022/identity_anchor/guarded.pt": "a57b8fb81871f843e2e16ba5bfaa16a7b42fb83c48d5d4e64a5ab4fba41e2614"
+    }
+  },
+  "TAS1/2021/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 2,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 17.076100897641115,
+          "qs": 9.814357548342963,
+          "coverage_80": 0.7670662100456621,
+          "coverage_90": 0.8662100456621005,
+          "bias": 0.5630819108217028
+        },
+        "full": {
+          "mae": 17.02938545196919,
+          "qs": 9.795525013775967,
+          "coverage_80": 0.7671803652968037,
+          "coverage_90": 0.866837899543379,
+          "bias": 0.5162575934578763
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.23317618435963894,
+            "full_minus_anchor": -0.04671544567192498,
+            "full_minus_B": -0.2798916300315639
+          },
+          "qs": {
+            "anchor_minus_B": -0.15737376622720056,
+            "full_minus_anchor": -0.018832534566996628,
+            "full_minus_B": -0.1762063007941972
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 16.841088046888743,
+          "qs": 9.7569663169562,
+          "coverage_80": 0.7648972602739726,
+          "coverage_90": 0.8634132420091324,
+          "bias": 1.2206501647687946
+        },
+        "full": {
+          "mae": 16.830465217602196,
+          "qs": 9.751892835402836,
+          "coverage_80": 0.7654109589041096,
+          "coverage_90": 0.8633561643835617,
+          "bias": 1.263699698298848
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/legacy/raw.pt": "e4f9c800f7ad14ee43fea6cd9bff8e7b02de3b2ab210291295596974996f9031",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/legacy/guarded.pt": "2b5f5fc7df4d3cdbca23a2075d8fa2152a0aa0dfe382648d5ee303d5dffd37b7"
+    }
+  },
+  "TAS1/2021/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 2,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 16.86925031689185,
+          "qs": 9.73884358216883,
+          "coverage_80": 0.7687785388127854,
+          "coverage_90": 0.8683219178082192,
+          "bias": 0.47759012634680953
+        },
+        "full": {
+          "mae": 16.817706910512605,
+          "qs": 9.715277674467186,
+          "coverage_80": 0.7696061643835617,
+          "coverage_90": 0.8699200913242009,
+          "bias": 0.3559499679617031
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": -0.4400267651089038,
+            "full_minus_anchor": -0.05154340637924548,
+            "full_minus_B": -0.4915701714881493
+          },
+          "qs": {
+            "anchor_minus_B": -0.2328877324013341,
+            "full_minus_anchor": -0.02356590770164324,
+            "full_minus_B": -0.25645364010297733
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 16.77022457042488,
+          "qs": 9.722795880097669,
+          "coverage_80": 0.7672659817351598,
+          "coverage_90": 0.8653538812785389,
+          "bias": 1.2728082972228263
+        },
+        "full": {
+          "mae": 16.750545920657387,
+          "qs": 9.710556407278471,
+          "coverage_80": 0.7676655251141552,
+          "coverage_90": 0.8652397260273973,
+          "bias": 1.3640585308733315
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/balanced/raw.pt": "bab1ddbcaf291ae48a02fa24aea2762eabd68d2e255d2f6ef07825029cf7ee49",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/balanced/guarded.pt": "f80d999e57e2e45fec854baa57656e93813555ef8cd2cf405853e635bf3a1ff0"
+    }
+  },
+  "TAS1/2021/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 2,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1460,
+        "n_cells": 35040,
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "full": {
+          "mae": 16.896926340777277,
+          "qs": 9.776984094423431,
+          "coverage_80": 0.7556506849315069,
+          "coverage_90": 0.8565068493150685,
+          "bias": 2.3308720592616687
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.41235074122347726,
+            "full_minus_B": -0.41235074122347726
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.1947472201467324,
+            "full_minus_B": -0.1947472201467324
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 2,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "anchor": {
+          "mae": 17.309277082000754,
+          "qs": 9.971731314570164,
+          "coverage_80": 0.7381849315068493,
+          "coverage_90": 0.8426655251141553,
+          "bias": 4.525349757394016
+        },
+        "full": {
+          "mae": 16.896926340777277,
+          "qs": 9.776984094423431,
+          "coverage_80": 0.7556506849315069,
+          "coverage_90": 0.8565068493150685,
+          "bias": 2.3308720592616687
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/identity_anchor/raw.pt": "05553efd586fcc5c23553155472f931137549396042326d909993d11256718db",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2021/identity_anchor/guarded.pt": "d75b67779c6218df75b4bff8bd9c2f12f9d1fef75b0e213aba384fb86db6709e"
+    }
+  },
+  "TAS1/2022/legacy": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.367915043714762,
+          "qs": 7.826907124964156,
+          "coverage_80": 0.8167925824175825,
+          "coverage_90": 0.9132039835164835,
+          "bias": -3.678154589262637
+        },
+        "full": {
+          "mae": 13.338454974300388,
+          "qs": 7.818075629515347,
+          "coverage_80": 0.8173076923076923,
+          "coverage_90": 0.9132326007326007,
+          "bias": -3.6015107327752474
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.23852529499219877,
+            "full_minus_anchor": -0.02946006941437318,
+            "full_minus_B": 0.2090652255778256
+          },
+          "qs": {
+            "anchor_minus_B": 0.011855588037571252,
+            "full_minus_anchor": -0.008831495448808901,
+            "full_minus_B": 0.0030240925887623504
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 1,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.073698869673182,
+          "qs": 7.749885663885367,
+          "coverage_80": 0.8104109432234432,
+          "coverage_90": 0.9043898809523809,
+          "bias": -1.601386396413955
+        },
+        "full": {
+          "mae": 13.065182059814179,
+          "qs": 7.747623960001758,
+          "coverage_80": 0.8103250915750916,
+          "coverage_90": 0.9045902014652014,
+          "bias": -1.5630644681702603
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/legacy/raw.pt": "c217aa453958116cb5f2983ad02b44fd6d1884186b2fc5cfd3b0960f55fc2f93",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/legacy/guarded.pt": "843e29637b556c1c28f6a3d9bae4b146d7c43e9ed27dc971dde3884b30151f21"
+    }
+  },
+  "TAS1/2022/balanced": {
+    "selection": {
+      "raw": {
+        "epoch": 1,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.483626030105704,
+          "qs": 7.84382394072487,
+          "coverage_80": 0.8120707417582418,
+          "coverage_90": 0.9110863095238095,
+          "bias": -4.077618192337808
+        },
+        "full": {
+          "mae": 13.426802473667944,
+          "qs": 7.826794861024779,
+          "coverage_80": 0.8129864926739927,
+          "coverage_90": 0.9114869505494505,
+          "bias": -3.9435711592829112
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.354236281383141,
+            "full_minus_anchor": -0.05682355643775949,
+            "full_minus_B": 0.2974127249453815
+          },
+          "qs": {
+            "anchor_minus_B": 0.028772403798285495,
+            "full_minus_anchor": -0.017029079700090932,
+            "full_minus_B": 0.011743324098194563
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 0.5,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.101618936296378,
+          "qs": 7.745685331359965,
+          "coverage_80": 0.8117559523809523,
+          "coverage_90": 0.9056490384615384,
+          "bias": -2.078754011091315
+        },
+        "full": {
+          "mae": 13.07463803827685,
+          "qs": 7.738609261644277,
+          "coverage_80": 0.8124141483516484,
+          "coverage_90": 0.9055631868131868,
+          "bias": -1.9744558269524402
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/balanced/raw.pt": "d958393c44ff61565a20d6e8c80ca036bd99f52640e00eba2c39dc4b017ebbc8",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/balanced/guarded.pt": "f94e8d6e6ade17c3bffed0b3937ca9167969463e7b0e33d81efeeee06e4901ce"
+    }
+  },
+  "TAS1/2022/identity_anchor": {
+    "selection": {
+      "raw": {
+        "epoch": 3,
+        "alpha": 1.0,
+        "fallback": false,
+        "n_origins": 1456,
+        "n_cells": 34944,
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "full": {
+          "mae": 12.998733448027814,
+          "qs": 7.71818002764717,
+          "coverage_80": 0.8047733516483516,
+          "coverage_90": 0.9001259157509157,
+          "bias": -1.3398424711583405
+        },
+        "gap": {
+          "mae": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.1306563006947492,
+            "full_minus_B": -0.1306563006947492
+          },
+          "qs": {
+            "anchor_minus_B": 0.0,
+            "full_minus_anchor": -0.09687150927941435,
+            "full_minus_B": -0.09687150927941435
+          }
+        }
+      },
+      "guarded": {
+        "alpha": 1.0,
+        "epoch": 3,
+        "fallback": false,
+        "reason": "positive_alpha_passes_four_guards_and_improves_full",
+        "baseline": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "anchor": {
+          "mae": 13.129389748722563,
+          "qs": 7.8150515369265845,
+          "coverage_80": 0.7935267857142857,
+          "coverage_90": 0.8882497710622711,
+          "bias": 0.4753817964347269
+        },
+        "full": {
+          "mae": 12.998733448027814,
+          "qs": 7.71818002764717,
+          "coverage_80": 0.8047733516483516,
+          "coverage_90": 0.9001259157509157,
+          "bias": -1.3398424711583405
+        }
+      }
+    },
+    "checkpoints": {
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/identity_anchor/raw.pt": "8ba9798c198edd7d3b0d149e4704ff84256e1db67648bfe960939159d42ec3de",
+      "outputs/forecasting/v5_anchor_balance_screen_20261022_r1/TAS1/2022/identity_anchor/guarded.pt": "889d89a75136cc0737719c14fe8975b6f7bcf79ba30d8b7a0eb263dcd46e941a"
+    }
+  }
+}
