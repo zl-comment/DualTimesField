@@ -1,0 +1,709 @@
+{
+  "run_id": "ddnn_jsu_unclipped_20261022_r1",
+  "state": "complete",
+  "stage": "fixed_configuration_comparison_not_tuned_sota",
+  "progress": {
+    "expected_cells": 9,
+    "listed_cells": 9,
+    "completed_cells": 9,
+    "completion_fraction": 1.0,
+    "status_counts": {
+      "completed": 9
+    },
+    "missing_manifest_cells": []
+  },
+  "jobs": [
+    {
+      "id": "ddnn_jsu/2026/NSW1",
+      "model": "ddnn_jsu",
+      "region": "NSW1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 36.905552979558706,
+      "started_at": "2026-10-22T15:17:09.834721+00:00",
+      "ended_at": "2026-10-22T15:17:46.740559+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2026/QLD1",
+      "model": "ddnn_jsu",
+      "region": "QLD1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 21.821210771799088,
+      "started_at": "2026-10-22T15:17:09.833826+00:00",
+      "ended_at": "2026-10-22T15:17:31.655306+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2026/TAS1",
+      "model": "ddnn_jsu",
+      "region": "TAS1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 20.05720604211092,
+      "started_at": "2026-10-22T15:17:39.977613+00:00",
+      "ended_at": "2026-10-22T15:18:00.035100+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2027/NSW1",
+      "model": "ddnn_jsu",
+      "region": "NSW1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 33.45552794635296,
+      "started_at": "2026-10-22T15:18:00.402392+00:00",
+      "ended_at": "2026-10-22T15:18:33.858223+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2027/QLD1",
+      "model": "ddnn_jsu",
+      "region": "QLD1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 20.78745986148715,
+      "started_at": "2026-10-22T15:18:10.689529+00:00",
+      "ended_at": "2026-10-22T15:18:31.477305+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2027/TAS1",
+      "model": "ddnn_jsu",
+      "region": "TAS1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 22.256618060171604,
+      "started_at": "2026-10-22T15:18:41.193497+00:00",
+      "ended_at": "2026-10-22T15:19:03.450408+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2028/NSW1",
+      "model": "ddnn_jsu",
+      "region": "NSW1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 38.21826332807541,
+      "started_at": "2026-10-22T15:18:41.251247+00:00",
+      "ended_at": "2026-10-22T15:19:19.469868+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2028/QLD1",
+      "model": "ddnn_jsu",
+      "region": "QLD1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 21.392710611224174,
+      "started_at": "2026-10-22T15:19:11.573943+00:00",
+      "ended_at": "2026-10-22T15:19:32.966961+00:00"
+    },
+    {
+      "id": "ddnn_jsu/2028/TAS1",
+      "model": "ddnn_jsu",
+      "region": "TAS1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 21.295945532619953,
+      "started_at": "2026-10-22T15:19:31.737980+00:00",
+      "ended_at": "2026-10-22T15:19:53.034213+00:00"
+    }
+  ],
+  "completed_artifact_validation": "passed",
+  "frozen_snapshot_validation": "verified",
+  "comparison_available": true,
+  "tables": {
+    "P": {},
+    "Q": {
+      "ddnn_jsu": {
+        "n_cells": 9,
+        "regions": {
+          "NSW1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 58.72542683903713,
+                  "rmse_pooled": 892.4421105279631,
+                  "pinball_by_quantile": {
+                    "0.05": 5.768879202082254,
+                    "0.1": 9.35416841458439,
+                    "0.5": 29.362713419518563,
+                    "0.9": 356.8133439976293,
+                    "0.95": 1227.4445333933747
+                  },
+                  "quantile_score_proxy": 651.4974553708757,
+                  "coverage_80": 0.45051176683218236,
+                  "interval_width_80": 3376.1864041577696,
+                  "coverage_90": 0.558672450202614,
+                  "interval_width_90": 24211.7476722265,
+                  "native_point_diagnostic": {
+                    "mae": 58.72542683903713,
+                    "rmse_pooled": 892.4421105279631
+                  }
+                },
+                "2027": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 59.03266610634347,
+                  "rmse_pooled": 768.0991865215507,
+                  "pinball_by_quantile": {
+                    "0.05": 5.710137107814074,
+                    "0.1": 9.446855343108956,
+                    "0.5": 29.516333053171735,
+                    "0.9": 101.2429681151211,
+                    "0.95": 207.54176983209487
+                  },
+                  "quantile_score_proxy": 141.38322538052432,
+                  "coverage_80": 0.46668759393489717,
+                  "interval_width_80": 827.8910795246899,
+                  "coverage_90": 0.5778755969027644,
+                  "interval_width_90": 3836.9702207829096,
+                  "native_point_diagnostic": {
+                    "mae": 59.03266610634347,
+                    "rmse_pooled": 768.0991865215507
+                  }
+                },
+                "2028": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 59.240991504201446,
+                  "rmse_pooled": 739.8268246613328,
+                  "pinball_by_quantile": {
+                    "0.05": 5.543253817665881,
+                    "0.1": 9.154137047391169,
+                    "0.5": 29.620495752100723,
+                    "0.9": 158.03678239284602,
+                    "0.95": 408.91291616219667
+                  },
+                  "quantile_score_proxy": 244.50703406888013,
+                  "coverage_80": 0.4266142533721439,
+                  "interval_width_80": 1372.0808225546984,
+                  "coverage_90": 0.525887982040599,
+                  "interval_width_90": 7805.950263872223,
+                  "native_point_diagnostic": {
+                    "mae": 59.240991504201446,
+                    "rmse_pooled": 739.8268246613328
+                  }
+                }
+              },
+              "seed_summary": {
+                "coverage_80": {
+                  "mean": 0.4479378713797411,
+                  "std": 0.020160279246941852,
+                  "n": 3
+                },
+                "coverage_90": {
+                  "mean": 0.554145343048659,
+                  "std": 0.02628781179846951,
+                  "n": 3
+                },
+                "crossing_rate": {
+                  "mean": 0.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "interval_width_80": {
+                  "mean": 1858.7194354123858,
+                  "std": 1342.0376745940273,
+                  "n": 3
+                },
+                "interval_width_90": {
+                  "mean": 11951.556052293878,
+                  "std": 10801.501032898615,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 58.999694816527345,
+                  "std": 0.259358941345008,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "native_point_diagnostic": {
+                  "mae": {
+                    "mean": 58.999694816527345,
+                    "std": 0.259358941345008,
+                    "n": 3
+                  },
+                  "rmse_pooled": {
+                    "mean": 800.1227072369488,
+                    "std": 81.19104494521224,
+                    "n": 3
+                  }
+                },
+                "pinball_by_quantile": {
+                  "0.05": {
+                    "mean": 5.674090042520736,
+                    "std": 0.11705232466916522,
+                    "n": 3
+                  },
+                  "0.1": {
+                    "mean": 9.31838693502817,
+                    "std": 0.1496035957836759,
+                    "n": 3
+                  },
+                  "0.5": {
+                    "mean": 29.499847408263673,
+                    "std": 0.129679470672504,
+                    "n": 3
+                  },
+                  "0.9": {
+                    "mean": 205.3643648351988,
+                    "std": 134.19753836065664,
+                    "n": 3
+                  },
+                  "0.95": {
+                    "mean": 614.633073129222,
+                    "std": 540.1768219915467,
+                    "n": 3
+                  }
+                },
+                "point_definition": "rearranged_q50",
+                "quantile_score_proxy": {
+                  "mean": 345.7959049400934,
+                  "std": 269.71968491646334,
+                  "n": 3
+                },
+                "rmse_pooled": {
+                  "mean": 800.1227072369488,
+                  "std": 81.19104494521224,
+                  "n": 3
+                },
+                "table": "Q"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 3,
+              "duplicate_seed_groups": [],
+              "known_deterministic_model": false,
+              "interpretation": "distinct_predictions_do_not_establish_statistical_independence"
+            }
+          },
+          "QLD1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 72.28164914966602,
+                  "rmse_pooled": 287.23128997914,
+                  "pinball_by_quantile": {
+                    "0.05": 5.126771587973594,
+                    "0.1": 9.498305386838776,
+                    "0.5": 36.14082457483301,
+                    "0.9": 41.52965236693172,
+                    "0.95": 36.096997997879654
+                  },
+                  "quantile_score_proxy": 51.3570207657827,
+                  "coverage_80": 0.29196868519681146,
+                  "interval_width_80": 57.98042505575686,
+                  "coverage_90": 0.40580351197610487,
+                  "interval_width_90": 83.08721414031676,
+                  "native_point_diagnostic": {
+                    "mae": 72.28164914966602,
+                    "rmse_pooled": 287.23128997914
+                  }
+                },
+                "2027": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 69.90793203338792,
+                  "rmse_pooled": 286.49153203446946,
+                  "pinball_by_quantile": {
+                    "0.05": 5.099959174407624,
+                    "0.1": 9.378731962408006,
+                    "0.5": 34.95396601669396,
+                    "0.9": 39.074224244218634,
+                    "0.95": 33.64059464937849
+                  },
+                  "quantile_score_proxy": 48.85899041884269,
+                  "coverage_80": 0.3218542510891692,
+                  "interval_width_80": 59.982687523467064,
+                  "coverage_90": 0.44488518539657174,
+                  "interval_width_90": 85.64768581512244,
+                  "native_point_diagnostic": {
+                    "mae": 69.90793203338792,
+                    "rmse_pooled": 286.49153203446946
+                  }
+                },
+                "2028": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 68.07870732986149,
+                  "rmse_pooled": 285.55613383013076,
+                  "pinball_by_quantile": {
+                    "0.05": 5.070700556638105,
+                    "0.1": 9.257740207734503,
+                    "0.5": 34.03935366493074,
+                    "0.9": 37.472240925398864,
+                    "0.95": 31.998766501340224
+                  },
+                  "quantile_score_proxy": 47.13552074241698,
+                  "coverage_80": 0.3353618514924947,
+                  "interval_width_80": 60.89918185262651,
+                  "coverage_90": 0.4598458040827198,
+                  "interval_width_90": 87.62555194294085,
+                  "native_point_diagnostic": {
+                    "mae": 68.07870732986149,
+                    "rmse_pooled": 285.55613383013076
+                  }
+                }
+              },
+              "seed_summary": {
+                "coverage_80": {
+                  "mean": 0.3163949292594918,
+                  "std": 0.02220573949277977,
+                  "n": 3
+                },
+                "coverage_90": {
+                  "mean": 0.43684483381846545,
+                  "std": 0.027903902489774448,
+                  "n": 3
+                },
+                "crossing_rate": {
+                  "mean": 0.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "interval_width_80": {
+                  "mean": 59.62076481061681,
+                  "std": 1.492657478250071,
+                  "n": 3
+                },
+                "interval_width_90": {
+                  "mean": 85.45348396612668,
+                  "std": 2.2753929927150454,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 70.08942950430514,
+                  "std": 2.107340974813397,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "native_point_diagnostic": {
+                  "mae": {
+                    "mean": 70.08942950430514,
+                    "std": 2.107340974813397,
+                    "n": 3
+                  },
+                  "rmse_pooled": {
+                    "mean": 286.42631861458005,
+                    "std": 0.8394799720607505,
+                    "n": 3
+                  }
+                },
+                "pinball_by_quantile": {
+                  "0.05": {
+                    "mean": 5.099143773006441,
+                    "std": 0.028044407612572913,
+                    "n": 3
+                  },
+                  "0.1": {
+                    "mean": 9.37825918566043,
+                    "std": 0.12028328640238223,
+                    "n": 3
+                  },
+                  "0.5": {
+                    "mean": 35.04471475215257,
+                    "std": 1.0536704874066984,
+                    "n": 3
+                  },
+                  "0.9": {
+                    "mean": 39.358705845516404,
+                    "std": 2.0436105885364126,
+                    "n": 3
+                  },
+                  "0.95": {
+                    "mean": 33.912119716199456,
+                    "std": 2.0625638768874652,
+                    "n": 3
+                  }
+                },
+                "point_definition": "rearranged_q50",
+                "quantile_score_proxy": {
+                  "mean": 49.117177309014124,
+                  "std": 2.1225600025703613,
+                  "n": 3
+                },
+                "rmse_pooled": {
+                  "mean": 286.42631861458005,
+                  "std": 0.8394799720607505,
+                  "n": 3
+                },
+                "table": "Q"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 3,
+              "duplicate_seed_groups": [],
+              "known_deterministic_model": false,
+              "interpretation": "distinct_predictions_do_not_establish_statistical_independence"
+            }
+          },
+          "TAS1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 43.22268856938027,
+                  "rmse_pooled": 164.01073835097452,
+                  "pinball_by_quantile": {
+                    "0.05": 4.2949964681489385,
+                    "0.1": 7.1384719158620715,
+                    "0.5": 21.611344284690134,
+                    "0.9": 21.733783689120475,
+                    "0.95": 17.19369256415389
+                  },
+                  "quantile_score_proxy": 28.788915568790202,
+                  "coverage_80": 0.34671013831021824,
+                  "interval_width_80": 41.840545888813246,
+                  "coverage_90": 0.48604769514677626,
+                  "interval_width_90": 61.772314469921675,
+                  "native_point_diagnostic": {
+                    "mae": 43.22268856938027,
+                    "rmse_pooled": 164.01073835097452
+                  }
+                },
+                "2027": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 43.63363339735793,
+                  "rmse_pooled": 164.4002145429502,
+                  "pinball_by_quantile": {
+                    "0.05": 4.336979054681432,
+                    "0.1": 7.2790964962195694,
+                    "0.5": 21.816816698678966,
+                    "0.9": 20.622447857550068,
+                    "0.95": 15.640387777356127
+                  },
+                  "quantile_score_proxy": 27.878291153794464,
+                  "coverage_80": 0.37978711260772785,
+                  "interval_width_80": 47.56122066681163,
+                  "coverage_90": 0.5366441222913456,
+                  "interval_width_90": 71.15527388452766,
+                  "native_point_diagnostic": {
+                    "mae": 43.63363339735793,
+                    "rmse_pooled": 164.4002145429502
+                  }
+                },
+                "2028": {
+                  "table": "Q",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "crossing_rate": 0.0,
+                  "point_definition": "rearranged_q50",
+                  "mae": 41.355567368296,
+                  "rmse_pooled": 163.24842507209607,
+                  "pinball_by_quantile": {
+                    "0.05": 4.535914758350029,
+                    "0.1": 7.373541265448934,
+                    "0.5": 20.677783684148,
+                    "0.9": 18.94802739690775,
+                    "0.95": 14.316447705103197
+                  },
+                  "quantile_score_proxy": 26.340685923983163,
+                  "coverage_80": 0.3835397522972433,
+                  "interval_width_80": 45.4139011165071,
+                  "coverage_90": 0.5427201643741796,
+                  "interval_width_90": 67.92239106870744,
+                  "native_point_diagnostic": {
+                    "mae": 41.355567368296,
+                    "rmse_pooled": 163.24842507209607
+                  }
+                }
+              },
+              "seed_summary": {
+                "coverage_80": {
+                  "mean": 0.37001233440506315,
+                  "std": 0.020267334143685128,
+                  "n": 3
+                },
+                "coverage_90": {
+                  "mean": 0.5218039939374338,
+                  "std": 0.03111453437307357,
+                  "n": 3
+                },
+                "crossing_rate": {
+                  "mean": 0.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "interval_width_80": {
+                  "mean": 44.93855589071066,
+                  "std": 2.8898087811604967,
+                  "n": 3
+                },
+                "interval_width_90": {
+                  "mean": 66.94999314105226,
+                  "std": 4.766460966096003,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 42.737296445011395,
+                  "std": 1.2141253411369812,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "native_point_diagnostic": {
+                  "mae": {
+                    "mean": 42.737296445011395,
+                    "std": 1.2141253411369812,
+                    "n": 3
+                  },
+                  "rmse_pooled": {
+                    "mean": 163.8864593220069,
+                    "std": 0.5858657730858324,
+                    "n": 3
+                  }
+                },
+                "pinball_by_quantile": {
+                  "0.05": {
+                    "mean": 4.389296760393466,
+                    "std": 0.12869833870948952,
+                    "n": 3
+                  },
+                  "0.1": {
+                    "mean": 7.263703225843525,
+                    "std": 0.11828826805076731,
+                    "n": 3
+                  },
+                  "0.5": {
+                    "mean": 21.368648222505698,
+                    "std": 0.6070626705684906,
+                    "n": 3
+                  },
+                  "0.9": {
+                    "mean": 20.434752981192762,
+                    "std": 1.402330758009245,
+                    "n": 3
+                  },
+                  "0.95": {
+                    "mean": 15.716842682204407,
+                    "std": 1.440145308324798,
+                    "n": 3
+                  }
+                },
+                "point_definition": "rearranged_q50",
+                "quantile_score_proxy": {
+                  "mean": 27.66929754885594,
+                  "std": 1.2374230657325325,
+                  "n": 3
+                },
+                "rmse_pooled": {
+                  "mean": 163.8864593220069,
+                  "std": 0.5858657730858324,
+                  "n": 3
+                },
+                "table": "Q"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 3,
+              "duplicate_seed_groups": [],
+              "known_deterministic_model": false,
+              "interpretation": "distinct_predictions_do_not_establish_statistical_independence"
+            }
+          }
+        },
+        "macro_regions": {
+          "mae": 57.27547358861463,
+          "rmse_pooled": 416.81182839117855,
+          "quantile_score_proxy": 140.86079326598784,
+          "crossing_rate": 0.0,
+          "coverage_80": 0.3781150450147654,
+          "coverage_90": 0.5042647236015195,
+          "interval_width_80": 654.4262520379044,
+          "interval_width_90": 4034.6531764670185,
+          "pinball_by_quantile": {
+            "0.05": 5.054176858640215,
+            "0.1": 8.653449782177374,
+            "0.5": 28.637736794307315,
+            "0.9": 88.38594122063598,
+            "0.95": 221.4206785092086
+          }
+        },
+        "aggregation": "equal_weight_region_mean_of_seed_metrics",
+        "statistical_significance": "not_computed_seed_repeats_are_not_independent_time_series"
+      }
+    }
+  }
+}
