@@ -63,20 +63,30 @@ def timestamp():
 
 
 def validate_config(config, *, extension=False):
+    _validate_common_protocol(config)
     exp = config['experiment']
-    if config.get('aligned_protocol', {}).get('stage') != 'full_fixed_configuration_rerun':
-        raise ValueError('Expected a full-data fixed-configuration protocol')
-    if tuple(exp['regions']) != REGIONS or tuple(exp['seeds']) != SEEDS:
-        raise ValueError('This matrix requires all three regions and all three seeds')
     required = EXTENSION_MODELS if extension else BASE_MODELS
     scope = exp.get('execution_scope', 'matrix')
     if scope not in ('matrix', 'single_model'):
         raise ValueError('execution_scope must be matrix or single_model')
     if scope == 'single_model':
-        if extension or len(exp['models']) != 1 or exp['models'][0] not in BASE_MODELS + EXTENSION_MODELS:
+        # Expansion-baseline registry members are fixed source in
+        # forecasting/common/baseline_registry.py; matrix/extension semantics are unchanged.
+        from .common.baseline_registry import expansion_model_ids
+        allowed_single = BASE_MODELS + EXTENSION_MODELS + expansion_model_ids()
+        if extension or len(exp['models']) != 1 or exp['models'][0] not in allowed_single:
             raise ValueError('Single-model execution requires exactly one supported model and no extension parent')
     elif set(exp['models']) != set(required) or len(exp['models']) != len(required):
         raise ValueError(f'All {len(required)} required models must be included exactly once')
+
+
+def _validate_common_protocol(config):
+    """Stage/protocol checks shared by the fixed matrix and the expansion scope."""
+    exp = config['experiment']
+    if config.get('aligned_protocol', {}).get('stage') != 'full_fixed_configuration_rerun':
+        raise ValueError('Expected a full-data fixed-configuration protocol')
+    if tuple(exp['regions']) != REGIONS or tuple(exp['seeds']) != SEEDS:
+        raise ValueError('This matrix requires all three regions and all three seeds')
     if config['data'].get('price_transform') != 'identity' or config['data'].get('quantile_target') != 'transformed':
         raise ValueError('Use the shared affine price space')
     if tuple(config['data']['split_names']) != SPLITS:

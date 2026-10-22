@@ -1,0 +1,19 @@
+{
+  "implementation": "方法重实现（依据论文公式的本地实现）",
+  "experiment_model_id": "ddnn_jsu",
+  "in_completed_baseline": false,
+  "paper_reference": "J34 Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting, IEEE 11430173",
+  "paper_url": "https://ieeexplore.ieee.org/document/11430173/",
+  "repository": "https://github.com/lebeand/uq-epf",
+  "upstream_commit": null,
+  "official_code_note": "官方公开仓库截至核对日仅提供 Normal 参数化 DDNN（ddnn_normal.py），未见 JSU 变体源码；本实现的 JSU 参数化按论文分布公式本地实现",
+  "jsu_parametrization": "z=gamma+delta*asinh((x-xi)/lambda); x_q=xi+lambda*sinh((Phi^-1(q)-gamma)/delta); NLL=−log phi(z)+log delta−log lambda+log cosh(z)",
+  "input_adaptation": "七块公共输入按 INPUT_KEYS 顺序展平进入 MLP（与树模型同一展平），无新增特征",
+  "output_target_transform": "标准化空间训练；解析分位经 train 拟合仿射逆变换回原始 RRP；支持负价",
+  "native_training_objective": "精确 JSU 负对数似然（Adam，共享预算 epochs100/patience15/batch256/lr1e-3/wd1e-4）",
+  "selection_metric": "原始价格公共五分位 QS（与公开评分同序）；与原文 NLL 选择方式的差异已在 metadata 声明",
+  "calibration": "第一版无后置校准器（结构上 J34 也未对 DDNN 加 CP）",
+  "dependency_versions": {"torch": "2.5.1+cu124"},
+  "license": "MIT（仓库自身实现；未复制官方代码）",
+  "differences_from_paper": "未做其大规模超参搜索（原文 l2/lr 为调参值）；选择指标改为公共 QS；输入为其 SMARD 之外的 AEMO 公共七块"
+}

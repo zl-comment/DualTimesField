@@ -1,0 +1,19 @@
+{
+  "implementation": "本地适配（冻结基座复用 + 公共 CP 工具）",
+  "experiment_model_id": "lightgbm_cp",
+  "in_completed_baseline": false,
+  "paper_reference": "J34 Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting, IEEE 11430173; 对照建议见 docs/research/epf_2026_review_20261022/baseline_recommendations.json",
+  "paper_url": "https://ieeexplore.ieee.org/document/11430173/",
+  "repository": null,
+  "upstream_commit": null,
+  "cp_formula_source": "仓库已审计公式 forecasting/common/calibration.py::absolute_residual_cp，参照 lipiecki/PostForecasts.jl src/models/cp.jl @ 589f9407d375e2272fb731873443f697c0060d85",
+  "frozen_base": "父运行 aligned_baselines_20261012 的 lightgbm 检查点（只读复用，不重训；booster/manifest 哈希逐格记录）",
+  "input_adaptation": "无新增输入；校准与测试预测由冻结 booster 再生成并逐位复现父运行 test.npz",
+  "output_target_transform": "原始 RRP 空间输出五分位；q50 与冻结基座 q50 完全一致",
+  "native_training_objective": "无训练；仅 2022H2 样本外绝对残差的逐 horizon type-7 分位",
+  "selection_metric": "不适用（无检查点选择）",
+  "calibration": "独立 OOS 绝对残差 CP；时间序列非交换，不承诺有限样本覆盖保证",
+  "dependency_versions": {"lightgbm": "4.7.0", "numpy": "2.4.6"},
+  "license": "MIT（仓库自身实现）",
+  "differences_from_paper": "J34 仅作同类对照建议；本实现为本地协议适配，未复现其数据管线或调参"
+}
