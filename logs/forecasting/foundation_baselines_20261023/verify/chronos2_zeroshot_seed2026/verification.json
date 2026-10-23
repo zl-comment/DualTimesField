@@ -1,0 +1,78 @@
+{
+  "model": "chronos2_zeroshot",
+  "region": "NSW1",
+  "seed": 2026,
+  "origins": 12,
+  "tolerance_relative": 0.0001,
+  "view_is_label_free": true,
+  "raw_price_reconstruction": {
+    "formula": "history_values[:,:,0] * target_std + target_mean (one inversion)",
+    "finite": true,
+    "min": -16.42166176845575,
+    "max": 194.17416971877614,
+    "future_actual_finite": true
+  },
+  "batch_invariance": {
+    "shuffled_batch_max_relative_diff": 0.0,
+    "single_vs_batch_max_relative_diff": 5.975970473327488e-07,
+    "companion_swap_max_relative_diff": 0.0,
+    "single_vs_batch_tolerance": 0.0001,
+    "passed": true
+  },
+  "seed_replay": {
+    "same_seed_stable_within_tolerance": true,
+    "max_relative_diff": 5.975967794911956e-07,
+    "tolerance": 0.0001
+  },
+  "mapping_sensitivity": {
+    "perturbation": "calendar[0,0] += 1.0 on origin 0",
+    "prediction_changed": true,
+    "max_relative_diff": 0.05419398175253547,
+    "note": "a null change is recorded, not treated as failure"
+  },
+  "negative_outputs": {
+    "any_negative": true,
+    "negative_fraction": 0.13541666666666666,
+    "actual_negative_fraction": 0.0
+  },
+  "identity": {
+    "weights": {
+      "repo": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "file": "model.safetensors",
+      "sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "size_bytes": 477930472,
+      "native_quantile_levels": [
+        0.01,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9,
+        0.95,
+        0.99
+      ],
+      "use_arcsinh": true,
+      "context_length_limit": 8192
+    },
+    "packages": {
+      "chronos-forecasting": "2.3.2",
+      "torch": "2.14.1+cu126",
+      "numpy": "2.4.6",
+      "pandas": "3.1.0"
+    }
+  }
+}

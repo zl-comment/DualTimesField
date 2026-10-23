@@ -41,6 +41,10 @@ class FoundationSpec:
     pretraining_scope: str           # pretrained-data identity statement
     deterministic_inference: bool    # same inputs+seed give bitwise-identical output
     dependencies: tuple[str, ...] = ()  # importable modules required at predict time
+    # Same-seed replay tolerance for the seed-reuse verification: 0.0 demands
+    # bitwise identity; small nonzero values document GPU kernel jitter that
+    # carries no information (recorded in every reuse evidence block).
+    reuse_tolerance: float = 0.0
 
     def scope_declaration(self) -> dict[str, Any]:
         return {
@@ -73,7 +77,7 @@ FOUNDATION_MODELS: tuple[FoundationSpec, ...] = (
         input_scope="restricted_price_target_demand_past_covariate_calendar_past_future",
         seed_scope="no_sampling_native_quantile_head_frozen_weights_deterministic",
         pretraining_scope="chronos2_public_and_synthetic_mix_nem_overlap_unaudited",
-        deterministic_inference=True, dependencies=("chronos",),
+        deterministic_inference=True, dependencies=("chronos",), reuse_tolerance=1e-4,
     ),
     FoundationSpec(
         "moirai2_zeroshot", "forecasting.moirai2_zeroshot.adapter", "Adapter", "P", "gpu",
@@ -83,7 +87,7 @@ FOUNDATION_MODELS: tuple[FoundationSpec, ...] = (
         input_scope="restricted_price_target_demand_past_covariate_calendar_past_future",
         seed_scope="no_sampling_quantile_head_q10_q90_only_frozen_weights_deterministic",
         pretraining_scope="moirai2_gift_eval_chronos_kernelsynth_mix_nem_overlap_unaudited",
-        deterministic_inference=True, dependencies=("uni2ts",),
+        deterministic_inference=True, dependencies=("uni2ts",), reuse_tolerance=1e-4,
     ),
     FoundationSpec(
         "timesfm25_xreg", "forecasting.timesfm25_xreg.adapter", "Adapter", "P", "gpu",
@@ -93,7 +97,7 @@ FOUNDATION_MODELS: tuple[FoundationSpec, ...] = (
         input_scope="restricted_price_target_calendar_dynamic_gas_static_incontext_xreg",
         seed_scope="incontext_xreg_least_squares_deterministic_frozen_backbone",
         pretraining_scope="timesfm25_synthetic_plus_real_monolithic_nem_overlap_unaudited",
-        deterministic_inference=True, dependencies=("timesfm",),
+        deterministic_inference=True, dependencies=("timesfm",), reuse_tolerance=1e-4,
     ),
 )
 

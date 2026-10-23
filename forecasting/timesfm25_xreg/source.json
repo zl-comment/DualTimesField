@@ -25,7 +25,12 @@
     "history_values.price": "un-standardized once via frozen train target mean/std -> 72h raw RRP context; outputs raw RRP",
     "history_calendar+future_calendar": "dynamic_numerical_covariates cal_0..cal_9, each [96] = history fit span + horizon",
     "origin_context": "static_numerical_covariate gas_7d_log_std",
-    "unmapped": ["history_values.demand", "future_exogenous", "ctf_exogenous", "quantile_exogenous"],
+    "unmapped": [
+      "history_values.demand",
+      "future_exogenous",
+      "ctf_exogenous",
+      "quantile_exogenous"
+    ],
     "unmapped_reason": "dynamic XReg covariates need values over the 72h fit span AND 24 legal future values; demand future exists only as differently-standardized forecast vintages (splicing rejected); remaining blocks are future-only",
     "scope_declaration": "input_scope=restricted_price_target_calendar_dynamic_gas_static_incontext_xreg; NOT an equal-input comparison to full-1465-column models"
   },
@@ -34,10 +39,23 @@
     "method": "BatchedInContextXRegLinear least squares, ridge=0.0, per-input target normalization, one_hot drop=None, max_rows_per_col=0 (no subsampling)",
     "order": "xreg_mode='xreg + timesfm': covariate regression fitted on the origin context -> horizon covariate effect forecast -> TimesFM forecasts the residual -> XReg effect added back",
     "quantile_effect": "the XReg shift is added equally to every native channel",
-    "backcast": "return_backcast=True required by the official XReg path"
+    "backcast": "return_backcast=True required by the official XReg path",
+    "pooled_batch_behavior": "VERIFIED 2026-10-23: the official BatchedInContextXRegLinear pools every series in one forecast_with_covariates call into ONE shared design matrix and ONE beta vector, so batch composition changes each origin's predictions (measured 14-36 AUD/MWh on dev data); this is cross-origin information sharing and is forbidden here",
+    "isolation_fix": "the adapter calls forecast_with_covariates once per origin; the XReg fit then uses only that origin's own legal 72h history; the TimesFM backbone itself is batch-invariant (measured 0.0)"
   },
   "output_quantiles": {
-    "native_channels": ["mean", 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "native_channels": [
+      "mean",
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
     "q05_q95": "not native; no interpolation to common tails is performed",
     "table": "P (point_only); point = native median channel + XReg (the library point return); native mean channel exists and is NOT used",
     "auxiliary": "native 10 channels exported per cell to auxiliary_quantiles.npz"

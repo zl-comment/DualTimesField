@@ -1,0 +1,158 @@
+{
+  "chronos2_zeroshot": {
+    "model": "chronos2_zeroshot",
+    "region": "NSW1",
+    "seed": 2026,
+    "smoke": true,
+    "dev_split": "selection",
+    "origins": 24,
+    "train_context_origins": null,
+    "identity_weights": {
+      "repo": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "file": "model.safetensors",
+      "sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "size_bytes": 477930472,
+      "native_quantile_levels": [
+        0.01,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9,
+        0.95,
+        0.99
+      ],
+      "use_arcsinh": true,
+      "context_length_limit": 8192
+    },
+    "seconds": 9.058,
+    "scores": {
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 18.05515793297026,
+      "rmse_pooled": 23.167844351722852,
+      "quantile_score_proxy": 11.985632348722882,
+      "coverage_90": 0.9826388888888888
+    },
+    "output": "outputs/forecasting/foundation_smoke_20261023/chronos2_zeroshot/seed2026/NSW1/test.npz"
+  },
+  "moirai2_zeroshot": {
+    "model": "moirai2_zeroshot",
+    "region": "NSW1",
+    "seed": 2026,
+    "smoke": true,
+    "dev_split": "selection",
+    "origins": 24,
+    "train_context_origins": null,
+    "identity_weights": {
+      "repo": "Salesforce/moirai-2.0-R-small",
+      "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "file": "model.safetensors",
+      "sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+      "size_bytes": 45557824,
+      "config": {
+        "quantile_levels": [
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9
+        ],
+        "patch_size": 16,
+        "max_seq_len": 512,
+        "d_model": 384,
+        "num_layers": 6
+      }
+    },
+    "seconds": 5.875,
+    "scores": {
+      "mae": 28.209250854121315,
+      "rmse_pooled": 34.500485537102726,
+      "point_definition": "native_point"
+    },
+    "output": "outputs/forecasting/foundation_smoke_20261023/moirai2_zeroshot/seed2026/NSW1/test.npz"
+  },
+  "tabpfn_v3": {
+    "model": "tabpfn_v3",
+    "region": "NSW1",
+    "seed": 2026,
+    "smoke": true,
+    "dev_split": "selection",
+    "origins": 24,
+    "train_context_origins": 2000,
+    "identity_weights": {
+      "repo": "Prior-Labs/tabpfn_3",
+      "file": "tabpfn-v3-regressor-v3_default.ckpt",
+      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/weights/hf_home/hub/blobs/f8/f82e3ac8d9de1cd4d715cbfb534237269fd129f29088e24e9db94c964e9f00e1",
+      "sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "size_bytes": 233289807
+    },
+    "seconds": 130.464,
+    "scores": {
+      "crossing_rate": 0.0,
+      "point_definition": "rearranged_q50",
+      "mae": 45.43389999677413,
+      "rmse_pooled": 52.490642784006525,
+      "quantile_score_proxy": 22.739269001325056,
+      "coverage_90": 0.8246527777777778
+    },
+    "output": "outputs/forecasting/foundation_smoke_20261023/tabpfn_v3/seed2026/NSW1/test.npz"
+  },
+  "timesfm25_xreg": {
+    "model": "timesfm25_xreg",
+    "region": "NSW1",
+    "seed": 2026,
+    "smoke": true,
+    "dev_split": "selection",
+    "origins": 24,
+    "train_context_origins": null,
+    "identity_weights": {
+      "repo": "google/timesfm-2.5-200m-pytorch",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "file": "model.safetensors",
+      "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "size_bytes": 925181104,
+      "config_keys": [
+        "architectures",
+        "context_length",
+        "head_dim",
+        "hidden_size",
+        "horizon_length",
+        "intermediate_size",
+        "model_type",
+        "num_attention_heads",
+        "num_hidden_layers",
+        "patch_length",
+        "quantile_horizon_length",
+        "quantiles",
+        "rms_norm_eps",
+        "torch_compile"
+      ]
+    },
+    "seconds": 13.442,
+    "scores": {
+      "mae": 21.9325205025404,
+      "rmse_pooled": 27.308550458529368,
+      "point_definition": "native_point"
+    },
+    "output": "outputs/forecasting/foundation_smoke_20261023/timesfm25_xreg/seed2026/NSW1/test.npz"
+  }
+}

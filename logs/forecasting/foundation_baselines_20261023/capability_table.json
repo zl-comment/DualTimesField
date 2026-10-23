@@ -1,0 +1,208 @@
+{
+  "verified_date": "2026-10-23",
+  "host": {
+    "cpu": "see stage0 doc",
+    "gpu": "NVIDIA L40 46GB x8, driver 560.35.05 (CUDA 12.6)",
+    "note": "torch cu130 wheels do not run on this driver; all envs pinned to cu126/cu121"
+  },
+  "shared_protocol": {
+    "parent_run": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012 (read-only)",
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "origins_per_region": {
+      "train": 61273,
+      "selection": 4321,
+      "calibration": 4393,
+      "test": 17521
+    },
+    "flatten_width": 1465,
+    "input_blocks": {
+      "history_values": [
+        72,
+        2
+      ],
+      "history_calendar": [
+        72,
+        10
+      ],
+      "future_calendar": [
+        24,
+        10
+      ],
+      "origin_context": [
+        1
+      ],
+      "future_exogenous": [
+        24,
+        11
+      ],
+      "ctf_exogenous": [
+        24,
+        1
+      ],
+      "quantile_exogenous": [
+        24,
+        3
+      ]
+    }
+  },
+  "models": {
+    "tabpfn_v3": {
+      "implementation": "tabpfn 9.2.0 (PyPI), explicit V3 checkpoint",
+      "weights": {
+        "repo": "Prior-Labs/tabpfn_3",
+        "file": "tabpfn-v3-regressor-v3_default.ckpt",
+        "revision": "24a16a89d245878b846555110985634aa2e656d7"
+      },
+      "local_weight_access": "downloaded from public HF repo; package's interactive license downloader bypassed via local file path; no token required or stored",
+      "native_quantiles": "arbitrary levels from predicted distribution CDF; five common levels exact",
+      "input_mapping": "all seven blocks flattened (1465 columns); 24 per-horizon in-context regression tasks",
+      "context_limit": "doc limit 1M samples x 2000 features; 61273x1465 fits",
+      "fit_label_contact": "train labels as in-context support only",
+      "table": "Q",
+      "input_scope_group": "full_public",
+      "context_group": "full_train_context",
+      "pretraining": "Prior Labs V3 synthetic+open data mix; NEM overlap unaudited (released 2026-04/05, after the 2023-2024 test window)",
+      "cost_probe": {
+        "fit_s_per_horizon": 7.6,
+        "predict_ms_per_query": 22.2,
+        "peak_gpu_mib": 7465,
+        "projected_hours_per_cell": 2.6
+      },
+      "seed_effect": "ensemble preprocessing RNG; same seed bitwise-stable; cross-seed differs",
+      "blocked": false
+    },
+    "chronos2_zeroshot": {
+      "implementation": "chronos-forecasting 2.3.2 Chronos2Pipeline",
+      "weights": {
+        "repo": "amazon/chronos-2",
+        "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+        "params": "120M"
+      },
+      "native_quantiles": "21 trained levels [.01,.05,...,.99]; all five common levels are trained head outputs (no interpolation)",
+      "input_mapping": {
+        "target": "raw RRP 72h (one inversion)",
+        "past_covariates": [
+          "demand(std)"
+        ],
+        "future_covariates": [
+          "cal_0..9"
+        ],
+        "unmapped": [
+          "origin_context",
+          "future_exogenous",
+          "ctf_exogenous",
+          "quantile_exogenous"
+        ]
+      },
+      "context_limit": "model default 8192; used 72 explicitly",
+      "fit_label_contact": "none (zero-shot)",
+      "table": "Q",
+      "input_scope_group": "restricted_covariates",
+      "context_group": "origin_own_72h",
+      "pretraining": "Chronos datasets + GIFT-Eval pretrain subsets + synthetic; NEM overlap unaudited (2025 release, after test window)",
+      "cost_probe": {
+        "smoke_24_origins_s": 9.1
+      },
+      "seed_effect": "none; frozen weights, no sampling; same-seed replay stable to ~1e-6 relative (GPU kernel jitter), reuse tolerance 1e-4 recorded",
+      "blocked": false
+    },
+    "moirai2_zeroshot": {
+      "implementation": "uni2ts @ git cfd46d4510ed8896f263116f32928eede05b0a75 (Moirai2Forecast)",
+      "weights": {
+        "repo": "Salesforce/moirai-2.0-R-small",
+        "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+        "params": "11.4M"
+      },
+      "native_quantiles": "exactly [0.1..0.9]; NO q05/q95; no sampling path; no extrapolation performed",
+      "input_mapping": {
+        "target": "raw RRP 72h (one inversion)",
+        "past_feat_dynamic_real": [
+          "demand(std)"
+        ],
+        "feat_dynamic_real": [
+          "cal_0..9 over 96h"
+        ],
+        "unmapped": [
+          "origin_context",
+          "future_exogenous",
+          "ctf_exogenous",
+          "quantile_exogenous"
+        ]
+      },
+      "context_limit": "max_seq_len 512 tokens, patch 16; used context 72",
+      "fit_label_contact": "none (zero-shot)",
+      "table": "P (point=native q50; q10/q90 auxiliary only)",
+      "input_scope_group": "restricted_covariates",
+      "context_group": "origin_own_72h",
+      "pretraining": "GIFT-Eval subsets, Chronos-derived mixup, KernelSynth, internal Salesforce data; NEM overlap unaudited (2025-11 release)",
+      "cost_probe": {
+        "smoke_24_origins_s": 5.9
+      },
+      "seed_effect": "none; dropout forced to zero; same-seed replay stable to ~1e-6 relative (GPU kernel jitter), reuse tolerance 1e-4 recorded",
+      "blocked": false
+    },
+    "timesfm25_xreg": {
+      "implementation": "timesfm 2.0.2 (official 2.5 impl incl. xreg_lib)",
+      "weights": {
+        "repo": "google/timesfm-2.5-200m-pytorch",
+        "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+        "params": "0.2B"
+      },
+      "native_quantiles": "[mean, q10..q90]; NO q05/q95; point = median channel; XReg shift added equally to all channels",
+      "input_mapping": {
+        "target": "raw RRP 72h (one inversion)",
+        "dynamic_covariates": [
+          "cal_0..9 over 96h"
+        ],
+        "static_covariates": [
+          "gas_7d_log(std)"
+        ],
+        "unmapped": [
+          "history demand (future only as differently-standardized forecast vintage; splice rejected)",
+          "future_exogenous",
+          "ctf_exogenous",
+          "quantile_exogenous"
+        ]
+      },
+      "xreg_fit": "per-origin least squares on its own legal 72h history (in-context labels; ridge=0); NOT train-split and NOT 'no fitting' VERIFIED: official batched call pools one shared design matrix/beta across the batch (cross-origin leakage, 14-36 AUD/MWh measured); adapter calls per origin to isolate.",
+      "context_limit": "context_limit 16384; used max_context=72, max_horizon=24",
+      "fit_label_contact": "in-context XReg on each origin's own history",
+      "table": "P (native 10 channels auxiliary)",
+      "input_scope_group": "restricted_covariates_xreg",
+      "context_group": "origin_own_72h_incontext_fit",
+      "pretraining": "TimesFM synthetic + real monolithic mix; NEM overlap unaudited (2.5 released 2025-10/11)",
+      "cost_probe": {
+        "smoke_24_origins_s": 13.4
+      },
+      "seed_effect": "none; same-seed replay stable to ~1e-6 relative (GPU kernel jitter); seed reuse verified within 1e-4",
+      "blocked": false,
+      "flag_choices": {
+        "infer_is_positive": "disabled (NEM negative prices; default would clip nonneg-history origins)",
+        "torch_compile": "disabled (determinism, offline workers)"
+      }
+    }
+  },
+  "comparison_groups": {
+    "full_public_Q5": [
+      "tabpfn_v3",
+      "chronos2_zeroshot (restricted inputs)"
+    ],
+    "full_public_point": [],
+    "restricted_input": [
+      "chronos2_zeroshot",
+      "moirai2_zeroshot",
+      "timesfm25_xreg"
+    ],
+    "restricted_context": [],
+    "pretraining_overlap_unaudited": [
+      "tabpfn_v3",
+      "chronos2_zeroshot",
+      "moirai2_zeroshot",
+      "timesfm25_xreg"
+    ]
+  }
+}

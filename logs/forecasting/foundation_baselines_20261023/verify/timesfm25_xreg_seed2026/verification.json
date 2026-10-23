@@ -1,0 +1,68 @@
+{
+  "model": "timesfm25_xreg",
+  "region": "NSW1",
+  "seed": 2026,
+  "origins": 12,
+  "tolerance_relative": 1e-06,
+  "view_is_label_free": true,
+  "raw_price_reconstruction": {
+    "formula": "history_values[:,:,0] * target_std + target_mean (one inversion)",
+    "finite": true,
+    "min": -16.42166176845575,
+    "max": 194.17416971877614,
+    "future_actual_finite": true
+  },
+  "batch_invariance": {
+    "shuffled_batch_max_relative_diff": 0.0,
+    "single_vs_batch_max_relative_diff": 0.0,
+    "companion_swap_max_relative_diff": 0.0,
+    "single_vs_batch_tolerance": 1e-06,
+    "passed": true
+  },
+  "seed_replay": {
+    "same_seed_stable_within_tolerance": true,
+    "max_relative_diff": 0.0,
+    "tolerance": 1e-06
+  },
+  "mapping_sensitivity": {
+    "perturbation": "calendar[0,0] += 1.0 on origin 0",
+    "prediction_changed": true,
+    "max_relative_diff": 0.1944897270561751,
+    "note": "a null change is recorded, not treated as failure"
+  },
+  "negative_outputs": {
+    "any_negative": false,
+    "negative_fraction": 0.0,
+    "actual_negative_fraction": 0.0
+  },
+  "identity": {
+    "weights": {
+      "repo": "google/timesfm-2.5-200m-pytorch",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "file": "model.safetensors",
+      "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "size_bytes": 925181104,
+      "config_keys": [
+        "architectures",
+        "context_length",
+        "head_dim",
+        "hidden_size",
+        "horizon_length",
+        "intermediate_size",
+        "model_type",
+        "num_attention_heads",
+        "num_hidden_layers",
+        "patch_length",
+        "quantile_horizon_length",
+        "quantiles",
+        "rms_norm_eps",
+        "torch_compile"
+      ]
+    },
+    "packages": {
+      "timesfm": "2.0.2",
+      "torch": "2.14.1+cu126",
+      "numpy": "2.4.6"
+    }
+  }
+}

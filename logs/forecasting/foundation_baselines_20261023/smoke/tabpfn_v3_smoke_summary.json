@@ -1,0 +1,26 @@
+{
+  "model": "tabpfn_v3",
+  "region": "NSW1",
+  "seed": 2026,
+  "smoke": true,
+  "dev_split": "selection",
+  "origins": 24,
+  "train_context_origins": 2000,
+  "identity_weights": {
+    "repo": "Prior-Labs/tabpfn_3",
+    "file": "tabpfn-v3-regressor-v3_default.ckpt",
+    "path": "/root/workspace/Code/DualTimesField-foundation-baselines/weights/hf_home/hub/blobs/f8/f82e3ac8d9de1cd4d715cbfb534237269fd129f29088e24e9db94c964e9f00e1",
+    "sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+    "size_bytes": 233289807
+  },
+  "seconds": 130.464,
+  "scores": {
+    "crossing_rate": 0.0,
+    "point_definition": "rearranged_q50",
+    "mae": 45.43389999677413,
+    "rmse_pooled": 52.490642784006525,
+    "quantile_score_proxy": 22.739269001325056,
+    "coverage_90": 0.8246527777777778
+  },
+  "output": "outputs/forecasting/foundation_smoke_20261023/tabpfn_v3/seed2026/NSW1/test.npz"
+}

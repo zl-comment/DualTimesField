@@ -35,7 +35,7 @@ from forecasting.common.foundation_api import PredictionView
 from forecasting.common.foundation_registry import FOUNDATION_REGISTRY, load_foundation_adapter
 from forecasting.foundation_experiment import _predict_indices
 
-DEFAULT_PARENT = Path("outputs/forecasting/aligned_baselines_20261012")
+DEFAULT_PARENT = Path("/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012")
 SMOKE_ROOT = Path("outputs/forecasting/foundation_smoke_20261023")
 
 

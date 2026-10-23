@@ -108,6 +108,11 @@
   逐序列归一化，已记录）；`fix_quantile_crossing=True`、`force_flip_invariance=True`、
   `use_continuous_quantile_head=True`、`return_backcast=True`（XReg 必需）为官方默认。
 - **XReg extras**：`timesfm[xreg]==2.0.2` 需显式安装（否则 ImportError，实测）。
+- **官方池化行为（阶段2实测，重要）**：`BatchedInContextXRegLinear` 将一次调用内的
+  全部序列并入**同一个设计矩阵**求**一组共享系数**（`pinv(X'X)X'y`，xreg_lib.py:476-485），
+  批次组成改变即改变各起点预测（开发数据实测单条 vs 批量差 14–36 AUD/MWh）——这是
+  跨起点信息共享，违反本协议隔离要求。适配器因此**逐 origin 调用**官方接口（XReg 仅
+  拟合该起点自身 72h）；骨干网络本身批次不变（实测 0.0）。
 
 ## 三、分组与已知限制
 

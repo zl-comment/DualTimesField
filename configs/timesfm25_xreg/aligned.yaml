@@ -121,9 +121,8 @@ foundation_models:
     batch_queries: 4096
     weight_file: tabpfn-v3-regressor-v3_default.ckpt
   timesfm25_xreg:
-    batch_origins: 512
-    ridge: 0.0
     xreg_mode: xreg + timesfm
+    ridge: 0.0
 future_exogenous:
   aggregation: min
   dimension: 1

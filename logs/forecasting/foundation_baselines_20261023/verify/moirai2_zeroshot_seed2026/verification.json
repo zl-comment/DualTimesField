@@ -1,0 +1,70 @@
+{
+  "model": "moirai2_zeroshot",
+  "region": "NSW1",
+  "seed": 2026,
+  "origins": 12,
+  "tolerance_relative": 0.0001,
+  "view_is_label_free": true,
+  "raw_price_reconstruction": {
+    "formula": "history_values[:,:,0] * target_std + target_mean (one inversion)",
+    "finite": true,
+    "min": -16.42166176845575,
+    "max": 194.17416971877614,
+    "future_actual_finite": true
+  },
+  "batch_invariance": {
+    "shuffled_batch_max_relative_diff": 0.0,
+    "single_vs_batch_max_relative_diff": 2.5360338712683847e-07,
+    "companion_swap_max_relative_diff": 0.0,
+    "single_vs_batch_tolerance": 0.0001,
+    "passed": true
+  },
+  "seed_replay": {
+    "same_seed_stable_within_tolerance": true,
+    "max_relative_diff": 3.170042339085481e-07,
+    "tolerance": 0.0001
+  },
+  "mapping_sensitivity": {
+    "perturbation": "calendar[0,0] += 1.0 on origin 0",
+    "prediction_changed": true,
+    "max_relative_diff": 0.00941488671071037,
+    "note": "a null change is recorded, not treated as failure"
+  },
+  "negative_outputs": {
+    "any_negative": false,
+    "negative_fraction": 0.0,
+    "actual_negative_fraction": 0.0
+  },
+  "identity": {
+    "weights": {
+      "repo": "Salesforce/moirai-2.0-R-small",
+      "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "file": "model.safetensors",
+      "sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+      "size_bytes": 45557824,
+      "config": {
+        "quantile_levels": [
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9
+        ],
+        "patch_size": 16,
+        "max_seq_len": 512,
+        "d_model": 384,
+        "num_layers": 6
+      }
+    },
+    "packages": {
+      "uni2ts": "2.0.0+git:cfd46d4510ed",
+      "torch": "2.4.1",
+      "numpy": "1.26.4",
+      "gluonts": "0.14.4"
+    }
+  }
+}

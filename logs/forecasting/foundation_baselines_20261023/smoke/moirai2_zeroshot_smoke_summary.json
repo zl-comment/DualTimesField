@@ -1,0 +1,40 @@
+{
+  "model": "moirai2_zeroshot",
+  "region": "NSW1",
+  "seed": 2026,
+  "smoke": true,
+  "dev_split": "selection",
+  "origins": 24,
+  "train_context_origins": null,
+  "identity_weights": {
+    "repo": "Salesforce/moirai-2.0-R-small",
+    "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+    "file": "model.safetensors",
+    "sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+    "size_bytes": 45557824,
+    "config": {
+      "quantile_levels": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9
+      ],
+      "patch_size": 16,
+      "max_seq_len": 512,
+      "d_model": 384,
+      "num_layers": 6
+    }
+  },
+  "seconds": 5.875,
+  "scores": {
+    "mae": 28.209250854121315,
+    "rmse_pooled": 34.500485537102726,
+    "point_definition": "native_point"
+  },
+  "output": "outputs/forecasting/foundation_smoke_20261023/moirai2_zeroshot/seed2026/NSW1/test.npz"
+}

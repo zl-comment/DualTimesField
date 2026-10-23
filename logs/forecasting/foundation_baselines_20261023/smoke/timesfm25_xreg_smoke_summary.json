@@ -1,0 +1,39 @@
+{
+  "model": "timesfm25_xreg",
+  "region": "NSW1",
+  "seed": 2026,
+  "smoke": true,
+  "dev_split": "selection",
+  "origins": 24,
+  "train_context_origins": null,
+  "identity_weights": {
+    "repo": "google/timesfm-2.5-200m-pytorch",
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "file": "model.safetensors",
+    "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+    "size_bytes": 925181104,
+    "config_keys": [
+      "architectures",
+      "context_length",
+      "head_dim",
+      "hidden_size",
+      "horizon_length",
+      "intermediate_size",
+      "model_type",
+      "num_attention_heads",
+      "num_hidden_layers",
+      "patch_length",
+      "quantile_horizon_length",
+      "quantiles",
+      "rms_norm_eps",
+      "torch_compile"
+    ]
+  },
+  "seconds": 13.442,
+  "scores": {
+    "mae": 21.9325205025404,
+    "rmse_pooled": 27.308550458529368,
+    "point_definition": "native_point"
+  },
+  "output": "outputs/forecasting/foundation_smoke_20261023/timesfm25_xreg/seed2026/NSW1/test.npz"
+}

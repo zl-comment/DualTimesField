@@ -430,10 +430,14 @@ def worker(root, job_id, device, *, allow_download=False):
             if reference is not None and reference.get('identity_hash') == identity_hash:
                 check_started = time.monotonic()
                 subset = _predict_indices(adapter, view, check, f'determinism check ({len(check)} origins)')
+                equal, worst = _reuse_compare(subset, reference, spec.reuse_tolerance)
                 reuse_evidence = {'reference_seed': first_seed, 'verified_origins': len(check),
-                                  'comparison': 'bitwise_equal' if _bitwise_equal(subset, reference) else 'mismatch',
+                                  'comparison': ('bitwise_equal' if worst == 0.0 else
+                                                 'max_abs_diff_within_tolerance'),
+                                  'max_abs_diff': worst, 'tolerance': spec.reuse_tolerance,
                                   'check_seconds': round(time.monotonic() - check_started, 3)}
-            if reuse_evidence and reuse_evidence['comparison'] == 'bitwise_equal':
+            if reuse_evidence and (reuse_evidence['comparison'] == 'bitwise_equal'
+                                   or reuse_evidence['max_abs_diff'] <= spec.reuse_tolerance):
                 copied = True
                 for index, (start, stop) in enumerate(boundaries):
                     source = reference_dir / 'predictions' / 'chunks' / f'chunk_{index:05d}.npz'
@@ -589,14 +593,23 @@ def _load_completed_predictions(reference_dir: Path, indices: np.ndarray) -> dic
         return None
 
 
-def _bitwise_equal(subset: dict, reference: dict) -> bool:
+def _reuse_compare(subset: dict, reference: dict, tolerance: float) -> tuple[bool, float]:
+    """Compare a verification subset against the reference cell.
+
+    tolerance=0.0 demands bitwise identity. A small nonzero tolerance documents
+    information-free GPU kernel jitter (measured value always recorded); the
+    adapter identity must still match exactly.
+    """
+    worst = 0.0
     for key in ('quantiles', 'point'):
         left, right = subset.get(key), reference.get(key)
         if (left is None) != (right is None):
-            return False
-        if left is not None and not np.array_equal(left, right):
-            return False
-    return True
+            return False, float('inf')
+        if left is None:
+            continue
+        diff = float(np.abs(np.asarray(left) - np.asarray(right)).max())
+        worst = max(worst, diff)
+    return bool(worst <= tolerance), worst
 
 
 def run(root, retry_failed=False):
@@ -713,7 +726,7 @@ def main():
     p.add_argument('--run-root', type=Path, required=True)
     p.add_argument('--extend-from', type=Path, required=True,
                    help='Completed frozen ten-model parent run (read-only)')
-    p.add_parser('run')
+    p = sub.add_parser('run')
     p.add_argument('--run-root', type=Path, required=True)
     p.add_argument('--retry-failed', action='store_true')
     p = sub.add_parser('worker')

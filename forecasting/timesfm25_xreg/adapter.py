@@ -53,13 +53,12 @@ class Adapter:
     def __init__(self, context):
         self.context = context
         params = context.config["foundation_models"]["timesfm25_xreg"]
-        expected = {"batch_origins", "xreg_mode", "ridge"}
+        expected = {"xreg_mode", "ridge"}
         if set(params) != expected:
             raise ValueError(f"Unexpected timesfm25_xreg parameters: {sorted(params)}")
         if params["xreg_mode"] != "xreg + timesfm" or float(params["ridge"]) != 0.0:
             raise ValueError("timesfm25_xreg fixes the official defaults "
                              "xreg_mode='xreg + timesfm' and ridge=0.0")
-        self.batch_origins = int(params["batch_origins"])
         from . import model as native
 
         self.hf_home = os.environ.get(
@@ -80,9 +79,9 @@ class Adapter:
                 "weights": native.weight_identity(self.hf_home),
                 "packages": native.package_versions(),
                 "config": {"forecast_config": native.FORECAST_CONFIG,
-                           "batch_origins": self.batch_origins,
                            "xreg_mode": "xreg + timesfm", "ridge": 0.0,
-                           "normalize_xreg_target_per_input": True},
+                           "normalize_xreg_target_per_input": True,
+                           "call_granularity": "one_origin_per_official_call"},
                 "input_mapping": {
                     "history_values.price": "raw_rrp_context_72",
                     "history_calendar+future_calendar": "dynamic_numerical_covariates_cal_0_9_96",
@@ -123,25 +122,27 @@ class Adapter:
                                    view.inputs["future_calendar"][indices]], axis=1)
         gas = view.inputs["origin_context"][indices][:, 0].astype(np.float64)
         points, auxiliaries = [], []
-        for start in range(0, len(indices), self.batch_origins):
-            stop = min(start + self.batch_origins, len(indices))
-            inputs = [price_raw[row] for row in range(start, stop)]
-            dynamic = {name: [calendar[row][:, column] for row in range(start, stop)]
+        # One origin per official call. The official forecast_with_covariates
+        # POOLS the in-context linear fit across every series in the call
+        # (xreg_lib builds one shared design matrix and one beta vector), so a
+        # batched call would let other origins' histories — which contain this
+        # origin's future — shift its XReg coefficients. Calling per origin is
+        # the only leak-free use of the official API; the backbone itself is
+        # batch-invariant (verified), so nothing else changes.
+        for row in range(len(indices)):
+            inputs = [price_raw[row]]
+            dynamic = {name: [calendar[row][:, column]]
                        for column, name in enumerate(CALENDAR_NAMES)}
-            static = {"gas_7d_log_std": [float(gas[row]) for row in range(start, stop)]}
+            static = {"gas_7d_log_std": [float(gas[row])]}
             chunk_points, chunk_quantiles = native.predict_with_xreg(
                 self.model, inputs=inputs, dynamic_numerical_covariates=dynamic,
                 static_numerical_covariates=static)
-            for row_index, point in enumerate(chunk_points):
-                array = np.asarray(point, dtype=np.float64)
-                if array.shape != (24,):
-                    raise ValueError(f"TimesFM point output shape {array.shape}")
-                points.append(array)
-            for row_index, quantile in enumerate(chunk_quantiles):
-                array = np.asarray(quantile, dtype=np.float64)
-                if array.shape != (24, 10):
-                    raise ValueError(f"TimesFM quantile output shape {array.shape}")
-                auxiliaries.append(array)
+            point = np.asarray(chunk_points[0], dtype=np.float64)
+            quantile = np.asarray(chunk_quantiles[0], dtype=np.float64)
+            if point.shape != (24,) or quantile.shape != (24, 10):
+                raise ValueError(f"TimesFM output shapes {point.shape}/{quantile.shape}")
+            points.append(point)
+            auxiliaries.append(quantile)
         point = np.stack(points, axis=0)
         self._last_auxiliary = np.stack(auxiliaries, axis=0)
         if not np.isfinite(point).all():

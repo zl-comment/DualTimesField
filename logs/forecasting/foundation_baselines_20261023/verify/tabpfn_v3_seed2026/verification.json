@@ -1,0 +1,52 @@
+{
+  "model": "tabpfn_v3",
+  "region": "NSW1",
+  "seed": 2026,
+  "origins": 12,
+  "tolerance_relative": 0.005,
+  "view_is_label_free": true,
+  "raw_price_reconstruction": {
+    "formula": "history_values[:,:,0] * target_std + target_mean (one inversion)",
+    "finite": true,
+    "min": -16.42166176845575,
+    "max": 194.17416971877614,
+    "future_actual_finite": true
+  },
+  "batch_invariance": {
+    "shuffled_batch_max_relative_diff": 0.0,
+    "single_vs_batch_max_relative_diff": 0.0014611709275374073,
+    "companion_swap_max_relative_diff": 0.0,
+    "single_vs_batch_tolerance": 0.005,
+    "passed": true
+  },
+  "seed_replay": {
+    "same_seed_stable_within_tolerance": true,
+    "max_relative_diff": 0.00141414851442647,
+    "tolerance": 0.005
+  },
+  "mapping_sensitivity": {
+    "perturbation": "calendar[0,0] += 1.0 on origin 0",
+    "prediction_changed": true,
+    "max_relative_diff": 0.035263353100166796,
+    "note": "a null change is recorded, not treated as failure"
+  },
+  "negative_outputs": {
+    "any_negative": true,
+    "negative_fraction": 0.009722222222222222,
+    "actual_negative_fraction": 0.0
+  },
+  "identity": {
+    "weights": {
+      "repo": "Prior-Labs/tabpfn_3",
+      "file": "tabpfn-v3-regressor-v3_default.ckpt",
+      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/weights/hf_home/hub/blobs/f8/f82e3ac8d9de1cd4d715cbfb534237269fd129f29088e24e9db94c964e9f00e1",
+      "sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "size_bytes": 233289807
+    },
+    "packages": {
+      "tabpfn": "9.2.0",
+      "torch": "2.14.1+cu126",
+      "numpy": "2.4.6"
+    }
+  }
+}

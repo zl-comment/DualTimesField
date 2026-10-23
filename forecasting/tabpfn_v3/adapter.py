@@ -66,18 +66,21 @@ class Adapter:
     def fit(self) -> None:
         """Register train-only label context for the 24 horizon tasks.
 
-        Idempotent: the context identity is persisted to
-        ``models/fit_state.json``; a resumed worker verifies it and skips
-        refitting, never rereading selection/calibration/test labels.
+        Registration is deterministic given weights/config/seed (verified
+        bitwise), so a resumed worker simply re-registers it and must get the
+        same state; ``models/fit_state.json`` pins the identity and is checked
+        against any stored state to refuse mixing snapshots. The registration
+        itself is never skipped: it is the in-memory context the frozen
+        checkpoint attends over, and rebuilding it is the only correct way to
+        resume.
         """
         state_path = self.context.model_directory / "fit_state.json"
         identity = self.identity()
         if state_path.exists():
             state = json.loads(state_path.read_text())
-            if state.get("identity_hash") == _hash(identity):
-                return
-            raise ValueError("Stored TabPFN label-context state does not match "
-                             "current weights/config; refusing to mix states")
+            if state.get("identity_hash") != _hash(identity):
+                raise ValueError("Stored TabPFN label-context state does not match "
+                                 "current weights/config; refusing to mix states")
         train = self.context.train
         if train is None:
             raise ValueError("tabpfn_v3 fit requires the train split (declared "
@@ -97,14 +100,16 @@ class Adapter:
                 random_state=self.context.seed + horizon)
             regressor.fit(x, y_raw[:, horizon])
             self._regressors.append(regressor)
-        self.context.model_directory.mkdir(parents=True, exist_ok=True)
-        state_path.write_text(json.dumps({
-            "identity_hash": _hash(identity), "created_at": time.time(),
-            "train_rows": int(x.shape[0]), "features": int(x.shape[1]),
-            "horizons": 24, "fit_seconds": round(time.monotonic() - started, 3),
-            "label_space": "raw_rrp_via_frozen_train_mean_std",
-            "context_note": "train labels only; in-context support, no weight updates",
-        }, indent=2) + "\n")
+        if not state_path.exists():
+            self.context.model_directory.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps({
+                "identity_hash": _hash(identity), "created_at": time.time(),
+                "train_rows": int(x.shape[0]), "features": int(x.shape[1]),
+                "horizons": 24, "fit_seconds": round(time.monotonic() - started, 3),
+                "label_space": "raw_rrp_via_frozen_train_mean_std",
+                "context_note": "train labels only; in-context support, no weight updates; "
+                                "deterministic registration is rebuilt on resume",
+            }, indent=2) + "\n")
 
     def identity(self) -> dict[str, Any]:
         if self._identity is None:
