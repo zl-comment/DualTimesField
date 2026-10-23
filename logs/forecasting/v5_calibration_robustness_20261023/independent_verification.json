@@ -1,0 +1,719 @@
+{
+  "prediction_files": 108,
+  "all_group_scores_verified": true,
+  "max_abs_metric_difference": 0.0,
+  "historical_predictions_bitwise_exact": 36,
+  "multiwindow_selections_reconstructed": 18,
+  "bound_checks_all_origins": true,
+  "original_inputs_and_72_fit_archive_unchanged": true,
+  "selection_sha256": "b1476f46ffa721505f1ce82030d3e800ffb110fc30bf3dd02799f1f96d047a4c",
+  "report_sha256": "99a7511a0be66af6203eb313f8208ec66e87035ba7f762bb5fc3d08d001da150",
+  "source_predictions": {
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/reference/reference_raw.npz": "02b5b27b1e0f23a047d4260857ff313a57b0f8ee3ed04b6f391a73c510122720",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/reference/reference_guarded.npz": "d9faaf27b4d6e293307a1d1c6236647c79fce678e2bb5154a97c58ee28631086",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/multiwindow/multiwindow_raw.npz": "02b5b27b1e0f23a047d4260857ff313a57b0f8ee3ed04b6f391a73c510122720",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/multiwindow/multiwindow_guarded.npz": "d9faaf27b4d6e293307a1d1c6236647c79fce678e2bb5154a97c58ee28631086",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "3dbfd78ad71b5b2909a4173d07d10d70cecbb65255306fad85116c47e5e45cea",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "8f2bb9178d59b396c53fc36a123ed8cdd3cf1369e4ea8cbeadd3c84c3ed77d0e",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/reference/reference_raw.npz": "0b9b817a37ce31acd7b09a80a14b1058e2561c7eb530efa3c6b0f62e285ce24b",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/reference/reference_guarded.npz": "17a5ae49de9135e337829052dd8f1d01685e3fd997a8bbdb18318389f5d0b53d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/multiwindow/multiwindow_raw.npz": "0b9b817a37ce31acd7b09a80a14b1058e2561c7eb530efa3c6b0f62e285ce24b",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/multiwindow/multiwindow_guarded.npz": "17a5ae49de9135e337829052dd8f1d01685e3fd997a8bbdb18318389f5d0b53d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "03c2cafcbe1bf92501cff8d2e2e4904d6357a9efbf077b75f0c35d6068f65dc7",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "d778cd4bcfc988612e0621ab1a7800e018561840876181fa969d9507a9cfd261",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/reference/reference_raw.npz": "b224afd6974c1f8eeac04fadc5e5c8db9cd011ceee387e5eb864362bb6e4ec4a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/reference/reference_guarded.npz": "1bccd4aae6cedd8b44984974a6bf1953ecebc3f25dadbcdbeda8b9a0ae91a257",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/multiwindow/multiwindow_raw.npz": "b224afd6974c1f8eeac04fadc5e5c8db9cd011ceee387e5eb864362bb6e4ec4a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/multiwindow/multiwindow_guarded.npz": "1bccd4aae6cedd8b44984974a6bf1953ecebc3f25dadbcdbeda8b9a0ae91a257",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "4f8f70dbcd6aa42dc075299c258408e9114af4aa1d04cd307ef71283c35fc646",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2021/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "fa673243da140655dd1d6c713b54bc2cc3d55940156775542db371cb09f13d7e",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/reference/reference_raw.npz": "327688f6b87d6fc3c6e2ff7a80c37dc76974227784f218156f71d1dc73eb74ba",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/reference/reference_guarded.npz": "327688f6b87d6fc3c6e2ff7a80c37dc76974227784f218156f71d1dc73eb74ba",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/multiwindow/multiwindow_raw.npz": "327688f6b87d6fc3c6e2ff7a80c37dc76974227784f218156f71d1dc73eb74ba",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/multiwindow/multiwindow_guarded.npz": "f0a55d4c916387d601dd63b03f34dd0e22303e902ce8eb8bfcf408ed9557bcad",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "d94fbbad17dd033dcc68736aa49934ce83d9494b0a9e2e53101c61684204e0a4",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "d94fbbad17dd033dcc68736aa49934ce83d9494b0a9e2e53101c61684204e0a4",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/reference/reference_raw.npz": "f194e5a3c14d4bd996096da1548803619237e0464e80182c08e3b8bb3fe38391",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/reference/reference_guarded.npz": "14e15c90a1104b81843e2633a4e2caa95a0fbfb02409c8edb9048028a5b5ce71",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/multiwindow/multiwindow_raw.npz": "f194e5a3c14d4bd996096da1548803619237e0464e80182c08e3b8bb3fe38391",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/multiwindow/multiwindow_guarded.npz": "82d578d5342730dbcc5c6fc842aab9a734fcf9fb59305cc4fd232d5ff4648d84",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "347fb1f547c58c7c7c4765750d60cf0c99df5d6a98dca6d994f1d1f4de09a8a3",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "347fb1f547c58c7c7c4765750d60cf0c99df5d6a98dca6d994f1d1f4de09a8a3",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/reference/reference_raw.npz": "09e1b437dee1a23c3994dd598b143da0a5aa48ac6c361176da66d28bb6cb4e64",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/reference/reference_guarded.npz": "09e1b437dee1a23c3994dd598b143da0a5aa48ac6c361176da66d28bb6cb4e64",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/multiwindow/multiwindow_raw.npz": "09e1b437dee1a23c3994dd598b143da0a5aa48ac6c361176da66d28bb6cb4e64",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/multiwindow/multiwindow_guarded.npz": "de440f629986a91e3797395b0f87b6c938499b6e1d1a0258f77d05027f88454a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "0e8b829aa14500fd42162d6fe22882ad5dc07117df60df74ff12bab52845421f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/NSW1/2022/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "0e8b829aa14500fd42162d6fe22882ad5dc07117df60df74ff12bab52845421f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/reference/reference_raw.npz": "92d5ab3e520167e76922098dd629a327e0be6b5cd230c842b09be694c1d843aa",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/reference/reference_guarded.npz": "9518b0549a698342bcd021625ee920db8ab0f6c570d21d31d5788082f31cafd4",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/multiwindow/multiwindow_raw.npz": "92d5ab3e520167e76922098dd629a327e0be6b5cd230c842b09be694c1d843aa",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/multiwindow/multiwindow_guarded.npz": "7e802aeb0649ddeb5e3b13166c5e5b561a11da17c51f88ddbf0b607684974b3d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "3e2d7e557b5a6b2765f14147a83490dd1ae926621f44107f2dba82cc97a0b950",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "ec34b12b6adc600643a05bb7ee7b0925cf0ba9a8b0d471d2584d22044f43c90a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/reference/reference_raw.npz": "84098c280374083ee8c45748ab813632a815256c7a0ad02b858310b0ee293dbd",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/reference/reference_guarded.npz": "96fb6ce9abb029918b2260c9141de5935d8b38a32d96b2b5523cf950c522b326",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/multiwindow/multiwindow_raw.npz": "84098c280374083ee8c45748ab813632a815256c7a0ad02b858310b0ee293dbd",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/multiwindow/multiwindow_guarded.npz": "96fb6ce9abb029918b2260c9141de5935d8b38a32d96b2b5523cf950c522b326",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "7fcbe14a77eb7bff1dd001df7f426d1d36358efe01c1e8913963d6c7445360c4",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "3514e58a5503cbcde90efc11d0b9063cda40f2c5125fe54853614923cb29b60a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/reference/reference_raw.npz": "ce80926358f97d380312b377643a084524ddb70283612c048315a5623dff2ec2",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/reference/reference_guarded.npz": "ce80926358f97d380312b377643a084524ddb70283612c048315a5623dff2ec2",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/multiwindow/multiwindow_raw.npz": "ce80926358f97d380312b377643a084524ddb70283612c048315a5623dff2ec2",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/multiwindow/multiwindow_guarded.npz": "18d80db0c0779566625db94b3dae04496b8a73b0dc139de068ca4c7935410e54",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "52ab455ee30803a9df7b9e0ca58ca2ee138301da6e3922bafdb47add2eebacfd",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2021/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "2151506b53a53175b3fcfd79898da3fe3c14c2d8cf54f2d173f9b1accaad3c36",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/reference/reference_raw.npz": "bad99ed4007b4bd061f3a954912ce20a99161a6115f16c766810f812ade826f1",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/reference/reference_guarded.npz": "6a36aaa1430227a5f17d093a125841ed2af416a7aae24395693923b8f55bebfa",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/multiwindow/multiwindow_raw.npz": "bad99ed4007b4bd061f3a954912ce20a99161a6115f16c766810f812ade826f1",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/multiwindow/multiwindow_guarded.npz": "da54f7e4a9bf165ce2292a466fce6eea62595c04ffe5edcbde498b25858f92ce",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "527fba3d7efd4a68343e955c860d6698f6b9c5a90591da32728c50acae53d8e9",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "8026bf181181793f051773692a24adcd5a15552062187c22fec49ddd6f846230",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/reference/reference_raw.npz": "cbdd81887e2636f8615e34a1d44e64b800a927672422ea01bd636138f15f570e",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/reference/reference_guarded.npz": "1e6d8c7a679968220935ff2003c30a4f52e47c11c007d8c59c281798f644dd25",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/multiwindow/multiwindow_raw.npz": "cbdd81887e2636f8615e34a1d44e64b800a927672422ea01bd636138f15f570e",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/multiwindow/multiwindow_guarded.npz": "1e6d8c7a679968220935ff2003c30a4f52e47c11c007d8c59c281798f644dd25",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "cf653c288cc0e7a34fc101ff168e19f22946fe41369f97d1dd313d07f6979b52",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "77349dd3bb66a5f9bdbad267e500ac3a8d0d4861b6a0dca89b2a82b1c3356e1a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/reference/reference_raw.npz": "cb8d5aa2306e97e684addc12c71e150f5e6c7a2d8b3af3e13d7b403811e8334f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/reference/reference_guarded.npz": "3fc2d59d17f425290c073e48210160f05e597cde76a3483269780b2c281211f8",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/multiwindow/multiwindow_raw.npz": "cb8d5aa2306e97e684addc12c71e150f5e6c7a2d8b3af3e13d7b403811e8334f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/multiwindow/multiwindow_guarded.npz": "3fc2d59d17f425290c073e48210160f05e597cde76a3483269780b2c281211f8",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "d4ad05047c0489333ed4e0884cd7fc8ac86f358b74083927798b7471193a8277",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/QLD1/2022/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "43cbf802f2ebf337885d9eed4ce691cdf755639fbb2358885d106bbf09c222fc",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/reference/reference_raw.npz": "199dcd26cc6025c5b3a3e598bc19d6726604c39a1f70038c5008cd977acb99df",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/reference/reference_guarded.npz": "b9bb2515d942176abedf212054d7bf7f910251c2ffdcfdc5b2f4d55cb0190d52",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/multiwindow/multiwindow_raw.npz": "199dcd26cc6025c5b3a3e598bc19d6726604c39a1f70038c5008cd977acb99df",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/multiwindow/multiwindow_guarded.npz": "b9bb2515d942176abedf212054d7bf7f910251c2ffdcfdc5b2f4d55cb0190d52",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "235f8a8dd3c790152afa42680eb522fb1bd27025e5139c1a017bee758d7ab860",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "392a68a329b213fc392afead8f90d24a51e4f7db72a5cff1389503706a4f634a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/reference/reference_raw.npz": "a78219b5e96aacf0168c38b3baf47a86a614a31e8480a7393e3222b4a5bc177d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/reference/reference_guarded.npz": "23f94b63233e62a3639503dc2d649c6540b40f9dfb758f70975afe503fc616a5",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/multiwindow/multiwindow_raw.npz": "a78219b5e96aacf0168c38b3baf47a86a614a31e8480a7393e3222b4a5bc177d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/multiwindow/multiwindow_guarded.npz": "23f94b63233e62a3639503dc2d649c6540b40f9dfb758f70975afe503fc616a5",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "b9af062a3a28c642fffbee1d84ee285e56adab14db8e9619493d81f80a5e232c",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "c1dcacdc7bd98b7d8cc4108228fd2c18fa728d9395a9dec5e4bd7afc2794f24e",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/reference/reference_raw.npz": "d3b40984b07be69f0b556360e29fa4942bc55b7f4479f5abe3f7301bf848760f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/reference/reference_guarded.npz": "75a5c75ef036d12e168b28f6882dae1278cd2304968192779cbbaf800c1367d5",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/multiwindow/multiwindow_raw.npz": "d3b40984b07be69f0b556360e29fa4942bc55b7f4479f5abe3f7301bf848760f",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/multiwindow/multiwindow_guarded.npz": "75a5c75ef036d12e168b28f6882dae1278cd2304968192779cbbaf800c1367d5",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "c1db49b372134c430e07cbf3d0236bc4988e68961ced21844ceae82daf60ba7c",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2021/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "1191a7318823fdad9c5a32eb7baa505069dd8f78db44850d4c6d4ee5c4a7e76b",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/reference/reference_raw.npz": "5a13362e3037bdba87299f1139707b77d7db869a4e9ee498af74781bcfb523ad",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/reference/reference_guarded.npz": "7ce9df1bef2b9e894d1afa29ba97a2c22a1d347df5fb23b3cde4acde39ea39e1",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/multiwindow/multiwindow_raw.npz": "5a13362e3037bdba87299f1139707b77d7db869a4e9ee498af74781bcfb523ad",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/multiwindow/multiwindow_guarded.npz": "5fb15da7de6654b992cb7dd056822733da06cec6de68cfcbbea87cfc200a40ca",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/bounded_calibration/bounded_calibration_raw.npz": "6a30edca6ef728ff521e1540260f4e5ee5feb7c4a9637bd226f9344f082450ec",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2026/bounded_calibration/bounded_calibration_guarded.npz": "427ce6d932802f919481449d90eb4d4bec0f0bb676f1b81093dd067274161410",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/reference/reference_raw.npz": "c24cc48b03343b86aea477417099a41ea7c23f627323bd956c08241825e9df29",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/reference/reference_guarded.npz": "de3ef21c4d7f30e70ad5091537f768330eb2e023d0e9b8dc407eb0c9d976fa54",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/multiwindow/multiwindow_raw.npz": "c24cc48b03343b86aea477417099a41ea7c23f627323bd956c08241825e9df29",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/multiwindow/multiwindow_guarded.npz": "44f941c3ba262a8254322b332f837a9eb66d34358e6d06599b447146dff8279d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/bounded_calibration/bounded_calibration_raw.npz": "66d653fc431f5cd7a5cc36ddfc35116cb62a873ec18c633ece5c35ef4730ccdf",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2027/bounded_calibration/bounded_calibration_guarded.npz": "9012956c5bb4769d7d447cf659c6b0d6f0312ca591457214f3df560325f550ce",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/reference/reference_raw.npz": "bbb3bedf161a6f35e13eef843598457980f2f4a490bb1e18f87d74c93a86aa0a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/reference/reference_guarded.npz": "876fc67b9e4f226069572e06eefcdd5637aee8596df1a944af4207d194d3c520",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/multiwindow/multiwindow_raw.npz": "bbb3bedf161a6f35e13eef843598457980f2f4a490bb1e18f87d74c93a86aa0a",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/multiwindow/multiwindow_guarded.npz": "45504be21222ace0cb73b93039f12e599cdf9eac1a597e674f0af114fed7b639",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/bounded_calibration/bounded_calibration_raw.npz": "f601b443a183e1d484612ae082a6d2fcd36ff011f0559eff88de462e93f642de",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r2/TAS1/2022/seed_2028/bounded_calibration/bounded_calibration_guarded.npz": "25a2feb89b9e91cdabe6deea5b62c8daa2aab81b8bf25e273fcbc278b8ff7d96"
+  },
+  "checkpoint_replay": {
+    "NSW1/2021/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "760791e834e58be6118d660301fac4e5f97b2712d68b41ce6baf486df80602d6"
+    },
+    "NSW1/2021/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "26d6977216170ab4f0035ccfffa725eb64dd73622b64f4ef29b8aac2fa28a3c4"
+    },
+    "NSW1/2021/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "883c94faa76fb4bad35643f5b92a711dfbd84c1d6a7c50cf21e38947b35dd2c9"
+    },
+    "NSW1/2021/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "57bb76c002c07b9f6bb76cdab3611a3d232f10338827e155a1765fe37a070b08"
+    },
+    "NSW1/2021/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "84a0126064e634e62ba58eda6c0f1ddbfe68f204afea510fc82877623e3af074"
+    },
+    "NSW1/2021/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "43ae13e011e57dbf4cda3a3c256d38a0c57daf0a34ba67ac4d8d54d094e9f7d1"
+    },
+    "NSW1/2021/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "85b6842c183676ea8e73a384fbaefab76899f5c42f79d7ffb017ec669dcfc468"
+    },
+    "NSW1/2021/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "d53dcfff14c1c4807c96dfb65f30a8d1590edf3c4686de87ded573cef0f9e468"
+    },
+    "NSW1/2021/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "58536800e8ab14e5fb20cdfa04a2347db945ab75d86494c17d04cf5c14c18ef3"
+    },
+    "NSW1/2022/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "61948064caea455523e6c1b43426cfe160fd6d1c383abbc170b0f89576cffcea"
+    },
+    "NSW1/2022/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "fcfb91dbd677b525e559b3c771b0d831ecb8db95d340215174a6040f03ff8c0e"
+    },
+    "NSW1/2022/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "234e6cd2b6907f4f214c06f52d10b7b0cb810b9ab605b679601a5c1202bcea19"
+    },
+    "NSW1/2022/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "3c03ff211827f1868e25c1e94daa4ab857ac18f0dee3826152011e18bb6f038e"
+    },
+    "NSW1/2022/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "d25c9d1b413725f100c7c10b6d3b387be15daf52b5ee81c1fd7a4afa4a89af89"
+    },
+    "NSW1/2022/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "1d23a0bbde5412e9cbc9f749fee1c0f08e913251883d2723a2ca98c77438813e"
+    },
+    "NSW1/2022/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "c9d3b830d74c7a5773ed9fb7565cfebbd4f00ef1a72466c43178ded094b00bcd"
+    },
+    "NSW1/2022/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "55aea36d5b3019591e70c9f4c345d109841f49138fb23846a1bafad91b6d6e11"
+    },
+    "NSW1/2022/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "e42676db9f8fcdd9e4b048c7824ec04722a2c0be08c895f9df4754e7bc4893e4"
+    },
+    "QLD1/2021/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "a68d7a54a37b1a3e351d818a880bf2976840720a62a589ba73f2f3ca94271277"
+    },
+    "QLD1/2021/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "a8d493b16ed326f9b0165d52522c7397c443504219a3be41d438fd30a7908bfd"
+    },
+    "QLD1/2021/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "e1596ef13594d0f0c9726eef17ec2ad4cdc339351acecc7ba90d50f20653763b"
+    },
+    "QLD1/2021/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "f8a7e8ac4f687cd91b1f6d45beaaad6cc17a4200d86d71c7149e2cf843cab0ff"
+    },
+    "QLD1/2021/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "b8719506169886607dfbc2442210eae44a7a977e5cd81d57dc5ea89598d14340"
+    },
+    "QLD1/2021/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "ffb47c009abbb009cda77bfcfccf7dc382b9b921f18fe05aacdf60e57a76627a"
+    },
+    "QLD1/2021/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "6438e7b00a1e2ccb0f107e85c143f132be6ff090e65c951944a89c0492244ac7"
+    },
+    "QLD1/2021/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "e0eacf1bd159a98f00f06f8af3e4e02dfd08d8c38e0b11e82600e8abc95e943e"
+    },
+    "QLD1/2021/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "792c6c57d956c97bb27a86869f1ed0b9f7af2d53cb59a333685b899f18ee0b72"
+    },
+    "QLD1/2022/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "50e62eda5594ac1d072643c32967642cf461d85dae65413c5580fa2c613d2a22"
+    },
+    "QLD1/2022/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "f153dc5a965216a145752204869dd1302955cf7080a425fe38bde4cf30021d32"
+    },
+    "QLD1/2022/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "c043e2468825c9569f377bf7a6640545379ab4f645a71dc2b0798f497378c952"
+    },
+    "QLD1/2022/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "fec803b1388806c334fcb2ca9096a5ac7447a994369576aeea52e8b8979405cf"
+    },
+    "QLD1/2022/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "28e207fc1776b9f3d728c60ebb07e9a0f1d5044f6ba80cbea8993e825f47c118"
+    },
+    "QLD1/2022/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "3188e036918e75ad13ceb793ea8f164e646ca415502756bb72bb841e73803cd0"
+    },
+    "QLD1/2022/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "ed59a1727d44bab681a0f5526c3e9a74e2835e2c8d0b43367ccd46bb05fd6e12"
+    },
+    "QLD1/2022/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "9e463c452173f50d7c2d3af1ea38c9dbda96ba3ecc417cd3ad4256895fee9455"
+    },
+    "QLD1/2022/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "c8e57d201239b1b625cf2804def632be6ac37857b9780c324f9651a529cbb2c1"
+    },
+    "TAS1/2021/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "c34c3ea68ae796bcb7e33095eb6e0d8e1821dc891e7ef8682cbc01fdf8133c73"
+    },
+    "TAS1/2021/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "a788df9bf06311c5abb404cbbd8d9192f60b9ade62d3194b3ca5604331356a80"
+    },
+    "TAS1/2021/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "bc018dd4572de1ac6c18da66131347b3075411b75b2122538779b9c5438ec4aa"
+    },
+    "TAS1/2021/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "7d6a1af33893539d86ab9c7778dd42911555c74ab6cfc757f886cc5ff382ae33"
+    },
+    "TAS1/2021/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "7cd12b59706db21f3383e99e64ed81698cc3979b2aa7c6eec0330c171f2b46f9"
+    },
+    "TAS1/2021/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "5a8882991c25c354ddeb349d92ec6c046a42b34b16d51b760e41681b54810d4b"
+    },
+    "TAS1/2021/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "1ada7d839efa07ee17381e90f23d4d8d85400fd0a9b6c6ea7a15d13f0e2391b6"
+    },
+    "TAS1/2021/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "8a05bf6e34431ad91387400c09c14408caff4a3249d57aab6181457a43d8f536"
+    },
+    "TAS1/2021/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 544,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "445e9b9fe121018929ac9df2262c8c38cdf9fe7a964b76374642175b7489ec07"
+    },
+    "TAS1/2022/2026/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "693e873b07f9fa546ff5771b77dd45ccf654ab259bbdbed816d5f8e4fe4694e6"
+    },
+    "TAS1/2022/2026/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "691ebd43a76bc3d8a8f18575a225ae2ec2aa831682482dd1f5816d44cc5adfb7"
+    },
+    "TAS1/2022/2026/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "84268466e4398722971f8120fc6106459ce5c3d7beeba229a5bd164e4aeb926f"
+    },
+    "TAS1/2022/2027/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "931f012cfe5921c3a23fca30d722831256c6336bbea1036826831454ac7ad368"
+    },
+    "TAS1/2022/2027/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "3ee85e129b08b5def76b5897ed0c4fc77e3eb2671c88bc67f1b09e44e920f5c0"
+    },
+    "TAS1/2022/2027/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "fe7c926cd56352a5faeb3b313d9cae9abd89e6919ad72a0c34faba013f996e8d"
+    },
+    "TAS1/2022/2028/multiwindow/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "a5b629d164472b74c33717428c660955e6b2905a9e494dfead0334eabe3c5100"
+    },
+    "TAS1/2022/2028/bounded_calibration/raw": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "3a6b284f8b44d27bc84d7b77d653414178a92140c4185b670901d6ea2a949bdf"
+    },
+    "TAS1/2022/2028/bounded_calibration/guarded": {
+      "bitwise_exact": true,
+      "max_abs_difference": 0.0,
+      "sampled_origins": 520,
+      "batch_starts": [
+        0,
+        4352,
+        8704
+      ],
+      "checkpoint_sha256": "854132e2d52a57bc4352d6e16fb30d3864d58f7b495b867e11047ceca174cadb"
+    }
+  },
+  "verified_at": "2026-10-23T17:59:14.297101+08:00",
+  "audit_script_sha256": "fec665499a2d01856659261dbd03217b406a5c1e833e6cf43bc362e8ac52d4f6"
+}

@@ -6,6 +6,8 @@
 
 当前 Full_joint 使用[平衡损失与非对称 Anchor 尺度头](full_v5_anchor_balance/README.md)，通过 `forecasting.full_v5_anchor_balance.aligned_final` 训练/评估；下方 `full/` 为历史静态结构，不是当前完整方法。
 
+后续[校正稳健性实验](full_v5_calibration_robustness/README.md)已完成两项独立改动、36 次训练及全部复核，[结果与验收](../logs/forecasting/v5_calibration_robustness_20261023/README.md)显示限幅均值改善但尚未稳定通过。原开发折和三神经种子预算保持不变，当前 Full_joint 主表保留已发布结果。
+
 | 目录 | 实验模型 ID | 实现类型 |
 | --- | --- | --- |
 | [full/](full/README.md) | `full` | 本地实现，历史结构对照 |
