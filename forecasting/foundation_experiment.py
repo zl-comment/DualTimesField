@@ -202,10 +202,12 @@ def prepare(config_path, run_root, extend_from):
     interpreters = {}
     for model in models:
         relative = config['experiment']['interpreters'][model]
-        candidate = (project / relative).resolve()
+        candidate = project / relative
         if not candidate.is_file():
             raise ValueError(f"Interpreter for {model} does not exist: {candidate}")
-        interpreters[model] = str(candidate)
+        # Keep the symlinked venv path: Path.resolve() would follow bin/python
+        # to the system interpreter and silently drop the model environment.
+        interpreters[model] = str(candidate.absolute())
     env_locks = _model_env_locks(project, models)
     run_root.mkdir(parents=True)
     shutil.copyfile(config_path, run_root / 'config.yaml')
