@@ -8,6 +8,8 @@
 
 后续[校正稳健性实验](full_v5_calibration_robustness/README.md)已完成两项独立改动、36 次训练及全部复核，[结果与验收](../logs/forecasting/v5_calibration_robustness_20261023/README.md)显示限幅均值改善但尚未稳定通过。原开发折和三神经种子预算保持不变，当前 Full_joint 主表保留已发布结果。
 
+[机理状态约束](full_v5_mechanism_state/README.md)独立实现训练期证据门与固定平均门对照，重点检验校正可靠性，不把短流程指标当作有效性结果。
+
 | 目录 | 实验模型 ID | 实现类型 |
 | --- | --- | --- |
 | [full/](full/README.md) | `full` | 本地实现，历史结构对照 |
