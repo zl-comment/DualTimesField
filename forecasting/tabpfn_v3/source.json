@@ -1,0 +1,60 @@
+{
+  "implementation_identity": "official tabpfn package (PyPI 9.2.0) running the pinned V3 regressor checkpoint locally; package version is not the model generation",
+  "experiment_model_id": "tabpfn_v3",
+  "batch": "second_foundation_20261023",
+  "paper_reference": "Prior Labs. TabPFN 3: Machine Learning with Zero Hyperparameter Tuning. arXiv:2605.13986, 2026",
+  "paper_url": "https://arxiv.org/abs/2605.13986",
+  "lineage_reference_not_this_checkpoint": "Hollmann et al. Accurate predictions on small data with a tabular foundation model. Nature 645:453-458, 2025. doi:10.1038/s41586-024-08328-6 (TabPFN v2; ancestry only)",
+  "repository": "https://github.com/PriorLabs/TabPFN",
+  "weights": {
+    "repo": "Prior-Labs/tabpfn_3",
+    "file": "tabpfn-v3-regressor-v3_default.ckpt",
+    "revision": "24a16a89d245878b846555110985634aa2e656d7",
+    "size_bytes": 232679299,
+    "sha256": "see weights/weight_identities.json in the run worktree (recorded at download, 2026-10-23)",
+    "license": "tabpfn-3-license-v1.0 (research and internal evaluation; no commercial use)",
+    "download": "public huggingface.co snapshot; the package's own interactive license downloader is bypassed by passing the local file path; no token stored or logged"
+  },
+  "dependency_versions": {
+    "python": "3.11.17",
+    "tabpfn": "9.2.0",
+    "torch": "2.14.1+cu126",
+    "note": "full freeze in requirements.lock.txt; torch cu126 required by host driver 560.35.05"
+  },
+  "input_mapping": "all seven public blocks in INPUT_KEYS order flattened by the shared flatten_inputs to 1465 columns; identical to tree baselines; no feature added or dropped",
+  "task_decomposition": "24 independent in-context regression tasks, one per horizon h=1..24, each fitted on the same 1465-column inputs with the h-step raw RRP label",
+  "context_policy": {
+    "context_source": "train split only (61273 rows per region), full set, no subsampling",
+    "label_use": "in-context support examples (label context fit); weights never updated; NOT 'no contact with task labels'",
+    "selection_use": "none",
+    "calibration_use": false,
+    "test_labels": "never visible to the adapter; scorer-only"
+  },
+  "target_space": "regressors fitted on raw RRP (train standardized labels inverted once via frozen train mean/std); predictions are raw RRP with no further inverse transform",
+  "output_quantiles": {
+    "levels": [0.05, 0.1, 0.5, 0.9, 0.95],
+    "source": "native predicted-distribution quantiles via predict(output_type='quantiles')",
+    "point_for_scoring": "rearranged q50 by the shared scorer; native mean exists but is not used"
+  },
+  "randomness": {
+    "seed_controls": "ensemble-preprocessing RNG only (random_state=seed+horizon); weights frozen",
+    "same_seed_repeat": "bitwise identical (verified 2026-10-23 on L40)",
+    "across_seeds": "genuinely different ensemble draws of the same frozen checkpoint (max abs diff > 0 verified)"
+  },
+  "internal_transforms": "none beyond the library's own internal preprocessing/standardization; no PCA, no feature selection, no external head",
+  "differences_from_paper": "no hyperparameter search (paper contribution is hyperparameter-free use); paper regression benchmarks are standard tabular datasets, not probabilistic electricity price forecasting; we do not claim reproduction of paper benchmark scores; multi-fidelity ensembling left at library defaults (n_estimators='auto')",
+  "cost_probe_2026_10_23": {
+    "gpu": "NVIDIA L40 46GB",
+    "fit_per_horizon_s": 7.6,
+    "predict_ms_per_query_4096_batch": 22.2,
+    "peak_gpu_mib_4096": 7465,
+    "projected_hours_per_region_seed": 2.6
+  },
+  "verified_date": "2026-10-23",
+  "sources_checked": [
+    "https://huggingface.co/Prior-Labs/tabpfn_3",
+    "https://docs.priorlabs.ai/models",
+    "https://docs.priorlabs.ai/models/selecting-model-version",
+    "https://arxiv.org/abs/2605.13986"
+  ]
+}

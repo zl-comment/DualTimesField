@@ -1,0 +1,62 @@
+{
+  "implementation_identity": "official chronos-forecasting package (PyPI 2.3.2) Chronos2Pipeline, frozen public checkpoint amazon/chronos-2, no fine-tuning; not Chronos-T5, Chronos-Bolt, or any synth/small variant",
+  "experiment_model_id": "chronos2_zeroshot",
+  "batch": "second_foundation_20261023",
+  "paper_reference": "Amazon. Chronos-2: The Time Series Forecasting Model for the Agentic Era. arXiv:2510.15821, 2025",
+  "paper_url": "https://arxiv.org/abs/2510.15821",
+  "model_card": "https://huggingface.co/amazon/chronos-2",
+  "repository": "https://github.com/amazon-science/chronos-forecasting",
+  "weights": {
+    "repo": "amazon/chronos-2",
+    "revision": "29ec3766d36d",
+    "file": "model.safetensors",
+    "size_bytes": 477365816,
+    "license": "Apache-2.0",
+    "sha256": "see weights/weight_identities.json in the run worktree (recorded at download, 2026-10-23)"
+  },
+  "dependency_versions": {
+    "python": "3.11.17",
+    "chronos-forecasting": "2.3.2",
+    "torch": "2.14.1+cu126",
+    "note": "full freeze in requirements.lock.txt"
+  },
+  "input_mapping": {
+    "history_values.price": "un-standardized once via frozen train target mean/std -> raw RRP target series [72]; model output is raw RRP (single inverse at input)",
+    "history_values.demand": "past-only covariate demand_std [72] (standardized units retained; no inverse constants exist in shared metadata)",
+    "history_calendar": "past covariates cal_0..cal_9 [72]",
+    "future_calendar": "future covariates cal_0..cal_9 [24]; future keys subset of past keys, satisfied exactly",
+    "unmapped": ["origin_context", "future_exogenous", "ctf_exogenous", "quantile_exogenous"],
+    "unmapped_reason": "official API has no static covariate slot; future-only covariates require a history span which the public cache does not contain and inventing history is forbidden",
+    "scope_declaration": "input_scope=restricted_price_target_demand_past_covariate_calendar_past_future; NOT an equal-input comparison to full-1465-column models"
+  },
+  "output_quantiles": {
+    "levels": [0.05, 0.1, 0.5, 0.9, 0.95],
+    "source": "native trained quantile head; checkpoint trained on 21 levels [.01,.05,...,.99] including all five common levels (verified from config.json revision 29ec3766); no interpolation, extrapolation or endpoint copying",
+    "point_for_scoring": "rearranged_q50 by shared scorer"
+  },
+  "native_behavior": {
+    "internal_transform": "checkpoint use_arcsinh=true (native)",
+    "padding": "context exactly 72; no padding needed; only official left-padding would apply for shorter histories",
+    "cross_learning": false,
+    "prediction_length": 24
+  },
+  "context_policy": {
+    "context_source": "each origin's own legal 72h price history plus covariates known at that origin",
+    "label_use": "none (zero-shot); no fit step",
+    "selection_use": "none",
+    "calibration_use": false,
+    "test_labels": "never visible to the adapter; scorer-only"
+  },
+  "randomness": {
+    "seed_controls": "nothing; frozen weights, no sampling, deterministic kernels given hardware; the three formal seeds reuse the verified deterministic output via the recorded reuse path",
+    "same_conditions_repeat": "bitwise stable within a fixed device/batch; batch-composition invariance is checked in stage 2 with a declared tolerance"
+  },
+  "differences_from_paper": "paper evaluates zero-shot on its benchmark suites, not AEMO NEM hourly prices; covariate subset restricted to what the shared cache can legally supply; no benchmark score reproduction claimed",
+  "verified_date": "2026-10-23",
+  "sources_checked": [
+    "https://huggingface.co/amazon/chronos-2",
+    "https://huggingface.co/amazon/chronos-2/resolve/main/config.json",
+    "https://github.com/amazon-science/chronos-forecasting",
+    "https://arxiv.org/abs/2510.15821"
+  ]
+}

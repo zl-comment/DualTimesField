@@ -1,0 +1,208 @@
+aligned_protocol:
+  id: aligned-baselines-20261012-static-v1
+  model_boundary: shared_preprocessing_native_model_internals
+  point_definition: sorted_q50
+  score: raw_rrp_common_five_quantile_pinball_proxy
+  stage: full_fixed_configuration_rerun
+  training_budget_status: fixed_configuration_no_hpo_retrospective_test
+ctf_exogenous:
+  clip_to_train_quantiles:
+  - 0.005
+  - 0.995
+  enabled: true
+  features:
+  - net_load_mw
+  out_of_range: log
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_pdpasa.npz
+    QLD1: data/aemo_exogenous/qld1_pdpasa.npz
+    TAS1: data/aemo_exogenous/tas1_pdpasa.npz
+  standardization: train_zscore
+  vintage_rule: latest_available_pdpasa_with_stpasa_tail
+data:
+  available_column: available_at_aest
+  delivery_column: delivery_start_aest
+  history_columns:
+  - rrp_aud_per_mwh
+  - total_demand_mw
+  load_end_exclusive: '2025-01-01'
+  price_transform: identity
+  quantile_target: transformed
+  region_column: region
+  region_files:
+    NSW1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/nsw1_hourly.csv
+    QLD1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/qld1_hourly.csv
+    TAS1: ../electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/tas1_hourly.csv
+  relabel_splits: true
+  split_boundaries:
+    calibration:
+      end_exclusive: '2023-01-01'
+      start: '2022-07-01'
+    selection:
+      end_exclusive: '2022-07-01'
+      start: '2022-01-01'
+    test:
+      end_exclusive: '2025-01-01'
+      start: '2023-01-01'
+    train:
+      end_exclusive: '2022-01-01'
+      start: '2015-01-01'
+  split_column: split
+  split_names:
+  - train
+  - selection
+  - calibration
+  - test
+  target_column: rrp_aud_per_mwh
+  timezone: Australia/Brisbane
+experiment:
+  chunk_size:
+    chronos2_zeroshot: 512
+    moirai2_zeroshot: 512
+    tabpfn_v3: 4096
+    timesfm25_xreg: 512
+  cpu_threads_per_job: 8
+  execution_scope: single_model
+  interpretation:
+    all_test_rows_retrospective: true
+    deterministic_replicates_not_independent_evidence: true
+    frozen_pretrained_weights: true
+    hyperparameter_search_completed: false
+    input_scopes_differ_between_models: true
+  interpreters:
+    chronos2_zeroshot: .venvs/chronos2/bin/python
+    moirai2_zeroshot: .venvs/moirai2/bin/python
+    tabpfn_v3: .venvs/tabpfn_v3/bin/python
+    timesfm25_xreg: .venvs/timesfm25/bin/python
+  max_origins: null
+  models:
+  - moirai2_zeroshot
+  regions:
+  - NSW1
+  - QLD1
+  - TAS1
+  resources:
+    cpu_workers: 1
+    gpu_ids:
+    - 6
+    - 7
+    gpu_max_initial_used_mib: 4096
+  seed_reuse:
+    mode: verify_and_copy
+    verification_origins: 64
+  seeds:
+  - 2026
+  - 2027
+  - 2028
+forecast_protocol:
+  calendar_features:
+  - hour_sin
+  - hour_cos
+  - day_of_week_sin
+  - day_of_week_cos
+  - day_of_year_sin
+  - day_of_year_cos
+  - month_sin
+  - month_cos
+  - is_weekend
+  - year_standardized
+  input_hours: 72
+  output_hours: 24
+  stride_hours: 1
+foundation:
+  batch: second_20261023
+  schema: foundation-expansion-20261023-v1
+foundation_models:
+  chronos2_zeroshot:
+    batch_origins: 512
+  moirai2_zeroshot:
+    batch_origins: 512
+  tabpfn_v3:
+    batch_queries: 4096
+    weight_file: tabpfn-v3-regressor-v3_default.ckpt
+  timesfm25_xreg:
+    batch_origins: 512
+    ridge: 0.0
+    xreg_mode: xreg + timesfm
+future_exogenous:
+  aggregation: min
+  dimension: 1
+  enabled: true
+  name: max_spare_capacity_mw
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_pdpasa.npz
+    QLD1: data/aemo_exogenous/qld1_pdpasa.npz
+    TAS1: data/aemo_exogenous/tas1_pdpasa.npz
+  standardization: train_zscore
+  vintage_rule: latest_available_pdpasa_with_stpasa_tail
+interconnector_exogenous:
+  enabled: true
+  features:
+  - ic_net_import_mw
+  - ic_import_room_mw
+  - ic_export_room_mw
+  - ic_main_import_room_mw
+  - ic_covered
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_predispatch_interconnector.npz
+    QLD1: data/aemo_exogenous/qld1_predispatch_interconnector.npz
+    TAS1: data/aemo_exogenous/tas1_predispatch_interconnector.npz
+  standardization: train_zscore
+  vintage_rule: latest_predispatch_run_published_by_origin
+model:
+  quantiles:
+  - 0.05
+  - 0.1
+  - 0.5
+  - 0.9
+  - 0.95
+origin_context:
+  enabled: true
+  name: dwgm_gas_price_7day_log
+  path: data/aemo_exogenous/raw_gas/dwgm_prices.csv
+  window_days: 7
+predispatch_exogenous:
+  enabled: true
+  features:
+  - predispatch_rrp
+  - predispatch_total_demand_mw
+  - predispatch_available_generation_mw
+  - predispatch_net_interchange_mw
+  - predispatch_covered
+  price_features:
+  - predispatch_rrp
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_predispatch.npz
+    QLD1: data/aemo_exogenous/qld1_predispatch.npz
+    TAS1: data/aemo_exogenous/tas1_predispatch.npz
+  standardization: train_zscore
+  vintage_rule: latest_predispatch_run_published_by_origin
+quantile_exogenous:
+  enabled: true
+  features:
+  - max_spare_capacity_mw
+  region_files:
+    NSW1: data/aemo_exogenous/nsw1_pdpasa.npz
+    QLD1: data/aemo_exogenous/qld1_pdpasa.npz
+    TAS1: data/aemo_exogenous/tas1_pdpasa.npz
+  shortfall_below_train_quantiles:
+  - 0.01
+  - 0.05
+  - 0.1
+  standardization: train_zscore
+  vintage_rule: latest_available_pdpasa_with_stpasa_tail
+training:
+  batch_size: 256
+  checkpoint_metrics:
+  - crps
+  device: cuda
+  device_batches: true
+  epochs: 100
+  learning_rate: 0.0003
+  num_workers: 0
+  output_directory: outputs/forecasting/model_runs/expansion
+  patience: 15
+  primary_selection: crps
+  seed: 2026
+  torch_threads: 2
+  weight_decay: 0.0001

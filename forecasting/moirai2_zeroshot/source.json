@@ -1,0 +1,66 @@
+{
+  "implementation_identity": "official uni2ts repository at pinned commit cfd46d4510ed8896f263116f32928eede05b0a75 (Moirai2Forecast/Moirai2Module); the PyPI uni2ts 2.0.0 wheel predates Moirai-2 and is NOT the implementation; Moirai 2.0-R-small weights, frozen, zero-shot (not Moirai 1.x, not Moirai-MoE)",
+  "experiment_model_id": "moirai2_zeroshot",
+  "batch": "second_foundation_20261023",
+  "paper_reference": "Woo et al. Unified Training of Universal Time Series Forecasting Transformers (Moirai-2). arXiv:2511.11698, 2025",
+  "paper_url": "https://arxiv.org/abs/2511.11698",
+  "model_card": "https://huggingface.co/Salesforce/moirai-2.0-R-small",
+  "repository": "https://github.com/SalesforceAIResearch/uni2ts",
+  "upstream_commit": "cfd46d4510ed8896f263116f32928eede05b0a75",
+  "weights": {
+    "repo": "Salesforce/moirai-2.0-R-small",
+    "revision": "30f43ff08c84",
+    "file": "model.safetensors",
+    "size_bytes": 45092864,
+    "params": "11.4M (model card)",
+    "license": "cc-by-nc-4.0 (research, non-commercial)",
+    "sha256": "see weights/weight_identities.json in the run worktree (recorded at download, 2026-10-23)"
+  },
+  "dependency_versions": {
+    "python": "3.11.17",
+    "uni2ts": "2.0.0 installed from git commit cfd46d4 (PyPI 2.0.0 wheel lacks Moirai-2)",
+    "torch": "2.4.1+cu121",
+    "gluonts": "0.14.4",
+    "note": "full freeze in requirements.lock.txt"
+  },
+  "input_mapping": {
+    "history_values.price": "un-standardized once via frozen train target mean/std -> past_target [72,1] raw RRP; output point is raw RRP",
+    "history_values.demand": "past_feat_dynamic_real [72,1] (standardized units; past-only field)",
+    "history_calendar+future_calendar": "feat_dynamic_real [96,10] (field must span past+future; calendar is future-known)",
+    "unmapped": ["origin_context", "future_exogenous", "ctf_exogenous", "quantile_exogenous"],
+    "unmapped_reason": "Moirai-2 wrapper has no static field; future-only covariates lack the past span required by feat_dynamic_real",
+    "scope_declaration": "input_scope=restricted_price_target_demand_past_covariate_calendar_past_future; NOT an equal-input comparison to full-1465-column models"
+  },
+  "output_quantiles": {
+    "native_levels": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "q05_q95": "not available natively (verified from checkpoint config.json revision 30f43ff0); no extrapolation, endpoint copying or Gaussian tails",
+    "table": "P (point_only); point = native q50",
+    "auxiliary": "native q10/q50/q90 exported per cell to auxiliary_quantiles.npz as diagnostics; never merged into a five-quantile score"
+  },
+  "native_behavior": {
+    "patch_size": 16,
+    "max_seq_len": 512,
+    "dropout": "forced to zero by Moirai2Forecast constructor",
+    "prediction_length": 24,
+    "context_length": 72
+  },
+  "context_policy": {
+    "context_source": "each origin's own legal 72h price history plus as-of covariates",
+    "label_use": "none (zero-shot); no fit step",
+    "selection_use": "none",
+    "calibration_use": false,
+    "test_labels": "never visible to the adapter; scorer-only"
+  },
+  "randomness": {
+    "seed_controls": "nothing; frozen weights, no sampling path (quantile head only), dropout zero",
+    "repeat": "deterministic given hardware"
+  },
+  "differences_from_paper": "paper evaluates on its own benchmarks; here zero-shot hourly NEM prices with restricted legal covariates; no benchmark score reproduction claimed",
+  "verified_date": "2026-10-23",
+  "sources_checked": [
+    "https://huggingface.co/Salesforce/moirai-2.0-R-small",
+    "https://huggingface.co/Salesforce/moirai-2.0-R-small/resolve/main/config.json",
+    "https://github.com/SalesforceAIResearch/uni2ts/tree/cfd46d4510ed8896f263116f32928eede05b0a75",
+    "https://arxiv.org/abs/2511.11698"
+  ]
+}

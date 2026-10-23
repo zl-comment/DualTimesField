@@ -1,0 +1,73 @@
+{
+  "implementation_identity": "official timesfm PyPI 2.0.2 package (TimesFM_2p5_200M_torch + timesfm/utils/xreg_lib.py — the official 2.5 implementation; PyPI 3.0.x tracks TimesFM 3.0 and is NOT used), frozen google/timesfm-2.5-200m-pytorch checkpoint",
+  "experiment_model_id": "timesfm25_xreg",
+  "batch": "second_foundation_20261023",
+  "paper_reference": "Das et al. A decoder-only foundation model for time-series forecasting. ICML 2024 (arXiv:2310.10688)",
+  "paper_url": "https://arxiv.org/abs/2310.10688",
+  "model_card": "https://huggingface.co/google/timesfm-2.5-200m-pytorch (TimesFM 2.5 version note: 200M pytorch checkpoint, fused-QKV update)",
+  "repository": "https://github.com/google-research/timesfm",
+  "weights": {
+    "repo": "google/timesfm-2.5-200m-pytorch",
+    "revision": "1d952420fba8",
+    "file": "model.safetensors",
+    "size_bytes": 925231144,
+    "params": "0.2B (model card)",
+    "license": "Apache-2.0",
+    "sha256": "see weights/weight_identities.json in the run worktree (recorded at download, 2026-10-23)"
+  },
+  "dependency_versions": {
+    "python": "3.11.17",
+    "timesfm": "2.0.2",
+    "torch": "2.14.1+cu126",
+    "note": "full freeze in requirements.lock.txt"
+  },
+  "input_mapping": {
+    "history_values.price": "un-standardized once via frozen train target mean/std -> 72h raw RRP context; outputs raw RRP",
+    "history_calendar+future_calendar": "dynamic_numerical_covariates cal_0..cal_9, each [96] = history fit span + horizon",
+    "origin_context": "static_numerical_covariate gas_7d_log_std",
+    "unmapped": ["history_values.demand", "future_exogenous", "ctf_exogenous", "quantile_exogenous"],
+    "unmapped_reason": "dynamic XReg covariates need values over the 72h fit span AND 24 legal future values; demand future exists only as differently-standardized forecast vintages (splicing rejected); remaining blocks are future-only",
+    "scope_declaration": "input_scope=restricted_price_target_calendar_dynamic_gas_static_incontext_xreg; NOT an equal-input comparison to full-1465-column models"
+  },
+  "xreg_fit": {
+    "fits_on": "each origin's own legal 72h price history at prediction time (in-context labels; NOT the train split; NOT 'no fitting')",
+    "method": "BatchedInContextXRegLinear least squares, ridge=0.0, per-input target normalization, one_hot drop=None, max_rows_per_col=0 (no subsampling)",
+    "order": "xreg_mode='xreg + timesfm': covariate regression fitted on the origin context -> horizon covariate effect forecast -> TimesFM forecasts the residual -> XReg effect added back",
+    "quantile_effect": "the XReg shift is added equally to every native channel",
+    "backcast": "return_backcast=True required by the official XReg path"
+  },
+  "output_quantiles": {
+    "native_channels": ["mean", 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "q05_q95": "not native; no interpolation to common tails is performed",
+    "table": "P (point_only); point = native median channel + XReg (the library point return); native mean channel exists and is NOT used",
+    "auxiliary": "native 10 channels exported per cell to auxiliary_quantiles.npz"
+  },
+  "forecast_config": {
+    "max_context": 72,
+    "max_horizon": 24,
+    "normalize_inputs": true,
+    "use_continuous_quantile_head": true,
+    "force_flip_invariance": true,
+    "infer_is_positive": false,
+    "infer_is_positive_reason": "NEM RRP takes negative values; leaving the default on would clamp native outputs to >=0 on origins whose 72h window happens to be nonnegative (asymmetric hidden truncation); disabled via the official flag",
+    "fix_quantile_crossing": true,
+    "per_core_batch_size": 32
+  },
+  "context_policy": {
+    "label_use": "in-context XReg fit on each origin's own legal history only; no train/selection/calibration labels",
+    "selection_use": "none",
+    "calibration_use": false,
+    "test_labels": "never visible to the adapter; scorer-only"
+  },
+  "randomness": {
+    "seed_controls": "nothing; frozen weights, deterministic kernels and deterministic least-squares fit given hardware"
+  },
+  "differences_from_paper": "paper benchmarks are not NEM prices; 2.5 has its own model-card evaluation; we claim no benchmark reproduction; covariates restricted to legally mappable shared-cache fields",
+  "verified_date": "2026-10-23",
+  "sources_checked": [
+    "https://huggingface.co/google/timesfm-2.5-200m-pytorch",
+    "https://huggingface.co/google/timesfm-2.5-200m-pytorch/resolve/main/config.json",
+    "timesfm 2.0.2 installed source: timesfm/timesfm_2p5/timesfm_2p5_base.py, timesfm_2p5_torch.py, timesfm/utils/xreg_lib.py",
+    "https://arxiv.org/abs/2310.10688"
+  ]
+}
