@@ -101,6 +101,22 @@ def test_bounds_gradient_zero_gate_identity_and_checkpoint(tmp_path):
     assert not output['constraint_gates'].any()
 
 
+def test_three_head_gradients_and_parameter_budget():
+    torch.set_num_threads(2)
+    x,y,b,t=observations();policy=fit_policy(x,y,b,t)
+    policy['gates']=[[.2,.3,.4]]*5+[[0.,0.,0.]]
+    model=build_model('state_evidence');model.set_policy(policy)
+    reference=build_model('bounded_reference')
+    assert sum(p.numel() for p in model.parameters())==sum(p.numel() for p in reference.parameters())
+    batch=synthetic_store().batch([4,7]);batch['mechanism_inputs']=torch.tensor(x[:2])
+    model(batch,history_off=True)['prediction'].sum().backward()
+    assert torch.all(model.calibration[-1].bias.grad.abs()>0)
+    model.zero_grad(set_to_none=True)
+    batch['mechanism_inputs'][...,4]=0
+    model(batch,history_off=True)['prediction'].sum().backward()
+    assert not model.calibration[-1].bias.grad.any()
+
+
 def test_current_targets_cannot_enter_prediction():
     x,y,b,t=observations();policy=fit_policy(x,y,b,t)
     original=synthetic_store(); adapted=DeviceHistoryStore(original,np.arange(12))

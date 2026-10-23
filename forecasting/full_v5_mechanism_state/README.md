@@ -5,6 +5,11 @@ across chronological blocks within the same supply/demand/transmission state?
 This is a falsifiable reliability hypothesis, not a proven cause of QLD errors.
 See the [problem and fixed protocol](../../docs/v5_mechanism_state_20261023.md).
 
+The [first-stage evidence and verification](../../logs/forecasting/v5_mechanism_state_20261023/README.md)
+are archived. The frozen-output diagnosis provides mixed support for the
+hypothesis; the real-data three-seed integration smoke passed exact replay.
+Full confirmation has not run, and no causal or performance improvement is claimed.
+
 The policy uses existing vintage-aligned inputs only. Every OOF fold is checked
 against its actual public features, including net load's original soft saturation.
 Training-only residual evidence separately bounds location, lower scale and upper
