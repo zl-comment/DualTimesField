@@ -1,0 +1,31 @@
+{
+  "status": "launched",
+  "launched_at": "2026-10-23T16:58:02.350981+08:00",
+  "pid": 1404946,
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-u",
+    "-m",
+    "forecasting.full_v5_calibration_robustness.experiment",
+    "--development",
+    "--devices",
+    "cuda:3",
+    "cuda:6",
+    "cuda:7",
+    "--output",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r1"
+  ],
+  "stdout": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r1.stdout.log",
+  "output": "/root/workspace/Code/DualTimesField/outputs/forecasting/v5_calibration_robustness_20261023_r1",
+  "commit": "b6d41d518113e3fbeaaa4033121d2060f79799e0",
+  "physical_fits": 36,
+  "logical_fits": 54,
+  "epochs_per_fit": 20,
+  "neural_seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "tree_seed": 2026,
+  "distinct_related_tests_passed": 54
+}

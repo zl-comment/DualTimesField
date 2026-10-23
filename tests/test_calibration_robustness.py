@@ -38,6 +38,7 @@ def test_window_guard_rejects_aggregate_improvement_hiding_one_bad_quarter():
 def test_quarter_windows_partition_without_adding_data():
     times=np.array([e.base.timestamp(f'2020-{m:02d}-01') for m in range(1,13)])
     masks=quarter_windows(times)
+    assert all(type(name) is str for name in masks)
     assert list(masks)==['2020Q1','2020Q2','2020Q3','2020Q4']
     np.testing.assert_array_equal(np.sum(list(masks.values()),axis=0),np.ones(12))
     with pytest.raises(ValueError,match='Four quarters'):
@@ -101,8 +102,10 @@ def test_reference_replay_exact_and_eval_targets_not_used(tmp_path,monkeypatch):
 
 def test_atomic_resume_preserves_both_selection_rules(tmp_path,monkeypatch):
     torch.set_num_threads(2)
-    monkeypatch.setattr(e,'quarter_windows',lambda origins:four_windows(4))
-    store=DeviceHistoryStore(synthetic_store(),np.arange(12))
+    calendar=synthetic_store()
+    calendar.origins[6:10]=[e.base.timestamp(f'2020-{m:02d}-01') for m in (1,4,7,10)]
+    calendar.origins[10:]=[e.base.timestamp('2021-01-01'),e.base.timestamp('2021-01-03')]
+    store=DeviceHistoryStore(calendar,np.arange(12))
     cfg,rows=small_config(),small_rows()
     expected=e.fit(store,rows,'reference',2027,cfg,tmp_path/'expected','run')
     writer=e.base.write_json
@@ -176,7 +179,10 @@ def test_full_runner_freezes_three_logical_arms_before_evaluation(tmp_path,monke
     monkeypatch.setattr(e.base,'split_rows',lambda *args:rows)
     output=tmp_path/'run'
     def prepare(*args,**kwargs):
-        output.mkdir();return dict(run_id='run')
+        output.mkdir()
+        manifest=dict(run_id='run',config=cfg)
+        e.base.write_json(output/'manifest.json',manifest)
+        return manifest
     monkeypatch.setattr(e,'prepare',prepare)
     monkeypatch.setattr(e,'verify_manifest',lambda *args:None)
     calls=[]
@@ -196,6 +202,10 @@ def test_full_runner_freezes_three_logical_arms_before_evaluation(tmp_path,monke
     assert json.loads((output/'training_order_audit.json').read_text())['reference_replays_exact']
     assert len(list(output.rglob('*.npz')))==6
     assert (output/'acceptance.json').exists()
+    from scripts.verify_calibration_robustness import score_audit
+    audit=score_audit(output)
+    assert audit['prediction_files']==6 and audit['historical_predictions_bitwise_exact']==2
+    assert audit['multiwindow_selections_reconstructed']==1
 
 
 def test_preparation_preserves_all_input_bytes(tmp_path,monkeypatch):
@@ -235,3 +245,21 @@ def test_cli_refuses_duplicate_runner_and_requires_development(tmp_path):
     with pytest.raises(FileExistsError):
         e.main(['--development','--output',str(output)])
     assert not list(output.iterdir())
+
+
+def test_new_acceptance_keeps_single_seed_and_spring_failures_visible():
+    from forecasting.full_v5_calibration_robustness.report import acceptance
+    cfg=e.configuration(['cpu']*3);cfg.update(regions=['QLD1'],folds=['2021'])
+    results={}
+    for seed in cfg['seeds']:
+        for arm in (*e.ARMS,'balanced'):
+            value=9.5 if arm=='reference' else 9.6 if arm=='balanced' else (11. if seed==2026 else 8.)
+            metrics={g:dict(full=dict(mae=value,qs=value),baseline=dict(mae=10.,qs=10.))
+                     for g in ('all','season/spring')}
+            results[f'QLD1/2021/{seed}/{arm}']=dict(B={g:dict(mae=10.,qs=10.) for g in metrics},
+                                                 guarded=dict(metrics=metrics))
+    assert acceptance(results,cfg,'multiwindow','guarded',cfg['seeds'])['passed']
+    individual=acceptance(results,cfg,'multiwindow','guarded',[2026])
+    assert not individual['passed']
+    assert not individual['folds']['2021']['checks']['each_spring_noninferior_to_B']
+    assert not individual['folds']['2021']['checks']['macro_noninferior_to_current_reference']

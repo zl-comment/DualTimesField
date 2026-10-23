@@ -57,6 +57,7 @@ QLD1 三 seed 均值下，2022H1 选择期 Full−B 的 MAE/QS 为 −4.7521/−
 - [三 seed 分组汇总](groups.csv)、[逐 seed 明细](per_seed_groups.csv)。
 - [选择期与评估期](selection_vs_evaluation.csv)、[校正形状](shape.json)。
 - [来源及文件哈希](verification.json)、[独立代数与加权分解核验](independent_verification.json)。
+- [诊断图 PNG](diagnosis.png)、[可编辑矢量图 SVG](diagnosis.svg)。
 - [后续两个小改动的固定协议](../../../docs/v5_calibration_robustness_20261023.md)。
 
 每个预测文件的起点、目标、标签与参考树对齐；全部 45 组输出的代数干预中位数保持不变，

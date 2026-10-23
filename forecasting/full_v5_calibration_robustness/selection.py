@@ -14,7 +14,9 @@ def quarter_windows(origins):
     names = np.unique(labels)
     if len(names) != 4 or len({name[:4] for name in names}) != 1:
         raise ValueError('Four quarters in one selection year are required')
-    return {name: labels == name for name in names}
+    # Checkpoint metadata must contain Python primitives, not numpy.str_ keys:
+    # weights_only=True deliberately rejects NumPy scalar pickle constructors.
+    return {str(name): labels == name for name in names}
 
 
 def window_key(candidate):

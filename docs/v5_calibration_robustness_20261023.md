@@ -77,5 +77,5 @@ raw 仅作诊断，主要比较三个逻辑方案各自预定 guarded 输出；�
 ```bash
 .venv/bin/python -m forecasting.full_v5_calibration_robustness.experiment \
   --development --devices cuda:3 cuda:6 cuda:7 \
-  --output outputs/forecasting/v5_calibration_robustness_20261023_r1
+  --output outputs/forecasting/v5_calibration_robustness_20261023_r2
 ```
