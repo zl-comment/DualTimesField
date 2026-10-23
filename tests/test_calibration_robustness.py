@@ -263,3 +263,89 @@ def test_new_acceptance_keeps_single_seed_and_spring_failures_visible():
     assert not individual['passed']
     assert not individual['folds']['2021']['checks']['each_spring_noninferior_to_B']
     assert not individual['folds']['2021']['checks']['macro_noninferior_to_current_reference']
+
+
+def collision_records(root,cfg):
+    records={}
+    for region in cfg['regions']:
+        for fold in cfg['folds']:
+            for seed in cfg['seeds']:
+                for trajectory in e.TRAJECTORIES:
+                    path=e.arm_path(root,region,fold,seed,trajectory);path.mkdir(parents=True)
+                    modes=('raw','guarded','multiwindow') if trajectory=='reference' else ('raw','guarded')
+                    for mode in modes:(path/f'{mode}.pt').write_text('frozen test checkpoint')
+                    record=dict(fit_id=f'{fold}/{seed}/{trajectory}',trajectory=trajectory,
+                        epochs_completed=cfg['epochs'],selection={mode:dict(epoch=1,alpha=0.) for mode in modes},
+                        checkpoints={str(path/f'{mode}.pt'):e.base.digest(path/f'{mode}.pt') for mode in modes})
+                    e.base.write_json(path/'selection.json',record)
+                    for arm in (('reference','multiwindow') if trajectory=='reference' else (trajectory,)):
+                        mode='multiwindow' if arm=='multiwindow' else 'guarded'
+                        records[f'{region}/{fold}/{seed}/{arm}']=dict(
+                            fit_id=record['fit_id'],trajectory=trajectory,epochs_completed=cfg['epochs'],
+                            selection=dict(raw=record['selection']['raw'],guarded=record['selection'][mode]),
+                            checkpoints=record['checkpoints'],
+                            checkpoint_paths=dict(raw=str(path/'raw.pt'),guarded=str(path/f'{mode}.pt')))
+    return records
+
+
+def test_region_local_fit_id_collisions_are_not_duplicate_physical_fits(tmp_path):
+    from forecasting.full_v5_calibration_robustness import runner
+    cfg=e.configuration(['cpu']*3)
+    records=collision_records(tmp_path,cfg)
+    assert len({r['fit_id'] for r in records.values()})==12
+    with pytest.raises(ValueError,match='physical trajectories'):e.verify_barrier(records,cfg)
+    runner.verify_barrier(records,cfg)
+    changed=copy.deepcopy(records)
+    changed['NSW1/2021/2026/reference']['checkpoint_paths']=records['QLD1/2021/2026/reference']['checkpoint_paths']
+    with pytest.raises(ValueError):runner.verify_barrier(changed,cfg)
+
+
+def test_completed_record_collection_preserves_every_selection_and_file(tmp_path,monkeypatch):
+    from forecasting.full_v5_calibration_robustness import runner
+    cfg=e.configuration(['cpu']*3);cfg.update(folds=['2021'],seeds=[2026])
+    records=collision_records(tmp_path,cfg)
+    before={str(p):p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()}
+    monkeypatch.setattr(e,'verify_reference',lambda *args:dict(exact=True))
+    assert runner.completed_records(tmp_path,cfg)==records
+    assert all(Path(p).read_bytes()==data for p,data in before.items())
+    next(tmp_path.glob('*/*/seed_*/*/selection.json')).unlink()
+    assert runner.completed_records(tmp_path,cfg) is None
+
+
+def test_completed_training_continuation_never_calls_training(tmp_path,monkeypatch):
+    from forecasting.full_v5_calibration_robustness import runner,report
+    cfg=e.configuration(['cpu']*3);cfg.update(folds=['2021'],seeds=[2026])
+    records=collision_records(tmp_path,cfg)
+    monkeypatch.setattr(e,'prepare',lambda *a,**k:dict(run_id='frozen-training'))
+    monkeypatch.setattr(e,'verify_manifest',lambda *a:None)
+    monkeypatch.setattr(runner,'freeze_orchestration',lambda *a:None)
+    monkeypatch.setattr(runner,'verify_orchestration',lambda *a:None)
+    monkeypatch.setattr(e,'verify_reference',lambda *a:dict(exact=True))
+    (tmp_path/'orchestration.json').write_text('{}')
+    called=[]
+    def pool(worker,specs):
+        assert worker is runner.evaluate_region
+        barrier=json.loads((tmp_path/'selection_complete.json').read_text())
+        assert barrier==records
+        called.append('evaluation')
+        return {key:{} for key in records}
+    monkeypatch.setattr(e.c,'run_pool',pool)
+    monkeypatch.setattr(report,'write_report',lambda *a:None)
+    runner.run(cfg,Path('fixture'),tmp_path,resume=True)
+    assert called==['evaluation']
+    progress=json.loads((tmp_path/'progress.json').read_text())
+    assert progress['physical_fits']==6 and progress['logical_fits']==9
+    assert progress['reused_completed_training'] and progress['stage']=='complete'
+
+
+def test_orchestration_freeze_keeps_original_manifest_and_weights(tmp_path):
+    from forecasting.full_v5_calibration_robustness import runner
+    cfg=e.configuration(['cpu']*3);cfg.update(folds=['2021'],seeds=[2026])
+    collision_records(tmp_path,cfg)
+    manifest=dict(run_id='frozen-training');e.base.write_json(tmp_path/'manifest.json',manifest)
+    before={str(p):p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()}
+    runner.freeze_orchestration(tmp_path,manifest)
+    runner.verify_orchestration(tmp_path)
+    assert all(Path(p).read_bytes()==data for p,data in before.items())
+    next(tmp_path.glob('*/*/seed_*/*/*.pt')).write_text('tampered checkpoint')
+    with pytest.raises(ValueError,match='evidence changed'):runner.verify_orchestration(tmp_path)

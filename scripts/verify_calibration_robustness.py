@@ -11,6 +11,7 @@ import torch
 from forecasting.full_v5_anchor_balance.selection import RTOL
 from forecasting.full_v5_calibration_robustness import experiment as e
 from forecasting.full_v5_calibration_robustness.model import build_model
+from forecasting.full_v5_calibration_robustness.runner import verify_barrier, verify_orchestration
 
 
 def independent_score(y,q):
@@ -56,7 +57,10 @@ def score_audit(root):
     assert progress['selection_sha256']==e.base.digest(root/'selection_complete.json')
     assert progress['report_sha256']==e.base.digest(root/'report.json')
     records=json.loads((root/'selection_complete.json').read_text())
-    e.verify_barrier(records,cfg)
+    verify_barrier(records,cfg)
+    if (root/'orchestration.json').exists():
+        verify_orchestration(root)
+        assert progress['orchestration_sha256']==e.base.digest(root/'orchestration.json')
     report=json.loads((root/'report.json').read_text())
     assert set(report)==e.expected_keys(cfg)
     maxdiff=0.;sources={};count=0;old_prediction_replays=0;selection_replays=0
@@ -124,7 +128,7 @@ def replay_region(spec):
     root,region,device=spec;root=Path(root)
     manifest=json.loads((root/'manifest.json').read_text());cfg=manifest['config']
     records=json.loads((root/'selection_complete.json').read_text())
-    e.verify_barrier(records,cfg);e.c.configure_device(device)
+    verify_barrier(records,cfg);verify_orchestration(root);e.c.configure_device(device)
     store,_=e.base.load_store(manifest['bundle_root'],region,cfg['tree_seed'])
     results={}
     for fold in cfg['folds']:
