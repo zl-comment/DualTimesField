@@ -3,7 +3,7 @@
 本轮以用户明确的边界为准：统一预测样本/标签、模型入口的数据及公共预处理、输出评分；模型内部变换、结构、融合方式和原生拟合策略由各模型自行决定。完成共同接口验收后建立核心基线的位置并筛查 Full 的互补价值；独立预测与集成增量是两条研究目标，最终结论允许是局部优势、预算内未改善或不支持领先。
 
 - 修订依据：分支 `diag/full-underperformance-zl`，起点 `af546fa3b1fd75852075460015810f745fd2fd74`；2026-10-12 在 `/root/workspace/Code/DualTimesField` 复核。
-- 状态（2026-10-23）：原 90 格仍是冻结起点（§8.7）；TimeXer/PriceFM 与五个新基线已完成，DDNN 已按未截断 JSU 修复复跑，原静态档案为 17 模型、153 格。最新平衡损失＋非对称尺度头 Full_joint 已完成 9 次拟合和 2023—2024 同协议三神经种子评估，树固定 seed 2026。[当前主表](../logs/forecasting/main_comparison_20261023/README.md)为 21 个输出、189 格，旧静态 Full/no_fields 的 18 格另列历史附表；旧单 seed 联合模型已替换。新版宏 MAE/QS 均值仍高于 LightGBM，不宣称领先。此前四方案的 72 次开发确认均未通过两个年份全部门槛，该历史结论保持不变。公平调参草案尚未执行，其他基础模型仍待接入。
+- 状态（2026-10-24）：原 90 格仍是冻结起点（§8.7）；TimeXer/PriceFM 与五个新基线已完成，DDNN 已按未截断 JSU 修复复跑，原静态档案为 17 模型、153 格。最新平衡损失＋非对称尺度头 Full_joint 已完成 9 次拟合和 2023—2024 同协议三神经种子评估，树固定 seed 2026。[当前主表](../logs/forecasting/main_comparison_20261023/README.md)为 25 个输出、225 格，旧静态 Full/no_fields 的 18 格另列历史附表；旧单 seed 联合模型已替换。新版宏 MAE/QS 均值仍高于 LightGBM，不宣称领先。此前四方案的 72 次开发确认均未通过两个年份全部门槛，该历史结论保持不变。公平调参草案尚未执行。TabPFN-3、Chronos-2、Moirai-2、TimesFM-2.5 + XReg 的 36 格已并入当前主表，保留输入/输出能力及预训练重叠未审计标注。
 - 本计划由已查看的历史结果形成，属于事后研究计划；冻结只能约束后续选择，不能把 2023–2024 或已研究的 2025 变回盲测。
 - 数值配置见 [协议草案](../configs/fair_sota/protocol_v1.draft.yaml)。草案目前没有执行器读取；文中实现项、预算和晋级阈值均不是已完成实验。
 - 历史参考：[冻结实验及限制](../logs/forecasting/exploration_20261011/README.md)、[原诊断报告](full_underperformance_diagnosis_zl.md)、[历次实验](../logs/forecasting/EXPERIMENT_RESULTS.md)。原诊断的本机缺文件、纯线性头等判断由本计划替代。
@@ -262,6 +262,8 @@ PostForecasts 为 MIT；本次快照的 TestForecasts/energy-analytics 未发现
 | TabPFN-2、TabPFN-3 | [PriorLabs/TabPFN](https://github.com/PriorLabs/TabPFN)，两个独立模型 ID | 显式选择版本/权重，不能用最新版默认代替；默认 `predict` 是 mean，须取明确 quantiles/q50。监督上下文标签只能来自协议允许的训练段，不能把测试早期样本当免费训练上下文 |
 | Chronos-2 | [amazon-science/chronos-forecasting](https://github.com/amazon-science/chronos-forecasting)，`amazon/chronos-2` | 使用已发布的未来协变量；跨 origin 的 cross-learning 关闭，避免批次跨时信息交换。`predict_quantiles` 第二项虽名 mean，源码实际取 q50；检查权重原生分位范围，禁止边界夹断冒充 q05/q95 |
 | Moirai-2 | [SalesforceAIResearch/uni2ts](https://github.com/SalesforceAIResearch/uni2ts)，`Salesforce/moirai-2.0-R-small` | 源码有历史/未来协变量接口，不能因 README 示例维数为 0 就断言模型不支持；需实际接通。模块默认仅 q10…q90，必须检查权重配置；未解决 q05/q95 时只允许 q50 点表，不进入五分位 Q 表 |
+
+以下为当时 source-only 阶段的历史记录；四个基础模型的最新完成状态见本文顶部及当前主表。
 
 8 个外部仓库的源码 commit 已固定；**基础模型权重 revision、文件哈希、权重许可和真实数据 smoke 均未完成**，基础模型条目仍标记待接入；LightGBM/Lasso+CP 的本地接入另见 §8.6，未把 source-only 检查算作成功复现。基础模型还要披露预训练数据与历史评分期的潜在重合；zero-shot 不意味着没有上下文/版本选择成本。
 

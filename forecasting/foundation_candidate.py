@@ -1,7 +1,7 @@
 """Candidate comparison report: foundation batch vs the current main table.
 
 Reads the completed foundation run (verified by build_aligned_report) and the
-existing 21-output main comparison CSVs strictly read-only, then writes a
+existing current main comparison CSVs strictly read-only, then writes a
 candidate report with explicit grouping labels:
 
   table            Q / P            output capability
@@ -102,6 +102,9 @@ def _existing_rows(directory: Path):
     regional = _rows(directory / "regional.csv")
     macro = _rows(directory / "macro_per_seed.csv")
     per_seed = _rows(directory / "per_seed.csv")
+    # The current main table may already contain this batch; replace those rows.
+    main, regional, macro, per_seed = ([r for r in rows if r['model'] not in FOUNDATION_REGISTRY]
+                                      for rows in (main, regional, macro, per_seed))
     for rows in (main, regional, macro, per_seed):
         for row in rows:
             row["source_run"] = "main_comparison_20261023 (read-only)"

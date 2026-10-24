@@ -1,6 +1,6 @@
 # TimeXer / PriceFM 同协议扩展（2026-10-13）
 
-> 当前比较已更新至[2026-10-23 三 seed 主表](../main_comparison_20261023/README.md)：新版 Full_joint 与相关输出均已完成三神经种子评估，当前表为 21 个输出、189 格；旧静态 Full/no_fields 移入历史附表。DDNN 使用未截断修复结果。本页单 seed 联合模型表及 108 格基线档案保留为历史记录。
+> 当前比较已更新至[2026-10-24 更新的三 seed 主表](../main_comparison_20261023/README.md)：新版 Full_joint 与相关输出均已完成三神经种子评估，当前表为 25 个输出、225 格；旧静态 Full/no_fields 移入历史附表。DDNN 使用未截断修复结果。本页单 seed 联合模型表及 108 格基线档案保留为历史记录。
 
 本次新增两个模型、三个地区 NSW1/QLD1/TAS1、三个 seed 2026/2027/2028，共 18 格；与 `aligned_baselines_20261012` 原有 90 格联合后为 12 个模型、108 格。比较的是共同任务下的适配版本，不是原论文数据集上的分数复现，也不是完成超参搜索后的 SOTA 认证。
 
@@ -52,7 +52,7 @@
 - [完整联合报告](results/combined_report.json.gz) 与 [新增模型报告](results/extension_report.json.gz)
 - [归档来源、SHA256 与完整性记录](results/provenance.json)
 
-归档保留原报告数值，不重新训练或改动排名。完整 checkpoint 和逐样本预测仍保存在忽略跟踪的 `outputs/forecasting/aligned_baselines_20261013_extension/`。新 [Full v2 方案](../../../docs/full_v2_architecture_20261013.md) 尚未实现或训练，不计入这 108 格。
+归档保留原报告数值，不重新训练或改动排名。完整 checkpoint 和逐样本预测仍保存在忽略跟踪的 `outputs/forecasting/aligned_baselines_20261013_extension/`。当时的 Full v2 方案不计入这 108 格，后续已废弃并删除；当前方法与比较请使用页首的最新主表入口。
 
 ## 共同实验边界
 

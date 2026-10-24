@@ -43,3 +43,16 @@ def test_candidate_std_is_across_seed_macros_not_regions():
     assert main[0]['mae_std'] == 1.
     assert regional[0]['mae_mean'] == 2.
     assert 'mae' not in regional[0]
+
+
+def test_candidate_refresh_replaces_foundation_rows_already_in_main(tmp_path):
+    import csv
+    from forecasting.foundation_candidate import _existing_rows
+    for name in ('main.csv', 'regional.csv', 'macro_per_seed.csv', 'per_seed.csv'):
+        with (tmp_path / name).open('w', newline='') as stream:
+            writer = csv.DictWriter(stream, fieldnames=['model', 'table'])
+            writer.writeheader()
+            writer.writerows([{'model': 'baseline_lightgbm', 'table': 'Q'},
+                              {'model': 'tabpfn_v3', 'table': 'Q'}])
+    for rows in _existing_rows(tmp_path):
+        assert [r['model'] for r in rows] == ['baseline_lightgbm']

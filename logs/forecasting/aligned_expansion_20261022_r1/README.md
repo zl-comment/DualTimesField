@@ -1,8 +1,7 @@
 # 第一批公平基线扩展：正式矩阵与合并报告（2026-10-22）
 
 后续验收发现本页旧 DDNN-JSU 结果包含逆 CDF 钳位，已完成去钳位修复和9格复跑。
-本页及原结果保留作历史记录；当前主表与验证见
-[DDNN 修复报告](../ddnn_jsu_unclipped_20261022_r1/README.md)。
+本页及原结果保留作历史记录；当前主表与验证见[最新统一主表](../main_comparison_20261023/README.md)，DDNN 修复过程见[修复报告](../ddnn_jsu_unclipped_20261022_r1/README.md)。
 
 45/45 格完成（5 模型 × NSW1/QLD1/TAS1 × seed 2026/2027/2028），失败 0 格，约 30 分钟。
 运行根：`outputs/forecasting/aligned_expansion_20261022_r1`（本仓库 outputs 忽略跟踪；轻量报告与合并表在本目录）。

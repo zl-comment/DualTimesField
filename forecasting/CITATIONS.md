@@ -1,6 +1,6 @@
 # 当前主表基线的论文与引用
 
-覆盖当前主表的 15 个静态基线。每个 `model.py` 开头提供论文链接与普通参考文献格式；对应目录的 `CITATIONS.bib` 提供可复制 BibTeX，`source.json` 记录用途、核对日期和证据页面。
+覆盖当前主表的 15 个静态基线及 4 个基础模型。每个 `model.py` 开头提供论文链接与普通参考文献格式；对应目录的 `CITATIONS.bib` 提供可复制 BibTeX，`source.json` 记录用途、核对日期和证据页面。
 
 组合基线分别引用骨干、校准方法及直接参考的软件；相关比较论文单独标注。Linear 与 MLP 为本地通用对照，其背景文献不视为本地完整模型的原论文。
 
@@ -21,9 +21,13 @@
 | `ddnn_jsu` | [ddnn_jsu/model.py](ddnn_jsu/model.py) | [CITATIONS.bib](ddnn_jsu/CITATIONS.bib) | 电价 DDNN/Johnson SU 原论文；J34 比较论文及本地网络形态参考 |
 | `lasso_arx72_cp` | [lasso/model.py](lasso/model.py) | [CITATIONS.bib](lasso/CITATIONS.bib) | Lasso 原论文；分割共形预测的方法背景；绝对残差 CP 公式的软件来源 |
 | `nhits_qra` | [nhits_qra/model.py](nhits_qra/model.py) | [CITATIONS.bib](nhits_qra/CITATIONS.bib) | NHITS 骨干原论文；MC-dropout 方法论文；QRA 原论文；NHITS+QRA 电价比较论文（P08）；相关校准讨论（P16） |
+| `tabpfn_v3` | [tabpfn_v3/model.py](tabpfn_v3/model.py) | [CITATIONS.bib](tabpfn_v3/CITATIONS.bib) | 基础模型论文、权重版本和本地适配范围见该目录 source.json |
+| `chronos2_zeroshot` | [chronos2_zeroshot/model.py](chronos2_zeroshot/model.py) | [CITATIONS.bib](chronos2_zeroshot/CITATIONS.bib) | 基础模型论文、权重版本和本地适配范围见该目录 source.json |
+| `moirai2_zeroshot` | [moirai2_zeroshot/model.py](moirai2_zeroshot/model.py) | [CITATIONS.bib](moirai2_zeroshot/CITATIONS.bib) | 基础模型论文、权重版本和本地适配范围见该目录 source.json |
+| `timesfm25_xreg` | [timesfm25_xreg/model.py](timesfm25_xreg/model.py) | [CITATIONS.bib](timesfm25_xreg/CITATIONS.bib) | 基础模型论文、权重版本和本地适配范围见该目录 source.json |
 
-合并后的文献库：[paper/manuscript/references.bib](../paper/manuscript/references.bib)。各目录引用复用该文献库的同名条目，避免重复导入；正文是否引用某篇论文仍由对应的 LaTeX `\cite{...}` 决定。
+合并后的文献库：[paper/manuscript/references.bib](../paper/manuscript/references.bib)。静态基线引用复用该文献库的同名条目；四个基础模型的版本引用以各自目录 BibTeX 为准，避免重复导入；正文是否引用某篇论文仍由对应的 LaTeX `\cite{...}` 决定。
 
 核对规则：优先采用正式期刊/会议出版页；预印本使用 arXiv 记录。TimeXer 使用正式会议页的九位作者；RevIN 使用作者项目页所列 ICLR 2022；QRA 使用正式卷期年份 2015。PriceFM 的首次提交年份与代码固定版本分别记录。
 
-本次仅新增引用说明与文献记录，不改动模型计算、训练预算、数据处理、已有实验档案或主表分数。
+引用索引随当前主表更新；模型的原始预测、训练预算和历史实验档案保持不变。

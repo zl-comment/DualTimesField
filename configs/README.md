@@ -2,6 +2,7 @@
 
 - `full/`、`no_fields/`、`mlp/`、`linear/`、`dlinear/`、`patchtst/`、`gatets/`、`timexer/`、`pricefm/`、`lightgbm/`、`xgboost/`、`lasso/`：各模型独立的 `aligned.yaml`，包含完整公共数据协议与该模型训练参数，可以直接加载；模型 ID 保持不变。
 - `lightgbm_cp/`、`lightgbm_qra/`、`xgboost_cp/`、`ddnn_jsu/`、`nhits_qra/`：五个新增基线各自的 `aligned.yaml`，通过 `forecasting.aligned_expansion` 运行并复用父实验公共缓存。
+- `tabpfn_v3/`、`chronos2_zeroshot/`、`moirai2_zeroshot/`、`timesfm25_xreg/`：第二批基础模型，入口为 `scripts/foundation_baselines.sh`；四模型的 36 格已纳入当前主表，使用各自独立依赖环境。
 - `experiments/`：原始 90 格矩阵、18 格扩展、45 格新增基线矩阵、9 格 DDNN 未截断修复复跑及 smoke 协议；已冻结的原运行配置保留原内容。
 - `legacy/`：旧探索/滚动/消融配置，保留原文件名。这些配置不代表当前统一基线。
 - `fair_sota/`：协议草案和审查记录。

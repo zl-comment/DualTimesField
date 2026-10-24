@@ -1,10 +1,10 @@
 # DualTimesField
 
-第二批基础模型：[候选结果与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
+第二批基础模型：[已并入主表的基础模型与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
 
 电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
 
-最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261023/README.md) · [三 seed 主表（新版 Full_joint，21 个输出）](logs/forecasting/main_comparison_20261023/main.csv) · [验证记录](logs/forecasting/main_comparison_20261023/VALIDATION.md)。联合方法的三个 seed 改变神经初始化与训练顺序，树 seed 固定 2026。
+最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261023/README.md) · [三 seed 主表（新版 Full_joint，25 个输出）](logs/forecasting/main_comparison_20261023/main.csv) · [验证记录](logs/forecasting/main_comparison_20261023/VALIDATION.md)。联合方法的三个 seed 改变神经初始化与训练顺序，树 seed 固定 2026。
 
 校正稳健性研究：[无需重训的误差诊断](logs/forecasting/v5_calibration_diagnosis_20261023/README.md) · [两项独立改动的完整结果](logs/forecasting/v5_calibration_robustness_20261023/README.md) · [固定实验协议](docs/v5_calibration_robustness_20261023.md)。36 次训练与全部核验已完成；限幅通过种子均值门槛、尚未通过所有 seed 的稳定门槛。开发实验使用原 2021/2022 折，正式主表仍保留已发布结果。
 

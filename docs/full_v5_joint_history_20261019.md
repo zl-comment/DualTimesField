@@ -141,6 +141,6 @@ QLD1、TAS1 同样运行；seed=2026。输出目录必须不存在，避免覆�
 
 **完整训练与最终测试已完成**：三个地区、seed 2026 的 21 个正式树折与三个地区的 20 epoch 联合训练均完成；选择期选中的 epoch 分别为 NSW1=9、QLD1=1、TAS1=2。2022H2 是开发评估，不能替代原协议测试集。随后冻结参数，在 2023—2024 原基线测试样本上完成最终预测，每地区 17,521 个 origin；仅更新已成熟记忆与误差统计。
 
-最终 Full_joint 宏 MAE=37.655966，原 LightGBM=37.089001，尚未超越最强基线。历史分支相对 Anchor_joint 有小幅增益。见[最终测试报告](../logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/report.md)与[更新后的主基线表](../logs/forecasting/aligned_baselines_20261013_extension/README.md)。完整预测保存在 `outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/`，轻量指标、冻结哈希和各地区 manifest 已归档。
+最终 Full_joint 宏 MAE=37.655966，原 LightGBM=37.089001，尚未超越最强基线。历史分支相对 Anchor_joint 有小幅增益。见[最终测试报告](../logs/forecasting/v5_joint_history_20261020_final_seed2026_r1/report.md)与[该轮历史比较表](../logs/forecasting/aligned_baselines_20261013_extension/README.md)（[最新统一主表](../logs/forecasting/main_comparison_20261023/README.md)）。完整预测保存在 `outputs/forecasting/v5_joint_history_20261020_final_seed2026_r1/`，轻量指标、冻结哈希和各地区 manifest 已归档。
 
 时间防线验证当前标签/未来标签不会进入预测输入，完整历史24小时均成熟后才可检索。外生发布时间仍依赖原有档案时间戳代理；本轮没有完成独立的真实发布时间审计，不能宣称所有数据源已严格无泄露。

@@ -1,6 +1,6 @@
 # 历史电价预测主比较（2026-10-22）
 
-> 当前结果已更新至[2026-10-23 三 seed 主表](../main_comparison_20261023/README.md)。新版 Full_joint、Anchor 与关闭干预均已完成三个神经 seed；本页单 seed 结果保留作历史记录，不再作为当前主表。
+> 当前结果已更新至[2026-10-24 更新的三 seed 主表](../main_comparison_20261023/README.md)。新版 Full_joint、Anchor 与关闭干预均已完成三个神经 seed；本页单 seed 结果保留作历史记录，不再作为当前主表。
 
 zcode 基线扩展及 DDNN-JSU 修复已合入 `research/v5-anchor-calibration-fix`，合并提交 `f771da3`。
 

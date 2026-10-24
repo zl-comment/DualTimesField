@@ -1,5 +1,7 @@
 # 第二批基础模型基线归档（foundation_baselines_20261023）
 
+**2026-10-24：四模型、36 格已并入[当前正式主表](../main_comparison_20261023/README.md)。** 下方 candidate 目录是交接候选档案，不再是最新主表入口。主表刷新统一使用 `scripts/update_latest_main_comparison.py`。
+
 分支 `research/foundation-baseline-expansion-20261023`（基点 19ba700），
 worktree `/root/workspace/Code/DualTimesField-foundation-baselines`。
 正式运行 `outputs/forecasting/foundation_baselines_20261023_r1`（36 格 =
