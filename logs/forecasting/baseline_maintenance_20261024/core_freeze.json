@@ -1,0 +1,499 @@
+{
+  "models": [
+    "lightgbm",
+    "xgboost",
+    "patchtst"
+  ],
+  "selection": "original 2022H1 rules, no new HPO",
+  "test": "2023-2024 retrospective",
+  "artifacts": [
+    {
+      "model": "baseline_lightgbm",
+      "region": "NSW1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/test.npz",
+      "sha256": "639568368494182adea5aea0dedf5f373840c7887ae3df5bb69786d8e951dcdc"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "NSW1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2027/NSW1/test.npz",
+      "sha256": "51f85f43a93303d330fe70bcb203d3dd6fdec45c1f6351595ebdf1d518aa6118"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "NSW1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2028/NSW1/test.npz",
+      "sha256": "ed4eb5685e3b8fab39e164f9eb81db84f59ee2bc26488740adb565a05a09125e"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "QLD1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/test.npz",
+      "sha256": "e0122a237e10fc9df00665d236cadb850b08f582e6527f9c1d38554eb4c7ee7c"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "QLD1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2027/QLD1/test.npz",
+      "sha256": "5055d8e1998ae2a6a45588a173b0de395f3ed2f5628b7dec4226482e8271bf98"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "QLD1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2028/QLD1/test.npz",
+      "sha256": "376db23a2016b758afa67504de79ffc53e85a9b02864a29ac89b5c5f31aaa39c"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "TAS1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/TAS1/test.npz",
+      "sha256": "79c663eefb59edc9c908f97510ec86a92b0e731241b29f20b2e63a683b8792f5"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "TAS1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2027/TAS1/test.npz",
+      "sha256": "b138f9be050e7ed1e9621ae1338775c266872a5691ee15d7598194340bba4e16"
+    },
+    {
+      "model": "baseline_lightgbm",
+      "region": "TAS1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2028/TAS1/test.npz",
+      "sha256": "fb9d69b1e002d6f957a33a622bebce6f0283e4a71f560ff7582ae1f8b1292eab"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "NSW1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/NSW1/test.npz",
+      "sha256": "b30d454818ffec01bc1bd5dbfa1f72a265d3e85df00bb19552c2009c234862a3"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "NSW1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2027/NSW1/test.npz",
+      "sha256": "d6f7ad15e58423c4631ec5c69840fe6d146145a0f9b3f2d286f5f496d23ec566"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "NSW1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2028/NSW1/test.npz",
+      "sha256": "9cebb49a91cba3491f4224feb5cccc2350b3b599bd6b954516241310ae336b99"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "QLD1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/QLD1/test.npz",
+      "sha256": "e51e1ef8fec6a33f3a5c3800425b959cde6286a63395412f4bc6fccee2618790"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "QLD1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2027/QLD1/test.npz",
+      "sha256": "440d16c22d96c598656e79ff6304fccbd77a40aca0f06cf0cc48234fb5f08a48"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "QLD1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2028/QLD1/test.npz",
+      "sha256": "5b1833f8ed5ca0fa20a77403c3376d92d857ce14f59552eca14aed2cbf6da41a"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "TAS1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2026/TAS1/test.npz",
+      "sha256": "9b1ddde1145a99216c12756297715fb868b6743962437a3bdfcf189eb7259bed"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "TAS1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2027/TAS1/test.npz",
+      "sha256": "ca12b6a8f2f4c00c6016577c97d8ced6a949e985599857fe7d860f6fba92aa0f"
+    },
+    {
+      "model": "baseline_patchtst",
+      "region": "TAS1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/patchtst/seed2028/TAS1/test.npz",
+      "sha256": "30200d91c34172b7715d219134bcff9941c51e2df7b594e47fffeab6e4320fda"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "NSW1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/NSW1/test.npz",
+      "sha256": "c1315075dff6993724c91d5e5ed428abe215bf508fad3cd19cc1bcdc5fb8fa9a"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "NSW1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2027/NSW1/test.npz",
+      "sha256": "8bf1b2399ec4243262682966a0ecf1c793ecc3eba1bbff35cc61046f289e5d5b"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "NSW1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2028/NSW1/test.npz",
+      "sha256": "3d14d6eae09dadfa95060c961e11f65edf77d602ca2f40bf42241198f1e8250b"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "QLD1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/QLD1/test.npz",
+      "sha256": "0509c95c2ac1a4b5bba3301fdc3a5f7aa58f62b7efce65f0a20912a45093d132"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "QLD1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2027/QLD1/test.npz",
+      "sha256": "8531d88b5ea2834f9a7f148f290dedb60a0ded0991c900e1153af77c0887de56"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "QLD1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2028/QLD1/test.npz",
+      "sha256": "4227aa1a5db30c11349fd4ef8de6256d398551de123b847439dd18620c11dac8"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "TAS1",
+      "seed": 2026,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2026/TAS1/test.npz",
+      "sha256": "63f5ed5a1cf62b0c1d5bb8569dff13efd4b43a81b17efc900e383b13b01d21b6"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "TAS1",
+      "seed": 2027,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2027/TAS1/test.npz",
+      "sha256": "4b37bd4f91e597a7ebd581c6293eae7a438a0317da769d9d82c58a97db661560"
+    },
+    {
+      "model": "baseline_xgboost",
+      "region": "TAS1",
+      "seed": 2028,
+      "source": {
+        "run_id": "aligned_baselines_20261012",
+        "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+        "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86"
+      },
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/xgboost/seed2028/TAS1/test.npz",
+      "sha256": "3e65af442fe201e926ebcba56380530f7f6522626d41ec43327f50944649fad6"
+    }
+  ],
+  "inputs": {
+    "data/aemo_exogenous/nsw1_pdpasa.npz": {
+      "sha256": "195d334f1c4ea26a1238885f8b0ee15c1935317533bc60c0c7c1a0817efa1640",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 0
+        },
+        "source_stpasa_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 3600
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 8
+        }
+      }
+    },
+    "data/aemo_exogenous/nsw1_predispatch.npz": {
+      "sha256": "51d73fd24db3b881b78bd0763df421859d2b84383a7bf85ccf44674faf3697c3",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "data/aemo_exogenous/nsw1_predispatch_interconnector.npz": {
+      "sha256": "9c3d1cb6a78870c4768de86c0131d4a55279bbbf2723cf63f20ddc90eecc4ab2",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "/root/workspace/Code/electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/nsw1_hourly.csv": {
+      "sha256": "454ac6013d13f351c6c1edf5dde832b66a441639a9f35414c8de0d23a8c8c08f",
+      "rows": 87672,
+      "availability_offset_seconds": [
+        3600.0
+      ],
+      "status": "declared_hour_end_proxy_not_original_release_log"
+    },
+    "data/aemo_exogenous/qld1_pdpasa.npz": {
+      "sha256": "563ebbed7f7b8927aac319579c8d2d96e17b4bec7a4f019685278f951852bf8d",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 0
+        },
+        "source_stpasa_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 3600
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 8
+        }
+      }
+    },
+    "data/aemo_exogenous/qld1_predispatch.npz": {
+      "sha256": "79ba498e6e86551b79109188671bbb288687f72b068f23caae6aa2b896bfc573",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "data/aemo_exogenous/qld1_predispatch_interconnector.npz": {
+      "sha256": "b2860934f779a1d25011847e42ec290f66685d8cf9e429c9e49eb42121af67c6",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "/root/workspace/Code/electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/qld1_hourly.csv": {
+      "sha256": "29bfc9d1c02fc78baac77d145d3313132174559f4a3acc05ba7b42f1317d400f",
+      "rows": 87672,
+      "availability_offset_seconds": [
+        3600.0
+      ],
+      "status": "declared_hour_end_proxy_not_original_release_log"
+    },
+    "data/aemo_exogenous/tas1_pdpasa.npz": {
+      "sha256": "907c796c05ff68ac0f7a956fce91f23ff4b103e3d125d6f8615c04ab2854e22d",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 0
+        },
+        "source_stpasa_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 3600
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 8
+        }
+      }
+    },
+    "data/aemo_exogenous/tas1_predispatch.npz": {
+      "sha256": "c5d0cefe3a17ce7d89a926fd5b6fbc6b2884dc99dc09a2b8056f8f9bef888b18",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "data/aemo_exogenous/tas1_predispatch_interconnector.npz": {
+      "sha256": "9fcb09b617bf6b68d90eb5b0fededcc2fbff14ec85864f7183ceb3ae58d09c4c",
+      "origins": 87671,
+      "checks": {
+        "source_run_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        },
+        "source_last_changed_unix": {
+          "future_count": 0,
+          "minimum_lead_seconds": 40
+        }
+      }
+    },
+    "/root/workspace/Code/electricity-price-forecasting-research/data/multi_market_energy_reserve/aemo_nem/tas1_hourly.csv": {
+      "sha256": "260df3603a382c1173566b089913b82586cb28d09a0efa17e289b91029178045",
+      "rows": 87672,
+      "availability_offset_seconds": [
+        3600.0
+      ],
+      "status": "declared_hour_end_proxy_not_original_release_log"
+    }
+  }
+}
