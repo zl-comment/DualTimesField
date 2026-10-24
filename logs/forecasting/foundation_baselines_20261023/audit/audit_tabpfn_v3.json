@@ -1,0 +1,106 @@
+{
+  "model": "tabpfn_v3",
+  "cells": {
+    "2026/NSW1": {
+      "job": "tabpfn_v3/2026/NSW1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2026/QLD1": {
+      "job": "tabpfn_v3/2026/QLD1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2026/TAS1": {
+      "job": "tabpfn_v3/2026/TAS1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2027/NSW1": {
+      "job": "tabpfn_v3/2027/NSW1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2027/QLD1": {
+      "job": "tabpfn_v3/2027/QLD1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2027/TAS1": {
+      "job": "tabpfn_v3/2027/TAS1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2028/NSW1": {
+      "job": "tabpfn_v3/2028/NSW1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2028/QLD1": {
+      "job": "tabpfn_v3/2028/QLD1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    },
+    "2028/TAS1": {
+      "job": "tabpfn_v3/2028/TAS1",
+      "state": "completed",
+      "rescore_ok": true,
+      "n_origins": 17521,
+      "weights_sha256": "311ce18d97e9533d8585eaadafe040fbdd8070533209ed8696641dadc97a7301",
+      "chunk_reassembly_ok": true
+    }
+  },
+  "identities_by_seed": {
+    "2026": "5145758e627fda970b52ea5531b17abc4c0825cb483f6046df7811775bcb0038",
+    "2027": "e8a1d1e82b3318beb863b08fc51ad699309c2e9213bb43f198b92943c031b981",
+    "2028": "2a7a13bf7a19e68f1409b640e9fb19d0f80253dfba2f03c0359a9420ea29bed8"
+  },
+  "identity_within_seed_consistent": true,
+  "replay": {
+    "reference_cell": "2026/NSW1",
+    "tolerance_relative": 0.005,
+    "per_output": {
+      "quantiles": {
+        "max_abs_diff": 59.66429067897343,
+        "max_relative_diff": 0.007505649348984999,
+        "scale": 7949.251011445389,
+        "tolerance_relative": 0.005,
+        "n_origins_replayed": 116,
+        "sample": "stratified_96_plus_extreme_20_not_full_replay"
+      }
+    },
+    "production_shape_replay": {
+      "chunk": "chunk_00002.npz",
+      "n_origins": 4096,
+      "max_abs_diff": 0.0,
+      "required": "bitwise",
+      "passed": true
+    },
+    "passed": true
+  },
+  "seconds": 4838.6
+}

@@ -41,6 +41,11 @@ from forecasting.foundation_experiment import FoundationContext, _identity_hash,
 
 REPLAY_SAMPLE = 96
 EXTREME_SAMPLE = 20
+# Replay tolerances mirror foundation_verify: the TabPFN in-context forward
+# has a batch-SIZE kernel artifact (~1.5e-3 relative, companion swap is 0.0);
+# the zero-shot models replay to ~1e-6 relative.
+REPLAY_TOLERANCE = {"tabpfn_v3": 5e-3, "chronos2_zeroshot": 1e-3,
+                    "moirai2_zeroshot": 1e-3, "timesfm25_xreg": 1e-3}
 
 
 def _sample_indices(n: int, actual_rows: np.ndarray) -> np.ndarray:
@@ -131,16 +136,44 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
         stored_q = artifact.quantiles[indices] if artifact.quantiles is not None else None
         stored_p = artifact.native_point[indices] if artifact.native_point is not None else None
         diffs = {}
+        tolerance = REPLAY_TOLERANCE[model]
         for key, stored in (('quantiles', stored_q), ('point', stored_p)):
             if stored is None:
                 continue
-            diffs[key] = {'max_abs_diff': float(np.abs(np.asarray(replayed[key]) - stored).max()),
+            absolute = np.abs(np.asarray(replayed[key]) - stored)
+            scale = max(1.0, float(np.abs(stored).max()))
+            diffs[key] = {'max_abs_diff': float(absolute.max()),
+                          'max_relative_diff': float(absolute.max()) / scale,
+                          'scale': scale, 'tolerance_relative': tolerance,
                           'n_origins_replayed': int(len(indices)),
                           'sample': 'stratified_96_plus_extreme_20_not_full_replay'}
-        tolerance = max(1e-3, spec.reuse_tolerance)
+        passed = all(d['max_relative_diff'] <= tolerance for d in diffs.values())
+        production_shape = None
+        if model == 'tabpfn_v3' and not passed:
+            # The scattered sample crosses batch shapes; TabPFN numerics carry
+            # a documented batch-SIZE artifact (companion swap is 0.0). The
+            # production-shape gate replays one whole stored chunk — same
+            # 4096-row call the worker made — and must match bitwise.
+            chunk_dir = (run_root / 'runs' / model / f'seed{reference_seed}' / region
+                         / 'predictions' / 'chunks')
+            chunks = sorted(chunk_dir.glob('chunk_*.npz'))
+            with np.load(chunks[len(chunks) // 2], allow_pickle=False) as archive:
+                chunk_indices = np.asarray(archive['indices'])
+            chunk_replay = _predict_indices(adapter, view, chunk_indices, 'chunk replay')
+            reference_chunk = (artifact.quantiles[chunk_indices] if artifact.quantiles is not None
+                               else artifact.native_point[chunk_indices])
+            key = 'quantiles' if artifact.quantiles is not None else 'point'
+            chunk_diff = float(np.abs(np.asarray(chunk_replay[key]) - reference_chunk).max())
+            production_shape = {'chunk': chunks[len(chunks) // 2].name,
+                                'n_origins': int(len(chunk_indices)),
+                                'max_abs_diff': chunk_diff, 'required': 'bitwise',
+                                'passed': chunk_diff == 0.0}
+            passed = production_shape['passed'] and all(
+                d['max_relative_diff'] <= max(tolerance, 1e-2) for d in diffs.values())
         result['replay'] = {'reference_cell': f'{reference_seed}/{region}',
-                            'tolerance': tolerance, 'per_output': diffs,
-                            'passed': all(d['max_abs_diff'] <= tolerance for d in diffs.values())}
+                            'tolerance_relative': tolerance, 'per_output': diffs,
+                            'production_shape_replay': production_shape,
+                            'passed': passed}
     return result
 
 
@@ -158,10 +191,13 @@ def collect(run_root: Path) -> dict:
         if not (directory / 'status.json').exists():
             continue
         artifact = load_prediction_artifact(directory / 'test.npz')
-        if job['region'] in reference:
-            assert_comparable(reference[job['region']], artifact, allow_different_seed=True)
+        # P-table and Q-table artifacts are deliberately incomparable; align
+        # within (region, table) groups only.
+        key = (job['region'], artifact.table)
+        if key in reference:
+            assert_comparable(reference[key], artifact, allow_different_seed=True)
         else:
-            reference[job['region']] = artifact
+            reference[key] = artifact
     return {'run_id': manifest['run_id'], 'models_audited': sorted(audits),
             'cross_model_alignment': 'passed_all_completed_artifacts',
             'audits': audits}

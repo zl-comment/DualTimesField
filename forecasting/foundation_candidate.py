@@ -72,31 +72,29 @@ def _append_model(main, regional, macro, per_seed, model, row, table, run_root, 
         seed_scope=spec.seed_scope,
         source_run=manifest["run_id"], source_hash=manifest["source_hash"],
         config_hash=manifest["config_hash"])
-    regional_rows, macro_rows = [], []
+    region_scores = [row["regions"][region]["scores"] for region in REGIONS]
     for region in REGIONS:
-        region_row = row["regions"][region]
-        seed_summary = region_row["scores"]["seed_summary"]
+        scores = row["regions"][region]["scores"]
+        seed_summary = scores["seed_summary"]
         regional.append(dict(identity, region=region,
                              **{m: seed_summary[m]["mean"] for m in METRICS if m in seed_summary},
                              **{m + "_std": seed_summary[m]["std"] for m in METRICS if m in seed_summary},
-                             seed_evidence=region_row["seed_evidence"]["interpretation"]))
-        regional_rows.append(seed_summary)
-        for seed, scores in region_row["scores"]["per_seed"].items():
+                             seed_evidence=row["regions"][region]["seed_evidence"]["interpretation"]))
+        for seed, per_seed_scores in scores["per_seed"].items():
             per_seed.append(dict(identity, region=region, seed=int(seed),
-                                 **{m: scores[m] for m in METRICS if m in scores}))
-    means = {}
-    for m in METRICS:
-        values = [r[m]["mean"] for r in regional_rows if m in r]
-        if values:
-            means[m] = float(np.mean(values))
-    stds = {m: float(np.std([r[m]["mean"] for r in regional_rows if m in r], ddof=1))
-            for m in METRICS if m in regional_rows[0]}
-    main.append(dict(identity, **{m + "_mean": means[m] for m in means},
-                     **{m + "_std": stds[m] for m in stds}))
+                                 **{m: per_seed_scores[m] for m in METRICS if m in per_seed_scores}))
+    available = [m for m in METRICS if all(m in scores["seed_summary"] for scores in region_scores)]
+    main.append(dict(identity,
+        **{m + "_mean": float(np.mean([scores["seed_summary"][m]["mean"] for scores in region_scores]))
+           for m in available},
+        **{m + "_std": float(np.std([scores["seed_summary"][m]["mean"] for scores in region_scores], ddof=1))
+           for m in available}))
     for seed in SEEDS:
-        per_region = {m: float(np.mean([r[m]["per_seed"][str(seed)][m] for r in regional_rows]))
-                      for m in METRICS if m in regional_rows[0]["per_seed"][str(seed)]}
-        macro.append(dict(identity, seed=seed, **per_region))
+        macro.append(dict(identity, seed=seed,
+            **{m: float(np.mean([scores["per_seed"][str(seed)][m] for scores in region_scores]))
+               for m in available
+               if all(str(seed) in scores["per_seed"] and m in scores["per_seed"][str(seed)]
+                      for scores in region_scores)}))
 
 
 def _existing_rows(directory: Path):

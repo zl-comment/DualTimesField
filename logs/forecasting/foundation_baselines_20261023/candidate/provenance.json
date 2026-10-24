@@ -1,0 +1,89 @@
+{
+  "candidate_for": "Codex review; not a new main table",
+  "foundation_run": {
+    "run_root": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1",
+    "run_id": "foundation_baselines_20261023_r1",
+    "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
+    "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04",
+    "parent": {
+      "run_root": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012",
+      "run_id": "aligned_baselines_20261012",
+      "jobs_hash": "4baaaa3122eeafd268c083671d77b3befd8dfe6754a56ae21198ca116ce779a1",
+      "source_hash": "6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd",
+      "config_hash": "59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86",
+      "cache_hashes": {
+        "NSW1": "0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1",
+        "QLD1": "a33f55f883c47ad78f8ee013780947f0ca4dab13ee81e36ab6ce4eff5b54d5f5",
+        "TAS1": "5e3109a52388a9b872ffd8e794fb37c8dfdfb4dd36fd011c62626db421ce80e4"
+      },
+      "cache_reuse": "read_only_parent_cache_via_symlink"
+    },
+    "scope": "registered_foundation_fixed_configuration_not_hpo_not_blind",
+    "declared_scopes": {
+      "tabpfn_v3": {
+        "fit_requires_train_labels": true,
+        "selection_use": "none",
+        "calibration_use": false,
+        "weight_training": false,
+        "output_type": "quantile",
+        "input_scope": "full_public",
+        "seed_scope": "ensemble_preprocessing_rng_all_common_levels_native_distribution_quantiles",
+        "pretraining_scope": "prior_labs_v3_pretraining_mix_nem_overlap_unaudited"
+      },
+      "chronos2_zeroshot": {
+        "fit_requires_train_labels": false,
+        "selection_use": "none",
+        "calibration_use": false,
+        "weight_training": false,
+        "output_type": "quantile",
+        "input_scope": "restricted_price_target_demand_past_covariate_calendar_past_future",
+        "seed_scope": "no_sampling_native_quantile_head_frozen_weights_deterministic",
+        "pretraining_scope": "chronos2_public_and_synthetic_mix_nem_overlap_unaudited"
+      },
+      "moirai2_zeroshot": {
+        "fit_requires_train_labels": false,
+        "selection_use": "none",
+        "calibration_use": false,
+        "weight_training": false,
+        "output_type": "point_only",
+        "input_scope": "restricted_price_target_demand_past_covariate_calendar_past_future",
+        "seed_scope": "no_sampling_quantile_head_q10_q90_only_frozen_weights_deterministic",
+        "pretraining_scope": "moirai2_gift_eval_chronos_kernelsynth_mix_nem_overlap_unaudited"
+      },
+      "timesfm25_xreg": {
+        "fit_requires_train_labels": false,
+        "selection_use": "none",
+        "calibration_use": false,
+        "weight_training": false,
+        "output_type": "point_only",
+        "input_scope": "restricted_price_target_calendar_dynamic_gas_static_incontext_xreg",
+        "seed_scope": "incontext_xreg_least_squares_deterministic_frozen_backbone",
+        "pretraining_scope": "timesfm25_synthetic_plus_real_monolithic_nem_overlap_unaudited"
+      }
+    },
+    "interpreters": {
+      "tabpfn_v3": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/tabpfn_v3/bin/python",
+      "chronos2_zeroshot": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python",
+      "moirai2_zeroshot": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/moirai2/bin/python",
+      "timesfm25_xreg": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/timesfm25/bin/python"
+    },
+    "git_head": "e9160462ab9c69932da16c2f469e8d798319f629"
+  },
+  "existing_main_table": {
+    "directory": "/root/workspace/Code/DualTimesField/logs/forecasting/main_comparison_20261023",
+    "read_only": true,
+    "verification": "e842fdd5c0652561308e6b80107547a1b0515346955d427b6763e90640d0d28f"
+  },
+  "grouping_notes": {
+    "equal_input_Q5": "only tabpfn_v3 consumes all 1465 public columns; chronos2_zeroshot enters Q5 with restricted covariates (declared)",
+    "point_table": "moirai2_zeroshot and timesfm25_xreg have no native q05/q95; no tails were extrapolated, copied or fabricated",
+    "pretraining": "all four checkpoints post-date the 2023-2024 test window and their training-data overlap with NEM is unaudited; not a clean blind test",
+    "full_joint_label": "Full_joint/Anchor rows use mature historical errors and keep their wider-information label; they are not equal-input comparisons to any static or foundation row"
+  },
+  "files": {
+    "main_candidate.csv": "0012ddacb999c7d41e447f278eb3f4fb689f8b8f4fbe9da3c2485367a2a56ed1",
+    "regional.csv": "493983e7e42d9e7e93f402004f91a58525eda428b2a975c0f6536855f10adb5f",
+    "macro_per_seed.csv": "b95184b2f5ac22a21a063e561590b20c3bc7eeb7dcf6290778d4b76d926b21c8",
+    "per_seed.csv": "3f7433a5ee32438a930f6f6fd4bbeca5e87fd269993ed8d14b568c8441a21dbc"
+  }
+}
