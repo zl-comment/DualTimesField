@@ -49,6 +49,7 @@ class Adapter:
         self.context = context
         self._regressors: list = []
         self._identity: dict[str, Any] | None = None
+        self._canonical_cache = None
         params = context.config["foundation_models"]["tabpfn_v3"]
         expected = {"batch_queries", "weight_file"}
         if set(params) != expected:
@@ -56,6 +57,8 @@ class Adapter:
         if params["weight_file"] != "tabpfn-v3-regressor-v3_default.ckpt":
             raise ValueError("tabpfn_v3 fixes the V3 default regressor checkpoint")
         self.batch_queries = int(params["batch_queries"])
+        if self.batch_queries <= 0:
+            raise ValueError("batch_queries must be positive")
         from . import model as native
 
         self.hf_home = os.environ.get(
@@ -94,6 +97,7 @@ class Adapter:
         if x.shape[0] != y_raw.shape[0] or y_raw.shape[1] != 24:
             raise ValueError("Train context shape mismatch")
         self._regressors = []
+        self._canonical_cache = None
         for horizon in range(24):
             regressor = native.create_regressor(
                 self.checkpoint, device=self.context.device,
@@ -124,6 +128,7 @@ class Adapter:
                            [self.context.seed + h for h in range(24)],
                            "ignore_pretraining_limits": False,
                            "batch_queries": self.batch_queries,
+                           "query_batch_policy": "canonical_view_chunks_v1",
                            "weight_file": params["weight_file"]},
                 "input_mapping": "seven_blocks_flattened_1465",
                 "output": {"type": "quantile", "levels": [0.05, 0.1, 0.5, 0.9, 0.95],
@@ -135,21 +140,37 @@ class Adapter:
 
     # -- prediction --------------------------------------------------------
     def predict_chunk(self, indices: np.ndarray) -> dict[str, np.ndarray]:
-        from . import model as native
+        """Replay the same canonical query blocks used by the original full run.
 
+        Subset calls must not change the numerical batch shape. Context labels
+        remain train-only. A single-block cache avoids repeated inference when
+        inspecting the same block; no predictions are shared between adapters.
+        Full ordered 4096-row production calls execute the original path.
+        """
+        from . import model as native
         if not self._regressors:
             self.fit()
-        view: PredictionView = self.context.test_view
-        x = np.asarray(flatten_inputs(_ViewSplit(view, indices)), dtype=np.float32)
-        horizon_columns = []
-        for regressor in self._regressors:
-            columns = [native.predict_quantiles(regressor, x[start:start + self.batch_queries])
-                       for start in range(0, len(x), self.batch_queries)]
-            horizon_columns.append(np.concatenate(columns, axis=0))
-        quantiles = np.stack(horizon_columns, axis=1)  # [n, 24, 5]
-        if quantiles.shape != (len(indices), 24, 5):
-            raise ValueError(f"TabPFN chunk shape {quantiles.shape}")
-        return {"quantiles": quantiles}
+        view = self.context.test_view
+        indices = np.asarray(indices)
+        if indices.ndim != 1 or not np.issubdtype(indices.dtype, np.integer):
+            raise ValueError('Query indices must be a one-dimensional integer array')
+        if len(indices) == 0 or np.any(indices < 0) or np.any(indices >= len(view)):
+            raise ValueError('Query indices must be nonempty and inside the view')
+        result = np.empty((len(indices), len(self._regressors), 5), dtype=np.float64)
+        for block in np.unique(indices // self.batch_queries):
+            start = int(block) * self.batch_queries
+            stop = min(start + self.batch_queries, len(view))
+            key = (id(view), start, stop)
+            if self._canonical_cache is None or self._canonical_cache[0] != key:
+                x = np.asarray(flatten_inputs(_ViewSplit(view, np.arange(start, stop))), dtype=np.float32)
+                quantiles = np.stack([native.predict_quantiles(regressor, x)
+                                      for regressor in self._regressors], axis=1)
+                self._canonical_cache = (key, quantiles)
+            mask = indices // self.batch_queries == block
+            result[mask] = self._canonical_cache[1][indices[mask] - start]
+        if result.shape != (len(indices), 24, 5):
+            raise ValueError(f'TabPFN chunk shape {result.shape}')
+        return {'quantiles': result}
 
 
 def _hash(identity: dict) -> str:
