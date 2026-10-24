@@ -27,6 +27,8 @@ worktree `/root/workspace/Code/DualTimesField-foundation-baselines`。
   `model_metadata.budget`。
 
 
+**TimesFM 原 ridge0 行已被开发期冻结的 ridge1 正式结果替换；本目录保留原运行档案。最新来源见[修复结果](../timesfm25_xreg_ridge1_20261024_r1/README.md)。**
+
 ## 正式结果（36/36 格完成，零失败；独立复算四模型全部通过）
 
 宏平均 = 三地区等权、先逐 seed 评分后取均值 ± 样本标准差。Q 表点指标用重排 q50；

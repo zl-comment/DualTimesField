@@ -460,9 +460,173 @@
   },
   "foundation_run": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1",
   "foundation_manifest_sha256": "36e9520bd9e7a535a7eaedf9e878c5d1adf416377306c0bcda84a6a31cdd10fc",
-  "foundation_replacements": {},
-  "foundation_repair_audits": {},
-  "foundation_sources_file_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+  "foundation_replacements": {
+    "timesfm25_xreg": {
+      "run_root": "outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1",
+      "manifest_sha256": "c5ac0614a8849cc5a5d48c0fea7e87cfd128498692a62816cb07898a124281f4",
+      "selection": {
+        "path": "logs/forecasting/baseline_maintenance_20261024/timesfm_selection.json",
+        "sha256": "be71bed2b5004b7a56c56a51c426b8d8ab6e5457a5c768dbbf3507c62a3555eb"
+      }
+    }
+  },
+  "foundation_repair_audits": {
+    "timesfm25_xreg": {
+      "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+      "models_audited": [
+        "timesfm25_xreg"
+      ],
+      "cross_model_alignment": "passed_all_completed_artifacts",
+      "audits": {
+        "timesfm25_xreg": {
+          "model": "timesfm25_xreg",
+          "cells": {
+            "2026/NSW1": {
+              "job": "timesfm25_xreg/2026/NSW1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "chunk_reassembly_ok": true
+            },
+            "2026/QLD1": {
+              "job": "timesfm25_xreg/2026/QLD1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "chunk_reassembly_ok": true
+            },
+            "2026/TAS1": {
+              "job": "timesfm25_xreg/2026/TAS1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "chunk_reassembly_ok": true
+            },
+            "2027/NSW1": {
+              "job": "timesfm25_xreg/2027/NSW1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "reuse_of_seed": 2026,
+              "chunk_reassembly_ok": true,
+              "seed_reuse": {
+                "check_seconds": 14.033,
+                "comparison": "bitwise_equal",
+                "max_abs_diff": 0.0,
+                "reference_seed": 2026,
+                "tolerance": 0.0001,
+                "verified_origins": 64
+              }
+            },
+            "2027/QLD1": {
+              "job": "timesfm25_xreg/2027/QLD1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "reuse_of_seed": 2026,
+              "chunk_reassembly_ok": true,
+              "seed_reuse": {
+                "check_seconds": 13.829,
+                "comparison": "bitwise_equal",
+                "max_abs_diff": 0.0,
+                "reference_seed": 2026,
+                "tolerance": 0.0001,
+                "verified_origins": 64
+              }
+            },
+            "2027/TAS1": {
+              "job": "timesfm25_xreg/2027/TAS1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "chunk_reassembly_ok": true
+            },
+            "2028/NSW1": {
+              "job": "timesfm25_xreg/2028/NSW1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "reuse_of_seed": 2026,
+              "chunk_reassembly_ok": true,
+              "seed_reuse": {
+                "check_seconds": 13.673,
+                "comparison": "bitwise_equal",
+                "max_abs_diff": 0.0,
+                "reference_seed": 2026,
+                "tolerance": 0.0001,
+                "verified_origins": 64
+              }
+            },
+            "2028/QLD1": {
+              "job": "timesfm25_xreg/2028/QLD1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "reuse_of_seed": 2026,
+              "chunk_reassembly_ok": true,
+              "seed_reuse": {
+                "check_seconds": 13.783,
+                "comparison": "bitwise_equal",
+                "max_abs_diff": 0.0,
+                "reference_seed": 2026,
+                "tolerance": 0.0001,
+                "verified_origins": 64
+              }
+            },
+            "2028/TAS1": {
+              "job": "timesfm25_xreg/2028/TAS1",
+              "state": "completed",
+              "rescore_ok": true,
+              "n_origins": 17521,
+              "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+              "reuse_of_seed": 2026,
+              "chunk_reassembly_ok": true,
+              "seed_reuse": {
+                "check_seconds": 13.72,
+                "comparison": "bitwise_equal",
+                "max_abs_diff": 0.0,
+                "reference_seed": 2026,
+                "tolerance": 0.0001,
+                "verified_origins": 64
+              }
+            }
+          },
+          "identities_by_seed": {
+            "2026": "26e7dd475ab0037eff998bc0206b4d53d3cc78631fc3c28fc05b3a846b56070c",
+            "2027": "26e7dd475ab0037eff998bc0206b4d53d3cc78631fc3c28fc05b3a846b56070c",
+            "2028": "26e7dd475ab0037eff998bc0206b4d53d3cc78631fc3c28fc05b3a846b56070c"
+          },
+          "identity_within_seed_consistent": true,
+          "replay": {
+            "reference_cell": "2026/NSW1",
+            "tolerance_relative": 0.001,
+            "per_output": {
+              "point": {
+                "max_abs_diff": 0.005188361747968884,
+                "max_relative_diff": 5.738288752374466e-07,
+                "scale": 9041.653307916884,
+                "tolerance_relative": 0.001,
+                "n_origins_replayed": 116,
+                "sample": "stratified_96_plus_extreme_20_not_full_replay"
+              }
+            },
+            "production_shape_replay": null,
+            "passed": true
+          },
+          "seconds": 25.2
+        }
+      }
+    }
+  },
+  "foundation_sources_file_sha256": "796127c11bbe97d9b6f699190fcc021ed8911205a199b8d4975d8aa40ac44223",
   "baseline_cell_scores_exactly_unchanged": true,
   "metric_max_abs_difference": 5.684341886080802e-14,
   "foundation_rescore_absolute_tolerance": 1e-10,
@@ -480,7 +644,13 @@
     2028
   ],
   "identical_information_scope": false,
-  "generator_sha256": "e65b26e703e3da7d6861d4fdf1e58a782b555339c8ccfd5c0654ca9158c3fcdf",
+  "generator_sha256": "1c4f1fdc0bddeab0b5c4c56979e3d334ccfb8f169cfde36622958047b5f0cd52",
+  "data_availability_audit": {
+    "evidence_path": "/root/workspace/Code/DualTimesField/logs/forecasting/baseline_maintenance_20261024/data_availability.json",
+    "sha256": "b819a50c66598bd5a210f9ae89b170aa10171413135403965d7919b6c08d2dd1",
+    "timestamp_proxy_violations": 0,
+    "public_release_audit_complete": false
+  },
   "run_manifest_sha256": "35d26226f0de3e90271c127dc6600daeecff79f51c3e4856e2ce81fdb91e998e",
   "selection_sha256": "a20922113d9597b589455f534772ebb134b81ec1e7a0db37a251b12fb359aedd",
   "baseline_report_sha256": "d126c4910e7fa4b667e77b91a84d43213cb22c89e24b79cc8b2243f54a90345e",
@@ -2956,12 +3126,12 @@
       "region": "NSW1",
       "seed": 2026,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2026/NSW1/test.npz",
-      "sha256": "b82be28cb48a0e72a929a8511249778a16446a18260b1d1a19509cb0da081bf7"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2026/NSW1/test.npz",
+      "sha256": "81ca482d67a7540b161885e36631303f20ecf4adfdd6c0790ccd4e99d2a4f7c1"
     },
     {
       "model": "tabpfn_v3",
@@ -3004,12 +3174,12 @@
       "region": "QLD1",
       "seed": 2026,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2026/QLD1/test.npz",
-      "sha256": "8729218549d6482ded40a9a39a62b66dc95ced9a8166bb8180f902f4925fad1c"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2026/QLD1/test.npz",
+      "sha256": "e34d7c216f1617b321477fea74d2403f502518acb9ae4527f92563c360e6791d"
     },
     {
       "model": "tabpfn_v3",
@@ -3052,12 +3222,12 @@
       "region": "TAS1",
       "seed": 2026,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2026/TAS1/test.npz",
-      "sha256": "8dd0065fb73b4976bc7895225a3b8e02061ca0829e94369b0ec30da0d6b6389e"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2026/TAS1/test.npz",
+      "sha256": "7c9b5ff972d63abc4ff834dbfffa74647f29f7e2392916fecbdfcfbe37af34fc"
     },
     {
       "model": "tabpfn_v3",
@@ -3100,12 +3270,12 @@
       "region": "NSW1",
       "seed": 2027,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2027/NSW1/test.npz",
-      "sha256": "fc2e58c6dcf9f2fe7e73611c6151b45dc9e7bfffa3222912c6e90b26d6934454"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2027/NSW1/test.npz",
+      "sha256": "b0f857126d17d277b7109e0ad8d0fef9f3e3d946b3a4defc6649fca3f4366e51"
     },
     {
       "model": "tabpfn_v3",
@@ -3148,12 +3318,12 @@
       "region": "QLD1",
       "seed": 2027,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2027/QLD1/test.npz",
-      "sha256": "045d4dd18c7e41d827c219be5d00df91976e150bd9b54878de4a967e7db4d74c"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2027/QLD1/test.npz",
+      "sha256": "b9a3d92363c27845c0ec4e90d25fa49ab8b4f8686e1461dbda45ab3b5d826596"
     },
     {
       "model": "tabpfn_v3",
@@ -3196,12 +3366,12 @@
       "region": "TAS1",
       "seed": 2027,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2027/TAS1/test.npz",
-      "sha256": "9cad32d8c7b86d959b9cf9692cea8694262b1e7698ff65b0e324f8e4a1e75f87"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2027/TAS1/test.npz",
+      "sha256": "7e537c2a75004ad76e09b3a33da57fa57767fcda2382d68c547b9493d643aa3b"
     },
     {
       "model": "tabpfn_v3",
@@ -3244,12 +3414,12 @@
       "region": "NSW1",
       "seed": 2028,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2028/NSW1/test.npz",
-      "sha256": "590702b3547f18d82313b0992e74e56b3c8353ff3a791cfda3ef61d52f043478"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2028/NSW1/test.npz",
+      "sha256": "2cc342ef5f5765671fc798c2d0fc1d2a652e07ae189f5040ceefac9b685f48ee"
     },
     {
       "model": "tabpfn_v3",
@@ -3292,12 +3462,12 @@
       "region": "QLD1",
       "seed": 2028,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2028/QLD1/test.npz",
-      "sha256": "59114542cb7b7c8aff66c2bbf5ce1964bd659f551e321426a5bb7cb1e17d6050"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2028/QLD1/test.npz",
+      "sha256": "a13ea816f3d9d96fb69c2ee7aafd58a340d651225824fc8f6e2d171c81eab3ab"
     },
     {
       "model": "tabpfn_v3",
@@ -3340,20 +3510,20 @@
       "region": "TAS1",
       "seed": 2028,
       "source": {
-        "run_id": "foundation_baselines_20261023_r1",
-        "source_hash": "08c6a1b0cd4e2602fb1130f0c1c906359e3c8e42b0cc31d8f0141ca20e03bdc2",
-        "config_hash": "03a4abce112163234bf0178fb36190b05078472a8019e15c9da7345d564fbe04"
+        "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+        "source_hash": "593c0d2133eec908172543579d0249a1ea19eab92d7b616c3930496f9b15cc86",
+        "config_hash": "2bede76f78aef6d68cc7c05615efcde10399d51d710f0e330e78accdb1b196b6"
       },
-      "path": "/root/workspace/Code/DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1/runs/timesfm25_xreg/seed2028/TAS1/test.npz",
-      "sha256": "0499e744b3b73ac2c59ec21513d5c51f232a68db171f9ef218768520ae2e9c6a"
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1/runs/timesfm25_xreg/seed2028/TAS1/test.npz",
+      "sha256": "ce6159046d8bacfaef7b7b9cddd7d385f47112fa3a88f4dc981cad19013fb1fc"
     }
   ],
   "output_sha256": {
-    "main.csv": "72438a28e034a4a664721ac37d631fa35e08e19ef64262795cce7de1a86caf2b",
-    "regional.csv": "2d1ba73a70b63cd0a00a37de4ec3b16fddf604fa085c19e66417fdf9bcd5a78f",
+    "main.csv": "a3015b93983a0d445083168fa056e70f60de316aad72514d6d6aaa1629db22e1",
+    "regional.csv": "30c34296b1b728c96ad0d0065e61009dcb20835e831eaff2c23a714b5bca2fb0",
     "historical_controls_per_seed.csv": "d01b62c2783b4745739d2ecb065e6463afe3cf97eee42c59c0a896a493c4ecb5",
     "historical_controls.csv": "a2770045e8f6589d30f2394fc4ab48cab874976dce53fa2163694af259a6055d",
-    "per_seed.csv": "b876a72b723ebf76c71ac565dc3dea1495f22ca4d5012e5715748ce3046f3e6e",
-    "macro_per_seed.csv": "301ff0f30e7491e4783a33e4c73c2bd28dde93370b2acb500ac188dca9013186"
+    "per_seed.csv": "54a742c72169e29dc658c4611774b78d01d91e22a0b6f7037a24b50850cf0c8f",
+    "macro_per_seed.csv": "691e27fbebe600ffeea97cac02d7eaf06b191ffc206c1632235a07b2c461075b"
   }
 }

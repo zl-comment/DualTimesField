@@ -1,0 +1,55 @@
+{
+  "selection_source": {
+    "run_root": "outputs/forecasting/timesfm25_xreg_ridge1_20261024_r1",
+    "manifest_sha256": "c5ac0614a8849cc5a5d48c0fea7e87cfd128498692a62816cb07898a124281f4",
+    "selection": {
+      "path": "logs/forecasting/baseline_maintenance_20261024/timesfm_selection.json",
+      "sha256": "be71bed2b5004b7a56c56a51c426b8d8ab6e5457a5c768dbbf3507c62a3555eb"
+    }
+  },
+  "test": "2023-2024 retrospective",
+  "regions": {
+    "NSW1": {
+      "original_ridge0": {
+        "mae": 131.74463565165442,
+        "rmse_pooled": 673.3693822561492
+      },
+      "selected_ridge1": {
+        "mae": 104.98989673530382,
+        "rmse_pooled": 523.6656147718886
+      }
+    },
+    "QLD1": {
+      "original_ridge0": {
+        "mae": 96.4888310119295,
+        "rmse_pooled": 378.918916209718
+      },
+      "selected_ridge1": {
+        "mae": 79.97592016239899,
+        "rmse_pooled": 335.9687406316509
+      }
+    },
+    "TAS1": {
+      "original_ridge0": {
+        "mae": 59.43214940330205,
+        "rmse_pooled": 220.4862158267399
+      },
+      "selected_ridge1": {
+        "mae": 49.833286078613554,
+        "rmse_pooled": 195.9882379343454
+      }
+    }
+  },
+  "macro": {
+    "original_ridge0": {
+      "mae": 95.88853868896199,
+      "rmse_pooled": 424.258171430869
+    },
+    "selected_ridge1": {
+      "mae": 78.26636765877213,
+      "rmse_pooled": 351.87419777929495
+    }
+  },
+  "promoted_by": "frozen development rule, not test score",
+  "deterministic_seeds_are_not_independent_training": true
+}

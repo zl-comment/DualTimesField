@@ -1,0 +1,249 @@
+{
+  "accepted": true,
+  "selected_ridge": 1.0,
+  "rule": "macro MAE strictly improves; no region worsens >5%; both fixed sample and complete 2022H1",
+  "split": "selection",
+  "seed": 2026,
+  "test_used_for_selection": false,
+  "protocol_sha256": "539f32eb4542d02a2d6b098e0e345cb70f450f77fd7a98bfd9c021be8e46a7cf",
+  "original_jobs_sha256": "36e9520bd9e7a535a7eaedf9e878c5d1adf416377306c0bcda84a6a31cdd10fc",
+  "evidence": {
+    "sample": {
+      "scores": {
+        "NSW1": {
+          "original": 86.45586154754749,
+          "ridge1": 69.41908947356507
+        },
+        "QLD1": {
+          "original": 202.9398068709712,
+          "ridge1": 176.6525834490013
+        },
+        "TAS1": {
+          "original": 113.8159649658683,
+          "ridge1": 100.562486539
+        }
+      },
+      "gate": {
+        "accepted": true,
+        "original_macro_mae": 134.40387779479568,
+        "ridge1_macro_mae": 115.54471982052212,
+        "regional_relative_changes": {
+          "NSW1": -0.19705745531912644,
+          "QLD1": -0.1295321200275079,
+          "TAS1": -0.1164465673233348
+        }
+      },
+      "files": {
+        "NSW1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_sample/NSW1.npz",
+          "sha256": "85dd460a0c77ba09dd668551398f56c4c34e28d3284b2c56c3a869288bc60ef0",
+          "metadata_sha256": "08e8cf97a5e6566e09cc8f3158810fef21c739bd8992c0e966d6d4c3aae1c8ae",
+          "count": 128,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "dd8266f75af269bf8d6d6103153aa61dc1fed4a2f015960c3da469c7ed6d71d8"
+        },
+        "QLD1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_sample/QLD1.npz",
+          "sha256": "17fd500251d12476683248e2448c7d3cae4012664dc093e28f4803670a599a38",
+          "metadata_sha256": "59496424b8301d06bdf47a77ecb001cceefea085ba14ba15556ee3b2087ab759",
+          "count": 128,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "dd8266f75af269bf8d6d6103153aa61dc1fed4a2f015960c3da469c7ed6d71d8"
+        },
+        "TAS1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_sample/TAS1.npz",
+          "sha256": "162d89b3f00f62ab9ff65038bc1b8abd46f9f08e5ed2d212f44cb000f6f248fa",
+          "metadata_sha256": "da11f96e4974a5da09ede52bd6e87c772c60423a1935b8f1f7fb8ffad68ee472",
+          "count": 128,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "dd8266f75af269bf8d6d6103153aa61dc1fed4a2f015960c3da469c7ed6d71d8"
+        }
+      }
+    },
+    "complete_selection": {
+      "scores": {
+        "NSW1": {
+          "original": 86.43959902816333,
+          "ridge1": 71.30818262535722
+        },
+        "QLD1": {
+          "original": 213.6762254426126,
+          "ridge1": 171.76037727341233
+        },
+        "TAS1": {
+          "original": 95.65987833924339,
+          "ridge1": 80.414333310809
+        }
+      },
+      "gate": {
+        "accepted": true,
+        "original_macro_mae": 131.92523427000643,
+        "ridge1_macro_mae": 107.82763106985952,
+        "regional_relative_changes": {
+          "NSW1": -0.17505190413801042,
+          "QLD1": -0.1961652405754316,
+          "TAS1": -0.1593724066255694
+        }
+      },
+      "files": {
+        "NSW1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_full_selection/NSW1.npz",
+          "sha256": "ab477ce21926e4aaf26cd72341b7b2799688f37f8115e4d7fca695d2d51b9d91",
+          "metadata_sha256": "1ba34b39ee8d2ca627ce7e2f729011349e0558a5a48e91b83125f0c65e32dffa",
+          "count": 4321,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "b8027377797993f9fd0c766d550686d074e8aacc29419914235e924c79e9ef06"
+        },
+        "QLD1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_full_selection/QLD1.npz",
+          "sha256": "bc0116bd909c6f5a6df995f10d17e38f0962aa02338c46e4892676f7cf231367",
+          "metadata_sha256": "80079eb335590e3eff460bdb28f437a31b5f02e264df54cd188144625223a48f",
+          "count": 4321,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "b8027377797993f9fd0c766d550686d074e8aacc29419914235e924c79e9ef06"
+        },
+        "TAS1": {
+          "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/baseline_maintenance_20261024/timesfm_full_selection/TAS1.npz",
+          "sha256": "3e43cbf0f465795927b0e5810abdada332e0cc342be81f996e8a56b772fbf106",
+          "metadata_sha256": "c308f6133c207f40599a6e4c8a25e880682f5a8e926ec716cfe28f496cff1bf5",
+          "count": 4321,
+          "weights": {
+            "repo": "google/timesfm-2.5-200m-pytorch",
+            "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+            "file": "model.safetensors",
+            "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+            "size_bytes": 925181104,
+            "config_keys": [
+              "architectures",
+              "context_length",
+              "head_dim",
+              "hidden_size",
+              "horizon_length",
+              "intermediate_size",
+              "model_type",
+              "num_attention_heads",
+              "num_hidden_layers",
+              "patch_length",
+              "quantile_horizon_length",
+              "quantiles",
+              "rms_norm_eps",
+              "torch_compile"
+            ]
+          },
+          "script_sha256": "b8027377797993f9fd0c766d550686d074e8aacc29419914235e924c79e9ef06"
+        }
+      }
+    }
+  },
+  "adapter_parity_sha256": "cca4f64c1968cb079a2387ca70492e3aed90951f50c3a8889343e4e551eec47b"
+}

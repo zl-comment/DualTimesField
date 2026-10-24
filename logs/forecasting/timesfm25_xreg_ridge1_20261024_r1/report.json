@@ -1,0 +1,354 @@
+{
+  "run_id": "timesfm25_xreg_ridge1_20261024_r1",
+  "state": "complete",
+  "stage": "fixed_configuration_comparison_not_tuned_sota",
+  "progress": {
+    "expected_cells": 9,
+    "listed_cells": 9,
+    "completed_cells": 9,
+    "completion_fraction": 1.0,
+    "status_counts": {
+      "completed": 9
+    },
+    "missing_manifest_cells": []
+  },
+  "jobs": [
+    {
+      "id": "timesfm25_xreg/2026/NSW1",
+      "model": "timesfm25_xreg",
+      "region": "NSW1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 2226.8778248652816,
+      "started_at": "2026-10-24T16:05:30.861296+00:00",
+      "ended_at": "2026-10-24T16:42:38.218753+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2026/QLD1",
+      "model": "timesfm25_xreg",
+      "region": "QLD1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 2218.1305548995733,
+      "started_at": "2026-10-24T16:05:30.921726+00:00",
+      "ended_at": "2026-10-24T16:42:29.525871+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2026/TAS1",
+      "model": "timesfm25_xreg",
+      "region": "TAS1",
+      "seed": 2026,
+      "state": "completed",
+      "seconds": 2159.2314392328262,
+      "started_at": "2026-10-24T16:42:41.518784+00:00",
+      "ended_at": "2026-10-24T17:18:41.221689+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2027/NSW1",
+      "model": "timesfm25_xreg",
+      "region": "NSW1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 18.962209675461054,
+      "started_at": "2026-10-24T16:42:51.705182+00:00",
+      "ended_at": "2026-10-24T16:43:11.146235+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2027/QLD1",
+      "model": "timesfm25_xreg",
+      "region": "QLD1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 18.809990491718054,
+      "started_at": "2026-10-24T16:43:21.549937+00:00",
+      "ended_at": "2026-10-24T16:43:40.838969+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2027/TAS1",
+      "model": "timesfm25_xreg",
+      "region": "TAS1",
+      "seed": 2027,
+      "state": "completed",
+      "seconds": 2216.078286021948,
+      "started_at": "2026-10-24T16:43:51.678890+00:00",
+      "ended_at": "2026-10-24T17:20:48.234134+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2028/NSW1",
+      "model": "timesfm25_xreg",
+      "region": "NSW1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 18.616641100496054,
+      "started_at": "2026-10-24T17:18:52.133864+00:00",
+      "ended_at": "2026-10-24T17:19:11.220204+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2028/QLD1",
+      "model": "timesfm25_xreg",
+      "region": "QLD1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 18.69456735253334,
+      "started_at": "2026-10-24T17:19:22.276403+00:00",
+      "ended_at": "2026-10-24T17:19:41.440614+00:00"
+    },
+    {
+      "id": "timesfm25_xreg/2028/TAS1",
+      "model": "timesfm25_xreg",
+      "region": "TAS1",
+      "seed": 2028,
+      "state": "completed",
+      "seconds": 18.67944073677063,
+      "started_at": "2026-10-24T17:19:52.362001+00:00",
+      "ended_at": "2026-10-24T17:20:11.505939+00:00"
+    }
+  ],
+  "completed_artifact_validation": "passed",
+  "frozen_snapshot_validation": "verified",
+  "comparison_available": true,
+  "tables": {
+    "P": {
+      "timesfm25_xreg": {
+        "n_cells": 9,
+        "regions": {
+          "NSW1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 104.98989673530382,
+                  "rmse_pooled": 523.6656147718886,
+                  "point_definition": "native_point"
+                },
+                "2027": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 104.98989673530382,
+                  "rmse_pooled": 523.6656147718886,
+                  "point_definition": "native_point"
+                },
+                "2028": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 104.98989673530382,
+                  "rmse_pooled": 523.6656147718886,
+                  "point_definition": "native_point"
+                }
+              },
+              "seed_summary": {
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 104.98989673530382,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "point_definition": "native_point",
+                "rmse_pooled": {
+                  "mean": 523.6656147718886,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "table": "P"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 1,
+              "duplicate_seed_groups": [
+                [
+                  2026,
+                  2027,
+                  2028
+                ]
+              ],
+              "known_deterministic_model": false,
+              "interpretation": "identical_predictions_are_not_independent_replicates"
+            }
+          },
+          "QLD1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 79.97592016239899,
+                  "rmse_pooled": 335.9687406316509,
+                  "point_definition": "native_point"
+                },
+                "2027": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 79.97592016239899,
+                  "rmse_pooled": 335.9687406316509,
+                  "point_definition": "native_point"
+                },
+                "2028": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 79.97592016239899,
+                  "rmse_pooled": 335.9687406316509,
+                  "point_definition": "native_point"
+                }
+              },
+              "seed_summary": {
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 79.97592016239899,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "point_definition": "native_point",
+                "rmse_pooled": {
+                  "mean": 335.9687406316509,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "table": "P"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 1,
+              "duplicate_seed_groups": [
+                [
+                  2026,
+                  2027,
+                  2028
+                ]
+              ],
+              "known_deterministic_model": false,
+              "interpretation": "identical_predictions_are_not_independent_replicates"
+            }
+          },
+          "TAS1": {
+            "scores": {
+              "per_seed": {
+                "2026": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 49.833286078613554,
+                  "rmse_pooled": 195.9882379343454,
+                  "point_definition": "native_point"
+                },
+                "2027": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 49.833286078613554,
+                  "rmse_pooled": 195.9882379343454,
+                  "point_definition": "native_point"
+                },
+                "2028": {
+                  "table": "P",
+                  "n_origins": 17521,
+                  "horizon": 24,
+                  "n_cells": 420504,
+                  "mae": 49.833286078613554,
+                  "rmse_pooled": 195.9882379343454,
+                  "point_definition": "native_point"
+                }
+              },
+              "seed_summary": {
+                "horizon": {
+                  "mean": 24.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "mae": {
+                  "mean": 49.833286078613554,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_cells": {
+                  "mean": 420504.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "n_origins": {
+                  "mean": 17521.0,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "point_definition": "native_point",
+                "rmse_pooled": {
+                  "mean": 195.9882379343454,
+                  "std": 0.0,
+                  "n": 3
+                },
+                "table": "P"
+              },
+              "aggregation": "mean_of_seed_metrics"
+            },
+            "seed_evidence": {
+              "seed_count": 3,
+              "distinct_scored_prediction_count": 1,
+              "duplicate_seed_groups": [
+                [
+                  2026,
+                  2027,
+                  2028
+                ]
+              ],
+              "known_deterministic_model": false,
+              "interpretation": "identical_predictions_are_not_independent_replicates"
+            }
+          }
+        },
+        "macro_regions": {
+          "mae": 78.26636765877213,
+          "rmse_pooled": 351.87419777929495
+        },
+        "aggregation": "equal_weight_region_mean_of_seed_metrics",
+        "statistical_significance": "not_computed_seed_repeats_are_not_independent_time_series"
+      }
+    },
+    "Q": {}
+  }
+}
