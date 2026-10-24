@@ -34,7 +34,7 @@ P 表无概率指标（缺失，不填零）。对照行见 candidate/（主表 
 
 | 模型 | 表 | 宏 MAE（mean±SD） | 宏 QS | 地区均 RMSE | 80% 覆盖 | 80% 宽度 | 交叉率 |
 |---|---|---:|---:|---:|---:|---:|---:|
-| tabpfn_v3（全 1465 列） | Q | 44.13 ± 0.18 | 39.48 | 275.38 | 0.888 | 319.8 | 0.0000 |
+| tabpfn_v3（全 1465 列） | Q | 44.13 ± 0.04 | 39.48 | 275.38 | 0.888 | 319.8 | 0.0000 |
 | chronos2_zeroshot（受限输入） | Q | 48.53 ± 0.00 | 32.50 | 352.03 | 0.747 | 146.2 | 0.0001 |
 | moirai2_zeroshot（受限输入） | P | 55.75 ± 0.00 | — | 291.78 | — | — | — |
 | timesfm25_xreg（受限输入+XReg） | P | 95.89 ± 0.00 | — | 424.26 | — | — | — |
@@ -44,7 +44,7 @@ P 表无概率指标（缺失，不填零）。对照行见 candidate/（主表 
 regional/macro_per_seed/per_seed/provenance。
 
 读法要点：
-- 无预训练基础模型在合法输入下超过 LightGBM 或 Full_joint；tabpfn_v3 点误差
+- 该历史回顾性比较中，没有预训练基础模型超过 LightGBM 或 Full_joint；tabpfn_v3 点误差
   优于 patchtst/timexer/linear/dlinear/mlp/pricefm，但五分位 QS 明显偏弱
   （区间宽 320、覆盖 0.89）。
 - chronos2 五分位为其 21 级原生头精确输出，QS 32.5 尚可但 80% 覆盖 0.747 偏低。
@@ -72,3 +72,10 @@ regional/macro_per_seed/per_seed/provenance。
 ## Codex 合并审查（2026-10-24）
 
 [审查与修复记录](../../../docs/foundation_baselines_codex_review_20261024.md)。候选表已统一为先地区宏平均、再计算 seed 间标准差；原始预测与分数未改动。TabPFN 以固定生产批次可复现为有限验收条件，不宣称任意批次大小下均满足原抽样容差。
+
+
+## 2026-10-24 基线维护
+
+[维护档案](../baseline_maintenance_20261024/README.md)记录 TabPFN 规范查询分块修复、TimesFM 开发验证和数据可用性证据。上述表格为原运行档案，原预测不覆盖；最新选用来源以[统一主表](../main_comparison_20261023/README.md)及其 verification.json 为准。
+
+“来源时间未晚于origin”仅对保存的时间代理成立；首次公开发布和后续修订记录仍未完整审计，不能将“合法输入”扩展为严格实时无泄露结论。TimesFM 的静态气价在逐origin回归中被中心化为0，API传入范围不等于有效信息范围。

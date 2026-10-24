@@ -56,9 +56,10 @@ class Adapter:
         expected = {"xreg_mode", "ridge"}
         if set(params) != expected:
             raise ValueError(f"Unexpected timesfm25_xreg parameters: {sorted(params)}")
-        if params["xreg_mode"] != "xreg + timesfm" or float(params["ridge"]) != 0.0:
-            raise ValueError("timesfm25_xreg fixes the official defaults "
-                             "xreg_mode='xreg + timesfm' and ridge=0.0")
+        self.ridge = float(params["ridge"])
+        if params["xreg_mode"] != "xreg + timesfm" or self.ridge not in (0.0, 1.0):
+            raise ValueError("timesfm25_xreg requires xreg_mode='xreg + timesfm' "
+                             "and the frozen original (0) or maintenance candidate (1) ridge")
         from . import model as native
 
         self.hf_home = os.environ.get(
@@ -79,7 +80,7 @@ class Adapter:
                 "weights": native.weight_identity(self.hf_home),
                 "packages": native.package_versions(),
                 "config": {"forecast_config": native.FORECAST_CONFIG,
-                           "xreg_mode": "xreg + timesfm", "ridge": 0.0,
+                           "xreg_mode": "xreg + timesfm", "ridge": self.ridge,
                            "normalize_xreg_target_per_input": True,
                            "call_granularity": "one_origin_per_official_call"},
                 "input_mapping": {
@@ -98,8 +99,8 @@ class Adapter:
                                         "auxiliary_quantiles.npz per cell"},
                 "xreg_fit": {"fits_on": "each origin's own legal 72h price history "
                                         "(in-context labels, not train split)",
-                             "parameters": "per-origin least squares with per-input "
-                                           "target normalization; ridge=0",
+                             "parameters": "per-origin regression with per-input "
+                                           f"target normalization; ridge={self.ridge:g}",
                              "order": "fit covariate regression -> forecast horizon "
                                       "effect -> TimesFM forecasts residual -> add back",
                              "quantile_effect": "added equally to every channel (shift)"},
@@ -109,6 +110,10 @@ class Adapter:
                 "seed_scope": "no_randomness_frozen_weights_deterministic_ls_fit",
                 "zero_shot_backbone": True,
             }
+            if "maintenance_selection" in self.context.config:
+                self._identity["external_development_selection"] = self.context.config["maintenance_selection"]
+            self._identity["input_mapping"]["static_gas_effect"] = (
+                "constant within each origin; official XReg centering removes this column")
         return self._identity
 
     def predict_chunk(self, indices: np.ndarray) -> dict[str, np.ndarray]:
@@ -136,7 +141,7 @@ class Adapter:
             static = {"gas_7d_log_std": [float(gas[row])]}
             chunk_points, chunk_quantiles = native.predict_with_xreg(
                 self.model, inputs=inputs, dynamic_numerical_covariates=dynamic,
-                static_numerical_covariates=static)
+                static_numerical_covariates=static, ridge=self.ridge)
             point = np.asarray(chunk_points[0], dtype=np.float64)
             quantile = np.asarray(chunk_quantiles[0], dtype=np.float64)
             if point.shape != (24,) or quantile.shape != (24, 10):

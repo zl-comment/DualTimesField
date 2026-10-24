@@ -74,13 +74,15 @@ def package_versions() -> dict[str, str]:
 
 def predict_with_xreg(model, *, inputs: list[np.ndarray],
                       dynamic_numerical_covariates: dict[str, list[np.ndarray]],
-                      static_numerical_covariates: dict[str, list[float]]) -> tuple[list, list]:
+                      static_numerical_covariates: dict[str, list[float]],
+                      ridge: float = 0.0) -> tuple[list, list]:
     """Official in-context XReg forecast; returns (points, native_quantiles).
 
     xreg_mode="xreg + timesfm": fit the covariate regression on each origin's
     own 72h context, forecast the horizon covariate effect, forecast the
-    residual with TimesFM, add the XReg effect back. ridge=0 (plain least
-    squares, library default), per-input target normalization on (defaults).
+    residual with TimesFM, add the XReg effect back. Default ridge=0 preserves
+    the original least-squares run; ridge=1 is the bounded development candidate.
+    Per-input target normalization remains enabled.
     """
     points, quantiles = model.forecast_with_covariates(
         inputs=inputs,
@@ -88,7 +90,7 @@ def predict_with_xreg(model, *, inputs: list[np.ndarray],
         static_numerical_covariates=static_numerical_covariates,
         xreg_mode="xreg + timesfm",
         normalize_xreg_target_per_input=True,
-        ridge=0.0,
+        ridge=ridge,
         max_rows_per_col=0,
         force_on_cpu=False,
     )

@@ -1,5 +1,5 @@
 {
-  "implementation_identity": "official timesfm PyPI 2.0.2 package (TimesFM_2p5_200M_torch + timesfm/utils/xreg_lib.py — the official 2.5 implementation; PyPI 3.0.x tracks TimesFM 3.0 and is NOT used), frozen google/timesfm-2.5-200m-pytorch checkpoint",
+  "implementation_identity": "official timesfm PyPI 2.0.2 package (TimesFM_2p5_200M_torch + timesfm/utils/xreg_lib.py \u2014 the official 2.5 implementation; PyPI 3.0.x tracks TimesFM 3.0 and is NOT used), frozen google/timesfm-2.5-200m-pytorch checkpoint",
   "experiment_model_id": "timesfm25_xreg",
   "batch": "second_foundation_20261023",
   "paper_reference": "Das et al. A decoder-only foundation model for time-series forecasting. ICML 2024 (arXiv:2310.10688)",
@@ -32,11 +32,12 @@
       "quantile_exogenous"
     ],
     "unmapped_reason": "dynamic XReg covariates need values over the 72h fit span AND 24 legal future values; demand future exists only as differently-standardized forecast vintages (splicing rejected); remaining blocks are future-only",
-    "scope_declaration": "input_scope=restricted_price_target_calendar_dynamic_gas_static_incontext_xreg; NOT an equal-input comparison to full-1465-column models"
+    "scope_declaration": "input_scope=restricted_price_target_calendar_dynamic_gas_static_incontext_xreg; NOT an equal-input comparison to full-1465-column models",
+    "effective_static_gas": "Per-origin static gas is constant across all 72 fitting rows; official column centering removes it exactly. Supplied to API but no effective gas information in this adapter."
   },
   "xreg_fit": {
     "fits_on": "each origin's own legal 72h price history at prediction time (in-context labels; NOT the train split; NOT 'no fitting')",
-    "method": "BatchedInContextXRegLinear least squares, ridge=0.0, per-input target normalization, one_hot drop=None, max_rows_per_col=0 (no subsampling)",
+    "method": "Official original ridge=0.0; adapter also permits preregistered maintenance candidate ridge=1.0. Frozen run config identifies the choice. Per-input target normalization and no subsampling remain unchanged.",
     "order": "xreg_mode='xreg + timesfm': covariate regression fitted on the origin context -> horizon covariate effect forecast -> TimesFM forecasts the residual -> XReg effect added back",
     "quantile_effect": "the XReg shift is added equally to every native channel",
     "backcast": "return_backcast=True required by the official XReg path",
@@ -73,7 +74,7 @@
   },
   "context_policy": {
     "label_use": "in-context XReg fit on each origin's own legal history only; no train/selection/calibration labels",
-    "selection_use": "none",
+    "selection_use": "Original config: none. Maintenance candidate: external fixed-sample and complete 2022H1 decision before test; adapter itself never receives selection labels. See maintenance_selection in the frozen config.",
     "calibration_use": false,
     "test_labels": "never visible to the adapter; scorer-only"
   },

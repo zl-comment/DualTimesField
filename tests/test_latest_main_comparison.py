@@ -69,3 +69,37 @@ def test_snapshot_validation_ignores_worktree_but_rejects_snapshot_tampering(tmp
     source.write_text('tampered code')
     with pytest.raises(ValueError, match='Frozen source snapshot'):
         report.verify_frozen_joint_manifest(manifest, tmp_path)
+
+
+def test_replacement_cannot_silently_fall_back_on_missing_evidence(tmp_path, monkeypatch):
+    from scripts import update_latest_main_comparison as report
+    monkeypatch.setattr(report, 'ROOT', tmp_path)
+    with pytest.raises(FileNotFoundError):
+        report.validate_maintenance_source('timesfm25_xreg', {
+            'run_root':'missing_run','manifest_sha256':'not-a-real-sha'})
+
+
+def test_maintenance_source_binds_selected_config_and_complete_grid(tmp_path, monkeypatch):
+    import yaml
+    monkeypatch.setattr(report, 'ROOT', tmp_path)
+    run=tmp_path/'repair';run.mkdir()
+    selection=tmp_path/'selection.json'
+    selection.write_text(json.dumps({'accepted':True,'test_used_for_selection':False,'selected_ridge':1.}))
+    digest=report.experiment.c.base.digest
+    pin={'path':'selection.json','sha256':digest(selection)}
+    (run/'maintenance_selection.json').write_text(selection.read_text())
+    manifest={'models':['timesfm25_xreg'],'maintenance_selection_sha256':pin['sha256'],'jobs':[
+        {'model':'timesfm25_xreg','region':r,'seed':s} for r in report.REGIONS for s in report.SEEDS]}
+    (run/'jobs.json').write_text(json.dumps(manifest))
+    config={'maintenance_selection':pin,'foundation_models':{'timesfm25_xreg':{'ridge':1.}}}
+    (run/'config.yaml').write_text(yaml.safe_dump(config))
+    record={'run_root':'repair','manifest_sha256':digest(run/'jobs.json'),'selection':pin}
+    assert report.validate_maintenance_source('timesfm25_xreg',record)[0]==run
+    config['foundation_models']['timesfm25_xreg']['ridge']=0.
+    (run/'config.yaml').write_text(yaml.safe_dump(config))
+    with pytest.raises(ValueError,match='candidate'):
+        report.validate_maintenance_source('timesfm25_xreg',record)
+    (run/'config.yaml').write_text(yaml.safe_dump({**config,'foundation_models':{'timesfm25_xreg':{'ridge':1.}}}))
+    selection.write_text(json.dumps({'accepted':False,'test_used_for_selection':True,'selected_ridge':1.}))
+    with pytest.raises(ValueError,match='selection changed'):
+        report.validate_maintenance_source('timesfm25_xreg',record)

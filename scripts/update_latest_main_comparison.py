@@ -102,11 +102,41 @@ def verify_frozen_joint_manifest(manifest, run=RUN):
     require(digest(run / 'protocol.md') == manifest['protocol_sha256'], 'Frozen protocol snapshot changed')
 
 
+def validate_maintenance_source(model, record):
+    """No silent fallback to a superseded run; selection must precede test."""
+    import yaml
+    digest = experiment.c.base.digest
+    root = (ROOT / record['run_root']).resolve()
+    require(digest(root / 'jobs.json') == record['manifest_sha256'], 'Replacement manifest changed')
+    manifest = read(root / 'jobs.json')
+    require(manifest['models'] == [model], 'Replacement must be a frozen single-model run')
+    require({(j['model'], j['region'], j['seed']) for j in manifest['jobs']} ==
+            {(model, r, s) for r in REGIONS for s in SEEDS} and len(manifest['jobs']) == 9,
+            'Replacement grid incomplete or duplicated')
+    selection_path = ROOT / record['selection']['path']
+    require(digest(selection_path) == record['selection']['sha256'], 'Repair selection changed')
+    require(manifest['maintenance_selection_sha256'] == record['selection']['sha256'] ==
+            digest(root / 'maintenance_selection.json'), 'Frozen repair selection changed')
+    selected = read(selection_path)
+    require(selected['accepted'] and selected['test_used_for_selection'] is False,
+            'Repair not accepted on development data')
+    config = yaml.safe_load((root / 'config.yaml').read_text())
+    frozen = config['maintenance_selection']
+    require(frozen['sha256'] == record['selection']['sha256'] and
+            frozen['path'] == record['selection']['path'], 'Run did not freeze this selection')
+    require(model == 'timesfm25_xreg' and
+            config['foundation_models'][model]['ridge'] == selected['selected_ridge'] == 1.0,
+            'Unexpected repair candidate')
+    return root, manifest
+
+
 def main(argv=None):
     progress = read(RUN / 'progress.json')
     require(progress['stage'] == 'complete', 'Latest run incomplete; do not publish replacement tables')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--foundation-run', type=Path, default=ROOT.parent / 'DualTimesField-foundation-baselines/outputs/forecasting/foundation_baselines_20261023_r1')
+    parser.add_argument('--foundation-sources', type=Path,
+                        default=ROOT / 'configs/experiments/current_foundation_sources.json')
     args = parser.parse_args(argv)
     from forecasting.foundation_audit import collect
     from forecasting.aligned_report import build_aligned_report
@@ -117,6 +147,17 @@ def main(argv=None):
     require(foundation_report['comparison_available'] and foundation_report['progress']['completed_cells'] == 36,
             'Foundation grid incomplete')
     foundation_manifest = read(foundation_run / 'jobs.json')
+    replacements = read(args.foundation_sources)
+    foundation_sources = {m: (foundation_run, foundation_manifest) for m in foundation_manifest['models']}
+    repair_audits = {}
+    for model, record in replacements.items():
+        require(model in foundation_sources, 'Unknown replacement model')
+        repair_root, repair_manifest = validate_maintenance_source(model, record)
+        repair_audits[model] = collect(repair_root)
+        repair_report = build_aligned_report(repair_root)
+        require(repair_report['comparison_available'] and repair_report['progress']['completed_cells'] == 9,
+                'Repair not complete and audited')
+        foundation_sources[model] = (repair_root, repair_manifest)
     progress = read(RUN / 'progress.json')
     require(progress['stage'] == 'complete', 'Latest run incomplete; do not publish replacement tables')
     manifest = read(RUN / 'manifest.json')
@@ -213,15 +254,17 @@ def main(argv=None):
             'fixed tree 2026 repeated reference' if model == 'B_retrained' else manifest['config']['seed_scope'],
             alpha=row['alpha'], fallback=row['fallback'], checkpoint_sha256=digest(checkpoint), expected_sha=row['sha256'])
     print('Re-scored and verified all 54 latest joint outputs', flush=True)
-    for job in foundation_manifest['jobs']:
+    for original_job in foundation_manifest['jobs']:
+        selected_root, selected_manifest = foundation_sources[original_job['model']]
+        job = next(j for j in selected_manifest['jobs'] if j['id'] == original_job['id'])
         model, region, seed = job['model'], job['region'], job['seed']
         spec = FOUNDATION_REGISTRY[model]
-        directory = foundation_run / job['output']
+        directory = selected_root / job['output']
         status = read(directory / 'status.json')
         append(model, region, seed, directory / 'test.npz', read(directory / 'metrics.json'),
-               'foundation_baseline', foundation_manifest['run_id'],
-               dict(run_id=foundation_manifest['run_id'], source_hash=foundation_manifest['source_hash'],
-                    config_hash=foundation_manifest['config_hash']), spec.seed_scope,
+               'foundation_baseline', selected_manifest['run_id'],
+               dict(run_id=selected_manifest['run_id'], source_hash=selected_manifest['source_hash'],
+                    config_hash=selected_manifest['config_hash']), spec.seed_scope,
                input_scope=spec.input_scope, pretraining_overlap='unaudited',
                expected_sha=status['artifact_hashes']['test.npz'])
     print('Re-scored and aligned all 36 foundation cells with the original LightGBM test samples', flush=True)
@@ -250,6 +293,8 @@ def main(argv=None):
         historical_control_outputs=2, historical_control_cells=18, neural_fits=9, latest_artifacts=54,
         baseline_cells=153, foundation_cells=36, foundation_audit=foundation_audit,
         foundation_run=str(foundation_run), foundation_manifest_sha256=digest(foundation_run / "jobs.json"),
+        foundation_replacements=replacements, foundation_repair_audits=repair_audits,
+        foundation_sources_file_sha256=digest(args.foundation_sources) if args.foundation_sources.exists() else None,
         baseline_cell_scores_exactly_unchanged=True, metric_max_abs_difference=max(score_differences), foundation_rescore_absolute_tolerance=1e-10,
         all_three_seeds_complete=True, raw_and_guarded_selection_independently_verified=True,
         selected_in_last_two_epochs=boundary,
@@ -282,7 +327,10 @@ def main(argv=None):
         '旧静态 baseline_full、baseline_no_fields 的 18 格移入历史结构对照附表，不占当前主表行。'
         '连同该附表，共核验 27 个来源输出、243 格。'
         '最近四方案的 2021/2022 开发分数保留原档，不混入本表；选择最新结构不代表它已通过开发验收。', '',
-        '新增基础模型全部标记预训练重叠未审计：TabPFN 使用完整公共输入，其他三者使用受限输入。TabPFN 固定生产分块可重现，但改变批次大小的抽样重放未通过原容差。三种时序基础模型的 seed 重复不能解释为独立随机训练。', '',
+        '新增基础模型全部标记预训练重叠未审计：TabPFN 使用完整公共输入，其他三者使用受限输入。TabPFN 固定生产分块可重现，但旧版改变批次大小的抽样重放未通过原容差；维护版固定规范分块，原正式预测保留，未宣称全量重新重放。三种时序基础模型的 seed 重复不能解释为独立随机训练。', '',
+        '**数据与预算边界：**已保存的外生来源时间代理未发现晚于起点，但真实公开发布时间及后续修订审计未完成；不能声称严格实时无泄露。当前为固定配置比较，未执行各模型等预算HPO。维护证据及 TimesFM 开发选择见[基线维护档案](../baseline_maintenance_20261024/README.md)。', '',
+        ('TimesFM 来源已替换为预定 ridge1 修复：固定抽样和完整2022H1选择集均通过门槛后冻结，再运行原2023—2024测试。原 ridge0 实验保留为历史档案，裸 TimesFM 仅作开发诊断。' if replacements else
+         'TimesFM 当前仍引用原 ridge0 正式结果；未完成开发门槛和九格审计的候选不会替换主表。'), '',
         '| 输出 | 表/信息组 | 宏 MAE（均值 ± SD） | 宏 QS（均值 ± SD） | 地区平均 RMSE | 回退格/9 |',
         '|---|---|---:|---:|---:|---:|']
     for row in main_rows:

@@ -74,7 +74,7 @@ def timesfm(output,region,count):
     price=split.inputs['history_values'][indices,:,0].astype(np.float64)*std+mean
     calendar=np.concatenate([split.inputs['history_calendar'][indices],split.inputs['future_calendar'][indices]],axis=1)
     gas=split.inputs['origin_context'][indices,0]
-    predictions={k:[] for k in ('original','ridge1','bare')};started=time.monotonic()
+    predictions={k:[] for k in (('original','ridge1','bare') if count else ('original','ridge1'))};started=time.monotonic()
     for i in range(len(indices)):
         inputs=[price[i]];dynamic={f'calendar_{c}':[calendar[i,:,c]] for c in range(calendar.shape[-1])}
         for name,ridge in [('original',0.),('ridge1',1.)]:
@@ -82,13 +82,14 @@ def timesfm(output,region,count):
                 static_numerical_covariates={'gas_7d_log_std':[float(gas[i])]},xreg_mode='xreg + timesfm',
                 normalize_xreg_target_per_input=True,ridge=ridge,max_rows_per_col=0,force_on_cpu=False)
             predictions[name].append(np.asarray(point[0])[-24:])
-        point,_=model.forecast(horizon=24,inputs=inputs)
-        predictions['bare'].append(np.asarray(point[0])[-24:])
+        if count:
+            point,_=model.forecast(horizon=24,inputs=inputs)
+            predictions['bare'].append(np.asarray(point[0])[-24:])
         if (i+1)%32==0 or i+1==len(indices):
             save(output/f'{region}_progress.json',{'completed':i+1,'total':len(indices),'seconds':time.monotonic()-started})
             print(region,i+1,'/',len(indices),flush=True)
-    actual=split.actual[indices]
-    predictions={k:np.stack(v) for k,v in predictions.items()}
+    actual=np.asarray(split.actual[indices],dtype=np.float64)
+    predictions={k:np.stack(v).astype(np.float64) for k,v in predictions.items()}
     scores={k:{'mae':float(np.mean(np.abs(v-actual))),'rmse':float(np.sqrt(np.mean((v-actual)**2))),'max_abs_prediction':float(np.max(np.abs(v)))} for k,v in predictions.items()}
     np.savez_compressed(output/f'{region}.npz',indices=indices,origin_unix=times,actual=actual,**predictions)
     save(output/f'{region}.json',{'region':region,'split':'selection','count':len(indices),'scores':scores,'seconds':time.monotonic()-started,'weights':native.weight_identity(os.environ['HF_HOME']),'script_sha256':digest(__file__)})

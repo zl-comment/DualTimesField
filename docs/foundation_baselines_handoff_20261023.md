@@ -1,5 +1,7 @@
 # 交接说明：第二批基础模型基线（2026-10-23，供 Codex 审查合并）
 
+本文件是原批次交接档案。已合并后的维护与最终来源见[当前主表](../logs/forecasting/main_comparison_20261023/README.md)和[2026-10-24维护](../logs/forecasting/baseline_maintenance_20261024/README.md)。
+
 ## 分支与基点
 
 - 分支：`research/foundation-baseline-expansion-20261023`
@@ -53,7 +55,7 @@ scripts/foundation_baselines.sh report                       # 候选对比（�
 | tabpfn_v3 | ✅ | ✅（MAE 45.4 dev24） | ✅ | ✅ 9/9（宏 MAE 44.13/QS 39.48） | ✅（整块逐位 0.0） |
 | chronos2_zeroshot | ✅ | ✅（18.1） | ✅ | ✅ 9/9（宏 MAE 48.53/QS 32.50） | ✅（相对 ≤1e-3） |
 | moirai2_zeroshot | ✅ | ✅（28.2） | ✅ | ✅ 9/9（宏 MAE 55.75，P 表） | ✅ |
-| timesfm25_xreg | ✅ | ✅（21.9） | ✅ | ✅ 9/9（宏 MAE 95.89，P 表；尖峰外推爆炸为主因） | ✅ |
+| timesfm25_xreg | ✅ | ✅（21.9） | ✅ | ✅ 9/9（宏 MAE 95.89，P 表；外推误差成因尚未完全分解） | ✅ |
 | 外部阻断 | 无 —— 四条目均完成编码/smoke/验证/正式9格/独立复算 | | | | |
 
 失败/修复记录（全部保留证据）：

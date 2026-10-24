@@ -194,6 +194,7 @@ def prepare(config_path, run_root, extend_from):
         raise ValueError('Foundation runs require --extend-from pointing at the 90-cell parent run')
     config = yaml.safe_load(config_path.read_text())
     models = validate_foundation_config(config)
+    maintenance_path = verify_maintenance_selection(config, project)
     if run_root.exists():
         raise FileExistsError('Use a new dated run directory')
     parent_root = Path(extend_from).resolve()
@@ -211,6 +212,8 @@ def prepare(config_path, run_root, extend_from):
     env_locks = _model_env_locks(project, models)
     run_root.mkdir(parents=True)
     shutil.copyfile(config_path, run_root / 'config.yaml')
+    if maintenance_path is not None:
+        shutil.copyfile(maintenance_path, run_root / 'maintenance_selection.json')
     source_files, source_hash = freeze_sources(project, run_root / 'source')
     config['project_root'] = str(project)
     (run_root / 'data_cache').symlink_to(parent_root / 'data_cache', target_is_directory=True)
@@ -238,9 +241,28 @@ def prepare(config_path, run_root, extend_from):
                     'config_hash': parent['config_hash'], 'cache_hashes': parent['cache_hashes'],
                     'cache_reuse': 'read_only_parent_cache_via_symlink',
                 }}
+    if maintenance_path is not None:
+        manifest['foundation']['external_development_selection'] = config['maintenance_selection']
+        manifest['maintenance_selection_sha256'] = sha(run_root / 'maintenance_selection.json')
     atomic_json(run_root / 'jobs.json', manifest)
     print(f'Prepared {len(jobs)} foundation jobs in {run_root}', flush=True)
     return manifest
+
+
+def verify_maintenance_selection(config, project):
+    """A repaired TimesFM setting cannot enter test before its dev freeze."""
+    params = config.get('foundation_models', {}).get('timesfm25_xreg', {})
+    if 'timesfm25_xreg' not in config['experiment']['models'] or float(params.get('ridge', 0)) == 0:
+        return None
+    selection = config['maintenance_selection']
+    path = Path(project) / selection['path']
+    if sha(path) != selection['sha256']:
+        raise ValueError('Maintenance selection fingerprint changed')
+    record = read_json(path)
+    if not (record['accepted'] and record['test_used_for_selection'] is False
+            and record['selected_ridge'] == float(params['ridge']) == 1.0):
+        raise ValueError('Maintenance development gate did not approve this candidate')
+    return path
 
 
 def _load_test_view(root: Path, manifest: dict, region: str):
