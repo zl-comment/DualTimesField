@@ -1,0 +1,272 @@
+给 zcode 的实施提示词：第二批表格与时序基础模型基线
+编写与来源核对日期：2026-10-23
+
+请实际完成下面的代码接入、验证与可运行模型的正式评估，不只提交设计方案。按阶段推进，遇到单个模型的依赖或能力阻断时记录证据，继续其他模型。任务完成后交给 Codex 审查合并。
+
+一、研究目标与本轮范围
+
+研究目标：在同一电价预测任务下，比较表格预训练模型、时序预训练模型、已有任务训练模型和电价专用模型。回答预训练与时序结构是否带来稳定收益，以及外生变量的接入方式、概率校准和计算成本有什么影响。验收不以超过 LightGBM 或我们的 Full 为条件。
+
+当前正式主表已有 15 个静态基线，包括 PatchTST、TimeXer、GateTS、DLinear、NHITS-QRA；不是没有时序模型。缺口是现代预训练基础模型。现有 PriceFM 是从头训练的单区域结构适配，不能替代预训练基础模型对照。
+
+本轮依次实施四个独立模型条目：
+  A1. tabpfn_v3：固定第三代本地回归权重，表格基础模型，保留原生分布/分位输出。
+  A2. chronos2_zeroshot：固定 amazon/chronos-2，优先接入公共外生变量，冻结权重推理。
+  B1. moirai2_zeroshot：固定 Salesforce/moirai-2.0-R-small，原生能力与输出范围如实登记。
+  B2. timesfm25_xreg：固定 google/timesfm-2.5-200m-pytorch，核实并使用官方 XReg 外生适配路径。
+
+A1/A2 为首批交付，完成后继续 B1/B2。一个模型阻断不应阻止另一个模型继续。
+以上 ID 是拟新增 ID，不表示目前已经注册或可运行。名称必须匹配最终执行方式；例如 Moirai 仅能接收价格历史时改为 moirai2_zeroshot_price_only，并同步重命名目录与配置，不得用完整外生模型名称掩盖输入限制。
+TabPFN-v2 的版本对照、TabPFN-TS、Chronos-2 微调、NBEATSx/TFT、Mitra、其他新版本仅列为后续，不在本轮自动扩张。采用 TabPFN-3 是为了先建立本地表格预训练对照；它与论文中的 API/Plus 版本是否相同必须核查，不宣称完整复现其论文成绩。
+本轮预训练骨干保持冻结。TabPFN 的标签上下文拟合与 XReg 的局部拟合必须明确记录，不能称为“完全不接触本任务标签”。
+
+二、独立分支与工作区
+
+Codex 活动目录：/root/workspace/Code/DualTimesField
+当前活动分支：research/v5-mechanism-state-calibration-20261023
+本任务已核对的代码基点：19ba700d5988c07083ba7751a31ab853744e94af
+目标独立目录：/root/workspace/Code/DualTimesField-foundation-baselines
+目标分支：research/foundation-baseline-expansion-20261023
+
+先读取实际 AGENTS.md（如存在）、git status、git worktree list，检查目标目录和分支是否已经存在。
+若均不存在，从上述固定基点创建新 worktree；命令为：
+  git -C /root/workspace/Code/DualTimesField worktree add -b research/foundation-baseline-expansion-20261023 /root/workspace/Code/DualTimesField-foundation-baselines 19ba700d5988c07083ba7751a31ab853744e94af
+若已经存在，核对其基点和未提交内容，继续已有任务，不重置、不覆盖、不重复创建。基点在本机不存在时先查明仓库状态，不随意改从第一批旧分支启动。
+
+特别注意：编写本提示词时，Codex 活动目录还有未提交的 15 个基线引用补充。这些不是新 worktree 自动继承的内容。不要 stash、提交、清理或复制覆盖活动目录的未提交修改。可以只读其 forecasting/CITATIONS.md 及各 CITATIONS.bib 来遵循格式；新模型的引用在你自己的目录建立，后续由 Codex 合并。
+不要继续在 /root/workspace/Code/DualTimesField-fair-baselines 的第一批旧工作区开发本任务。
+
+工作边界：
+  - 新增源码、配置、测试、环境、运行产物全部写入新的 worktree。
+  - 不修改 Full、Anchor、校正稳健性或机理状态实验；不重跑此前 72 次失败确认，也不删除失败记录。
+  - 共享数据和父运行只读复用；符号链接不等于系统只读保护，不对目标执行写入、chmod、清理。
+  - 不把整个 outputs 链接到活动目录；新运行保存在新 worktree 自己的 outputs 下。
+  - 不向活动目录的 .venv 安装包。每种模型可使用独立解释器/环境，由公共调度器调用；不要为了统一依赖而随意升级旧实验环境。
+  - 启动前检查 GPU 占用，每张卡最多一个本任务 worker，默认最多同时使用两张空闲 GPU。不得终止其他任务进程。
+  - 分阶段提交自己的改动，保存 commit 清单。不向其他人的分支提交，不自动合并回 Codex 分支。
+
+三、先读现有框架与证据
+
+以下路径以新 worktree 根目录 /root/workspace/Code/DualTimesField-foundation-baselines 为前缀：
+  forecasting/README.md
+  forecasting/aligned_inputs.py
+  forecasting/aligned_scoring.py
+  forecasting/aligned_experiment.py
+  forecasting/aligned_extension.py
+  forecasting/aligned_expansion.py
+  forecasting/aligned_expansion_report.py
+  forecasting/aligned_report.py
+  forecasting/common/baseline_registry.py
+  forecasting/common/cache.py
+  forecasting/common/native_trainer.py
+  forecasting/common/calibration.py
+  forecasting/ddnn_jsu/ 和 forecasting/nhits_qra/ 的适配例子
+  configs/experiments/aemo_forecast_aligned_20261012.yaml
+  configs/experiments/aemo_forecast_aligned_expansion_20261022.yaml
+  docs/baseline_expansion_zcode_prompt_20261022.txt
+  docs/baseline_expansion_codex_review_20261022.md
+  docs/research/epf_2026_review_20261022/baseline_recommendations.json
+  logs/forecasting/main_comparison_20261023/README.md
+  scripts/update_latest_main_comparison.py
+  tests/test_aligned_inputs.py、test_aligned_scoring.py、test_aligned_experiment.py
+  tests/test_expansion_model_layout.py 以及第一批相关调度/报告测试
+
+当前事实，实施前复核：
+  1. EXPANSION_MODELS 与 expansion.schema/batch 固定为第一批五模型；matrix 校验要求恰好包含该批模型。不要直接把四个新 ID 塞进去，破坏旧矩阵和旧快照。
+  2. 第一批用 native_training 决定是否加载 train/selection；TabPFN 权重不训练但需要 train 标签上下文，这个布尔值不足以表达新方法。新能力需要显式声明阶段与数据需求。
+  3. 第一批 worker 把 test AlignedSplit 连同标签交给适配器，并固定 output_type=quantile。新接口要做到预测侧不持有测试标签，并正确区分 Q/P；不能只加注释。
+  4. assert_comparable 检查 protocol_id、split、region、input_hash、sample_hash、preprocessing_hash。缓存相同不自动说明模型实际使用的信息相同；还要核验输入映射、预训练/在线状态和模型作用域。
+  5. build_multi_run_report 会调用 build_aligned_report，可能向输入 run 写报告。原运行要求只读，不能把原目录直接当可写报告工作区；采用只读审计或在新目录生成报告。
+  6. 主表更新脚本固定旧来源。交付候选合并报告及其入口，不直接调用脚本覆盖现有主表，也不重新选择旧模型结果。
+
+允许新增第二批独立 registry/schema/runner/report，或做兼容性扩展。公共样本、预处理、预测文件契约、评分与哈希审计必须复用，不能另建第二套数据和评分系统。目录、函数、CLI 是你要实现的交付，不要把拟议命令写成已经存在。
+
+四、目录和引用规范
+
+每个实际模型 ID 一个独立源码目录，全部位于 forecasting 下；示例：
+  /root/workspace/Code/DualTimesField-foundation-baselines/forecasting/tabpfn_v3/
+  /root/workspace/Code/DualTimesField-foundation-baselines/forecasting/chronos2_zeroshot/
+  /root/workspace/Code/DualTimesField-foundation-baselines/forecasting/moirai2_zeroshot/
+  /root/workspace/Code/DualTimesField-foundation-baselines/forecasting/timesfm25_xreg/
+每个目录至少包含 __init__.py、model.py、adapter.py、source.json、CITATIONS.bib、README.md。
+model.py 保存模型特有加载/预测实现；adapter.py 保存七块输入映射、阶段边界与公共产物转换。不要只有空文件夹而把所有模型逻辑写进 common 大文件。
+配置放 configs/<实际模型ID>/aligned.yaml；专属依赖锁和可复制环境安装说明放对应模型目录。
+公共下载校验、调度与评分可共享；官方库的实际算法实现与版本要可追溯。复制官方源码时保留许可、固定 commit 和修改列表，并放该模型自己的 vendor/。不把模型权重提交 Git。
+model.py 开头列论文名称、作者/年份、正式链接、普通参考文献格式，并指向本目录完整 BibTeX。
+引用采用具体版本的原始论文/技术报告；P04/P06 只作为电价比较的动机。库版本、模型代际、权重 revision 分别记录，不得混为同一版本。
+source.json 还须保存：实现身份、官方仓库、checkpoint ID/revision/SHA256、许可证来源、依赖版本、输入映射、输出分位规则、随机性来源、上下文策略、内部变换、与论文的差异、核验日期及来源 URL。
+
+五、公共实验协议
+
+复用父运行：/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012
+以其 jobs.json、config.yaml、data_cache 和源码快照为只读证据。独立审计父来源、文件哈希和缓存字段；不是只检查目录存在。
+
+市场：NSW1、QLD1、TAS1；时区 Australia/Brisbane。
+任务：小时数据，72 小时历史、24 小时预测、逐小时滚动起点。
+数据区间均左闭右开：
+  train       [2015-01-01, 2022-01-01)
+  selection   [2022-01-01, 2022-07-01)
+  calibration [2022-07-01, 2023-01-01)
+  test        [2023-01-01, 2025-01-01)
+完整目标窗口及边界 purge 沿用现有实现。三地区当前缓存各 split 起点数为 61273、4321、4393、17521；以冻结样本与时间戳为准，不得删行凑齐。
+正式评估 seed 为 2026、2027、2028，每个可运行模型 3 地区×3 seed，共 9 个评估格。
+
+七块公共输入，顺序固定为 INPUT_KEYS：
+  history_values       [72, 2]
+  history_calendar     [72, 10]
+  future_calendar      [24, 10]
+  origin_context       [1]
+  future_exogenous     [24, 11]
+  ctf_exogenous        [24, 1]
+  quantile_exogenous   [24, 3]
+目前 flatten_inputs 的总宽度为 1465，实施时对真实缓存复核。
+
+公共层统一负责数据读取、发布日期代理、日期切分、公共标准化、样本与评分。模型只能做内部表示转换，例如 flatten、张量布局、patch、原生协变量接口、合法的模型内部归一化。
+全局有状态变换只用 train 拟合；在预测时用当前起点合法 72h 上下文做官方逐序列归一化可以，但必须记录。不要通过新模型自己的数据集类重新切分、补齐或重拟合公共 scaler。
+外生变量只能使用该 origin 当时的公共缓存内容，不能换成未来实际负荷、风光或后续修订预报。
+available_at 仍是档案时间代理，不能表述成已经独立认证的真实首次发布时间。
+
+六、阶段、时间与信息隔离
+
+1. train 标签只用于已声明的上下文/任务拟合；selection 只用于预先列出的配置选择；calibration 只用于明确登记的校准器；test 标签仅由公共评分器读取。
+2. 本轮基础模型固定官方权重及一组配置，不做 HPO，不因为看过 test 误差而更换版本、样本量、协变量映射或尾部分位规则。
+3. 给预测 adapter 的对象只包含合法 inputs、origin/target 时间戳及必要的冻结变换元数据，不包含 actual/target，也不提供可绕过边界的测试标签路径。调度器在预测完成之后单独加载标签评分。
+4. 可以使用测试期内、在当前 origin 前已经观测到的 72h 价格历史；这是公共输入，不等于允许用测试标签持续更新模型。不得把 selection/calibration/test 中成熟标签追加进 TabPFN 的训练上下文库，也不做在线残差更新。
+5. 同一原始时间序列的不同预测起点不能拼成一个共享注意力/检索组：后一个起点的历史可能包含前一个起点的未来。每个 origin 独立建样本和 group，不跨 origin、跨地区共享上下文。防止官方 cross-learning/group 默认行为造成泄漏。
+6. 原生 DataFrame/数据集接口不得看到整段测试目标，再由框架内部自动滚动切片。只传该起点的历史与当时已知未来协变量。
+7. 对每个模型验证单个 origin 推理与不同 batch 分组/重排结果一致（按预先设定数值容差或绑定 origin 的固定采样 RNG）；不能因同批包含未来 origin 而改变较早预测。
+8. 预训练 checkpoint 发布晚于 2023—2024 测试期，需要单列预训练来源审计。记录真实数据集、时段、NEM 重叠证据及未知项；发布日期晚不等于已经证明污染，资料不足也不等于证明无污染。
+9. 不为本轮临时改到 2025/2026 测试或扩展到 168h。若需要新时间轨道，单列后续方案；不能与当前主表直接混排。
+
+七、模型逐项实施要求
+
+A1：TabPFN-3
+  - 采用官方本地 tabpfn 回归实现及明确的 V3 权重。不要使用不指定版本的默认构造器；当前官方默认可能是 3.5。库包版本不是模型代际。
+  - 原始输入先由公共 flatten_inputs 构建完整 1465 列，保留所有公共块。按 horizon 建 24 个回归任务或使用经验证的等价原生接口，不能无说明把 24 个 horizon 混成一种任务。
+  - 阶段0核实实际 V3 回归权重、依赖、样本/特征限制、原生 quantile/CDF 接口和显存成本。文档标称上限不等于本机同时容纳这些行列的能力。
+  - 上下文样本只能来自 train。优先使用全量 train；若必须子采样，先在 train-only 性能预检中确定固定样本数和确定性按时间分层的无标签抽样规则，冻结索引与 SHA256。抽样规则不能按 test 分数挑选，也不能悄悄只取最近一段。
+  - 样本量不足时在模型 ID/配置/metadata 中标识 ctxN，并进入“训练上下文受限”对照组。训练上下文量与全量拟合模型不同，不宣称等训练数据量。不要通过静默删特征、PCA、加外生预测头来绕过能力限制。
+  - 预测标准化目标还是原始 RRP 必须明确，输出只逆变换一次。点评分用真实 q50，不把 mean 当 median。
+  - 保存 label-context、各 horizon 模型状态/可重建清单、集成配置与 seed 语义。测试 query 不能参与全局 scaler 拟合或被当作带标签支持集。
+  - 已有合法本地访问凭证可使用，但不得在日志输出 token。需要用户自行完成账号授权时记录精确入口和缺失项，继续不依赖授权的模型。不要自动改成收费 API 或上传研究数据。
+
+A2：Chronos-2 zero-shot
+  - 使用官方 Chronos2Pipeline 和 amazon/chronos-2 的固定 revision；冻结权重，明确无微调。不是 Chronos-T5、Chronos-Bolt 或 synth/small 变体。
+  - 逐项列出七块输入到历史目标、past-only covariates、known-future covariates、当前上下文的映射。区分“历史实际需求”和“当时的未来需求预测”，不要未经说明把它们当同一统计变量拼接。
+  - 对只在未来存在的协变量，必须验证该版本支持的缺失历史与掩码语义；不伪造历史数值，也不能用其他 origin 的缓存拼接一条全知预报序列。
+  - 显式 prediction_length=24、公共 context=72；默认最长 context 不应扩大信息范围。只允许官方必要 padding，并记录 mask，不添真实额外历史。
+  - 直接核实原生输出是否支持五个指定分位，保存原始分位顺序及来源。支持参数不自动证明尾部分位由模型原生提供，要检查官方实现如何生成。
+  - 七块信息无法合法映射时给出具体缺失字段，保留 price-only 或受限 covariate 版本作为补充对照；不要训练自制 adapter 后仍叫 zero-shot。
+
+B1：Moirai-2 zero-shot
+  - 固定 Moirai 2.0 权重，不能把 Moirai 1.x 或 Moirai-MoE 改名成 2.0。
+  - 在锁定版本上实测 covariate 支持、patch/padding、输出分位集合；不能套用 Moirai 1.x 接口能力作为 2.0 的能力证明。
+  - 若原生只给 q10—q90，而不支持 q05/q95，不能外推、复制端点或补高斯尾巴冒充完整五分位输出。可将原生 q50 进入 P 表，其他原生分位进入明确标注的辅助表；说明未进入 Q5 表的原因。
+  - 官方有合法完整分布/采样输出时，可以按预先固定算法提取公共五分位，明确 MC 样本数、精度、RNG 和开销。
+  - 输入受限时使用说明限制的模型 ID/目录，保留模型真实性；不换普通 MLP 或额外训练头来强行凑齐。
+
+B2：TimesFM-2.5 + XReg
+  - 明确加载 google/timesfm-2.5-200m-pytorch 和官方 2.5 实现；当前仓库也有 3.0，不能跟随默认版本漂移。
+  - 官方 XReg 是基座外的回归步骤，需要记录拟合数据、参数与先后顺序；不能把任何使用标签拟合的步骤统称无拟合。
+  - 若 XReg 按每个 origin 的合法历史拟合，限制到相同 72h；未来 covariates 仅在未来预测中使用。全局 XReg 参数只能由 train 拟合。
+  - 核实官方 XReg 需要历史和未来同时存在的字段。当前缓存只有未来预测的字段不得通过编造历史补齐。
+  - 核实连续 quantile head 是否真实支持所需分位，以及 XReg 位置回加如何作用于所有分位；原生 point、mean、median 不得混用。
+  - 如果只能得到点输出，则进 P 表；可以保留原生模型与公共输入的受限适配结果，但明确它不能进入完整同输入 Q5 比较组。
+
+八、输出、三 seed 与预算口径
+
+复用 make_prediction_artifact/save_prediction_artifact/load_prediction_artifact/score_predictions。
+Q 表：原价 RRP 的 [N,24,5]，分位 [.05,.10,.50,.90,.95]。保存重排前输出，由公共评分器计算交叉率，再重排取 q50 计算 MAE/RMSE。
+P 表：原价点预测 [N,24]；没有合法完整分位时不得复制五列或借用其他模型区间。
+QS5=2×五分位平均 pinball，不称精确 CRPS。报告 MAE、pooled RMSE、QS5、各分位 pinball、80/90%覆盖和宽度、交叉率。P 表缺失的概率指标为缺失，不填零。
+不根据本数据范围裁剪价格、实际值或预测来改善评分。官方权重/原生分布若本身具有有限支持或内置截断，记录其原生行为；新增裁剪禁止，诊断中记录超界/饱和率。非有限值明确失败，不静默修补。
+每格完整保存 origin_unix、target_time_unix、原始实际值、公共哈希、输入范围标签、权重与配置哈希、预测来源。
+
+seed=2026/2027/2028 仍各自评估；先按 seed 求三地区等权均值，再报告 seed 均值与样本标准差，不先平均预测。
+冻结确定性模型的三 seed 可能完全相同。必须说明 seed 控制的是抽样、模型集成还是没有随机作用；不能把相同权重的三次推理称为三个独立训练。可去重计算但保留 cache/reuse_of 和确定性复核证据，不能伪造独立检查点。
+最多四个默认模型共 36 个逻辑评估格，不等于 36 次独立训练。重命名或受限作用域不会凭空增加一个额外模型；所有计划变更在正式测试前冻结。外部阻断必须在完整计划清单中保留。
+
+第一轮只做固定配置，不调参。对每个模型先用 train/selection 的输入做有限的内存和速度预检，确定 batch、精度与上下文方案；配置冻结后才打开 test 标签评分。
+预算记录至少包括加载/上下文拟合/推理时间、总墙钟时间、峰值 CPU/GPU 内存、CPU/GPU 型号、实际行数、特征数、batch、精度、采样数、集成数、权重大小及每千 origin 吞吐。预训练计算成本与本地任务成本分开，不能宣称与从头训练模型等总算力。
+OOM 先降低推理 batch、顺序执行 horizon 或使用官方缓存/offload；不能跳过困难样本、自动减少公共历史或换小模型却保留原 ID。若必须改算法相关参数，另建配置与运行，保留失败记录。
+
+九、验收与执行顺序
+
+阶段0：来源、能力与公平性审计
+  读取父缓存并核验 shape/hash；只用 train/selection 做 API 和小样本检查。输出 docs/foundation_baselines_stage0_20261023.md 和机器可读能力表。
+  每模型列明本地权重访问、实际版本、全部输入映射、原生分位、上下文限制、预训练来源、依赖、估计完整运行成本、可进入 Q/P/受限输入/上下文受限的哪一组。
+  对未知项附可复查错误或官方证据，不用“已支持”占位。
+
+阶段1：公共接入与模型目录
+  实现第二批注册、配置验证、阶段隔离、冻结快照、可恢复 worker、进度和报告能力。
+  旧第一批矩阵、模型 ID、schema、训练预算、冻结运行保持原语义；不要通过放宽所有校验让新方法过关。
+  配置和 manifest 显式记录 fit_requires_train_labels、selection_use、calibration_use、weight_training、output_type、input_scope、seed_scope、pretraining_scope 等等价字段。
+  实现下载后可离线重放；运行中不得自动更新官方依赖或权重。某个可选包未安装不能阻止其他模型 import/运行。
+
+阶段2：有意义的验证与小规模运行
+  - 对真实官方权重/库至少一次验证适配前后输入与预测对应关系，只有 mock 或随机模型 smoke 不算官方接入验收。
+  - 变动 evaluation actual/target 不影响模型状态或预测；预测 adapter 访问这些字段必须失败。
+  - 逐块核验输入映射和 mask；不能把“接收了 dict”当作使用了所有信息。扰动测试结合映射检查，不要求每次扰动必然改变模型预测。
+  - 对原价逆变换、时间戳秒单位、horizon 顺序、分位 level 顺序、mean/median 和负价进行验证。
+  - 对跨 origin 隔离、batch 顺序、独立/批量推理、seed 重放和官方跨序列注意力分组进行因果性测试。
+  - 人为改动缓存、权重 revision、上下文索引、输入 scope 或配置，应使恢复/汇总校验失败，而不是复用旧结果。
+  - 验证断点续跑不重复拟合、不遗漏行、不混合不同快照；耗时长的模型要可按 origin 分块持久化和恢复。
+  - 检查旧公共输入/评分、第一批目录/调度/报告的相关回归。按实际改动运行必要测试，不用测试数量替代证据。
+  - 真实权重 smoke 使用开发数据，输出完整 metadata 并标 smoke，不能进入正式主表。
+
+阶段3：正式评估与独立复算
+  每个模型通过阶段2后冻结源码/配置/权重/上下文索引，按声明的完整三地区三 seed 运行，不等所有其他模型解除外部阻断。
+  新 run_root 使用独立名称，例如 outputs/forecasting/foundation_baselines_20261023_<批次或模型>，不要写回父运行。
+  产物重新用公共评分器逐格复算；检查 sample/time/actual/preprocessing/input 哈希，并检查语义作用域与模型权重身份。
+  对完整确定性输出可做全量重放；对昂贵输出至少固定覆盖头/中/尾及极端价格样本做重放，报告抽样范围、容差和差异，不把抽样一致称为全量逐位一致。
+  比较范围按信息和输出能力明确分组：完整公共输入 Q5、完整公共输入点预测、输入受限、训练上下文受限、预训练来源待确认。作用域可多标签，不能伪造同一 input_hash 来掩盖实际删输入。
+  预训练模型同样本分数可列候选对照，但预训练重叠未知时必须显式标注，不宣称严格无污染的新盲测。
+  当前 Full_joint 额外使用成熟历史误差，信息范围不同；在候选报告中保留这一标签，不能因新模型加入而把旧 Full 行变成等信息对照。
+
+十、交付物与完成判据
+
+交付：
+  1. 四个模型的实现/适配、独立配置、论文链接与 BibTeX、权重/依赖锁；不能运行的条目保留真实阻断状态。
+  2. 准确的 prepare/run/resume/report/audit 命令及其 --help 核验；推荐提供统一 scripts 入口，不能交付不存在的 CLI。
+  3. 真实权重 smoke、阶段隔离、接口与回归验证记录，以及官方适配等价性的证据与限制。
+  4. 正式预测、评分、来源与 hash、环境/权重清单、上下文索引、成本、随机性与预训练审计。
+  5. logs/forecasting/<本轮归档>/ 中的轻量 README、progress.json、verification.json、各模型/地区/seed 明细及分组汇总。
+  6. main_candidate.csv、regional.csv、macro_per_seed.csv、per_seed.csv、provenance.json 等机器可读结果；缺失或受限情况显式列出，不能只展示成功/较优子集。
+  7. 与当前 15 个静态基线和 Full_joint 的候选对比报告。旧来源只读审计，输出到新目录；不覆盖 logs/forecasting/main_comparison_20261023，不把旧历史 Full/no_fields 重新混入当前方法行。
+  8. 交接说明：分支、基点、各阶段 commit、可 cherry-pick 提交、共享接口改动、复现命令、已完成/失败/阻断矩阵、供 Codex 合并审查的注意事项。
+
+模型已编码、smoke 已通过、正式9格已完成、独立复算已通过是不同状态，逐项报告。
+一个模型不支持 q05/q95 或完整公共外生时，按真实能力交付补充结果，不为取得主表资格伪造分位/输入。
+若四个条目都有正式结果及审计，报告本轮完成；若有外部阻断，报告完成了哪些、阻断了哪些，不称全部完成。无需因为常规实现选择反复请求确认；需要用户完成的账户操作或实际资源缺口才具体说明。
+
+十一、必须核对的原始来源
+
+电价比较研究（不能代替所用模型自己的论文引用）：
+  P04 https://arxiv.org/html/2609.00089v1
+  P06 https://arxiv.org/html/2607.02623v2
+  P08 https://arxiv.org/html/2604.14739v1
+
+TabPFN：
+  官方实现 https://github.com/PriorLabs/TabPFN
+  模型版本与能力 https://docs.priorlabs.ai/models
+  版本选择 https://docs.priorlabs.ai/models/selecting-model-version
+  V3 权重入口 https://huggingface.co/Prior-Labs/tabpfn_3
+  V3 技术报告 https://arxiv.org/abs/2605.13986
+  v2 原始论文 https://doi.org/10.1038/s41586-024-08328-6 （作为谱系引用，不据此把 v3 称为 v2）
+
+Chronos-2：
+  官方实现 https://github.com/amazon-science/chronos-forecasting
+  权重与模型卡 https://huggingface.co/amazon/chronos-2
+  技术报告 https://arxiv.org/abs/2510.15821
+
+Moirai-2：
+  官方实现 https://github.com/SalesforceAIResearch/uni2ts
+  权重与模型卡 https://huggingface.co/Salesforce/moirai-2.0-R-small
+  技术报告 https://arxiv.org/abs/2511.11698
+
+TimesFM-2.5：
+  官方实现 https://github.com/google-research/timesfm
+  权重与模型卡 https://huggingface.co/google/timesfm-2.5-200m-pytorch
+  原始方法论文 https://arxiv.org/abs/2310.10688 （另记录 2.5 的模型卡与版本说明）
+
+以上是编写时核对的入口，不是对任意最新依赖/API 的永久承诺。开始实施时读取相应模型卡和固定版本源码，把实际可用能力、权重 revision 与检查结果写入交付，不依赖仓库默认模型名。

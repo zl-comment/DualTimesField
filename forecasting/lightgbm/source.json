@@ -3,5 +3,19 @@
   "repository": "https://github.com/microsoft/LightGBM",
   "notes": "核心算法来自安装的 lightgbm 包；逐 horizon 训练五个分位数，五分位数联合选择该 horizon 的轮数。",
   "experiment_model_id": "lightgbm",
-  "in_completed_baseline": true
+  "in_completed_baseline": true,
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "官方库调用；逐 horizon、五分位训练与选择流程为本地适配。",
+  "references": [
+    {
+      "bibtex_key": "ke2017lightgbm",
+      "role": "LightGBM 原论文",
+      "citation": "Ke, Guolin; Meng, Qi; Finley, Thomas; Wang, Taifeng; Chen, Wei; Ma, Weidong; Ye, Qiwei; Liu, Tie-Yan (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information Processing Systems 30.",
+      "paper_url": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html",
+      "verified_from": [
+        "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html"
+      ]
+    }
+  ]
 }

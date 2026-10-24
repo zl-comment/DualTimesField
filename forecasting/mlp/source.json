@@ -3,5 +3,19 @@
   "repository": null,
   "notes": "共享输入展平后送入两层 MLP；没有对应的作者仓库。",
   "experiment_model_id": "mlp",
-  "in_completed_baseline": true
+  "in_completed_baseline": true,
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "本地通用 MLP 对照，没有对应本结构的单一原论文。所列文献仅为反向传播的经典背景，不是该电价模型或其两层/GELU/分位头设计的出处。",
+  "references": [
+    {
+      "bibtex_key": "rumelhart1986learning",
+      "role": "前馈网络反向传播的经典背景文献",
+      "citation": "Rumelhart, David E.; Hinton, Geoffrey E.; Williams, Ronald J. (1986). Learning representations by back-propagating errors. Nature, 323, 533–536.",
+      "paper_url": "https://doi.org/10.1038/323533a0",
+      "verified_from": [
+        "https://www.nature.com/articles/323533a0"
+      ]
+    }
+  ]
 }

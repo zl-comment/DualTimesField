@@ -2,7 +2,19 @@
 
 This is a PyTorch port, trained from scratch, with one graph node per region.
 It does not reproduce the original multi-country foundation-model pretraining.
-See ``vendor/pricefm/PROVENANCE.md`` for the source and explicit adaptations.
+See ``vendor/PROVENANCE.md`` for the source and explicit adaptations.
+
+论文链接与引用 / References
+--------------------------
+原工作首次提交于 2025 年，引用元数据按 2026 年修订版核对；代码独立固定 March 2026 MoE 提交。单区域单节点、从头训练的 PyTorch 移植，未复现原文多区域预训练与迁移。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[yu2025pricefm] PriceFM 原始工作（预印本）
+Yu, Runyao; Gu, Chenhui; Stiasny, Jochen; Wen, Qingsong; Dilov, Wasim Sarwar; Qi, Lianlian; Cremer,
+Jochen L. (2025). PriceFM: Foundation Model for Probabilistic Electricity Price Forecasting.
+arXiv:2508.04875 (v4 revised 2026).
+https://arxiv.org/abs/2508.04875
 """
 from __future__ import annotations
 

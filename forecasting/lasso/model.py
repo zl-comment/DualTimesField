@@ -1,4 +1,27 @@
-"""本地 Lasso ARX72 + CP 适配；不等同于论文 LEAR。来源见 README.md。"""
+"""本地 Lasso ARX72 + CP 适配；不等同于论文 LEAR。来源见 README.md。
+
+论文链接与引用 / References
+--------------------------
+本地 ARX72+CP，使用 sklearn Lasso；不是原论文 LEAR。本地逐 horizon 对称绝对残差校准，使用 type-7 分位插值；Lei 等仅提供分割共形预测的方法背景，具体公式参考 PostForecasts.jl。插值规则与时间序列非交换性意味着这里不主张该文的有限样本覆盖保证。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[tibshirani1996lasso] Lasso 原论文
+Tibshirani, Robert (1996). Regression Shrinkage and Selection Via the Lasso. Journal of the Royal
+Statistical Society: Series B (Methodological), 58(1), 267–288.
+https://doi.org/10.1111/j.2517-6161.1996.tb02080.x
+
+[lei2018distributionfree] 分割共形预测的方法背景
+Lei, Jing; G'Sell, Max; Rinaldo, Alessandro; Tibshirani, Ryan J.; Wasserman, Larry (2018).
+Distribution-Free Predictive Inference for Regression. Journal of the American Statistical
+Association, 113(523), 1094–1111.
+https://doi.org/10.1080/01621459.2017.1307116
+
+[lipiecki2025postforecasts] 绝对残差 CP 公式的软件来源
+Lipiecki, Arkadiusz; Weron, Rafał (2025). PostForecasts.jl: A Julia package for probabilistic
+forecasting by postprocessing point predictions. SoftwareX, 31, 102200.
+https://doi.org/10.1016/j.softx.2025.102200
+"""
 import numpy as np
 DEFAULT_QUANTILES = (0.05, 0.10, 0.50, 0.90, 0.95)
 

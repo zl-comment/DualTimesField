@@ -1,4 +1,22 @@
-"""本地实现。来源与任务适配见本目录 README.md。"""
+"""本地实现。来源与任务适配见本目录 README.md。
+
+论文链接与引用 / References
+--------------------------
+PatchTST/RevIN 的本地参考实现，增加外生变量 adapter 和五分位输出；未通过与官方权重映射的等价验证。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[nie2023time] PatchTST 原论文
+Nie, Yuqi; Nguyen, Nam H.; Sinthong, Phanwadee; Kalagnanam, Jayant (2023). A Time Series is Worth 64
+Words: Long-term Forecasting with Transformers. ICLR.
+https://arxiv.org/abs/2211.14730
+
+[kim2022reversible] RevIN 组件原论文
+Kim, Taesung; Kim, Jinhee; Tae, Yunwon; Park, Cheonbok; Choi, Jang-Ho; Choo, Jaegul (2022).
+Reversible Instance Normalization for Accurate Time-Series Forecasting against Distribution Shift.
+ICLR.
+https://openreview.net/forum?id=cGDAkQo1C0p
+"""
 from __future__ import annotations
 
 import math

@@ -3,5 +3,29 @@
   "repository": "https://github.com/yuqinie98/PatchTST",
   "notes": "本地重写 RevIN、patch、Transformer 与预测头；外生数据经线性 adapter。尚未完成与官方代码的权重映射等价验证。",
   "experiment_model_id": "patchtst",
-  "in_completed_baseline": true
+  "in_completed_baseline": true,
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "PatchTST/RevIN 的本地参考实现，增加外生变量 adapter 和五分位输出；未通过与官方权重映射的等价验证。",
+  "references": [
+    {
+      "bibtex_key": "nie2023time",
+      "role": "PatchTST 原论文",
+      "citation": "Nie, Yuqi; Nguyen, Nam H.; Sinthong, Phanwadee; Kalagnanam, Jayant (2023). A Time Series is Worth 64 Words: Long-term Forecasting with Transformers. ICLR.",
+      "paper_url": "https://arxiv.org/abs/2211.14730",
+      "verified_from": [
+        "https://arxiv.org/abs/2211.14730",
+        "https://github.com/yuqinie98/PatchTST"
+      ]
+    },
+    {
+      "bibtex_key": "kim2022reversible",
+      "role": "RevIN 组件原论文",
+      "citation": "Kim, Taesung; Kim, Jinhee; Tae, Yunwon; Park, Cheonbok; Choi, Jang-Ho; Choo, Jaegul (2022). Reversible Instance Normalization for Accurate Time-Series Forecasting against Distribution Shift. ICLR.",
+      "paper_url": "https://openreview.net/forum?id=cGDAkQo1C0p",
+      "verified_from": [
+        "https://seharanul17.github.io/RevIN/"
+      ]
+    }
+  ]
 }

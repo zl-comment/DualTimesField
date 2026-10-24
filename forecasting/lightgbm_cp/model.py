@@ -5,6 +5,35 @@ and calibrates per-horizon interval widths on 2022H2 out-of-sample absolute
 residuals. The centre stays exactly the frozen tree's rearranged q50. The
 shared driver lives in ``forecasting/common/frozen_base.py``; the CP formula
 itself is the already-audited ``common/calibration.absolute_residual_cp``.
+
+论文链接与引用 / References
+--------------------------
+冻结 LightGBM 基座上的本地组合。本地逐 horizon 对称绝对残差校准，使用 type-7 分位插值；Lei 等仅提供分割共形预测的方法背景，具体公式参考 PostForecasts.jl。插值规则与时间序列非交换性意味着这里不主张该文的有限样本覆盖保证。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[ke2017lightgbm] LightGBM 基座原论文
+Ke, Guolin; Meng, Qi; Finley, Thomas; Wang, Taifeng; Chen, Wei; Ma, Weidong; Ye, Qiwei; Liu, Tie-Yan
+(2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information
+Processing Systems 30.
+https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html
+
+[lei2018distributionfree] 分割共形预测的方法背景
+Lei, Jing; G'Sell, Max; Rinaldo, Alessandro; Tibshirani, Ryan J.; Wasserman, Larry (2018).
+Distribution-Free Predictive Inference for Regression. Journal of the American Statistical
+Association, 113(523), 1094–1111.
+https://doi.org/10.1080/01621459.2017.1307116
+
+[lipiecki2025postforecasts] 绝对残差 CP 公式的软件来源
+Lipiecki, Arkadiusz; Weron, Rafał (2025). PostForecasts.jl: A Julia package for probabilistic
+forecasting by postprocessing point predictions. SoftwareX, 31, 102200.
+https://doi.org/10.1016/j.softx.2025.102200
+
+[lebedev2026uncertainty] 相关电价比较论文（J34），非完整复现
+Lebedev, Andreas; Das, Abhinav; Pappert, Sven; Schlüter, Stephan (2026). Analyzing Uncertainty
+Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price
+Forecasting. IEEE Access, 14, 52162–52189.
+https://doi.org/10.1109/ACCESS.2026.3672716
 """
 from __future__ import annotations
 

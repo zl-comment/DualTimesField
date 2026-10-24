@@ -15,6 +15,40 @@ Input mapping (every shared block reaches the backbone, no block dropped):
     futr_exog  : future_calendar + future_exogenous +
                  ctf_exogenous + quantile_exogenous           ([B, 24, 16])
     stat_exog  : origin_context                              ([B, 1])
+
+论文链接与引用 / References
+--------------------------
+官方 NHITS 骨干移植，加固定 MC-dropout 与本地 QRA。QRA 输入为 MC 样本经验分位；采样、训练、特征与选择按公共框架执行，不是 P08/P16 的完整复现。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[challu2023nhits] NHITS 骨干原论文
+Challu, Cristian; Olivares, Kin G.; Oreshkin, Boris N.; Garza Ramirez, Federico; Mergenthaler
+Canseco, Max; Dubrawski, Artur (2023). NHITS: Neural Hierarchical Interpolation for Time Series
+Forecasting. Proceedings of the AAAI Conference on Artificial Intelligence, 37(6), 6989–6997.
+https://doi.org/10.1609/aaai.v37i6.25854
+
+[gal2016dropout] MC-dropout 方法论文
+Gal, Yarin; Ghahramani, Zoubin (2016). Dropout as a Bayesian Approximation: Representing Model
+Uncertainty in Deep Learning. ICML, PMLR 48, 1050–1059.
+https://proceedings.mlr.press/v48/gal16.html
+
+[nowotarski2015qra] QRA 原论文
+Nowotarski, Jakub; Weron, Rafał (2015). Computing electricity spot price prediction intervals using
+quantile regression and forecast averaging. Computational Statistics, 30(3), 791–803.
+https://doi.org/10.1007/s00180-014-0523-0
+
+[lettner2026performance] NHITS+QRA 电价比较论文（P08）
+Lettner, Jan Niklas; El Ashhab, Hadeer; Hagenmeyer, Veit; Schäfer, Benjamin (2026). Assessing the
+Performance-Efficiency Trade-off of Foundation Models in Probabilistic Electricity Price
+Forecasting. arXiv:2604.14739.
+https://arxiv.org/abs/2604.14739
+
+[lettner2026calibration] 相关校准讨论（P16）
+Lettner, Jan Niklas; El Ashhab, Hadeer; Schäfer, Benjamin (2026). Investigating Calibration
+Challenges in Probabilistic Electricity Price Forecasting. Proceedings of the 2026 ACM
+Sustainability Week, 565–566.
+https://doi.org/10.1145/3765611.3815392
 """
 from __future__ import annotations
 

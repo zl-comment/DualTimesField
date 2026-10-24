@@ -1,4 +1,17 @@
-"""Official TimeXer components adapted to the shared AEMO quantile task."""
+"""Official TimeXer components adapted to the shared AEMO quantile task.
+
+论文链接与引用 / References
+--------------------------
+固定官方主干，增加已知未来变量 token 与五分位头；作者列表以 NeurIPS 正式出版页为准。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[wang2024timexer] TimeXer 原论文
+Wang, Yuxuan; Wu, Haixu; Dong, Jiaxiang; Qin, Guo; Zhang, Haoran; Liu, Yong; Qiu, Yunzhong; Wang,
+Jianmin; Long, Mingsheng (2024). TimeXer: Empowering Transformers for Time Series Forecasting with
+Exogenous Variables. Advances in Neural Information Processing Systems 37, 469–498.
+https://proceedings.neurips.cc/paper_files/paper/2024/hash/0113ef4642264adc2e6924a3cbbdf532-Abstract-Conference.html
+"""
 from __future__ import annotations
 
 import json

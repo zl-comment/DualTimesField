@@ -6,7 +6,7 @@
   "paper_url": "https://ieeexplore.ieee.org/document/11430173/",
   "repository": "https://github.com/lebeand/uq-epf",
   "upstream_commit": null,
-  "official_code_note": "官方公开仓库截至核对日仅提供 Normal 参数化 DDNN（ddnn_normal.py），未见 JSU 变体源码；本实现的 JSU 参数化按论文分布公式本地实现",
+  "official_code_note": "此前核对的 J34 配套仓库 lebeand/uq-epf 仅提供 Normal 参数化 DDNN（ddnn_normal.py），未见 JSU 变体源码；此说明不适用于更早 DDNN 原论文的作者仓库。本实现的 JSU 参数化按论文分布公式本地实现",
   "jsu_parametrization": "W~N(mu_w,sigma_w^2); X=xi+lambda*sinh(W); u=asinh((x-xi)/lambda); z=(u-mu_w)/sigma_w; NLL=-log(phi(z))+log(sigma_w)+log(lambda)+log(cosh(u)); gamma=-mu_w/sigma_w, delta=1/sigma_w",
   "input_adaptation": "七块公共输入按 INPUT_KEYS 顺序展平进入 MLP（与树模型同一展平），无新增特征",
   "output_target_transform": "标准化空间训练；解析分位经 train 拟合仿射逆变换回原始 RRP；支持负价",
@@ -24,5 +24,30 @@
     "prediction_clipping": false,
     "nonfinite_policy": "raise",
     "scale_floor": 0.1
-  }
+  },
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "DDNN-JSU 的方法重实现。J34 配套仓库的 Normal 网络为网络形态参考；JSU 参数化在本地实现。Marcjasz 等为更早的电价 DDNN/JSU 来源；未复现两文完整数据与调参流程。",
+  "references": [
+    {
+      "bibtex_key": "marcjasz2023distributional",
+      "role": "电价 DDNN/Johnson SU 原论文",
+      "citation": "Marcjasz, Grzegorz; Narajewski, Michał; Weron, Rafał; Ziel, Florian (2023). Distributional neural networks for electricity price forecasting. Energy Economics, 125, 106843.",
+      "paper_url": "https://doi.org/10.1016/j.eneco.2023.106843",
+      "verified_from": [
+        "https://www.sciencedirect.com/science/article/pii/S0140988323003419"
+      ]
+    },
+    {
+      "bibtex_key": "lebedev2026uncertainty",
+      "role": "J34 比较论文及本地网络形态参考",
+      "citation": "Lebedev, Andreas; Das, Abhinav; Pappert, Sven; Schlüter, Stephan (2026). Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting. IEEE Access, 14, 52162–52189.",
+      "paper_url": "https://doi.org/10.1109/ACCESS.2026.3672716",
+      "verified_from": [
+        "https://api.crossref.org/works/10.1109/ACCESS.2026.3672716",
+        "https://arxiv.org/abs/2509.19417",
+        "https://github.com/lebeand/uq-epf"
+      ]
+    }
+  ]
 }

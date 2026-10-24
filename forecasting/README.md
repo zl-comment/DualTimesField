@@ -2,6 +2,8 @@
 
 各模型实现、来源说明分别位于以下独立目录；配置位于对应的 `configs/<目录>/aligned.yaml`。
 
+当前 15 个静态基线的[论文链接与引用总索引](CITATIONS.md)提供代码入口及各目录可复制的 `CITATIONS.bib`；引用用途和本地适配范围见对应 `source.json`。
+
 当前结果见[主比较入口](../logs/forecasting/main_comparison_20261023/README.md)：新版 Full_joint 已完成三神经种子同协议评估，当前主表为 21 个输出、189 格，包含 15 个静态基线和新版联合方法的 6 个输出。旧静态 Full/no_fields 的 18 格移入历史附表。原 17 模型、153 格静态基线档案保留不变。
 
 当前 Full_joint 使用[平衡损失与非对称 Anchor 尺度头](full_v5_anchor_balance/README.md)，通过 `forecasting.full_v5_anchor_balance.aligned_final` 训练/评估；下方 `full/` 为历史静态结构，不是当前完整方法。

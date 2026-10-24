@@ -1,4 +1,16 @@
-"""本地实现。来源与任务适配见本目录 README.md。"""
+"""本地实现。来源与任务适配见本目录 README.md。
+
+论文链接与引用 / References
+--------------------------
+移动平均分解与线性预测的本地参考实现，增加外生 adapter 与五分位头；未通过官方权重映射等价验证。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[zeng2023transformers] DLinear 原论文
+Zeng, Ailing; Chen, Muxi; Zhang, Lei; Xu, Qiang (2023). Are Transformers Effective for Time Series
+Forecasting?. Proceedings of the AAAI Conference on Artificial Intelligence, 37(9), 11121–11128.
+https://doi.org/10.1609/aaai.v37i9.26317
+"""
 from __future__ import annotations
 
 import torch

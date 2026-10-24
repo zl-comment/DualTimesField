@@ -3,5 +3,19 @@
   "repository": "https://github.com/cure-lab/LTSF-Linear",
   "notes": "移动平均分解与线性预测，本地增加分位数头及外生输入 adapter。未建立官方权重映射等价验证。",
   "experiment_model_id": "dlinear",
-  "in_completed_baseline": true
+  "in_completed_baseline": true,
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "移动平均分解与线性预测的本地参考实现，增加外生 adapter 与五分位头；未通过官方权重映射等价验证。",
+  "references": [
+    {
+      "bibtex_key": "zeng2023transformers",
+      "role": "DLinear 原论文",
+      "citation": "Zeng, Ailing; Chen, Muxi; Zhang, Lei; Xu, Qiang (2023). Are Transformers Effective for Time Series Forecasting?. Proceedings of the AAAI Conference on Artificial Intelligence, 37(9), 11121–11128.",
+      "paper_url": "https://doi.org/10.1609/aaai.v37i9.26317",
+      "verified_from": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/26317"
+      ]
+    }
+  ]
 }

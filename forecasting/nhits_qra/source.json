@@ -12,7 +12,61 @@
   "native_training_objective": "上游默认 MAE（标准化空间，点头 n_out=1），Adam，共享预算",
   "selection_metric": "选择期原始价格 MAE（eval 模式点预测，配置预声明）",
   "calibration": "冻结骨干后 MC-dropout（K=20，固定种子 job_seed+7919/2*7919，仅 dropout 层 train 模式）经验 type-7 分位 → 2022H2 标签 QRA（alpha=0 精确 LP）",
-  "dependency_versions": {"torch": "2.5.1+cu124", "neuralforecast": "vendored@6c11accf"},
+  "dependency_versions": {
+    "torch": "2.5.1+cu124",
+    "neuralforecast": "vendored@6c11accf"
+  },
   "license": "Apache-2.0（vendor 文件保留上游许可）；本地适配部分 MIT",
-  "differences_from_paper": "骨干为官方源码移植但训练/采样管线本地化；P08/P16 的完整对比流程未复现；MC 样本数与 dropout 为固定第一版参数，未做其调参"
+  "differences_from_paper": "骨干为官方源码移植但训练/采样管线本地化；P08/P16 的完整对比流程未复现；MC 样本数与 dropout 为固定第一版参数，未做其调参",
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "官方 NHITS 骨干移植，加固定 MC-dropout 与本地 QRA。QRA 输入为 MC 样本经验分位；采样、训练、特征与选择按公共框架执行，不是 P08/P16 的完整复现。",
+  "references": [
+    {
+      "bibtex_key": "challu2023nhits",
+      "role": "NHITS 骨干原论文",
+      "citation": "Challu, Cristian; Olivares, Kin G.; Oreshkin, Boris N.; Garza Ramirez, Federico; Mergenthaler Canseco, Max; Dubrawski, Artur (2023). NHITS: Neural Hierarchical Interpolation for Time Series Forecasting. Proceedings of the AAAI Conference on Artificial Intelligence, 37(6), 6989–6997.",
+      "paper_url": "https://doi.org/10.1609/aaai.v37i6.25854",
+      "verified_from": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/25854"
+      ]
+    },
+    {
+      "bibtex_key": "gal2016dropout",
+      "role": "MC-dropout 方法论文",
+      "citation": "Gal, Yarin; Ghahramani, Zoubin (2016). Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning. ICML, PMLR 48, 1050–1059.",
+      "paper_url": "https://proceedings.mlr.press/v48/gal16.html",
+      "verified_from": [
+        "https://proceedings.mlr.press/v48/gal16.html"
+      ]
+    },
+    {
+      "bibtex_key": "nowotarski2015qra",
+      "role": "QRA 原论文",
+      "citation": "Nowotarski, Jakub; Weron, Rafał (2015). Computing electricity spot price prediction intervals using quantile regression and forecast averaging. Computational Statistics, 30(3), 791–803.",
+      "paper_url": "https://doi.org/10.1007/s00180-014-0523-0",
+      "verified_from": [
+        "https://link.springer.com/article/10.1007/s00180-014-0523-0"
+      ]
+    },
+    {
+      "bibtex_key": "lettner2026performance",
+      "role": "NHITS+QRA 电价比较论文（P08）",
+      "citation": "Lettner, Jan Niklas; El Ashhab, Hadeer; Hagenmeyer, Veit; Schäfer, Benjamin (2026). Assessing the Performance-Efficiency Trade-off of Foundation Models in Probabilistic Electricity Price Forecasting. arXiv:2604.14739.",
+      "paper_url": "https://arxiv.org/abs/2604.14739",
+      "verified_from": [
+        "https://arxiv.org/abs/2604.14739"
+      ]
+    },
+    {
+      "bibtex_key": "lettner2026calibration",
+      "role": "相关校准讨论（P16）",
+      "citation": "Lettner, Jan Niklas; El Ashhab, Hadeer; Schäfer, Benjamin (2026). Investigating Calibration Challenges in Probabilistic Electricity Price Forecasting. Proceedings of the 2026 ACM Sustainability Week, 565–566.",
+      "paper_url": "https://doi.org/10.1145/3765611.3815392",
+      "verified_from": [
+        "https://arxiv.org/abs/2606.09517",
+        "https://api.crossref.org/works/10.1145/3765611.3815392"
+      ]
+    }
+  ]
 }

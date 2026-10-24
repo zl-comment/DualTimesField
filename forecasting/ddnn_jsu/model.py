@@ -20,6 +20,23 @@ RRP. Selection between epochs uses the declared raw-price common five-quantile
 QS, so checkpoint choice matches the public scoring even though training
 optimizes NLL. The JSU location is not claimed to be the median: the q50 used
 for point metrics is the true distribution median.
+
+论文链接与引用 / References
+--------------------------
+DDNN-JSU 的方法重实现。J34 配套仓库的 Normal 网络为网络形态参考；JSU 参数化在本地实现。Marcjasz 等为更早的电价 DDNN/JSU 来源；未复现两文完整数据与调参流程。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[marcjasz2023distributional] 电价 DDNN/Johnson SU 原论文
+Marcjasz, Grzegorz; Narajewski, Michał; Weron, Rafał; Ziel, Florian (2023). Distributional neural
+networks for electricity price forecasting. Energy Economics, 125, 106843.
+https://doi.org/10.1016/j.eneco.2023.106843
+
+[lebedev2026uncertainty] J34 比较论文及本地网络形态参考
+Lebedev, Andreas; Das, Abhinav; Pappert, Sven; Schlüter, Stephan (2026). Analyzing Uncertainty
+Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price
+Forecasting. IEEE Access, 14, 52162–52189.
+https://doi.org/10.1109/ACCESS.2026.3672716
 """
 from __future__ import annotations
 

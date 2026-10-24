@@ -1,4 +1,15 @@
-"""Official xgboost library with local aligned selection/output adapter. See README.md."""
+"""Official xgboost library with local aligned selection/output adapter. See README.md.
+
+论文链接与引用 / References
+--------------------------
+官方库调用；逐 horizon、五分位输出和公共选择流程为本地适配。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[chen2016xgboost] XGBoost 原论文
+Chen, Tianqi; Guestrin, Carlos (2016). XGBoost: A Scalable Tree Boosting System. KDD, 785–794.
+https://doi.org/10.1145/2939672.2939785
+"""
 import numpy as np
 
 

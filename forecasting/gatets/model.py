@@ -3,6 +3,17 @@
 ``gatets`` uses price history only. ``gatets_adapter`` additionally receives
 all known inputs through the existing linear baseline adapter. Neither is a
 reproduction of the paper's original dataset scores. See vendor provenance.
+
+论文链接与引用 / References
+--------------------------
+固定官方骨干，增加外生变量 adapter 与五分位输出；主表 ID 为 gatets_adapter，不是原论文数据集分数复现。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[yemets2025gatets] GateTS 原论文
+Yemets, Kyrylo; Lukashchuk, Mykola; Izonin, Ivan (2025). GateTS: Versatile and Efficient Forecasting
+via Attention-Inspired routed Mixture-of-Experts. arXiv:2508.17515.
+https://arxiv.org/abs/2508.17515
 """
 from __future__ import annotations
 

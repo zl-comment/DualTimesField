@@ -3,5 +3,19 @@
   "repository": "https://github.com/dmlc/xgboost",
   "notes": "核心算法来自安装的 xgboost 包；本地实现共同验证指标和逐 horizon 的训练选择。",
   "experiment_model_id": "xgboost",
-  "in_completed_baseline": true
+  "in_completed_baseline": true,
+  "citation_file": "CITATIONS.bib",
+  "citation_verified_on": "2026-10-23",
+  "citation_scope": "官方库调用；逐 horizon、五分位输出和公共选择流程为本地适配。",
+  "references": [
+    {
+      "bibtex_key": "chen2016xgboost",
+      "role": "XGBoost 原论文",
+      "citation": "Chen, Tianqi; Guestrin, Carlos (2016). XGBoost: A Scalable Tree Boosting System. KDD, 785–794.",
+      "paper_url": "https://doi.org/10.1145/2939672.2939785",
+      "verified_from": [
+        "https://arxiv.org/abs/1603.02754"
+      ]
+    }
+  ]
 }

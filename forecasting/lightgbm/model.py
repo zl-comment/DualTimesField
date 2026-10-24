@@ -1,4 +1,17 @@
-"""Official lightgbm library with local aligned selection/output adapter. See README.md."""
+"""Official lightgbm library with local aligned selection/output adapter. See README.md.
+
+论文链接与引用 / References
+--------------------------
+官方库调用；逐 horizon、五分位训练与选择流程为本地适配。
+
+BibTeX（可直接复制）: 本目录 CITATIONS.bib；逐项用途与核对来源: source.json。
+
+[ke2017lightgbm] LightGBM 原论文
+Ke, Guolin; Meng, Qi; Finley, Thomas; Wang, Taifeng; Chen, Wei; Ma, Weidong; Ye, Qiwei; Liu, Tie-Yan
+(2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information
+Processing Systems 30.
+https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html
+"""
 import numpy as np
 
 
