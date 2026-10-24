@@ -21,3 +21,6 @@
 新增基线的 prepare/run 入口与父缓存参数见[扩展运行记录](../logs/forecasting/aligned_expansion_20261022_r1/README.md)，DDNN 的正式修复配置与复跑见[修复协议](../docs/ddnn_jsu_unclipped_repair_20261022.md)。当前比较表统一从[三 seed 主表入口](../logs/forecasting/main_comparison_20261023/README.md)访问。新版 Full_joint 的冻结配置由 `forecasting.full_v5_anchor_balance.aligned_final.configuration` 提供，见[正式评估协议](../docs/v5_latest_aligned_20261023.md)，不使用旧静态 `configs/full/aligned.yaml`。
 
 非 Full 配置不包含 Full 专属结构或辅助损失字段。`model.quantiles` 是公共输出约定；神经模型的结构参数在 `model_baselines.<模型 ID>`，由运行器实际读取。树模型与 Lasso 参数在 `experiment.baseline_parameters`。
+
+
+基线维护的当前来源固定在 [experiments/current_foundation_sources.json](experiments/current_foundation_sources.json)。空映射沿用原基础模型运行；只有通过开发门槛、三地区×三seed审计的修复运行才可登记替换。刷新主表时必须读取这个索引，缺失或证据不匹配会报错，不能静默退回旧结果。维护协议见 [2026-10-24 记录](../docs/baseline_maintenance_20261024.md)。

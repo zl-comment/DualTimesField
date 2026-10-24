@@ -50,12 +50,22 @@ def freeze():
                 metadata_sha256=digest(path.with_suffix('.json')), count=len(expected),
                 weights=record['weights'], script_sha256=record['script_sha256'])
         evidence[stage] = dict(scores=scores, gate=gate(scores), files=files)
+    identities = {json.dumps(f['weights'], sort_keys=True)
+                  for stage in evidence.values() for f in stage['files'].values()}
+    if len(identities) != 1:
+        raise ValueError('Development stages must use the same frozen model weights')
+    parity_path = ARCHIVE / 'timesfm_adapter_parity.json'
+    parity = json.loads(parity_path.read_text())
+    if parity['split'] != 'selection' or any(
+            d['relative_to_max_abs_prediction'] > 1e-3 for d in parity['differences'].values()):
+        raise ValueError('Production adapter must match the development diagnostic')
     accepted = all(v['gate']['accepted'] for v in evidence.values())
     record = dict(accepted=accepted, selected_ridge=1.0 if accepted else 0.0,
         rule='macro MAE strictly improves; no region worsens >5%; both fixed sample and complete 2022H1',
         split='selection', seed=2026, test_used_for_selection=False,
         protocol_sha256=digest(ROOT/'docs/baseline_maintenance_20261024.md'),
         original_jobs_sha256=digest(RUN/'jobs.json'), evidence=evidence)
+    record['adapter_parity_sha256'] = digest(parity_path)
     dest = ARCHIVE / 'timesfm_selection.json'
     if dest.exists():
         if json.loads(dest.read_text()) != record:

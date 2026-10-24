@@ -29,3 +29,5 @@ TabPFN 已修复任意子集调用改变生产查询形状的问题：按同一�
 
 
 TimesFM 设计诊断：[timesfm_design.json](timesfm_design.json)。逐origin回归使静态气价中心化为0；128个固定开发起点的12列矩阵秩为5–6。ridge1将最大外推算子行范数从2.60降至1.56。该诊断没有使用标签数值，使用float64数学算子，不等价于官方JAX float32的逐位复现，也不足以单独解释全部误差；正式修复是否成立仍由预定完整开发门槛决定。
+
+正式 TimesFM 适配器与开发诊断在 NSW1 固定前8个开发起点、两种预定配置上逐位一致，见 [timesfm_adapter_parity.json](timesfm_adapter_parity.json)。它验证代码路径一致，不代替完整开发/测试评估。

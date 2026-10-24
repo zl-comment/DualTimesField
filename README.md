@@ -2,6 +2,8 @@
 
 第二批基础模型：[已并入主表的基础模型与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
 
+基线维护：[2026-10-24 限定修复、数据审计与重跑记录](logs/forecasting/baseline_maintenance_20261024/README.md)。当前主表由冻结来源索引生成；不覆盖历史预测档案。
+
 电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
 
 最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261023/README.md) · [三 seed 主表（新版 Full_joint，25 个输出）](logs/forecasting/main_comparison_20261023/main.csv) · [验证记录](logs/forecasting/main_comparison_20261023/VALIDATION.md)。联合方法的三个 seed 改变神经初始化与训练顺序，树 seed 固定 2026。

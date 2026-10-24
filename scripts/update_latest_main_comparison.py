@@ -142,6 +142,10 @@ def main(argv=None):
     from forecasting.aligned_report import build_aligned_report
     from forecasting.common.foundation_registry import FOUNDATION_REGISTRY
     foundation_run = args.foundation_run.resolve()
+    availability_path = ROOT / 'logs/forecasting/baseline_maintenance_20261024/data_availability.json'
+    availability = read(availability_path)
+    require(availability['timestamp_violations'] == 0,
+            'Known input timestamp violations require a shared-input repair before publication')
     foundation_audit = collect(foundation_run)
     foundation_report = build_aligned_report(foundation_run)
     require(foundation_report['comparison_available'] and foundation_report['progress']['completed_cells'] == 36,
@@ -300,6 +304,9 @@ def main(argv=None):
         selected_in_last_two_epochs=boundary,
         old_joint_outputs_replaced=True, tree_seed=2026, neural_seeds=list(SEEDS),
         identical_information_scope=False, generator_sha256=digest(Path(__file__)),
+        data_availability_audit=dict(evidence_path=str(availability_path), sha256=digest(availability_path),
+            timestamp_proxy_violations=availability['timestamp_violations'],
+            public_release_audit_complete=availability['publication_audit_complete']),
         run_manifest_sha256=digest(RUN / 'manifest.json'), selection_sha256=digest(RUN / 'selection_complete.json'),
         baseline_report_sha256=digest(BASELINES / 'combined_report.json'), artifacts=provenance,
         output_sha256={p.name: digest(p) for p in OUTPUT.glob('*.csv')})
