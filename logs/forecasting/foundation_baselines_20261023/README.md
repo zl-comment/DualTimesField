@@ -46,13 +46,13 @@ regional/macro_per_seed/per_seed/provenance。
   优于 patchtst/timexer/linear/dlinear/mlp/pricefm，但五分位 QS 明显偏弱
   （区间宽 320、覆盖 0.89）。
 - chronos2 五分位为其 21 级原生头精确输出，QS 32.5 尚可但 80% 覆盖 0.747 偏低。
-- timesfm 点 MAE 95.9 全部由 2024-05 类危机日尖峰外推爆炸驱动（中位误差 37.8 正常），
+- timesfm 点 MAE 95.9；危机日尖峰外推是待进一步分解核实的解释，
   无任何裁剪，如实报告。
 - chronos/moirai 的 2027/2028 seed 复用检查因 GPU 核抖动（>1e-4 绝对）回退为完全
   独立推理；timesfm 6 格中 4 格逐位复用（reuse_of=2026 记录）、2 格回退独立。
 - 独立复算：每模型逐格重评分+分块逐位重组通过；重放——零样本模型分层 96+极端 20
   起点相对差 ≤1e-3；tabpfn 生产形状整块（4096 起点）重放**逐位 0.0**，散样本
-  0.0075 相对差为已记录的批量尺寸核伪影（同伴交换 0.0）。
+  0.0075 相对差仍超过原抽样阈值；同批次形状可以复现不等于批次大小不变性通过。批次尺寸相关数值行为是当前解释，尚不能仅凭该检查归因于某个 GPU 核。
 
 ## 关键事实（完整依据见 stage0 文档与各模型 source.json）
 
@@ -66,3 +66,7 @@ regional/macro_per_seed/per_seed/provenance。
   共享）；逐 origin 调用后同伴交换不变性为 0.0。无 q05/q95 → P 表。
 - 四个检查点均发布于测试期之后，预训练与 NEM 重叠未审计 → 候选表全部带
   `pretraining_overlap=unaudited` 标注，不称严格无污染盲测。
+
+## Codex 合并审查（2026-10-24）
+
+[审查与修复记录](../../../docs/foundation_baselines_codex_review_20261024.md)。候选表已统一为先地区宏平均、再计算 seed 间标准差；原始预测与分数未改动。TabPFN 以固定生产批次可复现为有限验收条件，不宣称任意批次大小下均满足原抽样容差。

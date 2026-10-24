@@ -39,14 +39,15 @@ case "${1:-help}" in
     venv="$ROOT/.venvs/$(case $model in
       tabpfn_v3) echo tabpfn_v3;; chronos2_zeroshot) echo chronos2;;
       moirai2_zeroshot) echo moirai2;; timesfm25_xreg) echo timesfm25;; esac)"
-    cd "$RUN_ROOT/source" && exec "$venv/bin/python" -m forecasting.foundation_audit \
+    cd "$ROOT" && exec "$venv/bin/python" -u -m forecasting.foundation_audit \
       --model "$model" --run-root "$RUN_ROOT" "$@" ;;
   audit-collect)  # merge per-model audits + cross-model alignment
-    shift; cd "$RUN_ROOT/source" && exec "$REPO_PY" -m forecasting.foundation_audit \
+    shift; cd "$ROOT" && exec "$REPO_PY" -u -m forecasting.foundation_audit \
       --collect --run-root "$RUN_ROOT" "$@" ;;
   report)    # candidate comparison vs the frozen main table (read-only)
     shift; out="${1:-$ROOT/logs/forecasting/foundation_baselines_20261023/candidate}"
-    cd "$RUN_ROOT/source" && exec "$REPO_PY" -m forecasting.foundation_candidate \
+    if [ "$#" -gt 0 ]; then shift; fi
+    cd "$ROOT" && exec "$REPO_PY" -m forecasting.foundation_candidate \
       --run-root "$RUN_ROOT" --output "$out" "$@" ;;
   tests)     # framework tests incl. first-batch regression
     shift; cd "$ROOT" && exec "$REPO_PY" -m pytest -q \

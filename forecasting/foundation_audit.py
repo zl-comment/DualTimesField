@@ -71,7 +71,8 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
             artifact = load_prediction_artifact(directory / 'test.npz')
             scores = score_predictions(artifact)
             stored = read_json(directory / 'metrics.json')
-            for key in ('mae', 'rmse_pooled'):
+            for key in ('mae', 'rmse_pooled', 'quantile_score_proxy', 'coverage_80', 'coverage_90',
+                        'interval_width_80', 'interval_width_90', 'crossing_rate'):
                 if key in scores and not np.isclose(scores[key], stored[key], rtol=1e-10, atol=1e-10):
                     raise ValueError(f"{job['id']}: stored {key} disagrees with the shared scorer")
             cell['rescore_ok'] = True
@@ -83,15 +84,24 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
                 raise ValueError(f"{job['id']}: adapter identity differs within the same seed")
             cell['weights_sha256'] = identity.get('weights', {}).get('sha256')
             chunks = sorted((directory / 'predictions' / 'chunks').glob('chunk_*.npz'))
+            if not chunks:
+                raise ValueError(f"{job['id']}: missing prediction chunks")
             rebuilt = []
+            all_indices = []
             for path in chunks:
                 with np.load(path, allow_pickle=False) as archive:
+                    indices = np.asarray(archive['indices'])
+                    if _verify_chunk(path, _identity_hash(identity), indices) is None:
+                        raise ValueError(f"{job['id']}: invalid chunk SHA ledger {path.name}")
+                    all_indices.append(indices)
                     meta = json.loads(archive['meta_json'].item())
                     if meta.get('identity_hash') != _identity_hash(identity):
                         raise ValueError(f"{job['id']}: chunk identity mismatch {path.name}")
                     if meta.get('reuse_of_seed') is not None:
                         cell['reuse_of_seed'] = meta['reuse_of_seed']
                     rebuilt.append({k: archive[k] for k in ('quantiles', 'point') if k in archive})
+            if not np.array_equal(np.concatenate(all_indices), np.arange(len(artifact.origin_unix))):
+                raise ValueError(f"{job['id']}: chunk indices do not cover origins exactly once")
             arrays = [k for k in ('quantiles', 'point') if rebuilt and k in rebuilt[0]]
             for key in arrays:
                 joined = np.concatenate([part[key] for part in rebuilt], axis=0)
@@ -111,7 +121,7 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
               'identity_within_seed_consistent': identity_ok, 'replay': None}
     if replay and cells:
         reference_seed = min(int(key.split('/')[0]) for key in cells)
-        region = next(iter({job['region'] for job in manifest['jobs'] if job['model'] == model}))
+        region = sorted({job['region'] for job in manifest['jobs'] if job['model'] == model})[0]
         split = load_split(run_root, manifest, region, 'test')
         view = PredictionView({k: np.asarray(split.inputs[k]) for k in INPUT_KEYS},
                               np.asarray(split.origin_unix), np.asarray(split.target_time_unix),
@@ -128,7 +138,9 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
         from forecasting.common.foundation_registry import load_foundation_adapter
 
         adapter = load_foundation_adapter(model)(context)
+        print(f'{model}: rebuilding context for {region}; this can take tens of minutes', flush=True)
         adapter.fit()
+        print(f'{model}: context ready; starting sampled replay', flush=True)
         artifact = load_prediction_artifact(
             run_root / 'runs' / model / f'seed{reference_seed}' / region / 'test.npz')
         indices = _sample_indices(len(view), np.asarray(split.actual))
@@ -159,6 +171,7 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
             chunks = sorted(chunk_dir.glob('chunk_*.npz'))
             with np.load(chunks[len(chunks) // 2], allow_pickle=False) as archive:
                 chunk_indices = np.asarray(archive['indices'])
+            print(f'{model}: sampled replay outside tolerance; replaying production chunk ({len(chunk_indices)} origins)', flush=True)
             chunk_replay = _predict_indices(adapter, view, chunk_indices, 'chunk replay')
             reference_chunk = (artifact.quantiles[chunk_indices] if artifact.quantiles is not None
                                else artifact.native_point[chunk_indices])
@@ -177,6 +190,24 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
     return result
 
 
+def validate_audits(manifest: dict, audits: dict) -> None:
+    """Never publish an incomplete or failed audit as a successful collection."""
+    expected = {}
+    for job in manifest['jobs']:
+        expected.setdefault(job['model'], set()).add(f"{job['seed']}/{job['region']}")
+    if not expected or set(audits) != set(expected):
+        raise ValueError('Missing or unexpected model audits')
+    for model, cells in expected.items():
+        audit = audits[model]
+        if audit.get('model') != model or set(audit.get('cells', {})) != cells:
+            raise ValueError(f'{model}: incomplete audit cell matrix')
+        if not audit.get('identity_within_seed_consistent') or not (audit.get('replay') or {}).get('passed'):
+            raise ValueError(f'{model}: missing or failed replay/identity audit')
+        for cell in audit['cells'].values():
+            if cell.get('state') != 'completed' or not cell.get('rescore_ok') or not cell.get('chunk_reassembly_ok'):
+                raise ValueError(f'{model}: incomplete or failed cell audit')
+
+
 def collect(run_root: Path) -> dict:
     from forecasting.aligned_scoring import assert_comparable
 
@@ -185,14 +216,27 @@ def collect(run_root: Path) -> dict:
     audit_dir = run_root / 'audit'
     for path in sorted(audit_dir.glob('audit_*.json')):
         audits[path.stem.replace('audit_', '')] = read_json(path)
+    validate_audits(manifest, audits)
     reference = {}
+    region_reference = {}
     for job in manifest['jobs']:
         directory = run_root / job['output']
-        if not (directory / 'status.json').exists():
-            continue
+        if not (directory / 'status.json').exists() or read_json(directory / 'status.json').get('state') != 'completed':
+            raise ValueError(f"{job['id']}: artifact is not completed")
         artifact = load_prediction_artifact(directory / 'test.npz')
         # P-table and Q-table artifacts are deliberately incomparable; align
         # within (region, table) groups only.
+        region = job['region']
+        if region in region_reference:
+            other = region_reference[region]
+            for field in ('protocol_id', 'split', 'region', 'input_hash', 'sample_hash', 'preprocessing_hash', 'prediction_space'):
+                if artifact.metadata[field] != other.metadata[field]:
+                    raise ValueError(f'Cross-table alignment differs: {field}')
+            for field in ('origin_unix', 'target_time_unix', 'actual'):
+                if not np.array_equal(getattr(artifact, field), getattr(other, field)):
+                    raise ValueError(f'Cross-table alignment differs: {field}')
+        else:
+            region_reference[region] = artifact
         key = (job['region'], artifact.table)
         if key in reference:
             assert_comparable(reference[key], artifact, allow_different_seed=True)

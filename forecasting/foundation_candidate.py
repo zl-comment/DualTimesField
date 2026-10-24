@@ -77,7 +77,7 @@ def _append_model(main, regional, macro, per_seed, model, row, table, run_root, 
         scores = row["regions"][region]["scores"]
         seed_summary = scores["seed_summary"]
         regional.append(dict(identity, region=region,
-                             **{m: seed_summary[m]["mean"] for m in METRICS if m in seed_summary},
+                             **{m + "_mean": seed_summary[m]["mean"] for m in METRICS if m in seed_summary},
                              **{m + "_std": seed_summary[m]["std"] for m in METRICS if m in seed_summary},
                              seed_evidence=row["regions"][region]["seed_evidence"]["interpretation"]))
         for seed, per_seed_scores in scores["per_seed"].items():
@@ -87,7 +87,7 @@ def _append_model(main, regional, macro, per_seed, model, row, table, run_root, 
     main.append(dict(identity,
         **{m + "_mean": float(np.mean([scores["seed_summary"][m]["mean"] for scores in region_scores]))
            for m in available},
-        **{m + "_std": float(np.std([scores["seed_summary"][m]["mean"] for scores in region_scores], ddof=1))
+        **{m + "_std": float(np.std([np.mean([scores["per_seed"][str(seed)][m] for scores in region_scores]) for seed in SEEDS], ddof=1))
            for m in available}))
     for seed in SEEDS:
         macro.append(dict(identity, seed=seed,
@@ -112,6 +112,9 @@ def _existing_rows(directory: Path):
 
 def build(run_root: Path, main_directory: Path, output: Path) -> dict:
     run_root = run_root.resolve()
+    from forecasting.foundation_audit import collect
+
+    collect(run_root)  # Fail closed on missing/failed independent audits.
     manifest = read_json(run_root / "jobs.json")
     report = build_aligned_report(run_root)
     if not report["comparison_available"]:

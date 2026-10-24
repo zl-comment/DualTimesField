@@ -2,11 +2,11 @@
 # Finisher: wait for the foundation controller to complete, then run the
 # per-model independent recomputation audits, the audit collection and the
 # candidate report. Idempotent; safe to relaunch. Logs to finisher.log.
-set -uo pipefail
-ROOT=/root/workspace/Code/DualTimesField-foundation-baselines
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_PY=/root/workspace/Code/DualTimesField/.venv/bin/python
 RUN=$ROOT/outputs/forecasting/foundation_baselines_20261023_r1
-cd "$RUN/source" || exit 1
+cd "$ROOT" || exit 1
 export HF_HOME=$ROOT/weights/hf_home HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 
 log() { echo "[$(date -u +%H:%M:%S)] $*" >> "$RUN/finisher.log"; }
@@ -31,11 +31,11 @@ for model in chronos2_zeroshot moirai2_zeroshot timesfm25_xreg tabpfn_v3; do
   log "audit $model"
   CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.used --format=csv,noheader,nounits | sort -t, -k2 -n | head -1 | cut -d, -f1) \
     "$(venv_for "$model")" -m forecasting.foundation_audit --model "$model" --run-root "$RUN" \
-    >> "$RUN/finisher.log" 2>&1 || log "audit $model FAILED"
+    >> "$RUN/finisher.log" 2>&1 || { log "audit $model FAILED"; exit 1; }
 done
 log "audit-collect"
-"$REPO_PY" -m forecasting.foundation_audit --collect --run-root "$RUN" >> "$RUN/finisher.log" 2>&1 || log "collect FAILED"
+"$REPO_PY" -m forecasting.foundation_audit --collect --run-root "$RUN" >> "$RUN/finisher.log" 2>&1 || { log "collect FAILED"; exit 1; }
 log "candidate report"
 "$REPO_PY" -m forecasting.foundation_candidate --run-root "$RUN" \
-  --output "$ROOT/logs/forecasting/foundation_baselines_20261023/candidate" >> "$RUN/finisher.log" 2>&1 || log "report FAILED"
+  --output "$ROOT/logs/forecasting/foundation_baselines_20261023/candidate" >> "$RUN/finisher.log" 2>&1 || { log "report FAILED"; exit 1; }
 log "finisher complete"

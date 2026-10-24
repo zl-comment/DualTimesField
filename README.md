@@ -1,5 +1,7 @@
 # DualTimesField
 
+第二批基础模型：[候选结果与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
+
 电价预测代码索引：[各模型实现与来源](forecasting/README.md) · [按模型划分的配置](configs/README.md)。
 
 最新电价预测比较：[当前主表入口](logs/forecasting/main_comparison_20261023/README.md) · [三 seed 主表（新版 Full_joint，21 个输出）](logs/forecasting/main_comparison_20261023/main.csv) · [验证记录](logs/forecasting/main_comparison_20261023/VALIDATION.md)。联合方法的三个 seed 改变神经初始化与训练顺序，树 seed 固定 2026。
