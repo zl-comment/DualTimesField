@@ -1,0 +1,109 @@
+{
+  "status": "passed",
+  "verification_scope": "independent archived-forecast arithmetic, metadata and artifact integrity; no rerun of full training",
+  "audit_run_id": "7337f461d45872632816fa20d25b768960a639040169c745f9e17ad02a7981a3",
+  "checked_stage_artifacts": 104,
+  "replay_cases": 12,
+  "replay_prediction_files": 72,
+  "maximum_independent_metric_error": 8.881784197001252e-16,
+  "maximum_budget_relative_error": 1.7935345539948714e-14,
+  "all_case_checkpoint_hash_epoch_alpha_matches": true,
+  "all_archived_original_replays_match": true,
+  "all_selected_blends_exact": true,
+  "all_candidate_labels_mature": true,
+  "empty_covered_weak_rows_retained": 48,
+  "zero_anchor_gate_with_surviving_history_cases": 12,
+  "external_state_minus_same_origin_budget_uniform": [
+    {
+      "region": "NSW1",
+      "fold": 2021,
+      "mode": "raw",
+      "mae_delta": 0.06851841834792294,
+      "qs_delta": 0.028264673666962583
+    },
+    {
+      "region": "NSW1",
+      "fold": 2021,
+      "mode": "guarded",
+      "mae_delta": 0.0,
+      "qs_delta": 0.0
+    },
+    {
+      "region": "NSW1",
+      "fold": 2022,
+      "mode": "raw",
+      "mae_delta": 0.16673049617325497,
+      "qs_delta": 0.0500952598999292
+    },
+    {
+      "region": "NSW1",
+      "fold": 2022,
+      "mode": "guarded",
+      "mae_delta": 0.16673049617325497,
+      "qs_delta": 0.0500952598999292
+    },
+    {
+      "region": "QLD1",
+      "fold": 2021,
+      "mode": "raw",
+      "mae_delta": 0.17665609983807384,
+      "qs_delta": 0.14461674603372773
+    },
+    {
+      "region": "QLD1",
+      "fold": 2021,
+      "mode": "guarded",
+      "mae_delta": 0.12499131444433687,
+      "qs_delta": 0.10691769959920625
+    },
+    {
+      "region": "QLD1",
+      "fold": 2022,
+      "mode": "raw",
+      "mae_delta": 0.5922516160682603,
+      "qs_delta": 0.2844731150793412
+    },
+    {
+      "region": "QLD1",
+      "fold": 2022,
+      "mode": "guarded",
+      "mae_delta": 0.2906072884567173,
+      "qs_delta": 0.1269492058719115
+    },
+    {
+      "region": "TAS1",
+      "fold": 2021,
+      "mode": "raw",
+      "mae_delta": 0.09571486937797316,
+      "qs_delta": 0.03657237828595505
+    },
+    {
+      "region": "TAS1",
+      "fold": 2021,
+      "mode": "guarded",
+      "mae_delta": 0.04317803758238125,
+      "qs_delta": 0.01668611880948305
+    },
+    {
+      "region": "TAS1",
+      "fold": 2022,
+      "mode": "raw",
+      "mae_delta": -0.012620692095094114,
+      "qs_delta": -0.01660481288187317
+    },
+    {
+      "region": "TAS1",
+      "fold": 2022,
+      "mode": "guarded",
+      "mae_delta": -0.006619978618144283,
+      "qs_delta": 0.0013443330675674044
+    }
+  ],
+  "limitations": [
+    "Monthly replay samples are retrospective diagnostics, not independent market replications.",
+    "No significance, state-conditional calibration, causal mechanism or new blind-test claim follows.",
+    "The independent checker verifies forecast artifacts and checkpoint bytes; complete source publication times remain outside this check."
+  ],
+  "trained_models": 0,
+  "old_artifacts_written": false
+}

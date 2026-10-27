@@ -1,0 +1,21 @@
+{
+  "loss_delta": "after minus before; negative is improvement",
+  "gross_benefit": "mean(max(before loss - after loss, 0))",
+  "gross_harm": "mean(max(after loss - before loss, 0))",
+  "qs": "twice the mean of five pinball losses; per-quantile columns are unmultiplied pinball",
+  "weak_location": "g_location <= .25, the original diagnostic threshold",
+  "weak_tail": "g_lower/upper <= .25 is exploratory; original protocol only prespecified location threshold",
+  "sample_unit": "origin-horizon cell; overlapping windows are NOT independent market events",
+  "seeds": "neural optimization replicates, NOT independent market realizations",
+  "direction": "q50 correction times pre-correction residual < 0; all group cells are denominator",
+  "target_crossing": "same direction and |correction| > |residual|; not necessarily harmful",
+  "harmful_overshoot": "same direction and |correction| > 2|residual|",
+  "attribution": "ordered output decomposition B -> location -> lower -> upper -> history; order dependent, not retraining",
+  "formal_history": "Anchor -> same-checkpoint event_off -> Full: trend-only and event incremental effect including saturation",
+  "unavailable": "development NPZ lacks trend/event separately; formal raw NPZ lacks raw Anchor; these components are NOT inferred",
+  "maturity": "this rescoring does not certify source first-publication times or rerun temporal retrieval audits",
+  "actual_price_groups": "post-hoc outcome diagnostics, forbidden as prediction routing inputs",
+  "actual_price_boundaries": "negative; [0,100); [100,300); [300,1000); [1000,infinity), AUD/MWh",
+  "formal_raw": "independently selected raw checkpoint, not generally the guarded checkpoint before alpha",
+  "modifications": "none to predictions, checkpoints, selection, or existing main tables"
+}

@@ -1,0 +1,89 @@
+本轮结论：完成 L0；停止当前状态门直接进入 54 次确认训练。
+
+这是三个 agent 分工实现、复核并由主 agent 在 GPU 上统一执行的结果。当前 g=S×C 缺少稳定的校正价值排序证据。固定模型内部换门有地区与指标取舍；在最终增量上按同一 g 分配修正，多数情况下劣于同起点、同实际 L1 预算的均匀收缩。这个结果不证明重新训练后的状态门必然失败，也不支持把均匀收缩直接升级为新默认模型。
+
+1. 版本、执行与复现
+
+实验分支：research/v5-correction-value-audit-20261027
+基准提交：8cd651956d6b6f32518513931d3cef12fdb579ff
+实验源码提交：2e06332009f845b036c3f0120b53667b24e7c1de
+运行 ID：7337f461d45872632816fa20d25b768960a639040169c745f9e17ad02a7981a3
+冻结时工作区干净。216 个源码文件、3,350 个旧输入及结果文件在运行结束后哈希未变。
+分支规则已写入 /root/workspace/Code/DualTimesField/AGENTS.md：任何新增批量实验先新开独立研究分支；同一已冻结实验的恢复不算新增实验。
+
+实际完成：54 份正式预测、72 份开发预测重评分；3 地区×2 年份×raw/guarded 共 12 case，每 case 六臂，共 72 份干预预测。每 case 为 seed 2026、每月首日全部 24 起报小时，共 288 起报点。没有训练、重选 checkpoint/alpha、修改正式主表或推送远端。
+
+内部四臂：original、coverage_only、constant、state。保留原 forward，location 改变后重新计算历史趋势、匹配与采用过程。constant 是训练期固定门均值，并不匹配最终实际位移。
+外部两臂：external_final_state、external_matched_uniform。令 D=Q_original−B，前者输出 B+g_h D_h，后者输出 B+c_t D_h，其中
+c_t = sum_(h,q) |g_h D_hq| / sum_(h,q) |D_hq|，分母为 0 时 c_t=0。
+该常数仅用当前起报点可知的预测与门，不使用真实价格或未来起报点。匹配的是每起点 24 小时×五分位总 L1 位移，不是逐分位预算，也不是内部三头 state 重算后的预算。
+
+测试：12 项无训练测试通过。GPU 原始重放最大绝对误差为 0。正式主表六行复算最大差异 2.84e−14；独立 NumPy 核验全部 72 个预测的 MAE/QS、毛获益/毛伤害，最大差异 8.88e−16。外部预算最大相对误差 1.79e−14。104 个 stage 产物哈希、checkpoint/epoch/alpha、精确收缩、候选成熟、空组保留均通过。
+
+重跑同一冻结实验时，应使用新的输出目录，不覆盖旧目录：
+cd /root/workspace/Code/DualTimesField
+.venv/bin/python -m pytest -q tests/test_correction_value_audit.py
+.venv/bin/python scripts/audit_correction_value.py --output outputs/forecasting/correction_value_audit_20261027_reproduction
+已有完成目录仅验证与恢复：在原运行命令后加 --resume。若改变实验设计或批量矩阵，先另建分支并修改配置中的对应分支。
+独立核验：
+.venv/bin/python logs/forecasting/correction_value_audit_20261027/independent_verify.py outputs/forecasting/correction_value_audit_20261027
+
+2. 已由保存预测支持的判断
+
+正式宏平均仍为：B 的 MAE/QS=37.113225/24.181184；Full=37.782803/24.392180。Full−B=+0.669578/+0.210996。80% 覆盖率由 0.725550 降至 0.685648，区间宽度由 83.9174 降至 73.2286。当前整体仍未胜过同源强树。
+
+以下顺序为 B→位置→下尺度→上尺度→趋势历史→给定趋势后的事件增量，Δ=后一步损失−前一步损失，负值改善；三地区等权、三个 seed 均值：
+步骤             ΔMAE       ΔQS
+位置            +0.794553  +0.290638
+下尺度           0         −0.070548
+上尺度           0         +0.065788
+趋势历史        −0.153665  −0.069325
+事件增量        +0.028690  −0.005557
+这是有顺序的输出归因，不是各模块重训消融。开发预测缺少独立趋势/事件输出，未伪造其分解。
+
+直接比较最终 Full 与 B，MAE 毛获益/毛伤害=3.083557/3.753135，QS=2.101107/2.312103。顺序步骤的毛获益/伤害不能相加冒充最终毛值。
+
+主要风险具有地区和目标差异。QLD1 的位置步骤 ΔMAE/ΔQS=+2.761528/+1.069656，是主要退化来源；NSW1 的上尺度改善 QS 0.071182，因此不能仅因总体上尺度有害就宣布所有地区应删除它。事件步骤三地区总体 MAE 均退化，但 NSW1、QLD1 的 QS 改善，亦不能据此笼统删除事件。
+
+真实价格 [0,100) 占单元 58.2576%，对总体 Full−B 的 MAE/QS 贡献 +0.792577/+0.355500。真实价格≥1000 仅占 0.3501%，对总体 MAE 贡献 −0.133062，却对 QS 贡献 +0.233120；其中上尺度步骤对总体 QS 贡献 +0.339387，位置和事件分别补偿 −0.077132、−0.034229。尖峰点误差改善不能推出概率尾部改善。这些是事后价格诊断，不能作为预测路由输入。
+
+bounded Anchor 的低 g 组相对高 g 组：raw 六个地区年份的净 MAE、QS 增量都更好；guarded 五个非回退组合也如此。毛 MAE 伤害较大的比例仍分别是 4/6 与 1/6。因而“毛伤害较大→应少改”忽略了同时更大的获益，不能作为普遍规则。
+但低 g 也不是收益标签：只看 covered，QLD2022 raw 低 g 组 MAE 更差而 QS 更好。QLD2021、TAS2022 的低 g 组全部是 uncovered，covered 弱组为空；48 条相关空行保留。NSW2021 guarded 三个 seed 的 alpha 均为 0，是回退而非状态门成功。基线困难度、价格构成与选模仍是替代解释。
+
+3. 本轮新运行的固定模型干预证据
+
+以下使用原冻结 alpha，六个地区年份等权；正值表示前者较差。raw 与 guarded 可能使用不同 checkpoint，不能把列间差异全归于 alpha。
+对比                             raw ΔMAE / ΔQS         guarded ΔMAE / ΔQS
+内部 state−original             +0.039242 / −0.080805   +0.186056 / +0.045071
+内部 state−constant             +0.133288 / −0.014617   +0.107249 / +0.008576
+外部 state−等预算 uniform        +0.181208 / +0.087903   +0.103148 / +0.050332
+
+内部 state 对 original：raw 为 3 格双改善、3 格双退化；guarded 为 2 格双改善、3 格双退化、1 格 alpha=0 平局。NSW2022 是反例：MAE/QS 变差 +1.432237/+0.646799。QLD2022 raw 则改善 −0.600121/−1.114358，这一反向证据完整保留。
+对 constant，guarded state 只有 QLD2022 双指标更好；TAS2022 是 MAE 略好、QS 更差，其余三个非回退组合双退化。均值中少量 QS 改善不构成跨地区一致优势。
+
+外部等预算对照：raw 状态分配 5/6 格 MAE、QS 都更差，仅 TAS2022 双改善；guarded 五个非回退组合 QS 全部更差，其中四格 MAE 也更差。这直接削弱了当前 g_location 能有效分配给定修正预算的解释。它没有检验以第二阶段样本外收益训练的接受器。
+均匀收缩也不能升级为默认：guarded 原模型相对 B 的 ΔMAE/ΔQS 为 −0.911307/−0.365851，而外部均匀收缩仅 −0.418346/−0.172629。在这批样本上，它虽胜过外部状态分配，仍丢失原模型收益。
+
+4. 对原失效解释的修正
+
+已从代码并由本轮实测确认：Anchor 三门为零并不使 Full 精确回到 B。每个 case 首个起报点的零门探针均留下历史修正，最大偏离范围 0.02543–2.38316；最终 lambda=0 则精确回 B。当前及未成熟标签扰动不影响重建 HistoryStore 后的预测。
+
+但是，“Anchor 少改后历史普遍补回来，因而导致主要风险”没有得到冻结干预的强支持。raw 六格平均 q50 绝对 Anchor 位移从 5.2446 降到 2.4405，历史位移 2.0435→2.0315，总位移 6.3519→3.9468；六格总位移全部下降。历史位移只在 NSW2022、QLD2021 增大，且幅度有限。应降低“历史补回是首要根因”的排序，优先关注位置校正方向、状态门的收益排序及上尺度尾部损失。
+
+5. 继续、停止与下一条任务
+
+当前决定：不启动当前 state_evidence 的完整 54 次确认；不训练收益接受器；保留实现与失败证据作为对照。固定模型诊断不能代替重训，但目前没有足够正证据支持扩大计算。内部 state 的 QLD2022 收益应作为保留的反例，不因总体否定就删除。
+
+唯一建议的下一条实现任务，尚未实施：另开 research/v5-upper-scale-removal-diagnostic-20261027 分支，只检验“上尺度是否可删除”。复用现有完整保存预测、原 checkpoint、原 alpha；唯一改变是令上尺度恢复为 1，位置、下尺度和完整历史平移全部保留。对 q90/q95 构造 Q'_q=B_q+(Q_Full,50−B_50)，其余分位保持原 Full。先验证共同历史平移及分位单调性，q50 必须逐值不变。
+这是取消一个自由度的冻结反事实，不是重复训练非对称尺度、重新调限幅或重配损失。新增理由是本轮已量化上尺度对极端价 QS 的损失，而它在 NSW1 有收益，恰好给出可能推翻全局删除建议的反例。
+预先规定：只报告完整旧样本与各地区、价格组；不凭评估结果选择地区或新缩放系数。只有宏 QS 改善、各地区三 seed 平均 QS 均不退化，且普通价/极端价 QS 不退化，才进入单独前瞻 L1 设计；否则停止全局删除，不改变当前模型。该下一任务仍只是已见数据上的结构筛选，不能称盲测或确证。任何下一批实验都必须先另建分支。
+
+6. 证据边界及文件
+
+这 12 case 是六个地区年份×两种选模输出，部分权重与预测相同，不是 12 个独立市场样本。六个地区年份也可能共享市场冲击，六格计数仅用于描述。每 case 288 个重叠起报点只有 564 个唯一交付小时；极端小时很少。只有 seed 2026 的冻结干预，不能声称全年尖峰保留、显著改善、状态条件覆盖或供需因果机制成立。2021/2022 是反复开发期，2023/2024 正式结果也已查看。未对原始真实首次发布时间作新增全面审计；档案时间戳与成熟边界通过不等于完成该审计。
+
+完整运行目录：/root/workspace/Code/DualTimesField/outputs/forecasting/correction_value_audit_20261027
+归档目录：/root/workspace/Code/DualTimesField/logs/forecasting/correction_value_audit_20261027
+运行源码：/root/workspace/Code/DualTimesField/scripts/audit_correction_value.py
+干预实现：/root/workspace/Code/DualTimesField/forecasting/full_v5_correction_audit/replay.py
+归档内 run_manifest.json 记录配置、环境、源码与旧输入指纹；verification.json 和 independent_verification.json 记录完整性与独立复算；formal_*、weak_strong_seed_means.csv、replay_contrasts.csv、replay_strata.csv 保留反例和分组；replay_summary.json 保留所有 case 与六臂指标。大体积预测及源码快照留在完整运行目录，没有覆盖旧结果。
