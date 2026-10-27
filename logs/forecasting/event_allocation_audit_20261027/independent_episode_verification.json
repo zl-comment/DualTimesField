@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "run_id": "536aa6a0a7231cf5c55f5198d441fac256415adc22a5efec62f3be84aae213fc",
+  "cases": 9,
+  "independent_implementation": "Standalone NumPy vectorized segment endpoints and explicit earliest-peak selection; no production helper imports",
+  "summary_rows_checked": 3456,
+  "episode_peak_rows_checked": 74304,
+  "scalar_values_checked": 1024704,
+  "maximum_float_abs_error": 0.0,
+  "empty_episode_groups_retained": 0,
+  "threshold": 1000.0,
+  "full_upper_only_q90_exact": true,
+  "event_off_upper_only_q50_exact": true,
+  "unique_target_hours_within_each_lead": true,
+  "aest_target_year_boundaries_verified": true,
+  "missing_hour_boundaries_verified": true,
+  "original_predictions_and_metadata_unmodified": true,
+  "limitations": [
+    "Counts are retained separately by case, lead and AEST target year; no total of independent market episodes is inferred.",
+    "Quantile threshold exceedances are deterministic diagnostics, not event probabilities.",
+    "Peak timing is restricted to the observed actual episode window; it cannot detect forecast peaks outside that window.",
+    "Neural seeds and forecast leads repeat the same target hours; zero-episode groups retain blank peak errors."
+  ]
+}

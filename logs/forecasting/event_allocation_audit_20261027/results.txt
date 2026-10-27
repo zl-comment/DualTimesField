@@ -1,0 +1,117 @@
+第三方案实际结果：事件仅作用上尾未通过保护条件，不进入 L1。
+
+已完成实现、九组完整样本测试、三个 agent 分工审查及独立评分/事件复算。候选相对原 Full 的总体 MAE、QS 略有改善，宏 QS 也优于关闭事件；但损害了三个地区的极端价表现和 QLD1 负价表现，TAS1 的总体 QS 还不如 event_off。预先固定的 49 项条件中 9 项失败，决定为 stop_upper_only_event_allocation。保留失败结果，不改正式模型或主表，不启动重训。
+
+1. 本轮身份和实际范围
+
+本轮对应原始审查的“候选三：事件只作用上尾”。它不是前轮上尺度删除，也不是尚未实施的候选二“简单成熟历史对照”。
+独立分支：research/v5-event-upper-allocation-20261027
+父提交：ae6a3bf7c3387fe81da8d33a6be3af95cca3ba56
+冻结源码提交：d30c267b81ccf221d99cf90368285359269e8f17
+运行 ID：536aa6a0a7231cf5c55f5198d441fac256415adc22a5efec62f3be84aae213fc
+运行目录：/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027
+协议：/root/workspace/Code/DualTimesField/docs/event_allocation_protocol_20261027.txt
+
+新分支先于实现和批量运行建立；源码与判据先提交，运行开始时工作区干净。本轮正式 Full_joint guarded 的 NSW1/QLD1/TAS1 × seed 2026/2027/2028 共九个 case，每个 17521 起报点×24 小时。全部保存样本均纳入。正式 raw 9 case 和开发期 72 case 没有同 checkpoint 的 event_off，明确排除，未借用其他 checkpoint 或伪造趋势输出。
+
+2. 已从代码、真实模型测试和保存输出确认的干预
+
+T、E 表示已门控的 pre-tanh 趋势和事件项，E>=0。原 Full 与 event_off 分别为：
+F = A + 150 tanh((T+E)/150)
+Q^T = A + 150 tanh(T/150)
+有效事件增量 e = 150[tanh((T+E)/150) - tanh(T/150)]，理论范围 [0,300]。
+候选 U = Q^T + (0,0,0,e,e)。各臂保留原 alpha；选后事件范围为 [0,300 alpha]。
+
+实现对同 checkpoint、epoch、alpha 的已保存输出直接拼接：U 的 q05/q10/q50 精确取 event_off，q90/q95 精确取 Full。保留原非线性饱和耦合，不使用 E 或 150 tanh(E/150) 替代有效事件量，不更改 Anchor、检索、事件移动、采用门、损失或选模。
+event_off 仅清零直接事件修正项，仍保留事件 proposal 对 history gate 的输入影响；不能叫“完全没有事件信息”。共同平移误差使用事先推导的两次 FP32 加法和 FP64 blend 舍入界，不按结果调容差、裁负差或重排分位。
+当前真实价格只用于事后评分，不进入候选构造。原上尾精确保留意味着：相对 Full 不可能新增 q90/q95 预测收益；相对 event_off 才能衡量保留上尾事件的价值。
+
+3. 已实际运行并独立核验的总体结果
+
+地区内三个 seed 等权，再对三个地区等权；MAE/QS 越小越好。
+预测                 MAE          QS
+B                    37.113225    24.181184
+原 Full              37.782803    24.392180
+event_off            37.754113    24.397737
+upper_only           37.754113    24.382234
+
+候选相对 Full：ΔMAE=−0.028690264，ΔQS=−0.009946149。
+候选相对 event_off：ΔMAE=0（结构上相同），ΔQS=−0.015503188。
+候选仍差于 B：MAE +0.640888，QS +0.201050；不能声称已超越同源强树。
+
+各地区的全样本变化：
+地区     U−Full ΔMAE    U−Full ΔQS    U−event_off ΔQS
+NSW1     −0.053519      −0.008801     −0.032366
+QLD1     −0.020001      −0.001947     −0.015389
+TAS1     −0.012550      −0.019090     +0.001245
+
+三地区相对 Full 的三 seed 均值均改善，但逐 seed 的 QS 仅 6/9 改善。相对 event_off，NSW1/QLD1 的六个 seed 全部改善，TAS1 三个 seed 全部退化，且 TAS1 在 2023、2024 均退化。seed 差异描述优化敏感性，不等于独立市场复现。
+
+4. 为什么仍然停止：九项明确失败
+
+预先要求宏 QS 同时胜 Full 和 event_off；每地区相对 Full 的整体及负价、[0,300)、[0,100)、>=1000 组 MAE/QS 不退化；每地区总体 QS 不劣于 event_off；区域覆盖绝对偏差恶化不超过 1 个百分点；来源、样本、结构检查通过且保护组非空。
+数值容限 1e−10 不是统计非劣界；不在看到结果后改门槛。
+
+以下是条件组均值差，不是对全样本的加权贡献；正值表示退化。
+对比              地区/组           ΔMAE          ΔQS          失败数
+U−Full            NSW1 >=1000       +14.662642     +3.812287       2
+U−Full            QLD1 负价          +0.031304     +0.006462       2
+U−Full            QLD1 >=1000       +12.065267     +3.136970       2
+U−Full            TAS1 >=1000        +0.201918     +0.052499       2
+U−event_off       TAS1 全样本         0            +0.001245       1
+
+所有保护组非空，覆盖条件和结构条件均通过，因此失败来自预先固定的损失保护要求。原事件对尖峰中位数的局部收益被撤销，保持原上尾不等于保住尖峰点预测收益。由于协议要求二者兼顾，不能用总体小幅改善掩盖代价。
+
+5. 分位、价格贡献与概率风险
+
+宏平均 pinball 差：
+对比                q05          q10          q50          q90          q95
+U−Full             −0.007968    −0.002552    −0.014345     0            0
+U−event_off         0            0            0           −0.018983    −0.019775
+独立复算验证 ΔQS=(2/5)ΣΔPB。相对 Full 的 QS 改善全部来自前三个分位，不能写成新的上尾改进。
+U−Full 的 QS 毛获益/毛伤害为 0.042202/0.032256；MAE 毛获益/毛伤害为 0.149902/0.121211。
+
+互斥价格组对宏 ΔQS 的加权贡献：
+组                   U−Full        U−event_off
+负价                 −0.000233     −0.000038
+[0,100)              −0.012344     +0.000730
+[100,300)            −0.014429     +0.005310
+[300,1000)           +0.006043     +0.001706
+>=1000               +0.011017     −0.023212
+合计                 −0.009946     −0.015503
+
+极端组约占 0.3501% 的起报×步长单元。相对 Full，极端组给总体 MAE 带来 +0.042373 的损失贡献，被普通价改善抵消。相对 event_off，宏 QS 收益主要来自极端组 −0.023212，非极端合计 +0.007709 抵消部分收益；上尾事件并未对普通价普遍有利。[0,300) 与细分组重叠，没有再次计入贡献。
+
+U 的宏 80%/90% 覆盖率分别为 0.686454/0.827610，原 Full 为 0.685648/0.826990；区间宽度 73.228606→73.521803、118.078825→118.372023。覆盖略接近名义值伴随区间变宽，不等于条件校准成功。
+宏 RMSE 从 275.397268 增至 275.962331，bias 从 −21.351966 变为 −21.645164；总体 MAE 略降也没有消除大误差风险。
+
+6. 事件发生、时序、幅度诊断
+
+已保存 3456 行逐 case×lead×AEST 目标年×模型×分位的小时/事件统计和 74304 行实际 episode 峰值明细。阈值固定为 1000；同一 lead 内交付小时唯一，连续超阈且间隔一小时构成 episode，缺小时或目标年度边界切断。
+小时 TP/FP/FN/TN 使用相同小时单位；actual episode 的命中/遗漏和 predicted episode 的误报使用不同分母，未伪装成一一匹配的事件混淆矩阵。峰时、峰值误差仅在实际 episode 区间内计算，平局取最早小时；小时误报/漏报补充反映越阈错误，但不能完整度量区间外预测峰的时序误差。
+独立复算确认：U 的 q90 预测及全部事件指标与 Full 精确相同；U 的 q50 预测及全部事件指标与 event_off 精确相同。该方案没有相对 Full 的新增 q90 事件命中或峰时收益。
+全部 24 个 lead 的失败和改善都保留，不将不同 lead、seed 的事件数合并为独立市场事件。74304 是重复预测的明细行数，不是独立尖峰个数。q90 越阈是确定性预测诊断，不是新训练的事件发生概率。
+本批没有空 episode 组；单测已确认空组保留、峰误差为空而不是零。详细统计见 hourly_and_episode_metrics.csv；全部峰明细位于完整输出的 episodes/actual_episode_peaks.csv，并由 verification.json 的哈希保护。
+
+7. 验证、复现与证据边界
+
+38 项无训练测试通过，其中新增 15 项。真实 Asymmetric/Bounded 模型测试核对了历史 gates、weights、trend 不变和饱和耦合；测试还覆盖原 alpha、alpha=0 精确回 B、负价/并列分位、来源不匹配拒绝、评估标签扰动不改变候选及 metadata、空组不冒充通过。
+主独立脚本没有导入生产 scorer/core/audit，复算 1107 个配对分组及区域/宏平均，179968 次标量核对（该总数已经包含 84624 次聚合核对和判据数值），最大误差 9.44e−12；分位损失归因最大误差 3.98e−14；49 项决策条件独立重建，复现九项失败。
+事件独立脚本另复算 1024704 个标量、3456 汇总行和74304 峰明细行，最大误差 0。来源 checkpoint/epoch/alpha、精确拼接、共同非负事件差、全部分位有序均通过。
+运行前后 4049 个旧输入/结果文件及 228 个源码文件哈希不变，源码快照一致。没有训练、重选 checkpoint/alpha、对正式样本重新运行神经推理、修改主表或推送远端。
+
+2023/2024 已被查看，本轮是完整旧样本的冻结诊断，不是新盲测或重训后的效果。数值保护筛选没有给出统计非劣、显著性或条件覆盖保证。窗口重叠、地区共同冲击、三个神经 seed 的依赖均未被包装成独立样本。原首次发布时间没有在本轮重新全面审计。
+
+本轮仅否定“现有 Full 的直接事件项一律只加上尾，可以同时改善总体并保护全部指定组”的假设通过此筛选。有限的正面证据是：NSW1/QLD1 的保存上尾事件相对 event_off 有 QS 价值；有限的反证是：事件也携带尖峰中位数收益，不能机械剥离。不能据此宣称所有上尾事件模型无效，也不能在这批数据上新增地区路由或发生概率×幅度模型后立即称已验证。
+
+8. 可执行复现
+
+cd /root/workspace/Code/DualTimesField
+.venv/bin/python -m pytest -q tests/test_event_allocation.py tests/test_upper_scale_audit.py tests/test_correction_value_audit.py
+.venv/bin/python scripts/audit_event_allocation.py --output outputs/forecasting/event_allocation_audit_20261027_reproduction
+.venv/bin/python scripts/verify_event_allocation.py outputs/forecasting/event_allocation_audit_20261027_reproduction
+.venv/bin/python logs/forecasting/event_allocation_audit_20261027/independent_episode_verify.py outputs/forecasting/event_allocation_audit_20261027_reproduction
+
+复现同一冻结协议应保留旧输出、使用新目录；原完成目录只允许加 --resume 校验恢复。任何协议/矩阵变化都必须另建实验分支。
+归档：/root/workspace/Code/DualTimesField/logs/forecasting/event_allocation_audit_20261027
+primary_summary.csv 保留地区保护项，price_contributions.csv 保留加权贡献，scores/regional/macro.csv 保留全部分组与概率指标；decision.json 保留所有条件及失败。run_manifest/verification/prediction_manifest 与两份 independent_verification 记录来源、源码和产物身份；完整预测和源码快照保留于运行目录。

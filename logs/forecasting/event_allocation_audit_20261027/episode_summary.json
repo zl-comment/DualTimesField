@@ -1,0 +1,78 @@
+{
+  "cases": 9,
+  "summary_rows": 3456,
+  "actual_episode_peak_rows": 74304,
+  "threshold": 1000.0,
+  "quantiles": [
+    "q50",
+    "q90"
+  ],
+  "models": [
+    "B",
+    "Full",
+    "event_off",
+    "upper_only"
+  ],
+  "units": "one case, one lead, one AEST target year; unique target hours within each lead",
+  "lead_hours": "0 through 23 as encoded by target_time_unix-origin_unix",
+  "episode_definition": "actual >= 1000, consecutive 3600-second target hours; split at missing hours and AEST target-year boundaries",
+  "hourly_confusion": "TP/FP/FN/TN at the unique target-hour unit within each lead",
+  "episode_detection": "actual episode detected if any forecast >= 1000 within its window; misses use actual episodes; false alarms use predicted episodes with no actual positive hour",
+  "peak_definition": "peak amplitude and timing restricted to each actual episode window; earliest peak in a tie",
+  "empty_episode_groups": 0,
+  "empty_peak_errors": "null in JSON-compatible values / blank in CSV; no actual episode is not zero error",
+  "source_predictions": [
+    {
+      "case_id": "formal/Full_joint/guarded/seed2026/NSW1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2026/NSW1.npz",
+      "sha256": "2e6f1785463fd8a21eca5a3043b9daa0e2227ddfaa98c8be508cd44083207cc0"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2027/NSW1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2027/NSW1.npz",
+      "sha256": "3862f1dfff1b3a4889421afee46f9c795367171459e9b592a38e7701bc259d25"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2028/NSW1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2028/NSW1.npz",
+      "sha256": "bd1d0b290cfa18a81e8d0acd03522ee18693491e02857972d7c7192958a41033"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2026/QLD1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2026/QLD1.npz",
+      "sha256": "69667563aa255774f5f43d69d19b68b7730eae8ce51124fed8a2938ba613f8cf"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2027/QLD1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2027/QLD1.npz",
+      "sha256": "5356a538b766bb8d3a53e48b4eefae6966fe9714f1eaa5b3d6c3be407cb256f5"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2028/QLD1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2028/QLD1.npz",
+      "sha256": "353285103d1e01593b97e24eda5c8c7ec0d0215d120927e91f700a18469dfc97"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2026/TAS1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2026/TAS1.npz",
+      "sha256": "dd4cf385d6248e45ca731428018eb0ac1c202c5b5ab1737f60baa41f290d4c51"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2027/TAS1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2027/TAS1.npz",
+      "sha256": "e320db7737c8258b495eac772c1d84c0b0350f7dc8234c97216c56f9e18f3a53"
+    },
+    {
+      "case_id": "formal/Full_joint/guarded/seed2028/TAS1",
+      "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/event_allocation_audit_20261027/audit/predictions/formal/Full_joint/guarded/seed2028/TAS1.npz",
+      "sha256": "05a6cafcd9fac1f2f44caebe858361c9c7eec084c5eaaf28e2577a7463a7c92d"
+    }
+  ],
+  "limitations": [
+    "Quantile threshold exceedance is not an event occurrence probability.",
+    "Conditioning peak evaluation on an observed episode omits timing errors outside that window; hourly false alarms and misses are reported separately.",
+    "Leads and neural seeds repeat target hours and episodes; these row counts are not independent event totals.",
+    "Episodes at year boundaries or missing-hour gaps are split and can be censored.",
+    "These diagnostics are descriptive and do not enter checkpoint selection or the screening decision."
+  ]
+}

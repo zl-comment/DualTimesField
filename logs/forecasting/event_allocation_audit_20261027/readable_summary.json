@@ -1,0 +1,707 @@
+{
+  "models": {
+    "B": {
+      "mae": 37.11322523377363,
+      "qs": 24.181183692519557,
+      "pinball_q05": 4.03181011646527,
+      "pinball_q10": 6.784168251596525,
+      "pinball_q50": 18.556612616886817,
+      "pinball_q90": 16.84254433731476,
+      "pinball_q95": 14.23782390903501,
+      "coverage80": 0.7255499749506941,
+      "coverage90": 0.8515376785952097,
+      "width80": 83.91738476753201,
+      "width90": 141.50362694907602,
+      "rmse": 277.090008054394,
+      "bias": -20.572574757815357
+    },
+    "original": {
+      "mae": 37.78280325812513,
+      "qs": 24.39217994805757,
+      "pinball_q05": 3.9603846537861336,
+      "pinball_q10": 6.669804059959226,
+      "pinball_q50": 18.891401629062564,
+      "pinball_q90": 17.248509040551205,
+      "pinball_q95": 14.210350486785174,
+      "coverage80": 0.6856475932584601,
+      "coverage90": 0.8269896230343692,
+      "width80": 73.228605644908,
+      "width90": 118.0788249429386,
+      "rmse": 275.3972678538675,
+      "bias": -21.351966482073962
+    },
+    "event_off": {
+      "mae": 37.75411299439692,
+      "qs": 24.39773698769483,
+      "pinball_q05": 3.9524163479804866,
+      "pinball_q10": 6.667252126005234,
+      "pinball_q50": 18.87705649719846,
+      "pinball_q90": 17.267491767598425,
+      "pinball_q95": 14.23012573045431,
+      "coverage80": 0.6861020743361935,
+      "coverage90": 0.8274522953408292,
+      "width80": 73.22860564604194,
+      "width90": 118.07882494006157,
+      "rmse": 275.96233057423194,
+      "bias": -21.645164115914344
+    },
+    "upper_only": {
+      "mae": 37.75411299439692,
+      "qs": 24.382233799408258,
+      "pinball_q05": 3.9524163479804866,
+      "pinball_q10": 6.667252126005234,
+      "pinball_q50": 18.87705649719846,
+      "pinball_q90": 17.248509040551205,
+      "pinball_q95": 14.210350486785174,
+      "coverage80": 0.6864535044718824,
+      "coverage90": 0.8276097783189273,
+      "width80": 73.52180327923685,
+      "width90": 118.37202257759901,
+      "rmse": 275.96233057423194,
+      "bias": -21.645164115914344
+    }
+  },
+  "macro_comparisons": {
+    "event_off_vs_original": {
+      "mae_delta": -0.028690263728219718,
+      "qs_delta": 0.005557039637012544,
+      "mae_benefit": 0.1499016061905892,
+      "mae_harm": 0.12121134246236948,
+      "qs_benefit": 0.05172435917219958,
+      "qs_harm": 0.0572813988092126,
+      "pinball_q05_delta": -0.007968305805667463,
+      "pinball_q10_delta": -0.0025519339540137236,
+      "pinball_q50_delta": -0.014345131864109859,
+      "pinball_q90_delta": 0.018982727047226602,
+      "pinball_q95_delta": 0.019775243669095256
+    },
+    "upper_only_vs_event_off": {
+      "mae_delta": 0.0,
+      "qs_delta": -0.015503188286529334,
+      "mae_benefit": 0.0,
+      "mae_harm": 0.0,
+      "qs_benefit": 0.02996806642589109,
+      "qs_harm": 0.0144648781393621,
+      "pinball_q05_delta": 0.0,
+      "pinball_q10_delta": 0.0,
+      "pinball_q50_delta": 0.0,
+      "pinball_q90_delta": -0.018982727047226602,
+      "pinball_q95_delta": -0.019775243669095256
+    },
+    "upper_only_vs_original": {
+      "mae_delta": -0.028690263728219718,
+      "qs_delta": -0.009946148649515199,
+      "mae_benefit": 0.1499016061905892,
+      "mae_harm": 0.12121134246236948,
+      "qs_benefit": 0.04220190246908528,
+      "qs_harm": 0.03225575381956494,
+      "pinball_q05_delta": -0.007968305805667463,
+      "pinball_q10_delta": -0.0025519339540137236,
+      "pinball_q50_delta": -0.014345131864109859,
+      "pinball_q90_delta": 0.0,
+      "pinball_q95_delta": 0.0
+    }
+  },
+  "decision": {
+    "passed": false,
+    "decision": "stop_upper_only_event_allocation",
+    "primary": "formal/Full_joint/guarded/selected",
+    "primary_cases": 9,
+    "macro_qs_deltas": {
+      "upper_only_vs_original": -0.009946148649515199,
+      "upper_only_vs_event_off": -0.015503188286529334
+    },
+    "criteria": [
+      {
+        "name": "complete_primary_matrix",
+        "comparison": "upper_only_vs_original",
+        "passed": true,
+        "expected": 9,
+        "observed": 9
+      },
+      {
+        "name": "complete_primary_matrix",
+        "comparison": "event_off_vs_original",
+        "passed": true,
+        "expected": 9,
+        "observed": 9
+      },
+      {
+        "name": "complete_primary_matrix",
+        "comparison": "upper_only_vs_event_off",
+        "passed": true,
+        "expected": 9,
+        "observed": 9
+      },
+      {
+        "name": "same_checkpoint",
+        "passed": true
+      },
+      {
+        "name": "event_pair_passed",
+        "passed": true
+      },
+      {
+        "name": "lower_equals_trend",
+        "passed": true
+      },
+      {
+        "name": "upper_equals_full",
+        "passed": true
+      },
+      {
+        "name": "quantiles_ordered",
+        "passed": true
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.05351903028532266,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.008801091638072448,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": -0.009020907722869512,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": -0.006905223261347254,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.17499587070761113,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.044451896171779505,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.032456885260539775,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.020314411580406415,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 14.662641940709035,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 3.8122868958150753,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_event_off",
+        "group": "all",
+        "delta": -0.03236612248002784,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "NSW1",
+        "level": 80,
+        "before": 0.7164577110641832,
+        "after": 0.7177268230504348,
+        "absolute_deviation_worsening": -0.0012691119862515698,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "NSW1",
+        "level": 90,
+        "before": 0.844132279360006,
+        "after": 0.8450256517575734,
+        "absolute_deviation_worsening": -0.0008933723975673713,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.020001452923107562,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.0019470727365734656,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": 0.03130363054112648,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": 0.006462347304532239,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.07962949143748528,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.023331650493650876,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.007822555356377207,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.00675726317911998,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 12.065267484374496,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 3.1369695346549946,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_event_off",
+        "group": "all",
+        "delta": -0.015388937841337854,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "QLD1",
+        "level": 80,
+        "before": 0.6673095460051114,
+        "after": 0.6679119976662925,
+        "absolute_deviation_worsening": -0.0006024516611811137,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "QLD1",
+        "level": 90,
+        "before": 0.8339643221784652,
+        "after": 0.8343884164399546,
+        "absolute_deviation_worsening": -0.0004240942614894827,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.012550307976228936,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "all",
+        "delta": -0.019090281573899682,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": -0.017842484521116583,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": -0.01527920195985844,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.018791092349234793,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_300",
+        "delta": -0.0212500478971737,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.043130507198100014,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/0_to_100",
+        "delta": -0.03304971262322185,
+        "nonempty": true,
+        "passed": true,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 0.2019177447878008,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 0.05249861629323952,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_event_off",
+        "group": "all",
+        "delta": 0.0012454954617776891,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "TAS1",
+        "level": 80,
+        "before": 0.673175522706086,
+        "after": 0.67372169269892,
+        "absolute_deviation_worsening": -0.0005461699928339669,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "regional_coverage_deviation",
+        "region": "TAS1",
+        "level": 90,
+        "before": 0.8028722675646366,
+        "after": 0.803415266759254,
+        "absolute_deviation_worsening": -0.0005429991946174217,
+        "tolerance": 0.01,
+        "passed": true
+      },
+      {
+        "name": "macro_qs_strict_improvement",
+        "comparison": "upper_only_vs_original",
+        "delta": -0.009946148649515199,
+        "passed": true,
+        "tolerance": 1e-10
+      },
+      {
+        "name": "macro_qs_strict_improvement",
+        "comparison": "upper_only_vs_event_off",
+        "delta": -0.015503188286529334,
+        "passed": true,
+        "tolerance": 1e-10
+      }
+    ],
+    "failed_criteria": [
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 14.662641940709035,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "NSW1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 3.8122868958150753,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": 0.03130363054112648,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/negative",
+        "delta": 0.006462347304532239,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 12.065267484374496,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "QLD1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 3.1369695346549946,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_mae_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 0.2019177447878008,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_original",
+        "group": "actual/1000_plus",
+        "delta": 0.05249861629323952,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      },
+      {
+        "name": "regional_qs_nonincrease",
+        "region": "TAS1",
+        "comparison": "upper_only_vs_event_off",
+        "group": "all",
+        "delta": 0.0012454954617776891,
+        "nonempty": true,
+        "passed": false,
+        "tolerance": 1e-10,
+        "statistical_noninferiority_claim": false
+      }
+    ],
+    "supporting_results_used_for_selection": false,
+    "scientific_confirmation": false,
+    "instruction": "A passing screen permits a separate prospective L1 design only; no automatic training or replacement."
+  },
+  "price_contribution_closure_error": {
+    "upper_only_vs_original/mae": 1.0408340855860843e-17,
+    "upper_only_vs_original/qs": 1.779826286352204e-15,
+    "event_off_vs_original/mae": 1.0408340855860843e-17,
+    "event_off_vs_original/qs": 1.0668549377257364e-16,
+    "upper_only_vs_event_off/mae": 0.0,
+    "upper_only_vs_event_off/qs": 2.5326962749261384e-16
+  }
+}

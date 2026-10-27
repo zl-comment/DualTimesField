@@ -1,0 +1,34 @@
+{
+  "transformation": "upper_only[..., :3] = event_off[..., :3]; upper_only[..., 3:] = Full[..., 3:]; no sorting",
+  "comparisons": {
+    "upper_only_vs_original": [
+      "original",
+      "upper_only"
+    ],
+    "event_off_vs_original": [
+      "original",
+      "event_off"
+    ],
+    "upper_only_vs_event_off": [
+      "event_off",
+      "upper_only"
+    ]
+  },
+  "delta": "after loss minus before loss; negative is improvement",
+  "contrast_questions": {
+    "upper_only_vs_original": "Does removing direct event loading from q05/q10/q50 help while retaining exactly the original q90/q95? It cannot add upper-quantile or q90-threshold gains over Full.",
+    "upper_only_vs_event_off": "Does retaining the saved upper-quantile event contribution help beyond closing the direct event term? The first three quantiles are identical.",
+    "event_off_vs_original": "Descriptive complete direct-event-off comparator with the same checkpoint and learned gates."
+  },
+  "primary": "formal/Full_joint/guarded/selected, all archived origins and 24 horizons",
+  "event": "Full minus event_off preserves saved trend/event tanh coupling; it is not an independently added raw event proposal",
+  "selection": "source checkpoint, epoch and alpha frozen; no training, routing, reselection or new inference",
+  "qs": "2 * mean of five pinball losses; per-quantile pinball has no factor 2",
+  "benefit": "mean(max(before loss - after loss, 0)); harm reverses the difference",
+  "price_groups": "actual values used only after intervention for retrospective scoring; [0,300) overlaps [0,100) and [100,300)",
+  "time_groups": "AEST forecast-origin year and quarter; lead/00 is the origin hour, through lead/23",
+  "coverage": "absolute deviation of regional seed-mean coverage from nominal 0.8/0.9; maximum allowed worsening .01",
+  "aggregation": "equal neural-seed means within region, then equal-region macro; seed SD is descriptive",
+  "statistical_claim": "No significance or statistical noninferiority claim; overlapping forecast cells are not independent events",
+  "baseline": "B is a fixed reference, not an extra intervention; all three arms retain B-relative MAE/QS"
+}

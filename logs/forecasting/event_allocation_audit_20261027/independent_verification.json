@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "run_id": "536aa6a0a7231cf5c55f5198d441fac256415adc22a5efec62f3be84aae213fc",
+  "cases": 9,
+  "comparisons": [
+    "upper_only_vs_original",
+    "event_off_vs_original",
+    "upper_only_vs_event_off"
+  ],
+  "score_groups_checked": 1107,
+  "empty_score_groups_retained": 0,
+  "scalar_metrics_checked": 179968,
+  "aggregate_scalar_metrics_checked": 84624,
+  "maximum_metric_abs_error": 9.43600753089413e-12,
+  "maximum_quantile_qs_attribution_abs_error": 3.9791087091956e-14,
+  "maximum_common_event_shift_error_within_frozen_bound": 0.00091552734375,
+  "upper_quantiles_exactly_equal_full": true,
+  "lower_quantiles_exactly_equal_same_head_event_off": true,
+  "qs_delta_quantile_attribution_verified": true,
+  "all_quantiles_ordered": true,
+  "alpha_zero_exact_cases": 0,
+  "source_checkpoint_epoch_alpha_all_verified": true,
+  "files_hash_verified": 518,
+  "independent_decision": {
+    "passed": false,
+    "decision": "stop_upper_only_event_allocation",
+    "macro_qs_deltas": {
+      "upper_only_vs_original": -0.009946148649516989,
+      "upper_only_vs_event_off": -0.015503188286529399
+    },
+    "criteria_checked": 49,
+    "failed_criteria": 9
+  },
+  "independent_implementation": "Standalone NumPy piecewise pinball, interval calculations and event rounding analysis; no production imports.",
+  "trained_models": 0,
+  "original_artifacts_written": false,
+  "limitations": [
+    "Retrospective fixed-output allocation, not a retrained model or new blind test.",
+    "Seed variation and overlapping cells are not independent market-event replications.",
+    "No same-checkpoint raw/development event-off artifacts were substituted."
+  ]
+}

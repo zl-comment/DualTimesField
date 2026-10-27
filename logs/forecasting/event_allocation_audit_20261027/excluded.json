@@ -1,0 +1,21 @@
+[
+  {
+    "scope": "formal",
+    "mode": "raw",
+    "cases": 9,
+    "reason": "No saved same-checkpoint raw event_off/Trend; guarded outputs cannot substitute."
+  },
+  {
+    "scope": "development",
+    "modes": [
+      "raw",
+      "guarded"
+    ],
+    "variants": [
+      "reference",
+      "bounded_calibration"
+    ],
+    "cases": 72,
+    "reason": "Development saved NPZ contain Full and Anchor, but no same-checkpoint Trend output."
+  }
+]
