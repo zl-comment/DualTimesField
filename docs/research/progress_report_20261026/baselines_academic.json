@@ -1,0 +1,599 @@
+{
+  "models": [
+    {
+      "id": "linear",
+      "title": "Linear：线性结构对照",
+      "refs": [
+        "zeng2023transformers"
+      ],
+      "paragraphs": [
+        "线性预测模型能够以较低的参数规模保留历史序列的时间顺序，是评估复杂预测结构增益的基本参照。Zeng 等（2023）通过 LTSF-Linear 系列实验说明了线性映射在长序列预测中的竞争力。基于这一思想，本研究构建包含历史价格映射与外生变量映射的线性对照，其表达式为 q̂τ=Wτp历史+Aτz已知+bτ，直接输出未来 24 个时距的五个条件分位。",
+        "该实现沿用 DLinear 的参数布局并关闭移动平均分解，通过分位损失训练，外生变量经线性适配层进入预测。与原研究的点预测任务相比，此处扩展了概率输出与外生信息接口。该模型能够分离复杂结构相对于一般线性关系的贡献，但对供需稀缺条件下的阈值效应与高阶交互表达能力有限，尾部样本不足也可能导致尖峰幅度估计偏低。"
+      ],
+      "group": "statistical_linear",
+      "group_title": "统计与线性预测方法"
+    },
+    {
+      "id": "dlinear",
+      "title": "DLinear：趋势与残差分解",
+      "refs": [
+        "zeng2023transformers"
+      ],
+      "paragraphs": [
+        "DLinear（Zeng 等，2023）采用趋势—残差分解降低预测问题的复杂度。首先通过移动平均得到趋势项 T=MA(p)，再构造残差项 S=p−T，最后分别进行线性映射并叠加：ŷ=WT T+WS S。该结构以较少参数同时刻画价格水平的缓慢变化与较快波动。",
+        "本研究采用长度为 25 的移动平均与端点重复填充，在分解结构之外加入外生变量适配层和五分位输出头。该实现属于基于方法原理的重实现，与官方实现的权重映射等价性尚未完成验证。趋势分解有利于刻画日内波动及水平漂移，但其统计分量不直接对应市场供需状态。当尖峰由历史窗口之外的新稀缺条件触发时，仅依靠线性分解仍难以充分确定峰值幅度与发生时点。"
+      ],
+      "group": "statistical_linear",
+      "group_title": "统计与线性预测方法"
+    },
+    {
+      "id": "mlp",
+      "title": "MLP：全输入非线性对照",
+      "refs": [
+        "rumelhart1986learning"
+      ],
+      "paragraphs": [
+        "多层感知机通过隐层非线性变换学习输入与预测目标之间的关系。Rumelhart、Hinton 和 Williams（1986）的反向传播研究为其参数学习提供经典方法基础。本研究采用通用前馈网络作为非线性对照，将七组公共输入展平为向量 z，经单隐层 GELU 变换后产生 24×5 维输出：q̂=W₂ GELU(W₁z+b₁)+b₂。",
+        "隐层宽度设为 64，全部公共输入均参与预测，网络不包含双场结构、显式趋势分解或预设条件分布。该对照用于评估所提出结构相对于一般非线性映射的附加贡献。MLP 能够表示价格与外生因素的非线性联系，但缺少专门的时间结构归纳偏置；在尖峰样本稀少时，整体损失的改善未必伴随尾部事件预测能力的同步提升。"
+      ],
+      "group": "deep_forecasting",
+      "group_title": "深度时间序列预测方法"
+    },
+    {
+      "id": "lasso_arx72_cp",
+      "title": "Lasso ARX72 + CP：稀疏线性预测与残差区间",
+      "refs": [
+        "tibshirani1996lasso",
+        "lei2018distributionfree",
+        "lipiecki2025postforecasts"
+      ],
+      "paragraphs": [
+        "Lasso（Tibshirani，1996）通过目标函数 (1/2n)‖y−Xβ‖²+λ‖β‖₁ 同时实现系数收缩与变量选择。本研究以 72 小时历史及公共外生特征构建逐时距回归，在选定正则强度后，通过样本外残差校准生成分位预测。该组合定义为 ARX72+CP，其特征与训练设置不同于电价文献中的完整 LEAR 方案。",
+        "分割共形预测的理论背景来自 Lei 等（2018），绝对残差校准公式采用 Lipiecki 与 Weron（2025）的 PostForecasts.jl 形式：q̂τ=ŷ+sgn(τ−0.5)·Q|2τ−1|(|y校准−ŷ校准|)，其中残差分位按时距独立估计，并使用 type-7 插值。预测区间关于 Lasso 中心对称，因此具有较高可解释性，但无法调整中心偏差或表达上下尾不对称。由于重叠时间序列样本不满足交换性，且采用插值分位，该实现的覆盖表现通过实证检验评估。"
+      ],
+      "group": "statistical_linear",
+      "group_title": "统计与线性预测方法"
+    },
+    {
+      "id": "lightgbm",
+      "title": "LightGBM：梯度提升树分位回归",
+      "refs": [
+        "ke2017lightgbm"
+      ],
+      "paragraphs": [
+        "LightGBM（Ke 等，2017）以梯度提升树逐步逼近目标函数，其预测可写为 F(x)=Σmηfm(x)。原研究提出基于梯度的单侧采样与互斥特征捆绑，以提高大规模树学习效率。树结构能够表示需求、日历与历史价格之间的阈值关系和非线性交互，为电价状态建模提供灵活表示。",
+        "本研究调用官方 LightGBM 库，将公共输入统一展平，并对每个预测时距分别训练五个分位模型。迭代轮数由该时距的共同五分位评分联合确定，训练损失为 ρτ(u)=u[τ−1(u<0)]。这一设置将树提升方法适配至概率电价预测，原论文的效率机制不作为本实验逐项启用的假定。其主要局限在于叶节点输出对训练样本范围之外的极端幅度外推能力有限，且逐时距学习未显式约束预测轨迹的一致性。"
+      ],
+      "group": "tree_models",
+      "group_title": "梯度提升树预测方法"
+    },
+    {
+      "id": "xgboost",
+      "title": "XGBoost：正则化树提升分位回归",
+      "refs": [
+        "chen2016xgboost"
+      ],
+      "paragraphs": [
+        "XGBoost（Chen 与 Guestrin，2016）在经验风险之外引入树复杂度正则化，目标为 L=Σiℓ(yi,F(xi))+ΣmΩ(fm)。该方法利用梯度及曲率信息逐步增加树结构，并结合稀疏感知分裂、加权分位草图和系统优化提高计算效率。提升树能够刻画分段非线性关系及变量交互。",
+        "本研究基于官方 XGBRegressor 实现逐时距分位预测，采用直方图树方法和分位回归目标，并使用共同验证指标选择迭代前缀。五分位输出是针对当前研究任务进行的配置扩展。XGBoost 能够识别训练数据中与价格抬升相关的阈值条件，但其尖峰预测仍受到稀缺状态样本数量、市场机制变化及极端幅度外推的限制，因此需要联合分析整体误差与尖峰子集表现。"
+      ],
+      "group": "tree_models",
+      "group_title": "梯度提升树预测方法"
+    },
+    {
+      "id": "lightgbm_cp",
+      "title": "LightGBM + CP：冻结树中心的对称校准",
+      "refs": [
+        "ke2017lightgbm",
+        "lei2018distributionfree",
+        "lipiecki2025postforecasts",
+        "lebedev2026uncertainty"
+      ],
+      "paragraphs": [
+        "LightGBM+CP 将非线性中心预测与区间校准分为两个阶段。首先冻结 LightGBM 基础模型，然后利用 2022 年下半年的样本外残差，按预测时距估计对称区间宽度。方法背景包括 Lei 等（2018）的分割共形预测和 Lipiecki 与 Weron（2025）的绝对残差校准；Lebedev 等（2026）的研究则提供电价不确定性量化的相关比较依据。",
+        "校准形式为 q̂τ=q̂base,0.5+sgn(τ−0.5)Q|2τ−1|(|y−q̂base,0.5|)。校准前后基础模型的中位预测保持完全一致，因此该对照用于识别区间调整相对于复杂校正结构的独立贡献。其能够缓解总体区间过窄，但不改变中位预测及相应 MAE。同一时距采用固定宽度也限制了模型对不同稀缺状态的适应能力；总体覆盖率与尖峰条件覆盖率应分别评价。"
+      ],
+      "group": "probabilistic_calibration",
+      "group_title": "分布建模与概率校准方法"
+    },
+    {
+      "id": "xgboost_cp",
+      "title": "XGBoost + CP：更换基座的校准归因对照",
+      "refs": [
+        "chen2016xgboost",
+        "lei2018distributionfree",
+        "lipiecki2025postforecasts",
+        "lebedev2026uncertainty"
+      ],
+      "paragraphs": [
+        "XGBoost+CP 在冻结 XGBoost 基础模型之上执行绝对残差校准，校准流程与 LightGBM+CP 保持一致。其方法来源包括 Chen 与 Guestrin（2016）的树提升、Lei 等（2018）的分割共形预测及 Lipiecki 与 Weron（2025）的校准实现。Lebedev 等（2026）对电价预测不确定性方法的比较构成相关研究背景。",
+        "该模型使用 2022 年下半年的绝对误差经验分位生成逐时距对称区间，测试阶段固定区间宽度和基础模型参数，中位预测保持不变。通过更换基础模型而控制校准方案，可以分析校准收益对树算法的依赖程度。固定残差宽度无法消除中心偏差；当误差集中于少数供需失衡状态时，可能同时出现常态区间偏宽和尖峰区间覆盖不足，因而总体校准与尖峰预测能力需要分别检验。"
+      ],
+      "group": "probabilistic_calibration",
+      "group_title": "分布建模与概率校准方法"
+    },
+    {
+      "id": "lightgbm_qra",
+      "title": "LightGBM + QRA：允许中心移动的线性后校准",
+      "refs": [
+        "ke2017lightgbm",
+        "nowotarski2015qra",
+        "lebedev2026uncertainty"
+      ],
+      "paragraphs": [
+        "分位回归平均（QRA）由 Nowotarski 与 Weron（2015）提出，利用多个模型的点预测作为解释变量，构建 q̂τ=βτ,0+Σkβτ,k f̂k，并通过最小化分位损失估计组合权重。该方法把预测组合与概率校准结合起来，是电价概率预测中的重要参照；Lebedev 等（2026）进一步讨论了相关不确定性估计方法的比较。",
+        "本研究将 QRA 的输入改为单个冻结 LightGBM 模型的五个排序后分位及截距，构成六维设计矩阵。在 2022 年下半年校准集上，逐时距、逐分位求解无正则线性规划，测试阶段固定系数。该适配允许中位预测与区间非对称性同时变化，从而区别于仅调整宽度的 CP。由于校准器仍是预测特征的线性映射，其稳定性依赖尾部样本数量与校准期代表性；与复杂校正模型的比较应控制校准信息预算。"
+      ],
+      "group": "probabilistic_calibration",
+      "group_title": "分布建模与概率校准方法"
+    },
+    {
+      "id": "patchtst",
+      "title": "PatchTST：局部片段表示与 Transformer",
+      "refs": [
+        "nie2023time",
+        "kim2022reversible"
+      ],
+      "paragraphs": [
+        "PatchTST（Nie 等，2023）将连续时间点划分为局部片段，并把片段映射为 Transformer 输入标记。原方法采用共享权重的通道独立结构，以保留局部形态并降低注意力计算的序列长度。RevIN（Kim 等，2022）进一步通过样本级归一化与输出反归一化缓解分布变化。",
+        "本研究重实现片段嵌入、RevIN、注意力层及预测头，价格历史进入 Transformer，外生变量通过线性适配层参与预测，整体形式为 q̂=RevIN⁻¹[Head(Transformer(Patch(RevIN(p))))]+A(z)。输出扩展为五分位，官方权重映射的数值等价性尚未完成验证。该结构适合学习历史价格的局部波形与周期关系，但外生作用采用加性路径，且历史形态未必包含未来供给约束的信息，因此其对孤立尖峰及市场状态变化的适应能力需要专项评估。"
+      ],
+      "group": "deep_forecasting",
+      "group_title": "深度时间序列预测方法"
+    },
+    {
+      "id": "gatets_adapter",
+      "title": "GateTS adapter：注意力启发路由与专家混合",
+      "refs": [
+        "yemets2025gatets"
+      ],
+      "paragraphs": [
+        "GateTS（Yemets、Lukashchuk 与 Izonin，2025）通过注意力启发的路由机制组合不同专家，基本形式为 h=Σe∈TopK g_e(x)E_e(x)。原方法面向单变量预测，旨在降低额外负载均衡训练的需求，并使专家学习不同序列形态。",
+        "本研究保留官方固定版本的骨干结构，将输出维度扩展为 24×5，并增加已知外生变量的线性适配层。计算流程先评估全部专家，再施加 top-k 输出掩码，因此其运行效率应依据当前实现测量。专家分工为区分平稳与高波动状态提供了结构基础，但路由缺少显式供需机制监督，外生信息以加性方式进入。稀少尖峰状态下的专家利用率、路由稳定性及预测误差需要结合诊断实验分析。"
+      ],
+      "group": "deep_forecasting",
+      "group_title": "深度时间序列预测方法"
+    },
+    {
+      "id": "timexer",
+      "title": "TimeXer：内生片段与外生变量交叉注意力",
+      "refs": [
+        "wang2024timexer"
+      ],
+      "paragraphs": [
+        "TimeXer（Wang 等，2024）针对带外生变量的时间序列预测，将内生价格表示为时间片段，将外生序列表示为变量标记。可学习的全局内生标记通过变量级交叉注意力吸收外生信息，再与价格片段进行信息交换。其基本算子为 Attention(Q,K,V)=softmax(QKᵀ/√d)V。",
+        "本研究保留官方骨干，增加预测时点已知的未来变量标记，并将预测头扩展为五分位输出；历史路径已进行同权重数值比较。历史需求、日历及未来已知外生信息均按预测时点的信息可得性接入。该模型用于检验较充分的内外生信息交互对电价预测的贡献。注意力有助于学习非线性耦合，但其统计关联不直接构成市场因果机制，上尾校准与稀缺状态外推仍需独立评估。"
+      ],
+      "group": "deep_forecasting",
+      "group_title": "深度时间序列预测方法"
+    },
+    {
+      "id": "pricefm",
+      "title": "PriceFM：电价领域 MoE 与图结构迁移的局部实现",
+      "refs": [
+        "yu2025pricefm"
+      ],
+      "paragraphs": [
+        "PriceFM（Yu 等，2025；2026 年修订）面向欧洲跨区域概率电价预测，将价格、负荷及风光预测等变量映射到共享专家表示，并利用输电拓扑约束聚合区域信息。该方法将领域相关的市场联系与电力网络知识纳入基础模型设计。",
+        "本研究依据 2026 年专家混合架构，将官方 TensorFlow 实现移植到 PyTorch，使用历史与未来两条投影、稠密专家加权及图池化。五分位围绕中位数逐级加减非负增量构造，以保持分位顺序。实验采用每地区单节点、从头训练的设置，未包含原研究的多区域预训练和空间迁移，且跨框架数值等价性尚未通过验证。因此，该对照评估的是架构在当前任务中的适配效果。单节点设置弱化了跨区域信息聚合，对尖峰预测的贡献需结合当前实验解释。"
+      ],
+      "group": "deep_forecasting",
+      "group_title": "深度时间序列预测方法"
+    },
+    {
+      "id": "ddnn_jsu",
+      "title": "DDNN-JSU：条件偏态厚尾分布建模",
+      "refs": [
+        "marcjasz2023distributional",
+        "lebedev2026uncertainty"
+      ],
+      "paragraphs": [
+        "分布神经网络通过预测条件分布参数而非单一点值刻画价格不确定性。Marcjasz 等（2023）将该范式应用于电价预测，其中 Johnson SU 分布能够同时表示偏度、厚尾与负值。Lebedev 等（2026）进一步比较统计与神经预测中的不确定性估计。本研究参考其配套正态分布网络的结构，并依据 Johnson SU 公式重实现分布参数化。",
+        "设 W~N(μw,σw²)，Y=ξ+λsinh(W)，网络逐时距输出四个参数，其中 λ 与 σw 保持为正。训练目标为精确负对数似然，条件分位为 qτ=ξ+λsinh(μw+σwΦ⁻¹(τ))。位置参数 ξ 一般不等于中位数，故点预测由真实 q50 给出。七组公共输入全部展平，模型选择采用原价空间的共同分位评分，与原文的似然选择及大规模调参设置有所区别。",
+        "当前实验采用双精度解析逆分布函数，不截断 sinh 自变量或预测值；早期使用截断的结果仅保留为历史记录。Johnson SU 对偏态厚尾具有较强表达能力，但单一分布族未必能充分表示多状态混合，尾部参数也可能放大极端预测。因此，需要综合考察分位评分、区间覆盖、尖峰误差与数值稳定性。"
+      ],
+      "group": "probabilistic_calibration",
+      "group_title": "分布建模与概率校准方法"
+    },
+    {
+      "id": "nhits_qra",
+      "title": "NHITS + MC-dropout + QRA：多尺度骨干与后校准",
+      "refs": [
+        "challu2023nhits",
+        "gal2016dropout",
+        "nowotarski2015qra",
+        "lettner2026performance",
+        "lettner2026calibration"
+      ],
+      "paragraphs": [
+        "NHITS（Challu 等，2023）结合多速率池化、层级插值和残差回投，在不同频率尺度上逐块重建历史并累加预测。MC-dropout（Gal 与 Ghahramani，2016）通过预测阶段的重复随机前向传播近似刻画模型不确定性；QRA（Nowotarski 与 Weron，2015）则将预测特征映射为条件分位。Lettner 等（2026）分别从性能—效率权衡和校准挑战角度研究了电价概率预测，为该组合提供应用依据。",
+        "本研究移植官方 NHITS 骨干，保留最大池化、插值、残差回投及最后观测值初始化，并将七组公共输入映射至历史、未来和静态外生接口。首先以 MAE 训练并选择点预测模型，然后固定随机种子进行 20 次 MC-dropout，仅启用 dropout 层的随机性。样本经验分位作为 QRA 特征，在 2022 年下半年拟合无正则线性规划校准器，测试阶段固定系数。",
+        "该组合依据统一实验协议进行适配，其采样、特征和选择设置与既有电价研究有所区别。多尺度表示适合刻画不同频率的价格变化，但池化和插值可能平滑短促尖峰。MC-dropout 的离散度也不等同于全部数据噪声，而后续校准依赖有限样本及校准期尾部事件的代表性，需通过尖峰子集与覆盖诊断评估其局限。"
+      ],
+      "group": "probabilistic_calibration",
+      "group_title": "分布建模与概率校准方法"
+    },
+    {
+      "id": "tabpfn_v3",
+      "title": "TabPFN-3：冻结表格基础模型与上下文回归",
+      "refs": [
+        "priorlabs2026tabpfn3",
+        "hollmann2025tabpfn"
+      ],
+      "paragraphs": [
+        "TabPFN-3（Grinsztajn 等，2026）属于在合成任务上预训练的表格基础模型。模型通过带标签支持样本进行上下文推断，其预测形式为 pθ(y查询|x查询,D支持)，任务适配过程中无需更新模型权重。Hollmann 等（2025）提出的第二代 TabPFN 构成该模型谱系的前期研究。",
+        "本研究固定第三代回归检查点，将七组公共输入展平为 1465 个特征，并按 24 个预测时距构建独立回归任务。训练集标签用于支持上下文，选择集和校准集标签不参与推断，预训练权重保持冻结。模型原生输出包含共同评估所需的五个分位，因此能够参与完整概率评分。TabPFN 提供了表格非线性学习的基础模型对照，但独立时距任务未显式约束时间轨迹，极端状态的泛化仍受预训练先验与支持集尾部覆盖的共同影响。"
+      ],
+      "group": "foundation_models",
+      "group_title": "预训练基础模型"
+    },
+    {
+      "id": "chronos2_zeroshot",
+      "title": "Chronos-2：带协变量的零样本时序基础模型",
+      "refs": [
+        "amazon2025chronos2"
+      ],
+      "paragraphs": [
+        "Chronos-2（Ansari 等，2025）利用组注意力在相关序列、变量和协变量之间共享信息，支持冻结权重条件下的单变量、多变量与带协变量预测。其训练通过合成多变量结构增强上下文学习能力，拓展了通用时序模型的信息利用范围。",
+        "本研究使用固定 Chronos-2 检查点，逐起点输入过去 72 小时的价格、历史需求及过去和未来的日历，预测未来 24 小时。不同起点间不进行交叉学习，也不实施微调或后校准。原生 21 个分位级别包含共同五分位，满足概率评分要求。由于接口要求外生变量具备相应历史段，起点上下文及三组仅未来可得的外生输入未接入，故该模型属于受限输入对照。预训练与原生变换可能改善尺度适应，但尾部校准及稀缺信号不完整仍是尖峰预测的限制。"
+      ],
+      "group": "foundation_models",
+      "group_title": "预训练基础模型"
+    },
+    {
+      "id": "moirai2_zeroshot",
+      "title": "Moirai 2.0：解码器式多分位零样本模型",
+      "refs": [
+        "woo2025moirai2"
+      ],
+      "paragraphs": [
+        "Moirai 2.0（Liu 等，2025；2026 年修订）采用解码器式 Transformer、单一片段尺度和分位损失，通过多标记预测与递归多分位解码提高推断效率。相较于早期 Moirai，其结构由掩码编码器与混合分布输出转向直接多分位预测。",
+        "本研究使用固定的 Moirai 2.0-R-small 权重和配套实现，输入价格历史、历史需求以及覆盖过去和未来的日历。起点上下文与仅未来可得的外生输入未接入，因而属于受限输入零样本设置。其原生分位范围为 0.1 至 0.9，缺少共同概率评分所需的 0.05 与 0.95 分位。因此，统一比较使用原生中位数计算点预测指标，0.1 与 0.9 分位仅用于辅助诊断。该设置反映了通用先验在电价任务上的迁移能力，但不足以直接评价共同尾部分位下的区间质量。"
+      ],
+      "group": "foundation_models",
+      "group_title": "预训练基础模型"
+    },
+    {
+      "id": "timesfm25_xreg",
+      "title": "TimesFM-2.5 + XReg：残差基础模型与逐起点回归",
+      "refs": [
+        "das2024decoder"
+      ],
+      "paragraphs": [
+        "TimesFM（Das 等，2024）以片段化输入和解码器式预训练实现通用时间序列预测。本研究采用后续发布的 TimesFM-2.5 200M 检查点，并结合官方 XReg 路径引入协变量。该检查点与原始 ICML 版本属于同一模型谱系，但代际与具体输出能力有所区别。",
+        "XReg 在每个预测起点的合法 72 小时历史上独立拟合回归，扣除协变量效应后由 TimesFM 预测残差，再将未来协变量效应等量加回各分位通道：q̂τ=X未来β̂+q̂TimesFM,τ(残差历史)。逐起点拟合保证参数估计仅依赖该起点已知历史。日历变量可完整接入；静态气价在逐起点中心化后被消除，需求及仅未来可得的外生输入未接入。",
+        "原生输出包括均值及 0.1 至 0.9 分位，统一评估采用原生中位数计算点预测指标。当前比较使用无岭正则的回归设置，并关闭正值推断截断以保留负价。短上下文中的冗余日历设计、回归外推和受限输入均可能影响尖峰表现；已有矩阵秩与外推算子诊断提示其敏感性，但尚不足以将所有预测误差归因于数值问题。"
+      ],
+      "group": "foundation_models",
+      "group_title": "预训练基础模型"
+    }
+  ],
+  "references": [
+    {
+      "key": "zeng2023transformers",
+      "citation": "Zeng, Ailing; Chen, Muxi; Zhang, Lei; Xu, Qiang (2023). Are Transformers Effective for Time Series Forecasting?. Proceedings of the AAAI Conference on Artificial Intelligence, 37(9), 11121–11128.",
+      "url": "https://doi.org/10.1609/aaai.v37i9.26317",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/26317"
+      ]
+    },
+    {
+      "key": "rumelhart1986learning",
+      "citation": "Rumelhart, David E.; Hinton, Geoffrey E.; Williams, Ronald J. (1986). Learning representations by back-propagating errors. Nature, 323, 533–536.",
+      "url": "https://doi.org/10.1038/323533a0",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://api.crossref.org/works/10.1038/323533a0"
+      ]
+    },
+    {
+      "key": "tibshirani1996lasso",
+      "citation": "Tibshirani, Robert (1996). Regression Shrinkage and Selection Via the Lasso. Journal of the Royal Statistical Society: Series B (Methodological), 58(1), 267–288.",
+      "url": "https://doi.org/10.1111/j.2517-6161.1996.tb02080.x",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://api.crossref.org/works/10.1111/j.2517-6161.1996.tb02080.x"
+      ]
+    },
+    {
+      "key": "lei2018distributionfree",
+      "citation": "Lei, Jing; G'Sell, Max; Rinaldo, Alessandro; Tibshirani, Ryan J.; Wasserman, Larry (2018). Distribution-Free Predictive Inference for Regression. Journal of the American Statistical Association, 113(523), 1094–1111.",
+      "url": "https://doi.org/10.1080/01621459.2017.1307116",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://api.crossref.org/works/10.1080/01621459.2017.1307116"
+      ]
+    },
+    {
+      "key": "lipiecki2025postforecasts",
+      "citation": "Lipiecki, Arkadiusz; Weron, Rafał (2025). PostForecasts.jl: A Julia package for probabilistic forecasting by postprocessing point predictions. SoftwareX, 31, 102200.",
+      "url": "https://doi.org/10.1016/j.softx.2025.102200",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版页/作者项目页/作者软件仓库（2026-10-26）",
+      "verification_urls": [
+        "https://github.com/lipiecki/PostForecasts.jl"
+      ]
+    },
+    {
+      "key": "ke2017lightgbm",
+      "citation": "Ke, Guolin; Meng, Qi; Finley, Thomas; Wang, Taifeng; Chen, Wei; Ma, Weidong; Ye, Qiwei; Liu, Tie-Yan (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information Processing Systems 30.",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html"
+      ]
+    },
+    {
+      "key": "chen2016xgboost",
+      "citation": "Chen, Tianqi; Guestrin, Carlos (2016). XGBoost: A Scalable Tree Boosting System. KDD, 785–794.",
+      "url": "https://doi.org/10.1145/2939672.2939785",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/1603.02754"
+      ]
+    },
+    {
+      "key": "lebedev2026uncertainty",
+      "citation": "Lebedev, Andreas; Das, Abhinav; Pappert, Sven; Schlüter, Stephan (2026). Analyzing Uncertainty Quantification in Statistical and Deep Learning Models for Probabilistic Electricity Price Forecasting. IEEE Access, 14, 52162–52189.",
+      "url": "https://doi.org/10.1109/ACCESS.2026.3672716",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/2509.19417"
+      ]
+    },
+    {
+      "key": "nowotarski2015qra",
+      "citation": "Nowotarski, Jakub; Weron, Rafał (2015). Computing electricity spot price prediction intervals using quantile regression and forecast averaging. Computational Statistics, 30(3), 791–803.",
+      "url": "https://doi.org/10.1007/s00180-014-0523-0",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版页/作者项目页/作者软件仓库（2026-10-26）",
+      "verification_urls": [
+        "https://link.springer.com/article/10.1007/s00180-014-0523-0"
+      ]
+    },
+    {
+      "key": "nie2023time",
+      "citation": "Nie, Yuqi; Nguyen, Nam H.; Sinthong, Phanwadee; Kalagnanam, Jayant (2023). A Time Series is Worth 64 Words: Long-term Forecasting with Transformers. ICLR.",
+      "url": "https://arxiv.org/abs/2211.14730",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/2211.14730"
+      ]
+    },
+    {
+      "key": "kim2022reversible",
+      "citation": "Kim, Taesung; Kim, Jinhee; Tae, Yunwon; Park, Cheonbok; Choi, Jang-Ho; Choo, Jaegul (2022). Reversible Instance Normalization for Accurate Time-Series Forecasting against Distribution Shift. ICLR.",
+      "url": "https://openreview.net/forum?id=cGDAkQo1C0p",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版页/作者项目页/作者软件仓库（2026-10-26）",
+      "verification_urls": [
+        "https://seharanul17.github.io/RevIN/"
+      ]
+    },
+    {
+      "key": "yemets2025gatets",
+      "citation": "Yemets, Kyrylo; Lukashchuk, Mykola; Izonin, Ivan (2025). GateTS: Versatile and Efficient Forecasting via Attention-Inspired routed Mixture-of-Experts. arXiv:2508.17515.",
+      "url": "https://arxiv.org/abs/2508.17515",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/2508.17515"
+      ]
+    },
+    {
+      "key": "wang2024timexer",
+      "citation": "Wang, Yuxuan; Wu, Haixu; Dong, Jiaxiang; Qin, Guo; Zhang, Haoran; Liu, Yong; Qiu, Yunzhong; Wang, Jianmin; Long, Mingsheng (2024). TimeXer: Empowering Transformers for Time Series Forecasting with Exogenous Variables. Advances in Neural Information Processing Systems 37, 469–498.",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/0113ef4642264adc2e6924a3cbbdf532-Abstract-Conference.html",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://proceedings.neurips.cc/paper_files/paper/2024/hash/0113ef4642264adc2e6924a3cbbdf532-Abstract-Conference.html"
+      ]
+    },
+    {
+      "key": "yu2025pricefm",
+      "citation": "Yu, Runyao; Gu, Chenhui; Stiasny, Jochen; Wen, Qingsong; Dilov, Wasim Sarwar; Qi, Lianlian; Cremer, Jochen L. (2025). PriceFM: Foundation Model for Probabilistic Electricity Price Forecasting. arXiv:2508.04875 (v4 revised 2026).",
+      "url": "https://arxiv.org/abs/2508.04875",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/2508.04875"
+      ]
+    },
+    {
+      "key": "marcjasz2023distributional",
+      "citation": "Marcjasz, Grzegorz; Narajewski, Michał; Weron, Rafał; Ziel, Florian (2023). Distributional neural networks for electricity price forecasting. Energy Economics, 125, 106843.",
+      "url": "https://doi.org/10.1016/j.eneco.2023.106843",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://api.crossref.org/works/10.1016/j.eneco.2023.106843"
+      ]
+    },
+    {
+      "key": "challu2023nhits",
+      "citation": "Challu, Cristian; Olivares, Kin G.; Oreshkin, Boris N.; Garza Ramirez, Federico; Mergenthaler Canseco, Max; Dubrawski, Artur (2023). NHITS: Neural Hierarchical Interpolation for Time Series Forecasting. Proceedings of the AAAI Conference on Artificial Intelligence, 37(6), 6989–6997.",
+      "url": "https://doi.org/10.1609/aaai.v37i6.25854",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/25854"
+      ]
+    },
+    {
+      "key": "gal2016dropout",
+      "citation": "Gal, Yarin; Ghahramani, Zoubin (2016). Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning. ICML, PMLR 48, 1050–1059.",
+      "url": "https://proceedings.mlr.press/v48/gal16.html",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://proceedings.mlr.press/v48/gal16.html"
+      ]
+    },
+    {
+      "key": "lettner2026performance",
+      "citation": "Lettner, Jan Niklas; El Ashhab, Hadeer; Hagenmeyer, Veit; Schäfer, Benjamin (2026). Assessing the Performance-Efficiency Trade-off of Foundation Models in Probabilistic Electricity Price Forecasting. arXiv:2604.14739.",
+      "url": "https://arxiv.org/abs/2604.14739",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://arxiv.org/abs/2604.14739"
+      ]
+    },
+    {
+      "key": "lettner2026calibration",
+      "citation": "Lettner, Jan Niklas; El Ashhab, Hadeer; Schäfer, Benjamin (2026). Investigating Calibration Challenges in Probabilistic Electricity Price Forecasting. Proceedings of the 2026 ACM Sustainability Week, 565–566.",
+      "url": "https://doi.org/10.1145/3765611.3815392",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已核对官方出版/arXiv记录或出版商登记的 Crossref 元数据",
+      "verification_urls": [
+        "https://api.crossref.org/works/10.1145/3765611.3815392"
+      ]
+    },
+    {
+      "key": "priorlabs2026tabpfn3",
+      "citation": "Grinsztajn, Léo; Flöge, Klemens; Key, Oscar; et al. (2026). TabPFN-3: Technical Report. arXiv:2605.13986v2.",
+      "url": "https://arxiv.org/abs/2605.13986",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已打开一手出版页/arXiv记录核对"
+    },
+    {
+      "key": "hollmann2025tabpfn",
+      "citation": "Hollmann, Noah; Müller, Samuel; Purucker, Lennart; Krishnakumar, Arjun; Körfer, Max; Hoo, Shi Bin; Schirrmeister, Robin Tibor; Hutter, Frank (2025). Accurate predictions on small data with a tabular foundation model. Nature, 637, 319–326.",
+      "url": "https://www.nature.com/articles/s41586-024-08328-6",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已打开一手出版页/arXiv记录核对"
+    },
+    {
+      "key": "amazon2025chronos2",
+      "citation": "Ansari, Abdul Fatir; Shchur, Oleksandr; Küken, Jaris; et al. (2025). Chronos-2: From Univariate to Universal Forecasting. arXiv:2510.15821.",
+      "url": "https://arxiv.org/abs/2510.15821",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已打开一手出版页/arXiv记录核对"
+    },
+    {
+      "key": "woo2025moirai2",
+      "citation": "Liu, Chenghao; Aksu, Taha; Liu, Juncheng; Liu, Xu; Yan, Hanshu; Pham, Quang; Savarese, Silvio; Sahoo, Doyen; Xiong, Caiming; Li, Junnan (2025; revised 2026). Moirai 2.0: When Less Is More for Time Series Forecasting. arXiv:2511.11698v3.",
+      "url": "https://arxiv.org/abs/2511.11698",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已打开一手出版页/arXiv记录核对"
+    },
+    {
+      "key": "das2024decoder",
+      "citation": "Das, Abhimanyu; Kong, Weihao; Sen, Rajat; Zhou, Yichen (2024). A decoder-only foundation model for time-series forecasting. Proceedings of the 41st International Conference on Machine Learning, PMLR 235, 10148–10167.",
+      "url": "https://proceedings.mlr.press/v235/das24c.html",
+      "verified_date": "2026-10-26",
+      "verification": "本轮已打开一手出版页/arXiv记录核对"
+    }
+  ],
+  "corrections": [
+    {
+      "key": "priorlabs2026tabpfn3",
+      "correction": "本地将作者写为 Prior Labs、标题写为 Machine Learning with Zero Hyperparameter Tuning；arXiv 实际题为 TabPFN-3: Technical Report，首作者 Léo Grinsztajn。报告纠正，repo未修改。",
+      "url": "https://arxiv.org/abs/2605.13986"
+    },
+    {
+      "key": "hollmann2025tabpfn",
+      "correction": "本地 V2 谱系引用的作者及卷页有误；按 Nature 正式页更正为 Hollmann 等8位作者，637:319–326；此文不是V3检查点主引用。",
+      "url": "https://www.nature.com/articles/s41586-024-08328-6"
+    },
+    {
+      "key": "amazon2025chronos2",
+      "correction": "本地 Amazon 公司署名和 Agentic Era 标题不是所链接论文元数据；更正为 Ansari 等，Chronos-2: From Univariate to Universal Forecasting。",
+      "url": "https://arxiv.org/abs/2510.15821"
+    },
+    {
+      "key": "woo2025moirai2",
+      "correction": "本地 Woo 等作者和 Unified Training 标题均与 arXiv:2511.11698 不符；更正为 Chenghao Liu 等，Moirai 2.0: When Less Is More for Time Series Forecasting。仅保留旧key便于追溯。",
+      "url": "https://arxiv.org/abs/2511.11698"
+    },
+    {
+      "key": "das2024decoder",
+      "correction": "本地ICML论文作者列有误；正式出版页为 Abhimanyu Das、Weihao Kong、Rajat Sen、Yichen Zhou。2.5版本另以官方模型卡为证。",
+      "url": "https://proceedings.mlr.press/v235/das24c.html"
+    }
+  ],
+  "verified_date": "2026-10-26",
+  "version_sources": [
+    {
+      "model": "timesfm25_xreg",
+      "url": "https://huggingface.co/google/timesfm-2.5-200m-pytorch",
+      "note": "本轮打开，确认2.5-200m模型卡与2025-10-02 fused-QKV更新；具体固定版本/本地能力边界依据source.json和运行实现。"
+    }
+  ],
+  "caveats": [
+    "以上尖峰适用性与限制是基于论文机制和本地实现作出的分析，不是未经实验验证的性能结论。",
+    "公共原论文、组件论文、组合方法来源和本地适配必须区分；19个模型不是19篇独立原始模型论文。",
+    "本轮独立核查纠正5条基础模型/谱系元数据。其余引用通过正式出版页、arXiv、作者项目页或软件仓库核对；访问受限的部分条目用出版商登记的Crossref元数据补核，不声称逐页复核全部论文正文。",
+    "GateTS arXiv页已有2026 Neurocomputing关联DOI；报告为与固定代码及本地key一致仍引用2025预印本，不混称期刊版实验。",
+    "四个冻结基础模型的预训练数据不能在本项目内全面审计；零样本描述仅指本地未用训练split更新权重/拟合任务，不构成预训练无重叠证明。TabPFN明确使用train支持标签，TimesFM XReg明确使用起点历史拟合。",
+    "历史 Informer、iTransformer、Full/no_fields 不属于当前19基线清单；若另列历史结构对照须独立注明。"
+  ],
+  "groups": [
+    {
+      "id": "statistical_linear",
+      "title": "统计与线性预测方法",
+      "model_ids": [
+        "linear",
+        "dlinear",
+        "lasso_arx72_cp"
+      ],
+      "introduction": "统计与线性方法用于建立具有明确结构和较低估计复杂度的参照。线性映射、趋势分解与稀疏回归分别对应时间关系、慢变分量和特征选择三种建模假设，可用于衡量复杂模型相对于基本可预测结构的增益。"
+    },
+    {
+      "id": "tree_models",
+      "title": "梯度提升树预测方法",
+      "model_ids": [
+        "lightgbm",
+        "xgboost"
+      ],
+      "introduction": "梯度提升树通过递归划分特征空间刻画非线性关系，对异质外生变量和阈值交互具有较强适应性。本研究采用两类代表性树模型，并将其统一适配至逐时距分位预测，以构成完整输入条件下的重要比较基线。"
+    },
+    {
+      "id": "deep_forecasting",
+      "title": "深度时间序列预测方法",
+      "model_ids": [
+        "mlp",
+        "patchtst",
+        "gatets_adapter",
+        "timexer",
+        "pricefm"
+      ],
+      "introduction": "深度预测方法从通用非线性映射、局部片段表示、专家分工以及内外生信息交互等角度学习价格动态。不同结构的比较有助于分析表示能力、时间归纳偏置和外生信息利用方式对电价尖峰预测的影响。"
+    },
+    {
+      "id": "probabilistic_calibration",
+      "title": "分布建模与概率校准方法",
+      "model_ids": [
+        "lightgbm_cp",
+        "xgboost_cp",
+        "lightgbm_qra",
+        "ddnn_jsu",
+        "nhits_qra"
+      ],
+      "introduction": "概率建模既可以通过直接学习条件分布参数实现，也可以对已有预测实施后置校准。本研究同时纳入分布神经网络、对称残差校准和分位回归平均，以区分中心预测、区间宽度及尾部形状调整各自带来的贡献。"
+    },
+    {
+      "id": "foundation_models",
+      "title": "预训练基础模型",
+      "model_ids": [
+        "tabpfn_v3",
+        "chronos2_zeroshot",
+        "moirai2_zeroshot",
+        "timesfm25_xreg"
+      ],
+      "introduction": "预训练基础模型通过跨任务学习获得通用预测先验，在冻结权重条件下利用输入上下文生成预测。此类模型在任务标签使用方式、协变量接口和原生分位能力方面存在差异，因此比较时分别说明上下文拟合、输入范围和可评价指标。"
+    }
+  ],
+  "grouping_note": "按主要建模机制组织；Lasso+CP置于统计线性类以突出其稀疏回归中心，PriceFM置于深度预测类以反映本研究从头训练的架构适配，NHITS+QRA置于概率校准类以突出其组合预测流程。",
+  "style_note": "各模型正文按方法原理、任务适配与研究局限组织，引用键及已核查参考文献保持不变。"
+}

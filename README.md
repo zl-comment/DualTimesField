@@ -1,5 +1,7 @@
 # DualTimesField
 
+研究阶段报告：[论文章节版 Word、PDF 与实验审计材料](docs/research/progress_report_20261026/README.md)（2026-10-26）。
+
 第二批基础模型：[已并入主表的基础模型与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
 
 基线维护：[2026-10-24 限定修复、数据审计与重跑记录](logs/forecasting/baseline_maintenance_20261024/README.md)。当前主表由冻结来源索引生成；不覆盖历史预测档案。
