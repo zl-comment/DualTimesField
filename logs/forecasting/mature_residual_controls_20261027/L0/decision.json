@@ -1,0 +1,267 @@
+{
+  "stage": "L0",
+  "primary_arm": "R28",
+  "beta": 1.0,
+  "passed": false,
+  "decision": "stop_current_v5_residual_route",
+  "macro_before": {
+    "mae": 68.39676722769734,
+    "qs": 39.06459257866691
+  },
+  "macro_after": {
+    "mae": 60.17883937117443,
+    "qs": 36.18247279584323
+  },
+  "criteria": [
+    {
+      "name": "complete_single_R28_per_region",
+      "passed": true,
+      "expected_regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "observed_regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ]
+    },
+    {
+      "name": "positive_shared_beta",
+      "beta": 1.0,
+      "passed": true
+    },
+    {
+      "name": "complete_integrity_manifest",
+      "passed": true,
+      "required": [
+        "source_hashes_verified",
+        "baseline_archive_reproduced",
+        "samples_aligned",
+        "candidates_independently_verified",
+        "future_labels_invariant",
+        "maturity_boundary_verified",
+        "purge_verified",
+        "quantiles_ordered",
+        "beta_zero_exact",
+        "deterministic_simple_arms",
+        "old_files_unchanged"
+      ]
+    },
+    {
+      "name": "integrity/source_hashes_verified",
+      "passed": true
+    },
+    {
+      "name": "integrity/baseline_archive_reproduced",
+      "passed": true
+    },
+    {
+      "name": "integrity/samples_aligned",
+      "passed": true
+    },
+    {
+      "name": "integrity/candidates_independently_verified",
+      "passed": true
+    },
+    {
+      "name": "integrity/future_labels_invariant",
+      "passed": true
+    },
+    {
+      "name": "integrity/maturity_boundary_verified",
+      "passed": true
+    },
+    {
+      "name": "integrity/purge_verified",
+      "passed": true
+    },
+    {
+      "name": "integrity/quantiles_ordered",
+      "passed": true
+    },
+    {
+      "name": "integrity/beta_zero_exact",
+      "passed": true
+    },
+    {
+      "name": "integrity/deterministic_simple_arms",
+      "passed": true
+    },
+    {
+      "name": "integrity/old_files_unchanged",
+      "passed": true
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "NSW1",
+      "metric": "mae",
+      "before": 64.03290840913154,
+      "after": 53.13745458804115,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "NSW1",
+      "metric": "qs",
+      "before": 35.107996008803795,
+      "after": 29.804078946573807,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "NSW1",
+      "level": 80,
+      "before": 0.5704215998785671,
+      "after": 0.6159399666059502,
+      "absolute_deviation_worsening": -0.045518366727383075,
+      "limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "NSW1",
+      "level": 90,
+      "before": 0.7441750151791136,
+      "after": 0.770425394656952,
+      "absolute_deviation_worsening": -0.02625037947783848,
+      "limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "QLD1",
+      "metric": "mae",
+      "before": 75.7335887932723,
+      "after": 67.45561302195823,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "QLD1",
+      "metric": "qs",
+      "before": 46.252147408660775,
+      "after": 43.80428679369087,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "QLD1",
+      "level": 80,
+      "before": 0.7206663630843959,
+      "after": 0.7078874468731026,
+      "absolute_deviation_worsening": 0.012778916211293345,
+      "limit": 0.01,
+      "passed": false
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "QLD1",
+      "level": 90,
+      "before": 0.8672112173649059,
+      "after": 0.8478957953855495,
+      "absolute_deviation_worsening": 0.01931542197935643,
+      "limit": 0.01,
+      "passed": false
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "TAS1",
+      "metric": "mae",
+      "before": 65.42380448068815,
+      "after": 59.943450503523906,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_loss_limit",
+      "region": "TAS1",
+      "metric": "qs",
+      "before": 35.833634318536156,
+      "after": 34.93905264726501,
+      "relative_limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "TAS1",
+      "level": 80,
+      "before": 0.5627466605950212,
+      "after": 0.5579747267759563,
+      "absolute_deviation_worsening": 0.004771933819064933,
+      "limit": 0.01,
+      "passed": true
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "TAS1",
+      "level": 90,
+      "before": 0.7280092592592593,
+      "after": 0.6955164693381907,
+      "absolute_deviation_worsening": 0.03249278992106863,
+      "limit": 0.01,
+      "passed": false
+    },
+    {
+      "name": "macro_loss_nonincrease",
+      "metric": "mae",
+      "before": 68.39676722769734,
+      "after": 60.17883937117443,
+      "passed": true
+    },
+    {
+      "name": "macro_loss_nonincrease",
+      "metric": "qs",
+      "before": 39.06459257866691,
+      "after": 36.18247279584323,
+      "passed": true
+    },
+    {
+      "name": "at_least_one_macro_loss_strictly_better",
+      "passed": true
+    }
+  ],
+  "failed_criteria": [
+    {
+      "name": "regional_coverage_deviation",
+      "region": "QLD1",
+      "level": 80,
+      "before": 0.7206663630843959,
+      "after": 0.7078874468731026,
+      "absolute_deviation_worsening": 0.012778916211293345,
+      "limit": 0.01,
+      "passed": false
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "QLD1",
+      "level": 90,
+      "before": 0.8672112173649059,
+      "after": 0.8478957953855495,
+      "absolute_deviation_worsening": 0.01931542197935643,
+      "limit": 0.01,
+      "passed": false
+    },
+    {
+      "name": "regional_coverage_deviation",
+      "region": "TAS1",
+      "level": 90,
+      "before": 0.7280092592592593,
+      "after": 0.6955164693381907,
+      "absolute_deviation_worsening": 0.03249278992106863,
+      "limit": 0.01,
+      "passed": false
+    }
+  ],
+  "numerical_tolerance": 1e-10,
+  "intervals_used_for_decision": false,
+  "diagnostic_arms_used_for_decision": false,
+  "statistical_noninferiority_claim": false,
+  "period": "2022H2",
+  "run_id": "8d13a8baa2d74591f006de8e236ebf8ca3f089540e356ce230775264788e38ff"
+}

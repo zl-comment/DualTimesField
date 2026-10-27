@@ -1,0 +1,36 @@
+{
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_mature_residual_controls.py",
+    "tests/test_correction_value_audit.py",
+    "tests/test_upper_scale_audit.py",
+    "tests/test_event_allocation.py"
+  ],
+  "exit_code": 0,
+  "passed": true,
+  "stdout": "........................................................                 [100%]\n56 passed in 4.91s\n",
+  "stderr": "",
+  "tested_sources": {
+    "configs/mature_residual_controls.json": "ec625343b28e32477ca4f0bd80f32e695a07695f701dd5264b21f474d807455e",
+    "docs/mature_residual_controls_protocol_20261027.md": "f44143bfde68bd197683f4f5958a22f09145f6742ec47c2255c32e48d4780ee6",
+    "docs/mature_residual_controls_requested_plan_20261027.md": "8dded07058097f47a3e5baa51a0aa5531ac71908f5e6c6f6db5b76cb304f1776",
+    "forecasting/full_v5_mature_controls.py": "838546b3ad72a6fab0920461bef2d484476aba2abc6896cae2b3711e6cc2e077",
+    "forecasting/full_v5_mature_evaluation.py": "c4a7f932bfc5f7f9ff014fa6a062e6a83a61ddfd1a4435c636674627a318c1c5",
+    "forecasting/full_v5_mature_forward.py": "d37663825f77175d4e743692de4d0488bac29c20787437b163a1df994b1ba7a7",
+    "forecasting/full_v5_mature_sources.py": "2486109c6f4e8571993db009443db335ba2ccc186f1c575be01219ee5c0698f8",
+    "scripts/compare_mature_residual_controls.py": "fde695120d8a38412720d0288401a5e1d751174b0e2c845ebfb25a866681f79b",
+    "tests/test_mature_residual_controls.py": "cfe1fa39cdcc46f93457858f49ad8a7fb7e56935a9286acda841d491c16b7478"
+  },
+  "resources": {
+    "wall_seconds": 6.160592529922724,
+    "cpu_seconds": 6.325497,
+    "peak_rss_kib": 498316,
+    "neural_training": 0,
+    "lightgbm_retraining": 0,
+    "gpu_seconds": 0
+  },
+  "scope": "Synthetic tests and prior audit regression tests; no parameter selection, real H2 evaluation, or formal arrays"
+}

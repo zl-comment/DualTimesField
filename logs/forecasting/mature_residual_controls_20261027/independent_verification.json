@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "verified": true,
+  "scope": "selection_and_L0_independent_numeric_verification",
+  "run_id": "8d13a8baa2d74591f006de8e236ebf8ca3f089540e356ce230775264788e38ff",
+  "beta": 1.0,
+  "L0": {
+    "passed": false,
+    "beta": 1.0,
+    "macro_before": {
+      "mae": 68.39676722769734,
+      "qs": 39.06459257866691
+    },
+    "macro_after": {
+      "mae": 60.17883937117443,
+      "qs": 36.18247279584323
+    },
+    "groups": 714,
+    "candidate_median_probes": 594,
+    "decision": "stop_current_v5_residual_route"
+  },
+  "selection_candidate_median_probes": 198,
+  "hashes_verified": 5070,
+  "numeric_values_verified": 55253339,
+  "maximum_absolute_metric_error": 1.4210854715202004e-14,
+  "reproduction_absolute_tolerance": 1e-08,
+  "decision_numerical_tolerance": 1e-10,
+  "verified_stages": [
+    "selection",
+    "L0"
+  ],
+  "unverified_numeric_stages": [],
+  "resources": {
+    "wall_seconds": 35.27397972717881,
+    "cpu_seconds": 35.260676999999994,
+    "cpu_core_hours": 0.009794632499999999,
+    "peak_rss_kib": 513624,
+    "gpu_seconds": 0
+  },
+  "formal_arrays_opened_by_verifier": false,
+  "limits": [
+    "The block-bootstrap confidence interval draws were not independently repeated; daily losses and point estimates were recomputed.",
+    "All candidate permissions were checked; candidate prefilter identities and raw medians were independently recomputed at fixed 64 random positions plus endpoints per region and arm.",
+    "Protected formal prediction files may be byte-hashed without opening or decompressing their arrays.",
+    "If L1 completed, its numerical results need separate verification; this report never claims L1 numerical coverage."
+  ],
+  "verification_provenance": {
+    "original_artifact_manifest_sha256": "3d9eb329c5cf6c817b529e9f9de06503339997597db3cc16de9cf15ac8469164",
+    "verifier_path": "/root/workspace/Code/DualTimesField/scripts/verify_mature_residual_controls.py",
+    "verifier_sha256": "4ce28611ee1f46275de27e8d4dbaa0e42b1db5ee7c786c637b6dd74d61ae9e41"
+  }
+}

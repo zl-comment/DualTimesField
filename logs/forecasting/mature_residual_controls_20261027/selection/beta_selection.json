@@ -1,0 +1,163 @@
+{
+  "beta": 1.0,
+  "curve": [
+    {
+      "beta": 0.0,
+      "regional": {
+        "NSW1": {
+          "mae": 67.50378848810645,
+          "qs": 39.234951404838725
+        },
+        "QLD1": {
+          "mae": 107.66417902935541,
+          "qs": 72.95133987512573
+        },
+        "TAS1": {
+          "mae": 50.53148418504603,
+          "qs": 31.359011722698856
+        }
+      },
+      "macro": {
+        "mae": 75.23315056750263,
+        "qs": 47.8484343342211
+      },
+      "eligible": true,
+      "standardized_relative_loss_sum": 2.0
+    },
+    {
+      "beta": 0.25,
+      "regional": {
+        "NSW1": {
+          "mae": 64.94918106876797,
+          "qs": 38.22894516130501
+        },
+        "QLD1": {
+          "mae": 105.71079577095828,
+          "qs": 72.47763401898733
+        },
+        "TAS1": {
+          "mae": 49.00961136898811,
+          "qs": 30.855277655841892
+        }
+      },
+      "macro": {
+        "mae": 73.22319606957146,
+        "qs": 47.18728561204475
+      },
+      "eligible": true,
+      "standardized_relative_loss_sum": 1.9594660967988915
+    },
+    {
+      "beta": 0.5,
+      "regional": {
+        "NSW1": {
+          "mae": 62.52360081201373,
+          "qs": 37.30103092686118
+        },
+        "QLD1": {
+          "mae": 103.93681902470765,
+          "qs": 72.06715595387817
+        },
+        "TAS1": {
+          "mae": 47.67792519803329,
+          "qs": 30.459442088544225
+        }
+      },
+      "macro": {
+        "mae": 71.37944834491822,
+        "qs": 46.60920965642786
+      },
+      "eligible": true,
+      "standardized_relative_loss_sum": 1.9228775809368024
+    },
+    {
+      "beta": 0.75,
+      "regional": {
+        "NSW1": {
+          "mae": 60.249683513493494,
+          "qs": 36.4544573178259
+        },
+        "QLD1": {
+          "mae": 102.33686922837964,
+          "qs": 71.71934235810006
+        },
+        "TAS1": {
+          "mae": 46.5591492063618,
+          "qs": 30.175474750475534
+        }
+      },
+      "macro": {
+        "mae": 69.71523398274498,
+        "qs": 46.1164248088005
+      },
+      "eligible": true,
+      "standardized_relative_loss_sum": 1.8904579514473694
+    },
+    {
+      "beta": 1.0,
+      "regional": {
+        "NSW1": {
+          "mae": 58.148755174154346,
+          "qs": 35.69412290510037
+        },
+        "QLD1": {
+          "mae": 100.91744007845801,
+          "qs": 71.43572699330726
+        },
+        "TAS1": {
+          "mae": 45.664163958134885,
+          "qs": 30.00104447109767
+        }
+      },
+      "macro": {
+        "mae": 68.24345307024909,
+        "qs": 45.710298123168435
+      },
+      "eligible": true,
+      "standardized_relative_loss_sum": 1.8624072469612174
+    }
+  ],
+  "baseline_macro": {
+    "mae": 75.23315056750263,
+    "qs": 47.8484343342211
+  },
+  "fallback": false,
+  "positive_beta_eligible": true,
+  "reason": "minimum_standardized_relative_loss_sum_then_smaller_beta",
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "selection_start_unix": 1640959200,
+  "selection_end_exclusive_unix": 1656597600,
+  "selection_purge": "origin + 24 hours < 2022-07-01 00:00 AEST",
+  "objective": "macro_MAE(beta)/macro_MAE(B) + macro_QS(beta)/macro_QS(B)",
+  "region_weighting": "equal regions; deterministic controls have no neural seed dimension",
+  "selection_numeric_tolerance": 1e-10,
+  "objective_tie_tolerance": 1e-12,
+  "clip": 30.0,
+  "diagnostic_beta": "Recent16 and Matched16 reuse this R28 beta unchanged",
+  "run_id": "8d13a8baa2d74591f006de8e236ebf8ca3f089540e356ce230775264788e38ff",
+  "selection_only": true,
+  "H2_labels_opened": false,
+  "source_barrier": {
+    "source_records_verified": 1118,
+    "protected_old_files_unchanged": 4331,
+    "source_snapshots_unchanged": 327,
+    "resource": {
+      "wall_seconds": 70.3644913174212,
+      "cpu_seconds": 70.37747499999999,
+      "cpu_core_hours": 0.01954929861111111,
+      "peak_rss_kib": 724192,
+      "threads": 1,
+      "gpu_seconds": 0,
+      "gpu_hours": 0,
+      "neural_training": 0,
+      "lightgbm_retraining": 0,
+      "new_model_inference": 0,
+      "max_cpu_core_hours": 8,
+      "max_wall_hours": 3
+    }
+  }
+}

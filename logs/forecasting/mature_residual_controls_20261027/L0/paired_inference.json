@@ -1,0 +1,1119 @@
+{
+  "2022H2": {
+    "R28_minus_B": {
+      "method": "synchronized_non_circular_moving_day_block_percentile",
+      "date_basis": "AEST forecast-origin date; retain every lead within its origin date",
+      "estimand": "within-region paired loss sums divided by cell counts, then equal-region macro",
+      "regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "days": 183,
+      "bootstrap_replicates": 2000,
+      "bootstrap_confidence": 0.95,
+      "bootstrap_blocks_days": [
+        7,
+        14,
+        28
+      ],
+      "bootstrap_seed": 20261027,
+      "blocks": [
+        {
+          "block_days": 7,
+          "primary": true,
+          "available": true,
+          "valid_block_starts": 177,
+          "replicates": 2000,
+          "rng_seed": 20261034,
+          "common_day_indices_sha256": "cf2392afda965aa022790fe0b0a8ce02ff73dcbc83ac9bd164fc964a0a4627be",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.895453821090383,
+                "lower": -14.627362068480519,
+                "upper": -6.975876129522174
+              },
+              "qs": {
+                "estimate": -5.303917062229995,
+                "lower": -8.19819383069039,
+                "upper": -2.9684690326753382
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -8.277975771314068,
+                "lower": -11.65134813080475,
+                "upper": -4.7898739504587935
+              },
+              "qs": {
+                "estimate": -2.447860614969905,
+                "lower": -4.621607594154277,
+                "upper": -0.5680977865262826
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -5.480353977164247,
+                "lower": -8.901631984282684,
+                "upper": -1.937655732957661
+              },
+              "qs": {
+                "estimate": -0.8945816712711386,
+                "lower": -2.8577310200039863,
+                "upper": 1.1644963385520293
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.2179278565229,
+              "lower": -11.41151579628182,
+              "upper": -4.841646256921724
+            },
+            "qs": {
+              "estimate": -2.8821197828236795,
+              "lower": -4.912662891182415,
+              "upper": -1.0840015814338215
+            }
+          }
+        },
+        {
+          "block_days": 14,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 170,
+          "replicates": 2000,
+          "rng_seed": 20261041,
+          "common_day_indices_sha256": "d350790ebf8e14b49627b37b83a0d6bbe95195808a829a076a7de1a9b22a76d7",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.895453821090383,
+                "lower": -15.23060611146528,
+                "upper": -6.296244599237855
+              },
+              "qs": {
+                "estimate": -5.303917062229995,
+                "lower": -8.97103721746159,
+                "upper": -2.338867661919381
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -8.277975771314068,
+                "lower": -12.329204230273634,
+                "upper": -4.150876926610446
+              },
+              "qs": {
+                "estimate": -2.447860614969905,
+                "lower": -5.423958189510958,
+                "upper": -0.15075937296979303
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -5.480353977164247,
+                "lower": -9.249691385433835,
+                "upper": -1.1144782112672262
+              },
+              "qs": {
+                "estimate": -0.8945816712711386,
+                "lower": -3.2178930379383566,
+                "upper": 1.6075891688147428
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.2179278565229,
+              "lower": -11.870524619587572,
+              "upper": -4.251089745000002
+            },
+            "qs": {
+              "estimate": -2.8821197828236795,
+              "lower": -5.394435659892113,
+              "upper": -0.7678847999618515
+            }
+          }
+        },
+        {
+          "block_days": 28,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 156,
+          "replicates": 2000,
+          "rng_seed": 20261055,
+          "common_day_indices_sha256": "54fc168b895cd5693eda2238c5a8bc0798f5f96acf5e9f529264e2b73ce4e759",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.895453821090383,
+                "lower": -16.211638989611444,
+                "upper": -5.439986508849122
+              },
+              "qs": {
+                "estimate": -5.303917062229995,
+                "lower": -10.135711696444957,
+                "upper": -1.9813750930835823
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -8.277975771314068,
+                "lower": -13.289382367690289,
+                "upper": -3.743669949580959
+              },
+              "qs": {
+                "estimate": -2.447860614969905,
+                "lower": -6.294392856714279,
+                "upper": 0.04912201464503636
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -5.480353977164247,
+                "lower": -9.380303447876349,
+                "upper": -0.6818088680089327
+              },
+              "qs": {
+                "estimate": -0.8945816712711386,
+                "lower": -3.190975341420182,
+                "upper": 1.7587903338139066
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.2179278565229,
+              "lower": -12.573083834401038,
+              "upper": -3.683120739794299
+            },
+            "qs": {
+              "estimate": -2.8821197828236795,
+              "lower": -5.922293890663632,
+              "upper": -0.5517513278781606
+            }
+          }
+        }
+      ],
+      "point_region": {
+        "NSW1": {
+          "mae": -10.895453821090383,
+          "qs": -5.303917062229995
+        },
+        "QLD1": {
+          "mae": -8.277975771314068,
+          "qs": -2.447860614969905
+        },
+        "TAS1": {
+          "mae": -5.480353977164247,
+          "qs": -0.8945816712711386
+        }
+      },
+      "point_macro": {
+        "mae": -8.2179278565229,
+        "qs": -2.8821197828236795
+      },
+      "decision_uses_confidence_interval": false,
+      "interval_scope": "pointwise descriptive 95% intervals; no simultaneous or multiplicity-adjusted inference",
+      "limitations": [
+        "Overlapping origins remain dependent within date blocks; the day block length is prespecified.",
+        "Intervals are descriptive under temporal dependence and drift, not guarantees under arbitrary nonstationarity.",
+        "Regions share resampled dates; neural seeds are not resampled or treated as independent market data."
+      ]
+    },
+    "Recent16_minus_B": {
+      "method": "synchronized_non_circular_moving_day_block_percentile",
+      "date_basis": "AEST forecast-origin date; retain every lead within its origin date",
+      "estimand": "within-region paired loss sums divided by cell counts, then equal-region macro",
+      "regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "days": 183,
+      "bootstrap_replicates": 2000,
+      "bootstrap_confidence": 0.95,
+      "bootstrap_blocks_days": [
+        7,
+        14,
+        28
+      ],
+      "bootstrap_seed": 20261027,
+      "blocks": [
+        {
+          "block_days": 7,
+          "primary": true,
+          "available": true,
+          "valid_block_starts": 177,
+          "replicates": 2000,
+          "rng_seed": 20261034,
+          "common_day_indices_sha256": "cf2392afda965aa022790fe0b0a8ce02ff73dcbc83ac9bd164fc964a0a4627be",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -11.176106074718506,
+                "lower": -14.733831294425887,
+                "upper": -7.501042514113799
+              },
+              "qs": {
+                "estimate": -5.8068772249737375,
+                "lower": -8.482941523190922,
+                "upper": -3.590361780206715
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.381991580275544,
+                "lower": -12.404055012283672,
+                "upper": -6.232609555163012
+              },
+              "qs": {
+                "estimate": -3.39283289534103,
+                "lower": -5.30483806110438,
+                "upper": -1.7295911297426643
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.289900005391741,
+                "lower": -9.721148625198872,
+                "upper": -3.097581853927643
+              },
+              "qs": {
+                "estimate": -1.9107966810700026,
+                "lower": -3.750778943429372,
+                "upper": -0.23522439246012905
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.94933255346193,
+              "lower": -12.129219827417328,
+              "upper": -5.734628734492221
+            },
+            "qs": {
+              "estimate": -3.7035022671282563,
+              "lower": -5.675691299275592,
+              "upper": -1.9840805754165127
+            }
+          }
+        },
+        {
+          "block_days": 14,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 170,
+          "replicates": 2000,
+          "rng_seed": 20261041,
+          "common_day_indices_sha256": "d350790ebf8e14b49627b37b83a0d6bbe95195808a829a076a7de1a9b22a76d7",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -11.176106074718506,
+                "lower": -15.363336259586912,
+                "upper": -6.758785726927465
+              },
+              "qs": {
+                "estimate": -5.8068772249737375,
+                "lower": -9.22212109934974,
+                "upper": -3.0457132759541476
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.381991580275544,
+                "lower": -13.161307620674796,
+                "upper": -5.708635482188474
+              },
+              "qs": {
+                "estimate": -3.39283289534103,
+                "lower": -6.020964260350598,
+                "upper": -1.4166119410201428
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.289900005391741,
+                "lower": -10.178910331226101,
+                "upper": -2.3696286498203665
+              },
+              "qs": {
+                "estimate": -1.9107966810700026,
+                "lower": -4.191351132396635,
+                "upper": 0.0026296289716781058
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.94933255346193,
+              "lower": -12.485369120857763,
+              "upper": -5.077702437244796
+            },
+            "qs": {
+              "estimate": -3.7035022671282563,
+              "lower": -6.271199552730299,
+              "upper": -1.6300535602864978
+            }
+          }
+        },
+        {
+          "block_days": 28,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 156,
+          "replicates": 2000,
+          "rng_seed": 20261055,
+          "common_day_indices_sha256": "54fc168b895cd5693eda2238c5a8bc0798f5f96acf5e9f529264e2b73ce4e759",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -11.176106074718506,
+                "lower": -16.1517069100436,
+                "upper": -6.057520374875453
+              },
+              "qs": {
+                "estimate": -5.8068772249737375,
+                "lower": -10.413050894528158,
+                "upper": -2.7850552139826537
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.381991580275544,
+                "lower": -13.763415666738824,
+                "upper": -5.442570787056692
+              },
+              "qs": {
+                "estimate": -3.39283289534103,
+                "lower": -6.895637942228419,
+                "upper": -1.1968769307568417
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.289900005391741,
+                "lower": -10.489202466650353,
+                "upper": -1.6578173840817119
+              },
+              "qs": {
+                "estimate": -1.9107966810700026,
+                "lower": -4.28990295656991,
+                "upper": 0.2910005942327042
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.94933255346193,
+              "lower": -13.329312674448659,
+              "upper": -4.567145078237141
+            },
+            "qs": {
+              "estimate": -3.7035022671282563,
+              "lower": -6.994576384302933,
+              "upper": -1.4025161410989324
+            }
+          }
+        }
+      ],
+      "point_region": {
+        "NSW1": {
+          "mae": -11.176106074718506,
+          "qs": -5.8068772249737375
+        },
+        "QLD1": {
+          "mae": -9.381991580275544,
+          "qs": -3.39283289534103
+        },
+        "TAS1": {
+          "mae": -6.289900005391741,
+          "qs": -1.9107966810700026
+        }
+      },
+      "point_macro": {
+        "mae": -8.94933255346193,
+        "qs": -3.7035022671282563
+      },
+      "decision_uses_confidence_interval": false,
+      "interval_scope": "pointwise descriptive 95% intervals; no simultaneous or multiplicity-adjusted inference",
+      "limitations": [
+        "Overlapping origins remain dependent within date blocks; the day block length is prespecified.",
+        "Intervals are descriptive under temporal dependence and drift, not guarantees under arbitrary nonstationarity.",
+        "Regions share resampled dates; neural seeds are not resampled or treated as independent market data."
+      ]
+    },
+    "Matched16_minus_B": {
+      "method": "synchronized_non_circular_moving_day_block_percentile",
+      "date_basis": "AEST forecast-origin date; retain every lead within its origin date",
+      "estimand": "within-region paired loss sums divided by cell counts, then equal-region macro",
+      "regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "days": 183,
+      "bootstrap_replicates": 2000,
+      "bootstrap_confidence": 0.95,
+      "bootstrap_blocks_days": [
+        7,
+        14,
+        28
+      ],
+      "bootstrap_seed": 20261027,
+      "blocks": [
+        {
+          "block_days": 7,
+          "primary": true,
+          "available": true,
+          "valid_block_starts": 177,
+          "replicates": 2000,
+          "rng_seed": 20261034,
+          "common_day_indices_sha256": "cf2392afda965aa022790fe0b0a8ce02ff73dcbc83ac9bd164fc964a0a4627be",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.72251157360942,
+                "lower": -14.004040164444168,
+                "upper": -7.510402392479414
+              },
+              "qs": {
+                "estimate": -5.605153600238903,
+                "lower": -7.887893642809907,
+                "upper": -3.762822171844296
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.503524585656248,
+                "lower": -12.331652077440285,
+                "upper": -6.628065309305491
+              },
+              "qs": {
+                "estimate": -3.413453358193383,
+                "lower": -5.091522999657118,
+                "upper": -2.0072716954764664
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.597308282411795,
+                "lower": -9.588844895101838,
+                "upper": -3.5837311459202263
+              },
+              "qs": {
+                "estimate": -2.3580868997097313,
+                "lower": -3.941174171428497,
+                "upper": -0.9552385059707613
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.941114813892488,
+              "lower": -11.803503859826574,
+              "upper": -6.089057462325227
+            },
+            "qs": {
+              "estimate": -3.7922312860473393,
+              "lower": -5.362812458770782,
+              "upper": -2.443337966796499
+            }
+          }
+        },
+        {
+          "block_days": 14,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 170,
+          "replicates": 2000,
+          "rng_seed": 20261041,
+          "common_day_indices_sha256": "d350790ebf8e14b49627b37b83a0d6bbe95195808a829a076a7de1a9b22a76d7",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.72251157360942,
+                "lower": -14.470297649916898,
+                "upper": -6.81937590641607
+              },
+              "qs": {
+                "estimate": -5.605153600238903,
+                "lower": -8.618404953317885,
+                "upper": -3.1967446826306953
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.503524585656248,
+                "lower": -12.991732482378236,
+                "upper": -6.081172360721384
+              },
+              "qs": {
+                "estimate": -3.413453358193383,
+                "lower": -5.677762698946959,
+                "upper": -1.6911587485994326
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.597308282411795,
+                "lower": -10.140726528045846,
+                "upper": -2.9842029378351222
+              },
+              "qs": {
+                "estimate": -2.3580868997097313,
+                "lower": -4.3109027138714895,
+                "upper": -0.6867117637467423
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.941114813892488,
+              "lower": -12.21739278932243,
+              "upper": -5.532854211969425
+            },
+            "qs": {
+              "estimate": -3.7922312860473393,
+              "lower": -5.887858952304679,
+              "upper": -2.0725759817394067
+            }
+          }
+        },
+        {
+          "block_days": 28,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 156,
+          "replicates": 2000,
+          "rng_seed": 20261055,
+          "common_day_indices_sha256": "54fc168b895cd5693eda2238c5a8bc0798f5f96acf5e9f529264e2b73ce4e759",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -10.72251157360942,
+                "lower": -14.883532487963913,
+                "upper": -6.28912482689251
+              },
+              "qs": {
+                "estimate": -5.605153600238903,
+                "lower": -9.541895330947126,
+                "upper": -2.949656244551064
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -9.503524585656248,
+                "lower": -13.3153994602535,
+                "upper": -5.978543053361404
+              },
+              "qs": {
+                "estimate": -3.413453358193383,
+                "lower": -6.491739331500322,
+                "upper": -1.5024841601197316
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -6.597308282411795,
+                "lower": -10.533713831967294,
+                "upper": -2.317900450374761
+              },
+              "qs": {
+                "estimate": -2.3580868997097313,
+                "lower": -4.444529770815457,
+                "upper": -0.4242897272582318
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -8.941114813892488,
+              "lower": -12.519610438655434,
+              "upper": -5.0796939060715935
+            },
+            "qs": {
+              "estimate": -3.7922312860473393,
+              "lower": -6.479023346104837,
+              "upper": -1.8712686335913815
+            }
+          }
+        }
+      ],
+      "point_region": {
+        "NSW1": {
+          "mae": -10.72251157360942,
+          "qs": -5.605153600238903
+        },
+        "QLD1": {
+          "mae": -9.503524585656248,
+          "qs": -3.413453358193383
+        },
+        "TAS1": {
+          "mae": -6.597308282411795,
+          "qs": -2.3580868997097313
+        }
+      },
+      "point_macro": {
+        "mae": -8.941114813892488,
+        "qs": -3.7922312860473393
+      },
+      "decision_uses_confidence_interval": false,
+      "interval_scope": "pointwise descriptive 95% intervals; no simultaneous or multiplicity-adjusted inference",
+      "limitations": [
+        "Overlapping origins remain dependent within date blocks; the day block length is prespecified.",
+        "Intervals are descriptive under temporal dependence and drift, not guarantees under arbitrary nonstationarity.",
+        "Regions share resampled dates; neural seeds are not resampled or treated as independent market data."
+      ]
+    },
+    "Recent16_minus_R28": {
+      "method": "synchronized_non_circular_moving_day_block_percentile",
+      "date_basis": "AEST forecast-origin date; retain every lead within its origin date",
+      "estimand": "within-region paired loss sums divided by cell counts, then equal-region macro",
+      "regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "days": 183,
+      "bootstrap_replicates": 2000,
+      "bootstrap_confidence": 0.95,
+      "bootstrap_blocks_days": [
+        7,
+        14,
+        28
+      ],
+      "bootstrap_seed": 20261027,
+      "blocks": [
+        {
+          "block_days": 7,
+          "primary": true,
+          "available": true,
+          "valid_block_starts": 177,
+          "replicates": 2000,
+          "rng_seed": 20261034,
+          "common_day_indices_sha256": "cf2392afda965aa022790fe0b0a8ce02ff73dcbc83ac9bd164fc964a0a4627be",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -0.2806522536281238,
+                "lower": -0.7591074210941474,
+                "upper": 0.18671687028030115
+              },
+              "qs": {
+                "estimate": -0.5029601627437513,
+                "lower": -0.8219173683664399,
+                "upper": -0.19726975054008572
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.1040158089614769,
+                "lower": -2.054616848743288,
+                "upper": -0.2833534706175767
+              },
+              "qs": {
+                "estimate": -0.9449722803711255,
+                "lower": -1.4363589914519068,
+                "upper": -0.4870436215638814
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -0.8095460282274924,
+                "lower": -1.9926333016994187,
+                "upper": 0.07658070337677948
+              },
+              "qs": {
+                "estimate": -1.0162150097988625,
+                "lower": -1.9599892202423341,
+                "upper": -0.2494956203935038
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.731404696939031,
+              "lower": -1.2506770417930049,
+              "upper": -0.29894563953978814
+            },
+            "qs": {
+              "estimate": -0.8213824843045797,
+              "lower": -1.1520448679654731,
+              "upper": -0.5376669977956566
+            }
+          }
+        },
+        {
+          "block_days": 14,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 170,
+          "replicates": 2000,
+          "rng_seed": 20261041,
+          "common_day_indices_sha256": "d350790ebf8e14b49627b37b83a0d6bbe95195808a829a076a7de1a9b22a76d7",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -0.2806522536281238,
+                "lower": -0.7300265533830378,
+                "upper": 0.18056983881230834
+              },
+              "qs": {
+                "estimate": -0.5029601627437513,
+                "lower": -0.8266745768340864,
+                "upper": -0.1584736940174688
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.1040158089614769,
+                "lower": -2.066278305383986,
+                "upper": -0.3126097415303083
+              },
+              "qs": {
+                "estimate": -0.9449722803711255,
+                "lower": -1.4562258171201492,
+                "upper": -0.41949513820878603
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -0.8095460282274924,
+                "lower": -2.3531164931977204,
+                "upper": 0.15780923058350274
+              },
+              "qs": {
+                "estimate": -1.0162150097988625,
+                "lower": -2.2971449609010666,
+                "upper": -0.1060047132534329
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.731404696939031,
+              "lower": -1.297306260413026,
+              "upper": -0.3211050669582677
+            },
+            "qs": {
+              "estimate": -0.8213824843045797,
+              "lower": -1.2087667926147054,
+              "upper": -0.5378599247959486
+            }
+          }
+        },
+        {
+          "block_days": 28,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 156,
+          "replicates": 2000,
+          "rng_seed": 20261055,
+          "common_day_indices_sha256": "54fc168b895cd5693eda2238c5a8bc0798f5f96acf5e9f529264e2b73ce4e759",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": -0.2806522536281238,
+                "lower": -0.716181154478248,
+                "upper": 0.2214251068937219
+              },
+              "qs": {
+                "estimate": -0.5029601627437513,
+                "lower": -0.8339032646870486,
+                "upper": -0.1150775480333336
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.1040158089614769,
+                "lower": -2.035611486763295,
+                "upper": -0.3643466764502269
+              },
+              "qs": {
+                "estimate": -0.9449722803711255,
+                "lower": -1.4178805563663786,
+                "upper": -0.39560637252285313
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -0.8095460282274924,
+                "lower": -2.680246570573745,
+                "upper": 0.14255412053967853
+              },
+              "qs": {
+                "estimate": -1.0162150097988625,
+                "lower": -2.6105025319349435,
+                "upper": -0.08790930611137307
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.731404696939031,
+              "lower": -1.2542114755839,
+              "upper": -0.4922202513090321
+            },
+            "qs": {
+              "estimate": -0.8213824843045797,
+              "lower": -1.244573643172186,
+              "upper": -0.5757549457192065
+            }
+          }
+        }
+      ],
+      "point_region": {
+        "NSW1": {
+          "mae": -0.2806522536281238,
+          "qs": -0.5029601627437513
+        },
+        "QLD1": {
+          "mae": -1.1040158089614769,
+          "qs": -0.9449722803711255
+        },
+        "TAS1": {
+          "mae": -0.8095460282274924,
+          "qs": -1.0162150097988625
+        }
+      },
+      "point_macro": {
+        "mae": -0.731404696939031,
+        "qs": -0.8213824843045797
+      },
+      "decision_uses_confidence_interval": false,
+      "interval_scope": "pointwise descriptive 95% intervals; no simultaneous or multiplicity-adjusted inference",
+      "limitations": [
+        "Overlapping origins remain dependent within date blocks; the day block length is prespecified.",
+        "Intervals are descriptive under temporal dependence and drift, not guarantees under arbitrary nonstationarity.",
+        "Regions share resampled dates; neural seeds are not resampled or treated as independent market data."
+      ]
+    },
+    "Matched16_minus_R28": {
+      "method": "synchronized_non_circular_moving_day_block_percentile",
+      "date_basis": "AEST forecast-origin date; retain every lead within its origin date",
+      "estimand": "within-region paired loss sums divided by cell counts, then equal-region macro",
+      "regions": [
+        "NSW1",
+        "QLD1",
+        "TAS1"
+      ],
+      "days": 183,
+      "bootstrap_replicates": 2000,
+      "bootstrap_confidence": 0.95,
+      "bootstrap_blocks_days": [
+        7,
+        14,
+        28
+      ],
+      "bootstrap_seed": 20261027,
+      "blocks": [
+        {
+          "block_days": 7,
+          "primary": true,
+          "available": true,
+          "valid_block_starts": 177,
+          "replicates": 2000,
+          "rng_seed": 20261034,
+          "common_day_indices_sha256": "cf2392afda965aa022790fe0b0a8ce02ff73dcbc83ac9bd164fc964a0a4627be",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": 0.17294224748096293,
+                "lower": -0.9720118780761783,
+                "upper": 1.3654735656833747
+              },
+              "qs": {
+                "estimate": -0.3012365380089115,
+                "lower": -1.1308119457489694,
+                "upper": 0.6191476102273735
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.2255488143421787,
+                "lower": -2.442345891953222,
+                "upper": 0.044804369976942364
+              },
+              "qs": {
+                "estimate": -0.9655927432234759,
+                "lower": -1.6630945890762046,
+                "upper": -0.1775977051052556
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -1.11695430524755,
+                "lower": -2.334463188758142,
+                "upper": -0.20605377275469816
+              },
+              "qs": {
+                "estimate": -1.4635052284385932,
+                "lower": -2.4770921037973244,
+                "upper": -0.707950520822212
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.7231869573695885,
+              "lower": -1.6864447012332995,
+              "upper": 0.21869184951353376
+            },
+            "qs": {
+              "estimate": -0.9101115032236602,
+              "lower": -1.6095890235182986,
+              "upper": -0.24516381321607453
+            }
+          }
+        },
+        {
+          "block_days": 14,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 170,
+          "replicates": 2000,
+          "rng_seed": 20261041,
+          "common_day_indices_sha256": "d350790ebf8e14b49627b37b83a0d6bbe95195808a829a076a7de1a9b22a76d7",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": 0.17294224748096293,
+                "lower": -1.0709357747612325,
+                "upper": 1.6760917804517257
+              },
+              "qs": {
+                "estimate": -0.3012365380089115,
+                "lower": -1.2092972857335238,
+                "upper": 0.7924371176327075
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.2255488143421787,
+                "lower": -2.5804317113349704,
+                "upper": 0.22764513068205194
+              },
+              "qs": {
+                "estimate": -0.9655927432234759,
+                "lower": -1.762920022969176,
+                "upper": -0.07299970184252892
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -1.11695430524755,
+                "lower": -2.4998344779196673,
+                "upper": -0.22463331875187836
+              },
+              "qs": {
+                "estimate": -1.4635052284385932,
+                "lower": -2.6517862228389397,
+                "upper": -0.6353964303019334
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.7231869573695885,
+              "lower": -1.838210918115985,
+              "upper": 0.3658373557713371
+            },
+            "qs": {
+              "estimate": -0.9101115032236602,
+              "lower": -1.69213097916655,
+              "upper": -0.1503125594384353
+            }
+          }
+        },
+        {
+          "block_days": 28,
+          "primary": false,
+          "available": true,
+          "valid_block_starts": 156,
+          "replicates": 2000,
+          "rng_seed": 20261055,
+          "common_day_indices_sha256": "54fc168b895cd5693eda2238c5a8bc0798f5f96acf5e9f529264e2b73ce4e759",
+          "regional": {
+            "NSW1": {
+              "mae": {
+                "estimate": 0.17294224748096293,
+                "lower": -1.1383413023473792,
+                "upper": 1.9340726281538878
+              },
+              "qs": {
+                "estimate": -0.3012365380089115,
+                "lower": -1.23222380509924,
+                "upper": 0.9203805199466315
+              }
+            },
+            "QLD1": {
+              "mae": {
+                "estimate": -1.2255488143421787,
+                "lower": -2.5838170580672526,
+                "upper": 0.4977941594837717
+              },
+              "qs": {
+                "estimate": -0.9655927432234759,
+                "lower": -1.758687866761802,
+                "upper": 0.10137802214287113
+              }
+            },
+            "TAS1": {
+              "mae": {
+                "estimate": -1.11695430524755,
+                "lower": -2.3485764896082073,
+                "upper": -0.5344174716420242
+              },
+              "qs": {
+                "estimate": -1.4635052284385932,
+                "lower": -2.755531446535246,
+                "upper": -0.7809421449766303
+              }
+            }
+          },
+          "macro": {
+            "mae": {
+              "estimate": -0.7231869573695885,
+              "lower": -1.7913304971462027,
+              "upper": 0.497217880935146
+            },
+            "qs": {
+              "estimate": -0.9101115032236602,
+              "lower": -1.7387677687268486,
+              "upper": -0.13195981436401194
+            }
+          }
+        }
+      ],
+      "point_region": {
+        "NSW1": {
+          "mae": 0.17294224748096293,
+          "qs": -0.3012365380089115
+        },
+        "QLD1": {
+          "mae": -1.2255488143421787,
+          "qs": -0.9655927432234759
+        },
+        "TAS1": {
+          "mae": -1.11695430524755,
+          "qs": -1.4635052284385932
+        }
+      },
+      "point_macro": {
+        "mae": -0.7231869573695885,
+        "qs": -0.9101115032236602
+      },
+      "decision_uses_confidence_interval": false,
+      "interval_scope": "pointwise descriptive 95% intervals; no simultaneous or multiplicity-adjusted inference",
+      "limitations": [
+        "Overlapping origins remain dependent within date blocks; the day block length is prespecified.",
+        "Intervals are descriptive under temporal dependence and drift, not guarantees under arbitrary nonstationarity.",
+        "Regions share resampled dates; neural seeds are not resampled or treated as independent market data."
+      ]
+    }
+  }
+}

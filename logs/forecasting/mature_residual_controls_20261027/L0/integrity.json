@@ -1,0 +1,37 @@
+{
+  "checks": {
+    "source_hashes_verified": true,
+    "baseline_archive_reproduced": true,
+    "samples_aligned": true,
+    "candidates_independently_verified": true,
+    "future_labels_invariant": true,
+    "maturity_boundary_verified": true,
+    "purge_verified": true,
+    "quantiles_ordered": true,
+    "beta_zero_exact": true,
+    "deterministic_simple_arms": true,
+    "old_files_unchanged": true
+  },
+  "barrier": {
+    "source_records_verified": 1518,
+    "protected_old_files_unchanged": 4331,
+    "source_snapshots_unchanged": 327,
+    "resource": {
+      "wall_seconds": 179.930391125381,
+      "cpu_seconds": 179.89838799999998,
+      "cpu_core_hours": 0.04997177444444444,
+      "peak_rss_kib": 905000,
+      "threads": 1,
+      "gpu_seconds": 0,
+      "gpu_hours": 0,
+      "neural_training": 0,
+      "lightgbm_retraining": 0,
+      "new_model_inference": 0,
+      "max_cpu_core_hours": 8,
+      "max_wall_hours": 3
+    }
+  },
+  "evidence": "integrity_evidence.json",
+  "score_reproduction": "source_manifest.json",
+  "committed_boundary_tests": "tests/test_mature_residual_controls.py"
+}
