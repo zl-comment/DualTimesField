@@ -1,0 +1,93 @@
+结论：上尺度的全局删除方案未通过预先固定的保护条件，停止本路线进入 L1。
+
+本轮已经完成实际批量诊断和独立复算。删除上尺度使正式宏平均 QS 改善 0.058955，但 NSW1 总体 QS 退化，QLD1 普通价组、NSW1 和 TAS1 极端价组也退化。它没有同时保住尖峰收益和普通价表现。正式模型保持原样，不启动重训、L1 或 54 次确认矩阵。
+
+1. 分支与冻结协议
+
+新实验分支：research/v5-upper-scale-removal-diagnostic-20261027
+父提交：db54f7393eb7d1527c43c49fcc296a7b01c3749f
+运行源码提交：044d6f74a44a40bbf7d84421d57d957c2f3ffff8
+运行 ID：7c92160a4359e72d84ad3e49924ae49da6eaac1f61149cee4a260456bf5730eb
+运行开始前工作区干净，配置、源码与停止条件已提交。新分支先于实现及批量运行建立，遵守 /root/workspace/Code/DualTimesField/AGENTS.md 的批量实验规则。
+
+唯一改变：
+Q'_q = B_q + (Q_Full,50 − B_50)，q∈{0.90,0.95}；
+q05、q10、q50 复制原 Full，逐值不变。
+
+已从代码及真实模型单测确认：纯上尺度改变不进入 location、历史匹配、事件移动或采用门。由于完整历史校正是共同平移，上式删除上尺度同时保留原位置、下尺度、完整历史与原 alpha。这是保存输出上的 FP64 数学干预；不声称它与重新执行 FP32 forward 的上分位逐位一致。共同历史平移使用事先由 FP32 加法和 FP64 混合推导的舍入界，未根据结果放宽。
+
+实际矩阵：90 个原 checkpoint 输出 case、全部保存起报点与 24 小时目标。正式 Full_joint guarded 的三地区×三 seed 共 9 case 为唯一主分析；正式 raw 9 case 和开发期 reference/bounded、raw/guarded 的 72 case 为辅助分析。所有 case 都保留原 checkpoint、epoch、alpha；没有按评估结果挑地区、调上尺度或重选模型。
+
+预先固定的主门槛：宏 QS 严格改善；每地区三个 seed 平均的整体 QS、普通价 [0,300)、单独保护的 [0,100)、极端价≥1000 的 QS 均不退化，且样本非空；前三分位逐值不变、分位有序、共同历史前提通过。数值容限为 1e−10，不是统计非劣界限。[0,300) 与小分组重叠，不能重复相加当损失贡献。
+
+2. 已运行并独立核验的正式结果
+
+三地区等权、三个神经 seed 均值：
+预测                    MAE           QS
+B                       37.113225     24.181184
+原 Full                 37.782803     24.392180
+删除上尺度的 Full       37.782803     24.333225
+
+相对原 Full，ΔQS=−0.058955；相对 B，QS 仍差 +0.152042，MAE 仍差 +0.669578。MAE 不变是这项干预的结构性不变性，不能写成新的点预测增益。
+
+以下为“删除后−原 Full”的 QS 差，负值改善。价格组数字是该组条件均值，不是对总体损失的贡献。
+地区       全样本       [0,300)      [0,100)      ≥1000
+NSW1      +0.063971     −0.008582    +0.126987    +20.213833
+QLD1      −0.225799     +1.031160    +0.390165   −241.212552
+TAS1      −0.015036     −0.028917    −0.055396     +2.002670
+
+12 个地区×整体/价格保护项均非空，其中 6 项失败：NSW1 整体、[0,100)、极端；QLD1 [0,300)、[0,100)；TAS1 极端。因此 stop_global_upper_removal 是预设规则的直接结果，不能用总体改善或辅助 raw 结果覆盖。
+
+逐 seed 也不一致：NSW1 有两个 seed 退化、一个改善；QLD1 三个均改善；TAS1 两个改善、一个退化。分年看，NSW1 在 2023、2024 均退化；QLD1 改善主要集中在 2024。神经 seed 差异仅描述优化敏感性，不构成独立市场复现或显著性证明。
+
+3. 改善与伤害究竟来自哪里
+
+两项上分位并未同时改善。宏平均 pinball：q90 改善 −0.259184，q95 退化 +0.111797。其他三个分位损失不变，严格满足
+ΔQS = (2/5) × (ΔPB90 + ΔPB95)。
+QS 毛获益为 1.344237、毛伤害为 1.285282，净改善是二者相抵后的 −0.058955。
+
+按各组占比加权后，对总体 ΔQS 的贡献：
+负价                 −0.013490
+[0,100)              +0.078330
+[100,300)            +0.202126
+[300,1000)           +0.012416
+≥1000                −0.338337
+合计                 −0.058955
+极端单元约占 0.3501%。这说明总体改善依赖少量高价单元，普通价损失确实增加；不能仅看总体 QS 就认为研究目标已实现。QLD1 是最明确的取舍：极端价 QS 大幅改善，而 [0,300) QS 增加 1.031160。
+
+80% 覆盖率 0.685648→0.720296，宽度 73.2286→83.5941；90% 覆盖率 0.826990→0.847314，宽度 118.0788→140.8954。覆盖更接近名义值伴随更宽区间，不能单独证明概率校准成功。QLD1 普通价 [0,300) 的 90% 覆盖率约 0.85370→0.89855，宽度 132.183→193.678，QS 却变差，正好给出反例。
+
+本轮 ΔQS −0.058955 也不等于前轮“上尺度顺序归因 +0.065788”的简单取负：前轮比较是在历史平移之前的 Anchor 路径上，本轮在完整 Full 输出上撤销上尺度。pinball 非线性使作用点不同的两种比较不必数值相反。
+
+4. 辅助结果与研究判断
+
+正式 raw 的宏 ΔQS 为 −0.117565，但它不是预先指定的主分析，不能替代失败的 guarded 结论。开发期也未给出稳定优势：bounded guarded 在 2021、2022 的宏 ΔQS 分别为 +0.005182、+0.095792；reference guarded 分别为 −0.056703、+0.201074。全部反例和原选模身份保留在 CSV 中。
+
+基于本轮证据，应否定的具体假设是：“对现有固定 Full，一律取消上尺度，就能在提高总体概率预测的同时保护各地区普通价和极端价表现。”支持的有限判断是：上尺度确有可撤销的损失，但其作用随地区、时期和分位而不同；全局删除并未解决采用校正的收益—伤害取舍。
+
+本轮不据此新增地区规则、真实价格路由或新缩放系数，也不把 q90 改善当成拆分新预测头已经有效的证据。现有反事实不代表删除模块后重训的总效应。保护性筛选规则比仅优化总体 QS 更严格；本轮遵守原规则，不在失败后放宽。
+
+5. 核验与证据边界
+
+23 项无训练测试通过，其中本轮新增 11 项。独立脚本未导入生产 scorer/core/audit，复算 90 case、738 分组、74,324 项评分和聚合数值，最大误差 1.63e−11；上尾损失分解最大误差 6.36e−14。100 个产物哈希、原 checkpoint/epoch/alpha 全通过。
+全部 q05/q10/q50、前三 pinball、MAE、RMSE、bias、under_q05 不变，分位始终有序。8 个 alpha=0 case 精确保持 B。81 case 的共同历史平移通过预设舍入界；9 个正式 raw case 缺少对应 raw Anchor，明确保留该缺口，未借用 guarded Anchor。主分析 9 case 的证据完整。
+运行结束核对 3,701 个旧输入/结果文件和 222 个源码文件均未改变，源码快照一致。没有训练、重选模型、修改正式主表或推送远端。
+
+2021/2022 是开发期，2023/2024 也已经查看；本轮是已见数据上的完整样本冻结诊断，不是新盲测。极端组 NSW1/QLD1/TAS1 分别有 2040/1944/432 个 origin×horizon 单元，含重叠，不能写成独立极端事件数。不同地区可能共享市场冲击，90 case 及三个 seed 也不能视为独立市场重复。该数值筛选不构成显著性、统计非劣或条件覆盖保证。
+
+6. 复现与产物
+
+配置：/root/workspace/Code/DualTimesField/configs/upper_scale_audit.json
+入口：/root/workspace/Code/DualTimesField/scripts/audit_upper_scale.py
+完整输出：/root/workspace/Code/DualTimesField/outputs/forecasting/upper_scale_audit_20261027
+归档：/root/workspace/Code/DualTimesField/logs/forecasting/upper_scale_audit_20261027
+
+同一冻结实验的复现使用新输出目录，保留旧目录：
+cd /root/workspace/Code/DualTimesField
+.venv/bin/python -m pytest -q tests/test_upper_scale_audit.py tests/test_correction_value_audit.py
+.venv/bin/python scripts/audit_upper_scale.py --output outputs/forecasting/upper_scale_audit_20261027_reproduction
+
+独立核验原输出：
+.venv/bin/python logs/forecasting/upper_scale_audit_20261027/independent_verify.py outputs/forecasting/upper_scale_audit_20261027
+
+归档内 primary_summary.csv 是地区与保护组简表；primary_price_contribution.csv 给出加权贡献；scores.csv 保留所有单 case 分组；regional.csv/macro.csv 保留完整概率指标及 seed 差异；decision.json 保留所有失败门槛；run_manifest.json、verification.json、independent_verification.json 和 prediction_manifest.json 记录源码、来源及结果指纹。大体积配对预测与源码快照在完整输出目录。任何改变协议的新批量实验仍必须另建独立分支。

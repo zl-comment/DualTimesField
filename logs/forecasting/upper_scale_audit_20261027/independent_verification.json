@@ -1,0 +1,122 @@
+{
+  "status": "passed",
+  "run_id": "7c92160a4359e72d84ad3e49924ae49da6eaac1f61149cee4a260456bf5730eb",
+  "independent_implementation": "Standalone NumPy piecewise pinball and interval arithmetic; no imports from audit/core/scorers",
+  "cases": 90,
+  "primary_cases": 9,
+  "score_groups_checked": 738,
+  "scalar_metrics_checked": 39348,
+  "maximum_metric_abs_error": 1.6257217794191092e-11,
+  "aggregate_scalar_metrics_checked": 34976,
+  "all_q05_q10_q50_and_mae_unchanged": true,
+  "all_output_quantiles_ordered": true,
+  "all_point_rmse_bias_under_q05_and_lower_pinballs_unchanged": true,
+  "qs_delta_entirely_upper_pinball_verified": true,
+  "maximum_upper_tail_attribution_abs_error": 6.361577931102147e-14,
+  "alpha_zero_exact_cases": 8,
+  "source_checkpoint_epoch_alpha_all_verified": true,
+  "same_checkpoint_common_history_cases": 81,
+  "missing_raw_formal_anchor_cases": 9,
+  "max_common_shift_error_within_frozen_bound": 0.000457763671875,
+  "empty_score_groups_retained": 0,
+  "artifact_hashes_verified": 100,
+  "independent_decision": {
+    "passed": false,
+    "decision": "stop_global_upper_removal",
+    "primary_macro_qs_delta": -0.05895475466374924,
+    "regional_criteria": [
+      {
+        "region": "NSW1",
+        "group": "all",
+        "qs_delta": 0.06397056418186518,
+        "passed": false,
+        "nonempty": true
+      },
+      {
+        "region": "NSW1",
+        "group": "actual/0_to_300",
+        "qs_delta": -0.008581984903279336,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "NSW1",
+        "group": "actual/0_to_100",
+        "qs_delta": 0.12698709783784992,
+        "passed": false,
+        "nonempty": true
+      },
+      {
+        "region": "NSW1",
+        "group": "actual/1000_plus",
+        "qs_delta": 20.21383253323783,
+        "passed": false,
+        "nonempty": true
+      },
+      {
+        "region": "QLD1",
+        "group": "all",
+        "qs_delta": -0.22579889442353188,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "QLD1",
+        "group": "actual/0_to_300",
+        "qs_delta": 1.0311599357410577,
+        "passed": false,
+        "nonempty": true
+      },
+      {
+        "region": "QLD1",
+        "group": "actual/0_to_100",
+        "qs_delta": 0.39016478560817863,
+        "passed": false,
+        "nonempty": true
+      },
+      {
+        "region": "QLD1",
+        "group": "actual/1000_plus",
+        "qs_delta": -241.2125518321643,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "TAS1",
+        "group": "all",
+        "qs_delta": -0.015035933749580996,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "TAS1",
+        "group": "actual/0_to_300",
+        "qs_delta": -0.02891711348519267,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "TAS1",
+        "group": "actual/0_to_100",
+        "qs_delta": -0.05539593489848212,
+        "passed": true,
+        "nonempty": true
+      },
+      {
+        "region": "TAS1",
+        "group": "actual/1000_plus",
+        "qs_delta": 2.002669688731335,
+        "passed": false,
+        "nonempty": true
+      }
+    ],
+    "supporting_modes_used": false
+  },
+  "trained_models": 0,
+  "original_artifacts_written": false,
+  "limitations": [
+    "This verifies a retrospective frozen intervention, not a retrained model or causal effect.",
+    "The numerical screen does not establish statistical noninferiority or new blind-test performance.",
+    "The nine formal raw cases retain the missing same-checkpoint Anchor evidence gap."
+  ]
+}

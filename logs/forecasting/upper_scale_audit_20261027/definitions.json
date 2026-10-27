@@ -1,0 +1,17 @@
+{
+  "delta": "after upper_off loss minus original loss; negative is improvement",
+  "primary": "formal/Full_joint/guarded/selected; raw and development never select the intervention",
+  "formula": "first three quantiles copied; upper two = B upper + (original q50 - B q50)",
+  "comparison": "original and upper_off share each source checkpoint and alpha; no fitting or reselection",
+  "ordinary": "[0,300), with separately protected [0,100); overlapping groups must not be added",
+  "extreme": "actual >=1000; retrospective outcome grouping only",
+  "disjoint_prices": "negative, [0,100), [100,300), [300,1000), [1000,infinity)",
+  "year": "AEST forecast-origin year",
+  "common_history": "compared to same-checkpoint Anchor where available, with FP32 rounding bound; raw formal gap retained",
+  "qs": "2 * mean of five pinball losses; q-specific pinball columns use no factor 2",
+  "benefit": "mean(max(original loss - upper_off loss,0)); harm reverses the difference",
+  "neural_seeds": "optimization replicates, not independent markets",
+  "forecast_cells": "overlapping origin-horizon cells, not independent events",
+  "statistical_claim": "numerical prespecified screening only; no significance or statistical noninferiority claim",
+  "artifacts": "FP64 compact paired predictions, full origins; no duplicated neural checkpoint files"
+}
