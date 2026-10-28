@@ -1,0 +1,3 @@
+# Preserve exact source-response bytes and terminal control characters.
+evidence/raw/** -text -diff
+basic_smoke/stderr.txt -text -diff

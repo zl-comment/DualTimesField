@@ -1,0 +1,192 @@
+{
+  "run_id": "agent_evidence_contract_g0_20261028",
+  "created_at_utc": "2026-10-28T11:17:03.644383+00:00",
+  "branch": "research/agent-evidence-contract-g0-20261028",
+  "base_commit": "a090efe05766fcfb7ebad8d7e04305ffcbe74d3c",
+  "frozen_execution_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+  "results_commit": "Resolve with git log for this file; this later archival commit is not the execution source.",
+  "previous_plan_push": {
+    "remote": "origin",
+    "branch": "research/agent-zeroshot-feasibility-20261028",
+    "verified_remote_head": "a090efe05766fcfb7ebad8d7e04305ffcbe74d3c"
+  },
+  "g0_branch_pushed": false,
+  "decision": "STOP_CURRENT_COMBINATION",
+  "overall_g0_passed": false,
+  "full_protocol_compliance": false,
+  "g0_b_basic_tool": "passed",
+  "g0_a_numeric_paths": 0,
+  "event_pair": "not_run_no_legal_same_origin_input_path",
+  "advance_to_g1_g2": false,
+  "accuracy_evaluated": false,
+  "extraction_accuracy_evaluated": false,
+  "agent_increment_over_fixed_pipeline_evaluated": false,
+  "decision_scope": "Only the frozen source/input-contract/checkpoint combination; no general claim that news or agents cannot improve forecasting.",
+  "tests": {
+    "synthetic_tests_passed": 39,
+    "synthetic_tests_failed": 0,
+    "preflight_wall_seconds": 3.4687508530914783,
+    "real_model_calls_in_tests": 0,
+    "independent_cpu_checks_passed": 36,
+    "independent_evidence_consistency_passed": true,
+    "independent_checks_are_not_extraction_accuracy": true
+  },
+  "input": {
+    "region": "NSW1",
+    "row": 72,
+    "origin_utc": "2022-01-03T14:00:00Z",
+    "history_hours": 72,
+    "horizon_hours": 24,
+    "quantiles": [
+      0.05,
+      0.1,
+      0.5,
+      0.9,
+      0.95
+    ],
+    "input_hash": "bbc2f7e76d808ab170cffc39724478d6e97136643c5ccf37d6b63cab01700dfc",
+    "archive_asof_proven": false
+  },
+  "model": {
+    "checkpoint_revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "device": "cpu",
+    "dtype": "float32",
+    "state_sha256": "c325f9b311d6b97f7a72ad22f0dc11d56a895c010edd089468be85f68e6f733e",
+    "state_unchanged": true,
+    "native_shape": [
+      24,
+      5
+    ],
+    "forecast_file_sha256": "be525ef76c155b161701deffc3e5349ca5aae5317cb4bde0b8dd4bcde426e76b",
+    "native_negative_values": 10,
+    "native_crossings": 0
+  },
+  "sampling": {
+    "candidate_count": 117,
+    "predecessors": 10,
+    "reviewed_notices": 127,
+    "reviewed_chains": 68,
+    "category_counts": {
+      "withdrawal": 2,
+      "postponement": 0,
+      "conflict": 0,
+      "revision": 2,
+      "cross_day": 0,
+      "initial": 2
+    },
+    "all_primary_chain_counts": {
+      "revision": 8,
+      "withdrawal": 46,
+      "initial": 14
+    },
+    "source_frame_complete": false,
+    "collection_status": "partial",
+    "missing": [
+      {
+        "from_notice_id": 145307,
+        "notice_id": 145162,
+        "reason": "chain_member_cap"
+      }
+    ],
+    "zero_cross_day_primary_means": "存在跨日次级特征，被修订/撤销更高优先级吸收；不是无跨日公告。"
+  },
+  "selected_anchor_ids": [
+    145722,
+    145723,
+    145724,
+    145725,
+    145754,
+    145758
+  ],
+  "facts_or_explanation_only": 6,
+  "resources": {
+    "model_calls": 1,
+    "model_call_limit": 3,
+    "event_pair_calls": 0,
+    "event_pair_budget_unspent": 2,
+    "model_wall_seconds_including_spawn": 10.647937152534723,
+    "worker_wall_seconds": 9.328824482858181,
+    "worker_user_cpu_seconds": 8.686442,
+    "worker_system_cpu_seconds": 1.447074,
+    "worker_total_cpu_seconds": 10.133516,
+    "model_peak_rss_bytes": 1264910336,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "collection": {
+      "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+      "python_version": "3.11.0 | packaged by conda-forge | (main, Oct 25 2022, 06:24:40) [GCC 10.4.0]",
+      "wall_seconds": 562.4118750058115,
+      "http_requests": 131,
+      "bytes_received": 366268,
+      "bytes_charged": 366268,
+      "failed_requests": 2,
+      "successful_requests": 129,
+      "maximum_attempts_per_url": 2,
+      "maximum_body_bytes": 159051,
+      "limits": {
+        "requests": 160,
+        "total_bytes": 16777216,
+        "response_bytes": 262144,
+        "candidates": 120,
+        "predecessors": 36,
+        "chain_members": 6,
+        "lookback_days": 30,
+        "wall_seconds": 600
+      },
+      "extra_fetches_after_collect": 0
+    },
+    "gpu": 0,
+    "training": 0,
+    "model_downloads": 0,
+    "package_installations": 0,
+    "experiment_external_llm_calls": 0,
+    "collection_cpu_and_peak_rss": "not_measured",
+    "research_agent_token_and_cost_total": "not_metered_here",
+    "wall_time_scope": "Stage-specific measurements; not a complete elapsed time or cost account for research-agent analysis."
+  },
+  "protocol_deviations": [
+    {
+      "id": "human_review_not_performed",
+      "protocol_section": "1. G0-A公告抽样",
+      "required_text": "人工审核后再冻结最终分类和选择表",
+      "observed": "研究agent对源文裁定，并由另一research agent独立复核；未进行外部真人审核，也没有人工gold。",
+      "status": "uncompleted_human_task_and_protocol_difference",
+      "effect": "不能宣称人工审核已完成、完整协议验收通过或抽取准确率已测定。六链均拒绝，不需要为本轮STOP追索额外人工审批。"
+    },
+    {
+      "id": "request_start_clock_not_first_complete_acquisition",
+      "protocol_section": "1. G0-A公告抽样",
+      "required_text": "fetched_at是本次首次取得",
+      "observed": "执行源码在请求开始前写fetched_at_utc；未另存完整正文接收完成UTC。",
+      "status": "observation_implementation_limitation",
+      "effect": "该时钟不能证明完整正文当时可见或历史first_seen；不回填伪精确完成时间。本轮全部事件拒绝且未运行配对，对无事件放行结论没有影响。"
+    }
+  ],
+  "limitations": [
+    "研究agent源文裁定，没有外部真人金标准；本轮未评估抽取准确率、预测准确率或agent相对固定规则增益。",
+    "没有官方证明目录display或正文Creation Date的时区和首次公开语义；其不一致不是已证实泄漏。",
+    "fetched_at_utc在请求开始前记录，不能严格作为完整正文first_seen；保留原始记录，不回填伪精确完成时间。",
+    "Current index及空Archive不是完整历史证明。chain_audit.json顶层chain_complete=None不得解释为true；本报告所有selected complete_history_proven=false。",
+    "选中修订145754/145758的先前计划公告未知；公告内原计划/实际恢复可核验，不等于取得所有历史版本。",
+    "145831与145832/33可能是同一物理事件但没有显式跨链notice ID；保留关联疑点，不将链数解释为独立物理事件数。",
+    "145834标题23/10与正文27/10不一致；未修改源文或择一假装时间确定。",
+    "剩余两次真实模型调用保留未运行，未追加窗口、模型、地区或价格修正补救。",
+    "Frozen legacy input cache proves timestamp proxies only, not strict real-time availability.",
+    "Modern pretrained checkpoint overlap with the 2022 sample is not ruled out; this is a tool smoke only.",
+    "No independent OS syscall trace or extra model rerun was performed.",
+    "Neither same-origin alignment alone nor an input-schema expansion would prove semantic validity or forecast accuracy."
+  ],
+  "artifacts": {
+    "readme": "README.txt",
+    "manifest": "artifact_manifest.json",
+    "cpu": "basic_smoke/",
+    "cpu_verification": "independent_cpu_verification.json",
+    "evidence_verification": "independent_evidence_verification.json",
+    "evidence": "evidence/",
+    "numeric_path_audit": "evidence/numeric_path_audit.json",
+    "raw_output_directory": "outputs/forecasting/agent_evidence_contract_g0_20261028/basic_smoke/"
+  },
+  "work_after_execution": "Archive, independent read-only verification, and documentation only; frozen execution sources unchanged."
+}

@@ -1,0 +1,242 @@
+{
+  "passed": true,
+  "scope": "independent_basic_cpu_tool_verification_only",
+  "verified_at_utc": "2026-10-28T10:48:19.010550+00:00",
+  "source_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+  "checks": {
+    "code_commit": true,
+    "base_branch_interpreter": true,
+    "source_list": true,
+    "all_sources_equal_frozen_commit": true,
+    "input_file_allowlist": true,
+    "input_source_hashes": true,
+    "row_origin": true,
+    "source_row_shapes": true,
+    "request_exactly_reconstructed_from_allowed_row": true,
+    "request_hash_all_artifacts": true,
+    "future_target_hours": true,
+    "request_explicit_label_free_schema": true,
+    "finite_native_24x5": true,
+    "forecast_file_hash": true,
+    "native_crossing_record": true,
+    "output_no_clipping_or_rearrangement_source": true,
+    "negative_preservation_flag": true,
+    "checkpoint_byte_hashes_and_sizes": true,
+    "levels_are_native_checkpoint_levels": true,
+    "recorded_model_state_unchanged": true,
+    "source_has_before_after_state_and_disk_check": true,
+    "packages_match_frozen_config_and_environment": true,
+    "cpu_and_no_learning_record": true,
+    "worker_guards_clean": true,
+    "no_scores_or_labels_recorded": true,
+    "archival_clock_limitation_retained": true,
+    "trace_chain_and_request_publish": true,
+    "one_persisted_call": true,
+    "reservation_precedes_worker_start": true,
+    "successful_worker_and_monitor": true,
+    "resources_within_budget": true,
+    "no_gpu_training_download_llm_record": true,
+    "event_and_overall_not_claimed_passed": true,
+    "output_file_set": true,
+    "preflight_hash_and_success": true,
+    "verifier_never_opened_labels_or_loaded_model": true
+  },
+  "failed_checks": [],
+  "source_hashes": {
+    "configs/agent_forecasting/g0_20261028.json": {
+      "recorded": "0c5f315bf791d8d3d94851d274b733a12c7be5b2d4ddc57f92896e06ca9acaf9",
+      "current": "0c5f315bf791d8d3d94851d274b733a12c7be5b2d4ddc57f92896e06ca9acaf9",
+      "committed": "0c5f315bf791d8d3d94851d274b733a12c7be5b2d4ddc57f92896e06ca9acaf9"
+    },
+    "docs/research/agent_forecasting/g0_protocol_20261028.txt": {
+      "recorded": "ec5ff9d51e9a0c1447bb3cd3732b19e2dd44d867482dd433f6c974f5955dea72",
+      "current": "ec5ff9d51e9a0c1447bb3cd3732b19e2dd44d867482dd433f6c974f5955dea72",
+      "committed": "ec5ff9d51e9a0c1447bb3cd3732b19e2dd44d867482dd433f6c974f5955dea72"
+    },
+    "forecasting/agent_forecasting/__init__.py": {
+      "recorded": "b235f8f7a0fc8f84fc6fa4a4d7e846b8b7505cddcb120fc748b77aca5fc15d02",
+      "current": "b235f8f7a0fc8f84fc6fa4a4d7e846b8b7505cddcb120fc748b77aca5fc15d02",
+      "committed": "b235f8f7a0fc8f84fc6fa4a4d7e846b8b7505cddcb120fc748b77aca5fc15d02"
+    },
+    "forecasting/agent_forecasting/contracts.py": {
+      "recorded": "a4678d2366b50b04f41acb8917a3aff264d90a36df5021939c65f962c43df357",
+      "current": "a4678d2366b50b04f41acb8917a3aff264d90a36df5021939c65f962c43df357",
+      "committed": "a4678d2366b50b04f41acb8917a3aff264d90a36df5021939c65f962c43df357"
+    },
+    "forecasting/agent_forecasting/asof.py": {
+      "recorded": "808399811758aeb25839f751b0df338b0784b5693469211f0aebe8ae0c548db9",
+      "current": "808399811758aeb25839f751b0df338b0784b5693469211f0aebe8ae0c548db9",
+      "committed": "808399811758aeb25839f751b0df338b0784b5693469211f0aebe8ae0c548db9"
+    },
+    "forecasting/agent_forecasting/trace.py": {
+      "recorded": "46ab0a35e1ff94e56cc8e4e498c31e01d1401d8a6711290e7c9dc541de245c15",
+      "current": "46ab0a35e1ff94e56cc8e4e498c31e01d1401d8a6711290e7c9dc541de245c15",
+      "committed": "46ab0a35e1ff94e56cc8e4e498c31e01d1401d8a6711290e7c9dc541de245c15"
+    },
+    "forecasting/agent_forecasting/frozen_chronos.py": {
+      "recorded": "bfd85b915c3fdde68f6a35c366c2cba0e61499469a072609481e0f52847d40f2",
+      "current": "bfd85b915c3fdde68f6a35c366c2cba0e61499469a072609481e0f52847d40f2",
+      "committed": "bfd85b915c3fdde68f6a35c366c2cba0e61499469a072609481e0f52847d40f2"
+    },
+    "scripts/check_agent_forecast_contract.py": {
+      "recorded": "65e8cc09e7315fabebb23ea05b0515bb91a09cbd2cc16f41acafe62d5193ff18",
+      "current": "65e8cc09e7315fabebb23ea05b0515bb91a09cbd2cc16f41acafe62d5193ff18",
+      "committed": "65e8cc09e7315fabebb23ea05b0515bb91a09cbd2cc16f41acafe62d5193ff18"
+    },
+    "scripts/audit_agent_evidence_g0.py": {
+      "recorded": "75e7e3e0b70459bb22e4d8469064128d97329e6c19d2d96b3caa55f917686d74",
+      "current": "75e7e3e0b70459bb22e4d8469064128d97329e6c19d2d96b3caa55f917686d74",
+      "committed": "75e7e3e0b70459bb22e4d8469064128d97329e6c19d2d96b3caa55f917686d74"
+    },
+    "tests/test_agent_forecast_contract.py": {
+      "recorded": "35007258e9b98f18729c8a817e7c0b09ba4f01b21943b72d1bebfa05ba8fe4d9",
+      "current": "35007258e9b98f18729c8a817e7c0b09ba4f01b21943b72d1bebfa05ba8fe4d9",
+      "committed": "35007258e9b98f18729c8a817e7c0b09ba4f01b21943b72d1bebfa05ba8fe4d9"
+    },
+    "tests/test_agent_frozen_chronos.py": {
+      "recorded": "8d1a7c36baddf53d9b232f8e654e8f8d9262bbba4fcf7f63d931c86e91df86bc",
+      "current": "8d1a7c36baddf53d9b232f8e654e8f8d9262bbba4fcf7f63d931c86e91df86bc",
+      "committed": "8d1a7c36baddf53d9b232f8e654e8f8d9262bbba4fcf7f63d931c86e91df86bc"
+    },
+    "tests/test_agent_evidence_g0.py": {
+      "recorded": "b8262a5a6abf891d847225757c0c78f15d54df1e8c7faf9306a51485ba9d06d7",
+      "current": "b8262a5a6abf891d847225757c0c78f15d54df1e8c7faf9306a51485ba9d06d7",
+      "committed": "b8262a5a6abf891d847225757c0c78f15d54df1e8c7faf9306a51485ba9d06d7"
+    }
+  },
+  "artifact_hashes": {
+    "forecast.json": {
+      "sha256": "be525ef76c155b161701deffc3e5349ca5aae5317cb4bde0b8dd4bcde426e76b",
+      "bytes": 3966
+    },
+    "input.json": {
+      "sha256": "f0d01340dd7471a91d1d3ac0123bc448c1f07674f5e0146a15916c7b5dbd6eaa",
+      "bytes": 22057
+    },
+    "input_provenance.json": {
+      "sha256": "7fb2fcc0bb33b3ebfd1b0e5c2f2dc63cf5be0b97d729e3f4cae5bf66391a4357",
+      "bytes": 1506
+    },
+    "resource_report.json": {
+      "sha256": "1a234fcb921ffc04005062c189281867a8a391de726167c9b76c34b51180ce81",
+      "bytes": 660
+    },
+    "run_manifest.json": {
+      "sha256": "b16ff4ee4708a827b95d3e4265091cb9118ac6cba365b8f600dc08983e701d3f",
+      "bytes": 1879
+    },
+    "stderr.txt": {
+      "sha256": "555b339ab6fbfc33a3eacc44b0626062eaef6d162d7b44348a9a2d1e4df7390b",
+      "bytes": 212
+    },
+    "stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tool_trace.jsonl": {
+      "sha256": "4cedf4cd559ad217aab4c4b334dd733add21b8202cbaeadc7f2d180fe68e1c4e",
+      "bytes": 736
+    },
+    "worker_report.json": {
+      "sha256": "751fff032e017a8a934bd438263715ecfd220c776885e038d3a8caa4a3e7832c",
+      "bytes": 1643
+    },
+    "worker_started.json": {
+      "sha256": "1b48e82e419403ad132a9b6e4b8d0ef04c75016ca088e9ff9a6e31f0fb3ecb74",
+      "bytes": 76
+    }
+  },
+  "attempt_ledger": {
+    "path": "/root/workspace/Code/DualTimesField/outputs/forecasting/agent_evidence_contract_g0_20261028/model_attempts.jsonl",
+    "sha256": "4f73c8594ef25df39142e725b74b5c88a6e91a7e3e703156c2a27263f90cb306",
+    "records": [
+      {
+        "attempt": 1,
+        "kind": "basic_smoke",
+        "reserved_at_utc": "2026-10-28T10:45:15.438798+00:00"
+      }
+    ]
+  },
+  "input": {
+    "row": 72,
+    "region": "NSW1",
+    "origin_unix": 1641218400,
+    "origin_utc": "2022-01-03T14:00:00+00:00",
+    "sha256": "bbc2f7e76d808ab170cffc39724478d6e97136643c5ccf37d6b63cab01700dfc",
+    "source_hashes": {
+      "input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0",
+      "input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+      "input__history_values.npy": "9a477e06757ec244b102b36354815749fbe13a0109677332abaa489a51e3d4cd",
+      "metadata.json": "e9d9b1a7e348524337273240687332d549ce191bbe9b9321da032aed06f63df5",
+      "origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da"
+    },
+    "price_history_min": 10.588334682977276,
+    "negative_history_values": 0
+  },
+  "output": {
+    "shape": [
+      24,
+      5
+    ],
+    "quantile_levels": [
+      0.05,
+      0.1,
+      0.5,
+      0.9,
+      0.95
+    ],
+    "minimum": -24.151138305664062,
+    "maximum": 221.83522033691406,
+    "negative_quantile_values": 10,
+    "native_crossing_count": 0,
+    "sha256": "be525ef76c155b161701deffc3e5349ca5aae5317cb4bde0b8dd4bcde426e76b"
+  },
+  "checkpoint": {
+    "config.json": {
+      "sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "size_bytes": 1067
+    },
+    "model.safetensors": {
+      "sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "size_bytes": 477930472
+    }
+  },
+  "recorded_state_sha256": "c325f9b311d6b97f7a72ad22f0dc11d56a895c010edd089468be85f68e6f733e",
+  "run_resources": {
+    "wall_seconds_including_spawn": 10.647937152534723,
+    "worker_wall_seconds": 9.328824482858181,
+    "user_cpu_seconds": 8.686442,
+    "system_cpu_seconds": 1.447074,
+    "monitor_peak_rss_bytes": 1264726016,
+    "worker_peak_rss_bytes": 1264910336,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "local_gpu_usage": 0,
+    "model_calls": 1
+  },
+  "preflight": {
+    "sha256": "973ca47bc52af3b2b05d33c07e186a02de6d2a8503d2cd76f132379aaf5e612d",
+    "reported_tests": 39,
+    "returncode": 0
+  },
+  "limitations": [
+    "基础工具通过不代表事件输入通路通过、预测准确性通过或G0整体通过。",
+    "输入沿用开发期归档时间代理，不能据此证明历史时刻的严格实时可取得性。",
+    "本核验未重新推理或加载模型；内存state前后一致依据已冻结代码及运行记录，磁盘权重与输入哈希另行重算。",
+    "无标签/无网络结论依据白名单加载器、冻结源码和运行guard记录；没有独立操作系统系统调用全量日志。",
+    "负价不裁剪由冻结输出路径与合成测试支持；本次真实输出是否包含负值单独列报，不要求模型输出负价。",
+    "单次CPU运行不能验证重放数值一致性、后续实时吞吐或其他origin的准确性。"
+  ],
+  "verification_method": "Standalone inline Python with independent canonical JSON/hash, NumPy row reconstruction and direct source inspection; no imports of production contract/scorer/loader or torch/chronos.",
+  "verification_resources": {
+    "wall_seconds": 0.5985830239951611,
+    "self_user_cpu_seconds": 9.004329,
+    "self_system_cpu_seconds": 0.17584999999999998,
+    "peak_rss_bytes": 37269504,
+    "model_calls": 0,
+    "gpu": 0,
+    "label_reads": 0
+  }
+}

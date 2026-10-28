@@ -1,0 +1,19 @@
+{
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "python_version": "3.11.0 | packaged by conda-forge | (main, Oct 25 2022, 06:24:40) [GCC 10.4.0]",
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "scripts/audit_agent_evidence_g0.py",
+    "collect",
+    "--protocol",
+    "docs/research/agent_forecasting/g0_protocol_20261028.txt",
+    "--frozen-commit",
+    "9740509d8a28b7b05ce3ce59286afa49d9180e85"
+  ],
+  "started_at_utc": "2026-10-28T10:45:37.532429+00:00",
+  "finished_at_utc": "2026-10-28T10:54:59.944299+00:00",
+  "wall_seconds": 562.4118750058115,
+  "returncode": 0,
+  "stdout": "{\"status\": \"partial\", \"frozen\": {\"commit\": \"9740509d8a28b7b05ce3ce59286afa49d9180e85\", \"protocol\": \"docs/research/agent_forecasting/g0_protocol_20261028.txt\", \"protocol_sha256\": \"ec5ff9d51e9a0c1447bb3cd3732b19e2dd44d867482dd433f6c974f5955dea72\", \"config\": \"configs/agent_forecasting/g0_20261028.json\", \"config_sha256\": \"0c5f315bf791d8d3d94851d274b733a12c7be5b2d4ddc57f92896e06ca9acaf9\", \"branch\": \"research/agent-evidence-contract-g0-20261028\", \"script_sha256\": \"75e7e3e0b70459bb22e4d8469064128d97329e6c19d2d96b3caa55f917686d74\"}, \"limits\": {\"requests\": 160, \"total_bytes\": 16777216, \"response_bytes\": 262144, \"candidates\": 120, \"predecessors\": 36, \"chain_members\": 6, \"lookback_days\": 30, \"wall_seconds\": 600}, \"requests\": 131, \"bytes_charged\": 366268, \"bytes_received\": 366268, \"candidate_count\": 117, \"fetched_candidate_count\": 117, \"predecessor_count\": 10, \"missing\": [{\"from_notice_id\": 145307, \"notice_id\": 145162, \"reason\": \"chain_member_cap\"}], \"archive_file_count\": 0, \"clock_status\": \"display_clock_unverified\", \"historical_publication_availability_proven\": false, \"sampling_frame_complete\": false, \"predictions_run\": false, \"labels_loaded\": false, \"selection_status\": \"awaiting_source_backed_manual_review\", \"artifact_sha256\": {\"candidate_index.json\": \"f17e2e79c70e1f2e48c219ca4380b1f2e3bf2796dd8ef289485ffb9e5ff82046\", \"fetch_manifest.json\": \"1264c76184d218c5233e7b6b92b61be410ed15228c618d245c13b686d502bdb5\", \"notice_records.json\": \"23e5ccb0c717ee45a79fc0a3d69e219c4e259fce0782dbf5415e7d5984ae7955\"}}\n",
+  "stderr": ""
+}

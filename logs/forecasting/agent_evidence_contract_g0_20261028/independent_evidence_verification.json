@@ -1,0 +1,290 @@
+{
+  "run_id": "agent_evidence_contract_g0_20261028",
+  "created_at_utc": "2026-10-28T11:15:34.310355+00:00",
+  "passed": true,
+  "passed_definition": "Archived evidence integrity, independently recomputed collection/selection arithmetic, quotations, and rejection decision are verified. This does not mean full protocol compliance or overall G0 passage.",
+  "overall_g0_passed": false,
+  "full_protocol_compliance": false,
+  "scientific_decision": "STOP_CURRENT_COMBINATION",
+  "decision_agrees_with_source_review": true,
+  "advance_to_g1_g2": false,
+  "reviewer": "independent_research_agent_gate_audit_no_human_gold",
+  "frozen_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+  "scope": "G0-A evidence collection, classification and numeric-input feasibility only. No forecast outputs, actual/target arrays or forecast scores were opened; no network or model calls were made by this verifier.",
+  "method": "Independent stdlib HTML parsing, direct original source text inspection, regex numerical cross-check, SHA256 and git-object matching; no production review or forecasting module imported.",
+  "collection_verification": {
+    "collection_verification_passed": true,
+    "checks_passed": 1463,
+    "counts": {
+      "hash_comparisons": 267
+    },
+    "frozen_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+    "candidates": 117,
+    "index_rows": 888,
+    "predecessors": 10,
+    "requests": 131,
+    "unique_urls": 129,
+    "accepted_requests": 129,
+    "failed_attempts": 2,
+    "bytes_charged": 366268,
+    "max_response_bytes": 159051,
+    "max_request_seconds": 8.348944280296564,
+    "min_request_start_interval_seconds": 3.6032021045684814,
+    "wall_seconds": 562.4118750058115,
+    "missing": [
+      {
+        "from_notice_id": 145307,
+        "notice_id": 145162,
+        "reason": "chain_member_cap"
+      }
+    ],
+    "candidate_ids_first_last": [
+      145722,
+      145838
+    ],
+    "predecessor_order": [
+      145703,
+      145698,
+      145696,
+      145694,
+      145706,
+      145699,
+      145597,
+      145388,
+      145486,
+      145307
+    ]
+  },
+  "manual_and_selection_verification": {
+    "manual_and_selection_verification_passed": true,
+    "manual_hash": "2ad549ba5e9cfdeb686926baceddef29da5773270d8333f77c86c986d54ee6d6",
+    "chains": 68,
+    "notice_nodes": 127,
+    "directed_edges": 60,
+    "exact_quote_checks": 360,
+    "unique_notice_quote_pairs": 333,
+    "notice_clock_provenance_checks": 127,
+    "primary_categories_all_chains": {
+      "revision": 8,
+      "withdrawal": 46,
+      "initial": 14
+    },
+    "category_presence_including_secondary": {
+      "revision": 8,
+      "withdrawal": 46,
+      "initial": 63,
+      "cross_day": 4
+    },
+    "selected_anchors": [
+      145722,
+      145723,
+      145724,
+      145725,
+      145754,
+      145758
+    ],
+    "selected_category_counts": {
+      "withdrawal": 2,
+      "postponement": 0,
+      "conflict": 0,
+      "revision": 2,
+      "cross_day": 0,
+      "initial": 2
+    },
+    "all_candidates_accounted": true,
+    "external_human_gold": false,
+    "selected_semantic_review": {
+      "145722": "Observed initial outage with no preceding notice visible; does not prove historical first publication.",
+      "145723": "Explicit cancellation of the linked SA LOR2 forecast; no numerical reserve restoration value inferred.",
+      "145724": "Constraint activation explicitly cancelled by 145728; a change in market intervention status, not direct demand/price.",
+      "145725": "Single notice reports outage and restoration; under frozen coding convention this is observed initial, not a linked withdrawal.",
+      "145754": "Original scheduled end and earlier actual restoration both stated; revision, with secondary cross-day feature; prior plan not acquired.",
+      "145758": "Same reasoning as 145754 for Basslink; no capacity or price conversion inferred."
+    },
+    "limitations": [
+      "No external human gold or extraction-accuracy benchmark.",
+      "Secondary cross-day features exist although its primary quota is zero.",
+      "Request-start timestamps do not establish body-complete first-seen."
+    ]
+  },
+  "numeric_path_verification": {
+    "passed": true,
+    "input_artifact_hashes_verified": 7,
+    "summary_numeric_hash_verified": true,
+    "selected_chains": 6,
+    "legal_numeric_paths": 0,
+    "facts_or_explanation_only": 6,
+    "numeric_source_quote_checks": 20,
+    "unique_numeric_quote_pairs": 18,
+    "reserve_versions_independently_reparsed": 4,
+    "reserve_periods_independently_reparsed": 6,
+    "clock_rows_recomputed": 127,
+    "paired_model_calls": 0,
+    "rejection_reasons_by_anchor": {
+      "145723": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "最新撤销没有新MW值；旧MW属于备用容量语义不是demand_std；无连续72小时同语义reserve序列或完整24小时as-of路径，非NSW样本。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "明确notice ID构建版本链，并以撤销结束有效状态，固定状态机足以表示这些关系；不把多个版本备用缺口相加，不将取消映射为数值0。"
+      },
+      "145722": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "没有结束时刻、容量MW、约束数值RHS、价格或负荷修正值；没有该事件变量72小时逐时历史。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "固定模板可提取线路/约束ID及起始时刻；结束未知必须保留unknown，不能持续到任意未来。"
+      },
+      "145724": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "没有公告可用于修改历史price_history/demand_std的具体数值，也没有约束状态72小时完整历史及同origin快照。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "显式145728→145724引用与开始/结束时刻可由固定规则维护单一约束episode；不将已停约束持续外推。"
+      },
+      "145725": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "无容量MW/数值约束/价格修订；只在同篇内看到约束已撤销，不能从额定电压推断价格/供给效果；无72小时同语义历史。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "固定模板可区分停运、约束开始、恢复三个时刻；只看outage关键词会错误延续已结束事件，完整状态逻辑可防止。"
+      },
+      "145754": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "无原计划as-of版本、可验证first_seen和数值MW/RHS；没有72小时同语义状态历史，也不能修改既有calendar。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "固定规则可将原计划与实际恢复分开、以恢复终止状态；需要未知前序保持unknown，不能只按原计划将停运延伸到27日。"
+      },
+      "145758": {
+        "all_input_slots_rejected": {
+          "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+          "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+          "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+          "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+        },
+        "specific_missing_evidence": "无原计划公告、数值潮流/容量变化、72小时同语义历史和24小时同时点序列；与固定NSW origin/地区不匹配。",
+        "time_alignment": "2026公告与2022起报不同时；不得拼接。",
+        "fixed_rule_assessment": "固定状态机可把实际恢复优先于原计划结束并撤销状态；不能把约束名ZERO改写为物理量0。"
+      }
+    },
+    "final_validation_assertions_by_kind": {
+      "prior": 2,
+      "hash": 17,
+      "schema": 1,
+      "identity": 21,
+      "quote": 20,
+      "selection": 2,
+      "path": 42,
+      "time": 395,
+      "decision": 3,
+      "scope": 1,
+      "summary": 7,
+      "number": 5,
+      "resource": 10,
+      "sampling": 2,
+      "deviation": 2,
+      "artifact": 4
+    },
+    "final_validation_assertions_total": 534
+  },
+  "documented_protocol_deviations": [
+    {
+      "id": "human_review_not_performed",
+      "protocol_section": "1. G0-A公告抽样",
+      "required_text": "人工审核后再冻结最终分类和选择表",
+      "observed": "研究agent对源文裁定，并由另一research agent独立复核；未进行外部真人审核，也没有人工gold。",
+      "status": "uncompleted_human_task_and_protocol_difference",
+      "effect": "不能宣称人工审核已完成、完整协议验收通过或抽取准确率已测定。六链均拒绝，不需要为本轮STOP追索额外人工审批。"
+    },
+    {
+      "id": "request_start_clock_not_first_complete_acquisition",
+      "protocol_section": "1. G0-A公告抽样",
+      "required_text": "fetched_at是本次首次取得",
+      "observed": "执行源码在请求开始前写fetched_at_utc；未另存完整正文接收完成UTC。",
+      "status": "observation_implementation_limitation",
+      "effect": "该时钟不能证明完整正文当时可见或历史first_seen；不回填伪精确完成时间。本轮全部事件拒绝且未运行配对，对无事件放行结论没有影响。"
+    }
+  ],
+  "evidence_limits": [
+    "Only engineering and evidence consistency were checked; no extraction accuracy, forecasting accuracy, calibration, or agent-over-fixed-rule increment was measured.",
+    "All six selected chains fail the frozen numeric input contract: no legal same-origin value correction and no verified same-semantic 72h history/24h mapping; 2026 notices cannot be attached to the 2022 smoke origin.",
+    "MW reserve forecasts are not demand_std; voltage kV is not MW; constraint names including ZERO are identifiers rather than numeric physical measurements; cancellation does not imply numeric zero.",
+    "Fixed rules can represent the explicit notice links and restoration/cancellation states checked here. Necessary LLM reasoning and superiority over a sound fixed pipeline were not demonstrated.",
+    "Historical publication timezone and first-seen remain unproved; directory/creation literal differences alone do not establish leakage.",
+    "Collection is partial due to predecessor 145307->145162 hitting the frozen six-node traversal cap. All 117 window candidates were obtained, but this is not complete historical coverage.",
+    "Selected prior-plan documents for 145754/145758 are absent. Chain counts are not counts of independent physical events.",
+    "Primary cross_day count zero reflects category priority; four reviewed chains have a secondary cross_day feature.",
+    "This STOP applies only to the frozen source/origin/schema combination and is not a negative test of all news or agent forecasting approaches.",
+    "Base CPU smoke verification is separate and is not claimed as part of this evidence report."
+  ],
+  "collection_resources_verified": {
+    "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "python_version": "3.11.0 | packaged by conda-forge | (main, Oct 25 2022, 06:24:40) [GCC 10.4.0]",
+    "wall_seconds": 562.4118750058115,
+    "http_requests": 131,
+    "bytes_received": 366268,
+    "bytes_charged": 366268,
+    "failed_requests": 2,
+    "successful_requests": 129,
+    "maximum_attempts_per_url": 2,
+    "maximum_body_bytes": 159051,
+    "limits": {
+      "requests": 160,
+      "total_bytes": 16777216,
+      "response_bytes": 262144,
+      "candidates": 120,
+      "predecessors": 36,
+      "chain_members": 6,
+      "lookback_days": 30,
+      "wall_seconds": 600
+    },
+    "extra_fetches_after_collect": 0
+  },
+  "input_artifact_sha256": {
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/collection.json": "5b1454dc9f24b4f70bc73a987f498e8a8e90388481cc0f0aa2e77e285c8c923f",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/candidate_index.json": "f17e2e79c70e1f2e48c219ca4380b1f2e3bf2796dd8ef289485ffb9e5ff82046",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/fetch_manifest.json": "1264c76184d218c5233e7b6b92b61be410ed15228c618d245c13b686d502bdb5",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/notice_records.json": "23e5ccb0c717ee45a79fc0a3d69e219c4e259fce0782dbf5415e7d5984ae7955",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/manual_review.json": "2ad549ba5e9cfdeb686926baceddef29da5773270d8333f77c86c986d54ee6d6",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/chain_audit.json": "325b5bd0c63d633dec13a34ba72f7d9cb19d2440e1e64a621701e114ebc79f58",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/execution.json": "04ee07729754ff603c226ade48b099250877c5ce707cf59f2982901492af91c2",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/numeric_path_audit.json": "ccb63191de95ab3efbee2ecac1b812993ed364090b288e658581828cbdd12f12",
+    "logs/forecasting/agent_evidence_contract_g0_20261028/evidence/source_review_summary.json": "d80a8412cbf7f4cbb9ae70de35e189401c61457e6208e80e3cf42ec35ff96327"
+  },
+  "frozen_files_sha256": {
+    "docs/research/agent_forecasting/g0_protocol_20261028.txt": "ec5ff9d51e9a0c1447bb3cd3732b19e2dd44d867482dd433f6c974f5955dea72",
+    "configs/agent_forecasting/g0_20261028.json": "0c5f315bf791d8d3d94851d274b733a12c7be5b2d4ddc57f92896e06ca9acaf9",
+    "scripts/audit_agent_evidence_g0.py": "75e7e3e0b70459bb22e4d8469064128d97329e6c19d2d96b3caa55f917686d74",
+    "forecasting/agent_forecasting/contracts.py": "a4678d2366b50b04f41acb8917a3aff264d90a36df5021939c65f962c43df357"
+  },
+  "independent_final_check_resources": {
+    "wall_seconds": 0.06272104009985924,
+    "cpu_seconds": 0.04223662200000003,
+    "measurement_scope": "Final numeric/hash consolidation only; preceding collection and manual independent read-only review were not timed.",
+    "http_requests": 0,
+    "model_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0
+  }
+}

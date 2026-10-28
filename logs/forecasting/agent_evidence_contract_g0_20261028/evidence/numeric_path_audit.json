@@ -1,0 +1,1842 @@
+{
+  "review_method": "research_agent_source_adjudication_no_human_gold",
+  "created_at_utc": "2026-10-28T11:09:12.915213+00:00",
+  "frozen_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+  "selected_chain_count": 6,
+  "legal_numeric_paths": 0,
+  "facts_or_explanation_only": 6,
+  "predictions_run": false,
+  "labels_loaded": false,
+  "paired_model_calls_run": 0,
+  "decision": "STOP_CURRENT_COMBINATION",
+  "advance_to_g1_g2": false,
+  "decision_scope": "仅停止冻结的2026公告×2022起报×既有输入schema组合；不是电价准确性失败，不否定所有新闻/agent方法。",
+  "input_contract": {
+    "path": "forecasting/agent_forecasting/contracts.py",
+    "sha256": "a4678d2366b50b04f41acb8917a3aff264d90a36df5021939c65f962c43df357",
+    "price_history": "72 hourly AUD/MWh values",
+    "past_covariates": [
+      "demand_std",
+      "cal_0",
+      "cal_1",
+      "cal_2",
+      "cal_3",
+      "cal_4",
+      "cal_5",
+      "cal_6",
+      "cal_7",
+      "cal_8",
+      "cal_9"
+    ],
+    "future_covariates": [
+      "cal_0",
+      "cal_1",
+      "cal_2",
+      "cal_3",
+      "cal_4",
+      "cal_5",
+      "cal_6",
+      "cal_7",
+      "cal_8",
+      "cal_9"
+    ],
+    "future_length": 24,
+    "arbitrary_event_features_allowed": false
+  },
+  "resources": {
+    "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "python_version": "3.11.0 | packaged by conda-forge | (main, Oct 25 2022, 06:24:40) [GCC 10.4.0]",
+    "wall_seconds": 562.4118750058115,
+    "http_requests": 131,
+    "bytes_received": 366268,
+    "bytes_charged": 366268,
+    "failed_requests": 2,
+    "successful_requests": 129,
+    "maximum_attempts_per_url": 2,
+    "maximum_body_bytes": 159051,
+    "limits": {
+      "requests": 160,
+      "total_bytes": 16777216,
+      "response_bytes": 262144,
+      "candidates": 120,
+      "predecessors": 36,
+      "chain_members": 6,
+      "lookback_days": 30,
+      "wall_seconds": 600
+    },
+    "extra_fetches_after_collect": 0
+  },
+  "chains": [
+    {
+      "anchor_notice_id": 145723,
+      "notice_ids": [
+        145694,
+        145696,
+        145698,
+        145703,
+        145723
+      ],
+      "primary_category": "withdrawal",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "SA1"
+      ],
+      "object": "STPASA SA forecast LOR2 for 23/10/2026, revised then cancelled",
+      "fields": [
+        {
+          "name": "reserve_forecast_versions",
+          "value": [
+            {
+              "notice_id": 145694,
+              "periods": [
+                {
+                  "start": "23/10/2026 04:00",
+                  "end": "23/10/2026 05:00",
+                  "required": 365,
+                  "available": 283
+                },
+                {
+                  "start": "23/10/2026 06:00",
+                  "end": "23/10/2026 07:00",
+                  "required": 225,
+                  "available": 223
+                },
+                {
+                  "start": "23/10/2026 09:00",
+                  "end": "23/10/2026 18:00",
+                  "required": 157,
+                  "available": 78
+                }
+              ]
+            },
+            {
+              "notice_id": 145696,
+              "periods": [
+                {
+                  "start": "23/10/2026 05:30",
+                  "end": "23/10/2026 09:00",
+                  "required": 442,
+                  "available": 359
+                }
+              ]
+            },
+            {
+              "notice_id": 145698,
+              "periods": [
+                {
+                  "start": "23/10/2026 04:00",
+                  "end": "23/10/2026 10:00",
+                  "required": 437,
+                  "available": 157
+                }
+              ]
+            },
+            {
+              "notice_id": 145703,
+              "periods": [
+                {
+                  "start": "23/10/2026 09:00",
+                  "end": "23/10/2026 13:00",
+                  "required": 370,
+                  "available": 339
+                }
+              ]
+            }
+          ],
+          "unit": "MW",
+          "source_evidence": [
+            {
+              "notice_id": 145694,
+              "quote": "The forecast capacity reserve requirement is  365 MW.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261020.R145694",
+              "raw_sha256": "1c69611c38d18ccedc924807fc8e049cbd6603080d2c4b0acfc94b71bde9cfcc"
+            },
+            {
+              "notice_id": 145696,
+              "quote": "The forecast capacity reserve requirement is 442 MW.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261020.R145696",
+              "raw_sha256": "bb7da7033a02d6072b279b83b4a67e85676bee5c8b04d6d849407f8072807e49"
+            },
+            {
+              "notice_id": 145698,
+              "quote": "The forecast capacity reserve requirement is 437 MW.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261020.R145698",
+              "raw_sha256": "e6c9348be28b2a5fe4a1977505d4ca2a644d72de47c7e711a81f3bda94674ccf"
+            },
+            {
+              "notice_id": 145703,
+              "quote": "The forecast capacity reserve requirement is 370 MW.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261020.R145703",
+              "raw_sha256": "15004972e44ed09096fc4863186d294642a1f2fc7b29b02fbe6e28b6dbe18f23"
+            },
+            {
+              "notice_id": 145703,
+              "quote": "The minimum capacity reserve available is 339 MW.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261020.R145703",
+              "raw_sha256": "15004972e44ed09096fc4863186d294642a1f2fc7b29b02fbe6e28b6dbe18f23"
+            }
+          ],
+          "semantics": "容量备用需求和可用量，并非地区负荷/需求。各版本是替代关系，不能累加；最新公告撤销条件，没有给出新的MW序列。"
+        },
+        {
+          "name": "lor2_condition",
+          "value": "cancelled",
+          "unit": "categorical",
+          "source_evidence": {
+            "notice_id": 145723,
+            "quote": "The Forecast LOR2 condition in the SA region advised in AEMO Electricity Market Notice No. 145703 is cancelled at 0800 hrs 21/10/2026.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145723",
+            "raw_sha256": "c4c9f99102ca9c9c1e0f918f5e5fb8248813eb7b37dac53c555cbad98d5af6e2"
+          },
+          "semantics": "取消预测状态，不表示未来容量缺口等于0，也不提供可修正电价"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "forecast_targets": "23/10/2026 periods as each source version",
+        "cancellation": "21/10/2026 08:00",
+        "event_end": "LOR2 forecast withdrawn; actual system outcome not observed"
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "最新撤销没有新MW值；旧MW属于备用容量语义不是demand_std；无连续72小时同语义reserve序列或完整24小时as-of路径，非NSW样本。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "明确notice ID构建版本链，并以撤销结束有效状态，固定状态机足以表示这些关系；不把多个版本备用缺口相加，不将取消映射为数值0。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    },
+    {
+      "anchor_notice_id": 145722,
+      "notice_ids": [
+        145722
+      ],
+      "primary_category": "initial",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "NSW1"
+      ],
+      "object": "Glen Innes - Tenterfield 96R line; N-96L_96R_CB4102; N-Q-MNSP1",
+      "fields": [
+        {
+          "name": "equipment_nominal_voltage",
+          "value": 132,
+          "unit": "kV",
+          "source_evidence": {
+            "notice_id": 145722,
+            "quote": "At   0645 hrs 21/10/2026 there was a short notice outage of Glen Innes - Tenterfield 96R 132 kV Line .",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145722",
+            "raw_sha256": "a81b01d1377893216ddf1145452521691ac4a1a4ecb9c5a43423745b537f1087"
+          },
+          "semantics": "设备电压；不是容量、需求或价格"
+        },
+        {
+          "name": "outage_status",
+          "value": "outage",
+          "unit": "categorical",
+          "source_evidence": {
+            "notice_id": 145722,
+            "quote": "At   0645 hrs 21/10/2026 there was a short notice outage of Glen Innes - Tenterfield 96R 132 kV Line .",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145722",
+            "raw_sha256": "a81b01d1377893216ddf1145452521691ac4a1a4ecb9c5a43423745b537f1087"
+          },
+          "semantics": "短时通知停运事件"
+        },
+        {
+          "name": "constraint_set",
+          "value": "N-96L_96R_CB4102",
+          "unit": "identifier",
+          "source_evidence": {
+            "notice_id": 145722,
+            "quote": "N-96L_96R_CB4102",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145722",
+            "raw_sha256": "a81b01d1377893216ddf1145452521691ac4a1a4ecb9c5a43423745b537f1087"
+          },
+          "semantics": "无数值RHS或MW变化"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "outage_start": "21/10/2026 06:45",
+        "constraint_start": "21/10/2026 06:55",
+        "event_end": null
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "没有结束时刻、容量MW、约束数值RHS、价格或负荷修正值；没有该事件变量72小时逐时历史。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "固定模板可提取线路/约束ID及起始时刻；结束未知必须保留unknown，不能持续到任意未来。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    },
+    {
+      "anchor_notice_id": 145724,
+      "notice_ids": [
+        145724,
+        145728
+      ],
+      "primary_category": "withdrawal",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "VIC1",
+        "SA1"
+      ],
+      "object": "NRM_VIC1_SA1 negative settlement residue management",
+      "fields": [
+        {
+          "name": "constraint_state",
+          "value": [
+            "started",
+            "ceased"
+          ],
+          "unit": "categorical",
+          "source_evidence": [
+            {
+              "notice_id": 145724,
+              "quote": "The negative residue constraint set NRM_VIC1_SA1 commenced operating from 0930 hrs on 21 October 2026.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145724",
+              "raw_sha256": "18f23b0ae1b56018e0cf43c04b0524091e07999838519651186f1285af698602"
+            },
+            {
+              "notice_id": 145728,
+              "quote": "The negative residue constraint NRM_VIC1_SA1 ceased operating at 1330 hrs on 21 October 2026.",
+              "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145728",
+              "raw_sha256": "b0dc9652991fd2f9f417f70fcb7533b5b04b852cb006506b19e2e4e1f17cd53b"
+            }
+          ],
+          "semantics": "约束动作状态；源文没有残余金额、阈值数值、约束RHS、MW或AUD/MWh"
+        },
+        {
+          "name": "direction",
+          "value": "VIC to SA",
+          "unit": "categorical",
+          "source_evidence": {
+            "notice_id": 145724,
+            "quote": "ACTUAL NEGATIVE SETTLEMENT RESIDUES - VIC to SA - 21 October 2026.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145724",
+            "raw_sha256": "18f23b0ae1b56018e0cf43c04b0524091e07999838519651186f1285af698602"
+          },
+          "semantics": "跨区方向，不是NSW地区价格或负荷变量"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "start": "21/10/2026 09:30",
+        "end": "21/10/2026 13:30"
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "没有公告可用于修改历史price_history/demand_std的具体数值，也没有约束状态72小时完整历史及同origin快照。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "显式145728→145724引用与开始/结束时刻可由固定规则维护单一约束episode；不将已停约束持续外推。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    },
+    {
+      "anchor_notice_id": 145725,
+      "notice_ids": [
+        145725
+      ],
+      "primary_category": "initial",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "VIC1"
+      ],
+      "object": "Moorabool A1 transformer; V-MLTX_A1",
+      "fields": [
+        {
+          "name": "equipment_nominal_voltage",
+          "value": [
+            500,
+            220
+          ],
+          "unit": "kV",
+          "source_evidence": {
+            "notice_id": 145725,
+            "quote": "At   1226 hrs 21/10/2026 there was an unplanned outage of Moorabool A1 500/220 kV Transformer.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145725",
+            "raw_sha256": "c93bfde7f2b2587c8de4191e38e1f14af3ca79d8dd59c442215370d3f30d9658"
+          },
+          "semantics": "设备电压，不能作为MW或价格"
+        },
+        {
+          "name": "outage_and_restoration",
+          "value": "outage followed by returned to service",
+          "unit": "categorical",
+          "source_evidence": {
+            "notice_id": 145725,
+            "quote": "The Moorabool A1 500/220 kV Transformer has been returned to service and Constraint Set V-MLTX_A1 revoked at 12:45 hrs.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261021.R145725",
+            "raw_sha256": "c93bfde7f2b2587c8de4191e38e1f14af3ca79d8dd59c442215370d3f30d9658"
+          },
+          "semantics": "同篇记录已结束事件，无先前公告ID；不是可直接输入未来24小时的持续停运"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "outage_start": "21/10/2026 12:26",
+        "constraint_start": "21/10/2026 12:35",
+        "end": "21/10/2026 12:45",
+        "creation_literal": "21/10/2026 12:48:14"
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "无容量MW/数值约束/价格修订；只在同篇内看到约束已撤销，不能从额定电压推断价格/供给效果；无72小时同语义历史。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "固定模板可区分停运、约束开始、恢复三个时刻；只看outage关键词会错误延续已结束事件，完整状态逻辑可防止。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    },
+    {
+      "anchor_notice_id": 145754,
+      "notice_ids": [
+        145754
+      ],
+      "primary_category": "revision",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "NSW1"
+      ],
+      "object": "Stockdill Upper Tumut No1 line; N-SDUT_1",
+      "fields": [
+        {
+          "name": "equipment_nominal_voltage",
+          "value": 330,
+          "unit": "kV",
+          "source_evidence": {
+            "notice_id": 145754,
+            "quote": "A planned outage of the Stockdill Upper Tumut No1 330kV line in the NSW region was scheduled from 0715 hrs 20/10/2026 to 1500 hrs 27/10/2026.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145754",
+            "raw_sha256": "2848701c1d940039a220b7867654a68e17b9b0ca692b040a733c82d62e58a55b"
+          },
+          "semantics": "设备额定电压；无线路容量或负荷改变量"
+        },
+        {
+          "name": "scheduled_outage_end",
+          "value": "27/10/2026 15:00",
+          "unit": "source_local_clock_unverified",
+          "source_evidence": {
+            "notice_id": 145754,
+            "quote": "A planned outage of the Stockdill Upper Tumut No1 330kV line in the NSW region was scheduled from 0715 hrs 20/10/2026 to 1500 hrs 27/10/2026.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145754",
+            "raw_sha256": "2848701c1d940039a220b7867654a68e17b9b0ca692b040a733c82d62e58a55b"
+          },
+          "semantics": "原计划结束，不应覆盖已发生的提前恢复"
+        },
+        {
+          "name": "actual_restoration",
+          "value": "23/10/2026 13:30",
+          "unit": "source_local_clock_unverified",
+          "source_evidence": {
+            "notice_id": 145754,
+            "quote": "The outage has been completed and the Stockdill Upper Tumut No1 330kV line was returned to service at 1330 hrs 23/10/2026",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145754",
+            "raw_sha256": "2848701c1d940039a220b7867654a68e17b9b0ca692b040a733c82d62e58a55b"
+          },
+          "semantics": "较原计划更早；不是延期；先前计划公告未取得"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "planned_start": "20/10/2026 07:15",
+        "planned_end": "27/10/2026 15:00",
+        "revised_actual_end": "23/10/2026 13:30"
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "无原计划as-of版本、可验证first_seen和数值MW/RHS；没有72小时同语义状态历史，也不能修改既有calendar。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "固定规则可将原计划与实际恢复分开、以恢复终止状态；需要未知前序保持unknown，不能只按原计划将停运延伸到27日。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    },
+    {
+      "anchor_notice_id": 145758,
+      "notice_ids": [
+        145758
+      ],
+      "primary_category": "revision",
+      "review_method": "research_agent_source_adjudication_no_human_gold",
+      "source_status": {
+        "official_https_bodies_archived": true,
+        "identity": "AEMO/NEMITWEB1 text fields and official nemweb.com.au URL",
+        "historical_publication_proven": false,
+        "body_creation_is_publication_proven": false,
+        "historical_first_seen_proven": false,
+        "fetch_time_caveat": "fetched_at_utc=request start, not independently recorded complete-body availability UTC"
+      },
+      "region": [
+        "TAS1"
+      ],
+      "object": "Basslink; I-BL_ZERO",
+      "fields": [
+        {
+          "name": "constraint_set",
+          "value": "I-BL_ZERO",
+          "unit": "identifier",
+          "source_evidence": {
+            "notice_id": 145758,
+            "quote": "Constraint set(s) revoked: I-BL_ZERO",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145758",
+            "raw_sha256": "b8644a306b5be468a9c7b02aac328093d42907ce7dec13b6e628210dbdbd1632"
+          },
+          "semantics": "ZERO是约束标识的一部分，不可自行推断未来潮流数值为0"
+        },
+        {
+          "name": "scheduled_outage_end",
+          "value": "26/10/2026 16:00",
+          "unit": "source_local_clock_unverified",
+          "source_evidence": {
+            "notice_id": 145758,
+            "quote": "A planned outage of Basslink in the TAS region was scheduled from 0500 hrs 19/10/2026 to 1600 hrs 26/10/2026.",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145758",
+            "raw_sha256": "b8644a306b5be468a9c7b02aac328093d42907ce7dec13b6e628210dbdbd1632"
+          },
+          "semantics": "原计划结束"
+        },
+        {
+          "name": "actual_restoration",
+          "value": "23/10/2026 19:35",
+          "unit": "source_local_clock_unverified",
+          "source_evidence": {
+            "notice_id": 145758,
+            "quote": "The outage has been completed and Basslink  returned to service at 1935 hrs 23/10/2026",
+            "url": "https://nemweb.com.au/Reports/CURRENT/Market_Notice/NEMITWEB1_MKTNOTICE_20261023.R145758",
+            "raw_sha256": "b8644a306b5be468a9c7b02aac328093d42907ce7dec13b6e628210dbdbd1632"
+          },
+          "semantics": "提前恢复，不能称延期；无容量/潮流具体值"
+        }
+      ],
+      "event_time": {
+        "clock": "source_literal_timezone_unverified",
+        "planned_start": "19/10/2026 05:00",
+        "planned_end": "26/10/2026 16:00",
+        "revised_actual_end": "23/10/2026 19:35"
+      },
+      "selected_input_slot": null,
+      "slot_rejection_reasons": {
+        "price_history": "没有同origin已可得的AUD/MWh历史价格数值修正；不得把事件金额/容量/电压转成价格。",
+        "past_demand_std": "备用容量、设备容量或电压不是已标准化地区需求；没有同origin、同变换的72小时需求修正。",
+        "past_and_future_calendar": "公告状态不改变日历；不得将事件偷偷编码到cal_0..9。",
+        "unknown_event_covariate": "当前FrozenForecastInput不接受事件、未来需求/容量、自由文本或任意路由字段。"
+      },
+      "same_semantic_72h_history": {
+        "available": false,
+        "evidence": "无原计划公告、数值潮流/容量变化、72小时同语义历史和24小时同时点序列；与固定NSW origin/地区不匹配。"
+      },
+      "future_24h_mapping": {
+        "available": false,
+        "reason": "未建立合法输入槽位、72小时同语义序列和已验证发布时间；事件字面时间不能当作首次可用时间。"
+      },
+      "predispatch_double_counting": {
+        "assessed": false,
+        "status": "unknown_no_same_origin_predispatch_snapshot",
+        "reason": "不能声称信息尚未进入预调度，也不能声称已有重复计入；未取相同origin/target预调度快照。"
+      },
+      "within_source_deduplication": {
+        "rule": "每notice_id+raw_sha256只保留一次；显式更新/撤销作状态替代，禁止各版本累加。",
+        "complete_history_proven": false
+      },
+      "fixed_rule_assessment": {
+        "assessment": "固定状态机可把实际恢复优先于原计划结束并撤销状态；不能把约束名ZERO改写为物理量0。",
+        "necessary_llm_reasoning_demonstrated": false,
+        "extraction_accuracy_evaluated": false
+      },
+      "time_alignment_with_frozen_smoke": {
+        "origin_unix": 1641218400,
+        "origin_utc": "2022-01-03T14:00:00Z",
+        "origin_region": "NSW1",
+        "matched": false,
+        "reason": "2026公告与2022起报不同时；不得拼接。"
+      },
+      "path_class": "facts_or_explanation_only",
+      "numeric_input_evidence": "insufficient",
+      "legal_numeric_path": false,
+      "decision": "STOP_CURRENT_COMBINATION"
+    }
+  ],
+  "clock_audit": {
+    "status": "display_clock_unverified",
+    "publication_verified": false,
+    "fetched_at_field": "request_start_not_complete_body_first_seen",
+    "body_completed_utc_independently_recorded": false,
+    "notice_145486": {
+      "notice_id": 145486,
+      "creation_literal": "06/10/2026     13:48:46",
+      "directory_display_literal": "Tuesday, October 13, 2026 06:35 PM",
+      "display_minus_creation_literal_seconds": 621974.0,
+      "timezone_applied": false,
+      "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+    },
+    "rows": [
+      {
+        "notice_id": 145307,
+        "creation_literal": "22/09/2026     13:33:39",
+        "directory_display_literal": "Tuesday, September 22, 2026 01:53 PM",
+        "display_minus_creation_literal_seconds": 1161.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145388,
+        "creation_literal": "29/09/2026     13:21:42",
+        "directory_display_literal": "Tuesday, September 29, 2026 01:54 PM",
+        "display_minus_creation_literal_seconds": 1938.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145486,
+        "creation_literal": "06/10/2026     13:48:46",
+        "directory_display_literal": "Tuesday, October 13, 2026 06:35 PM",
+        "display_minus_creation_literal_seconds": 621974.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145597,
+        "creation_literal": "13/10/2026     11:01:59",
+        "directory_display_literal": "Tuesday, October 13, 2026 11:36 AM",
+        "display_minus_creation_literal_seconds": 2041.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145694,
+        "creation_literal": "20/10/2026     05:34:05",
+        "directory_display_literal": "Tuesday, October 20, 2026 05:35 AM",
+        "display_minus_creation_literal_seconds": 55.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145696,
+        "creation_literal": "20/10/2026     10:04:37",
+        "directory_display_literal": "Tuesday, October 20, 2026 10:07 AM",
+        "display_minus_creation_literal_seconds": 143.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145698,
+        "creation_literal": "20/10/2026     10:59:18",
+        "directory_display_literal": "Tuesday, October 20, 2026 11:01 AM",
+        "display_minus_creation_literal_seconds": 102.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145699,
+        "creation_literal": "20/10/2026     13:31:05",
+        "directory_display_literal": "Tuesday, October 20, 2026 01:34 PM",
+        "display_minus_creation_literal_seconds": 175.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145703,
+        "creation_literal": "20/10/2026     13:58:53",
+        "directory_display_literal": "Tuesday, October 20, 2026 02:00 PM",
+        "display_minus_creation_literal_seconds": 67.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145706,
+        "creation_literal": "20/10/2026     16:15:41",
+        "directory_display_literal": "Tuesday, October 20, 2026 04:18 PM",
+        "display_minus_creation_literal_seconds": 139.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145722,
+        "creation_literal": "21/10/2026     07:09:50",
+        "directory_display_literal": "Wednesday, October 21, 2026 07:12 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145723,
+        "creation_literal": "21/10/2026     08:52:02",
+        "directory_display_literal": "Wednesday, October 21, 2026 08:54 AM",
+        "display_minus_creation_literal_seconds": 118.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145724,
+        "creation_literal": "21/10/2026     09:30:15",
+        "directory_display_literal": "Wednesday, October 21, 2026 09:32 AM",
+        "display_minus_creation_literal_seconds": 105.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145725,
+        "creation_literal": "21/10/2026     12:48:14",
+        "directory_display_literal": "Wednesday, October 21, 2026 12:50 PM",
+        "display_minus_creation_literal_seconds": 106.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145726,
+        "creation_literal": "21/10/2026     12:47:35",
+        "directory_display_literal": "Wednesday, October 21, 2026 12:49 PM",
+        "display_minus_creation_literal_seconds": 85.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145727,
+        "creation_literal": "21/10/2026     13:01:41",
+        "directory_display_literal": "Wednesday, October 21, 2026 01:04 PM",
+        "display_minus_creation_literal_seconds": 139.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145728,
+        "creation_literal": "21/10/2026     13:30:15",
+        "directory_display_literal": "Wednesday, October 21, 2026 01:32 PM",
+        "display_minus_creation_literal_seconds": 105.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145729,
+        "creation_literal": "21/10/2026     13:49:10",
+        "directory_display_literal": "Wednesday, October 21, 2026 01:51 PM",
+        "display_minus_creation_literal_seconds": 110.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145730,
+        "creation_literal": "21/10/2026     14:43:58",
+        "directory_display_literal": "Wednesday, October 21, 2026 02:45 PM",
+        "display_minus_creation_literal_seconds": 62.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145731,
+        "creation_literal": "21/10/2026     15:17:10",
+        "directory_display_literal": "Wednesday, October 21, 2026 03:19 PM",
+        "display_minus_creation_literal_seconds": 110.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145732,
+        "creation_literal": "21/10/2026     16:00:18",
+        "directory_display_literal": "Wednesday, October 21, 2026 04:02 PM",
+        "display_minus_creation_literal_seconds": 102.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145733,
+        "creation_literal": "21/10/2026     16:08:09",
+        "directory_display_literal": "Wednesday, October 21, 2026 04:10 PM",
+        "display_minus_creation_literal_seconds": 111.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145734,
+        "creation_literal": "21/10/2026     16:30:19",
+        "directory_display_literal": "Wednesday, October 21, 2026 04:32 PM",
+        "display_minus_creation_literal_seconds": 101.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145735,
+        "creation_literal": "21/10/2026     17:05:20",
+        "directory_display_literal": "Wednesday, October 21, 2026 05:08 PM",
+        "display_minus_creation_literal_seconds": 160.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145736,
+        "creation_literal": "21/10/2026     17:19:50",
+        "directory_display_literal": "Wednesday, October 21, 2026 05:21 PM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145737,
+        "creation_literal": "21/10/2026     17:30:10",
+        "directory_display_literal": "Wednesday, October 21, 2026 05:34 PM",
+        "display_minus_creation_literal_seconds": 230.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145738,
+        "creation_literal": "21/10/2026     18:04:51",
+        "directory_display_literal": "Wednesday, October 21, 2026 06:08 PM",
+        "display_minus_creation_literal_seconds": 189.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145739,
+        "creation_literal": "21/10/2026     18:05:11",
+        "directory_display_literal": "Wednesday, October 21, 2026 06:08 PM",
+        "display_minus_creation_literal_seconds": 169.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145740,
+        "creation_literal": "21/10/2026     18:43:45",
+        "directory_display_literal": "Wednesday, October 21, 2026 06:47 PM",
+        "display_minus_creation_literal_seconds": 195.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145741,
+        "creation_literal": "21/10/2026     21:44:50",
+        "directory_display_literal": "Wednesday, October 21, 2026 09:47 PM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145742,
+        "creation_literal": "22/10/2026     02:40:11",
+        "directory_display_literal": "Thursday, October 22, 2026 02:43 AM",
+        "display_minus_creation_literal_seconds": 169.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145743,
+        "creation_literal": "22/10/2026     07:00:14",
+        "directory_display_literal": "Thursday, October 22, 2026 07:03 AM",
+        "display_minus_creation_literal_seconds": 166.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145744,
+        "creation_literal": "22/10/2026     07:55:19",
+        "directory_display_literal": "Thursday, October 22, 2026 07:57 AM",
+        "display_minus_creation_literal_seconds": 101.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145745,
+        "creation_literal": "22/10/2026     09:30:20",
+        "directory_display_literal": "Thursday, October 22, 2026 09:31 AM",
+        "display_minus_creation_literal_seconds": 40.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145746,
+        "creation_literal": "22/10/2026     10:00:16",
+        "directory_display_literal": "Thursday, October 22, 2026 10:01 AM",
+        "display_minus_creation_literal_seconds": 44.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145747,
+        "creation_literal": "22/10/2026     12:30:22",
+        "directory_display_literal": "Thursday, October 22, 2026 12:31 PM",
+        "display_minus_creation_literal_seconds": 38.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145748,
+        "creation_literal": "22/10/2026     14:00:16",
+        "directory_display_literal": "Thursday, October 22, 2026 02:02 PM",
+        "display_minus_creation_literal_seconds": 104.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145749,
+        "creation_literal": "22/10/2026     15:30:21",
+        "directory_display_literal": "Thursday, October 22, 2026 03:32 PM",
+        "display_minus_creation_literal_seconds": 99.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145750,
+        "creation_literal": "22/10/2026     16:55:13",
+        "directory_display_literal": "Thursday, October 22, 2026 04:57 PM",
+        "display_minus_creation_literal_seconds": 107.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145751,
+        "creation_literal": "22/10/2026     17:25:21",
+        "directory_display_literal": "Thursday, October 22, 2026 05:27 PM",
+        "display_minus_creation_literal_seconds": 99.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145752,
+        "creation_literal": "23/10/2026     07:56:50",
+        "directory_display_literal": "Friday, October 23, 2026 07:59 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145753,
+        "creation_literal": "23/10/2026     11:06:21",
+        "directory_display_literal": "Friday, October 23, 2026 11:08 AM",
+        "display_minus_creation_literal_seconds": 99.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145754,
+        "creation_literal": "23/10/2026     13:34:03",
+        "directory_display_literal": "Friday, October 23, 2026 01:37 PM",
+        "display_minus_creation_literal_seconds": 177.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145755,
+        "creation_literal": "23/10/2026     15:56:08",
+        "directory_display_literal": "Friday, October 23, 2026 03:58 PM",
+        "display_minus_creation_literal_seconds": 112.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145756,
+        "creation_literal": "23/10/2026     16:27:52",
+        "directory_display_literal": "Friday, October 23, 2026 04:30 PM",
+        "display_minus_creation_literal_seconds": 128.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145757,
+        "creation_literal": "23/10/2026     18:39:51",
+        "directory_display_literal": "Friday, October 23, 2026 06:42 PM",
+        "display_minus_creation_literal_seconds": 129.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145758,
+        "creation_literal": "23/10/2026     19:44:40",
+        "directory_display_literal": "Friday, October 23, 2026 07:46 PM",
+        "display_minus_creation_literal_seconds": 80.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145759,
+        "creation_literal": "24/10/2026     01:18:35",
+        "directory_display_literal": "Saturday, October 24, 2026 01:21 AM",
+        "display_minus_creation_literal_seconds": 145.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145760,
+        "creation_literal": "24/10/2026     02:56:00",
+        "directory_display_literal": "Saturday, October 24, 2026 02:58 AM",
+        "display_minus_creation_literal_seconds": 120.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145761,
+        "creation_literal": "24/10/2026     03:01:18",
+        "directory_display_literal": "Saturday, October 24, 2026 03:03 AM",
+        "display_minus_creation_literal_seconds": 102.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145762,
+        "creation_literal": "24/10/2026     03:05:20",
+        "directory_display_literal": "Saturday, October 24, 2026 03:07 AM",
+        "display_minus_creation_literal_seconds": 100.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145763,
+        "creation_literal": "24/10/2026     03:19:50",
+        "directory_display_literal": "Saturday, October 24, 2026 03:22 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145764,
+        "creation_literal": "24/10/2026     03:59:50",
+        "directory_display_literal": "Saturday, October 24, 2026 04:03 AM",
+        "display_minus_creation_literal_seconds": 190.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145765,
+        "creation_literal": "24/10/2026     05:09:50",
+        "directory_display_literal": "Saturday, October 24, 2026 05:11 AM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145766,
+        "creation_literal": "24/10/2026     05:21:40",
+        "directory_display_literal": "Saturday, October 24, 2026 05:24 AM",
+        "display_minus_creation_literal_seconds": 140.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145767,
+        "creation_literal": "24/10/2026     05:21:40",
+        "directory_display_literal": "Saturday, October 24, 2026 05:24 AM",
+        "display_minus_creation_literal_seconds": 140.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145768,
+        "creation_literal": "24/10/2026     06:39:55",
+        "directory_display_literal": "Saturday, October 24, 2026 06:42 AM",
+        "display_minus_creation_literal_seconds": 125.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145769,
+        "creation_literal": "24/10/2026     07:03:05",
+        "directory_display_literal": "Saturday, October 24, 2026 07:04 AM",
+        "display_minus_creation_literal_seconds": 55.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145770,
+        "creation_literal": "24/10/2026     07:44:50",
+        "directory_display_literal": "Saturday, October 24, 2026 07:46 AM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145771,
+        "creation_literal": "24/10/2026     09:04:50",
+        "directory_display_literal": "Saturday, October 24, 2026 09:06 AM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145772,
+        "creation_literal": "24/10/2026     09:51:00",
+        "directory_display_literal": "Saturday, October 24, 2026 09:53 AM",
+        "display_minus_creation_literal_seconds": 120.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145773,
+        "creation_literal": "24/10/2026     10:00:13",
+        "directory_display_literal": "Saturday, October 24, 2026 10:02 AM",
+        "display_minus_creation_literal_seconds": 107.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145774,
+        "creation_literal": "24/10/2026     10:37:25",
+        "directory_display_literal": "Saturday, October 24, 2026 10:40 AM",
+        "display_minus_creation_literal_seconds": 155.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145775,
+        "creation_literal": "24/10/2026     10:53:12",
+        "directory_display_literal": "Saturday, October 24, 2026 10:55 AM",
+        "display_minus_creation_literal_seconds": 108.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145776,
+        "creation_literal": "24/10/2026     10:56:01",
+        "directory_display_literal": "Saturday, October 24, 2026 10:57 AM",
+        "display_minus_creation_literal_seconds": 59.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145777,
+        "creation_literal": "24/10/2026     11:16:15",
+        "directory_display_literal": "Saturday, October 24, 2026 11:18 AM",
+        "display_minus_creation_literal_seconds": 105.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145778,
+        "creation_literal": "24/10/2026     12:00:14",
+        "directory_display_literal": "Saturday, October 24, 2026 12:02 PM",
+        "display_minus_creation_literal_seconds": 106.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145779,
+        "creation_literal": "24/10/2026     13:23:35",
+        "directory_display_literal": "Saturday, October 24, 2026 01:26 PM",
+        "display_minus_creation_literal_seconds": 145.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145780,
+        "creation_literal": "24/10/2026     13:59:49",
+        "directory_display_literal": "Saturday, October 24, 2026 02:02 PM",
+        "display_minus_creation_literal_seconds": 131.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145781,
+        "creation_literal": "24/10/2026     14:40:22",
+        "directory_display_literal": "Saturday, October 24, 2026 02:42 PM",
+        "display_minus_creation_literal_seconds": 98.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145782,
+        "creation_literal": "24/10/2026     14:45:30",
+        "directory_display_literal": "Saturday, October 24, 2026 02:48 PM",
+        "display_minus_creation_literal_seconds": 150.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145783,
+        "creation_literal": "24/10/2026     15:30:18",
+        "directory_display_literal": "Saturday, October 24, 2026 03:31 PM",
+        "display_minus_creation_literal_seconds": 42.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145784,
+        "creation_literal": "24/10/2026     15:49:50",
+        "directory_display_literal": "Saturday, October 24, 2026 03:51 PM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145785,
+        "creation_literal": "24/10/2026     17:42:20",
+        "directory_display_literal": "Saturday, October 24, 2026 05:44 PM",
+        "display_minus_creation_literal_seconds": 100.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145786,
+        "creation_literal": "24/10/2026     17:42:00",
+        "directory_display_literal": "Saturday, October 24, 2026 05:43 PM",
+        "display_minus_creation_literal_seconds": 60.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145787,
+        "creation_literal": "24/10/2026     16:51:21",
+        "directory_display_literal": "Saturday, October 24, 2026 04:53 PM",
+        "display_minus_creation_literal_seconds": 99.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145788,
+        "creation_literal": "24/10/2026     17:19:50",
+        "directory_display_literal": "Saturday, October 24, 2026 05:20 PM",
+        "display_minus_creation_literal_seconds": 10.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145789,
+        "creation_literal": "24/10/2026     17:24:20",
+        "directory_display_literal": "Saturday, October 24, 2026 05:25 PM",
+        "display_minus_creation_literal_seconds": 40.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145790,
+        "creation_literal": "24/10/2026     17:24:50",
+        "directory_display_literal": "Saturday, October 24, 2026 05:27 PM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145791,
+        "creation_literal": "24/10/2026     17:26:10",
+        "directory_display_literal": "Saturday, October 24, 2026 05:28 PM",
+        "display_minus_creation_literal_seconds": 110.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145792,
+        "creation_literal": "24/10/2026     17:39:41",
+        "directory_display_literal": "Saturday, October 24, 2026 05:41 PM",
+        "display_minus_creation_literal_seconds": 79.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145793,
+        "creation_literal": "24/10/2026     18:54:51",
+        "directory_display_literal": "Saturday, October 24, 2026 06:57 PM",
+        "display_minus_creation_literal_seconds": 129.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145794,
+        "creation_literal": "24/10/2026     19:19:36",
+        "directory_display_literal": "Saturday, October 24, 2026 07:22 PM",
+        "display_minus_creation_literal_seconds": 144.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145795,
+        "creation_literal": "25/10/2026     00:24:51",
+        "directory_display_literal": "Sunday, October 25, 2026 12:26 AM",
+        "display_minus_creation_literal_seconds": 69.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145796,
+        "creation_literal": "25/10/2026     00:56:06",
+        "directory_display_literal": "Sunday, October 25, 2026 12:58 AM",
+        "display_minus_creation_literal_seconds": 114.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145797,
+        "creation_literal": "25/10/2026     02:59:51",
+        "directory_display_literal": "Sunday, October 25, 2026 03:01 AM",
+        "display_minus_creation_literal_seconds": 69.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145798,
+        "creation_literal": "25/10/2026     03:39:25",
+        "directory_display_literal": "Sunday, October 25, 2026 03:40 AM",
+        "display_minus_creation_literal_seconds": 35.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145799,
+        "creation_literal": "25/10/2026     04:44:50",
+        "directory_display_literal": "Sunday, October 25, 2026 04:47 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145800,
+        "creation_literal": "25/10/2026     05:46:35",
+        "directory_display_literal": "Sunday, October 25, 2026 05:48 AM",
+        "display_minus_creation_literal_seconds": 85.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145801,
+        "creation_literal": "25/10/2026     07:25:09",
+        "directory_display_literal": "Sunday, October 25, 2026 07:27 AM",
+        "display_minus_creation_literal_seconds": 111.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145802,
+        "creation_literal": "25/10/2026     07:49:50",
+        "directory_display_literal": "Sunday, October 25, 2026 07:51 AM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145803,
+        "creation_literal": "25/10/2026     09:12:55",
+        "directory_display_literal": "Sunday, October 25, 2026 09:15 AM",
+        "display_minus_creation_literal_seconds": 125.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145804,
+        "creation_literal": "25/10/2026     12:14:50",
+        "directory_display_literal": "Sunday, October 25, 2026 12:17 PM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145805,
+        "creation_literal": "25/10/2026     12:35:10",
+        "directory_display_literal": "Sunday, October 25, 2026 12:36 PM",
+        "display_minus_creation_literal_seconds": 50.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145806,
+        "creation_literal": "25/10/2026     13:39:50",
+        "directory_display_literal": "Sunday, October 25, 2026 01:42 PM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145807,
+        "creation_literal": "25/10/2026     14:07:15",
+        "directory_display_literal": "Sunday, October 25, 2026 02:08 PM",
+        "display_minus_creation_literal_seconds": 45.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145808,
+        "creation_literal": "25/10/2026     15:46:51",
+        "directory_display_literal": "Sunday, October 25, 2026 03:48 PM",
+        "display_minus_creation_literal_seconds": 69.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145809,
+        "creation_literal": "25/10/2026     16:20:01",
+        "directory_display_literal": "Sunday, October 25, 2026 04:22 PM",
+        "display_minus_creation_literal_seconds": 119.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145810,
+        "creation_literal": "26/10/2026     00:10:31",
+        "directory_display_literal": "Monday, October 26, 2026 12:12 AM",
+        "display_minus_creation_literal_seconds": 89.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145811,
+        "creation_literal": "26/10/2026     05:14:50",
+        "directory_display_literal": "Monday, October 26, 2026 05:17 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145812,
+        "creation_literal": "26/10/2026     06:03:59",
+        "directory_display_literal": "Monday, October 26, 2026 06:06 AM",
+        "display_minus_creation_literal_seconds": 121.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145813,
+        "creation_literal": "26/10/2026     14:15:20",
+        "directory_display_literal": "Monday, October 26, 2026 02:18 PM",
+        "display_minus_creation_literal_seconds": 160.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145814,
+        "creation_literal": "27/10/2026     02:10:16",
+        "directory_display_literal": "Tuesday, October 27, 2026 02:12 AM",
+        "display_minus_creation_literal_seconds": 104.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145815,
+        "creation_literal": "27/10/2026     02:50:16",
+        "directory_display_literal": "Tuesday, October 27, 2026 02:51 AM",
+        "display_minus_creation_literal_seconds": 44.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145816,
+        "creation_literal": "27/10/2026     03:08:10",
+        "directory_display_literal": "Tuesday, October 27, 2026 03:11 AM",
+        "display_minus_creation_literal_seconds": 170.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145817,
+        "creation_literal": "27/10/2026     05:09:50",
+        "directory_display_literal": "Tuesday, October 27, 2026 05:12 AM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145818,
+        "creation_literal": "27/10/2026     07:51:22",
+        "directory_display_literal": "Tuesday, October 27, 2026 07:53 AM",
+        "display_minus_creation_literal_seconds": 98.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145819,
+        "creation_literal": "27/10/2026     07:55:18",
+        "directory_display_literal": "Tuesday, October 27, 2026 07:57 AM",
+        "display_minus_creation_literal_seconds": 102.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145820,
+        "creation_literal": "27/10/2026     08:00:12",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:02 AM",
+        "display_minus_creation_literal_seconds": 108.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145821,
+        "creation_literal": "27/10/2026     08:05:12",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:07 AM",
+        "display_minus_creation_literal_seconds": 108.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145822,
+        "creation_literal": "27/10/2026     08:10:16",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:12 AM",
+        "display_minus_creation_literal_seconds": 104.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145823,
+        "creation_literal": "27/10/2026     08:12:14",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:13 AM",
+        "display_minus_creation_literal_seconds": 46.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145824,
+        "creation_literal": "27/10/2026     08:12:14",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:15 AM",
+        "display_minus_creation_literal_seconds": 166.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145825,
+        "creation_literal": "27/10/2026     08:12:14",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:16 AM",
+        "display_minus_creation_literal_seconds": 226.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145826,
+        "creation_literal": "27/10/2026     08:12:14",
+        "directory_display_literal": "Tuesday, October 27, 2026 08:15 AM",
+        "display_minus_creation_literal_seconds": 166.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145827,
+        "creation_literal": "27/10/2026     13:14:06",
+        "directory_display_literal": "Tuesday, October 27, 2026 01:16 PM",
+        "display_minus_creation_literal_seconds": 114.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145828,
+        "creation_literal": "27/10/2026     11:55:19",
+        "directory_display_literal": "Tuesday, October 27, 2026 11:58 AM",
+        "display_minus_creation_literal_seconds": 161.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145829,
+        "creation_literal": "27/10/2026     13:30:10",
+        "directory_display_literal": "Tuesday, October 27, 2026 01:32 PM",
+        "display_minus_creation_literal_seconds": 110.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145830,
+        "creation_literal": "27/10/2026     13:50:25",
+        "directory_display_literal": "Tuesday, October 27, 2026 01:52 PM",
+        "display_minus_creation_literal_seconds": 95.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145831,
+        "creation_literal": "27/10/2026     14:09:56",
+        "directory_display_literal": "Tuesday, October 27, 2026 02:12 PM",
+        "display_minus_creation_literal_seconds": 124.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145832,
+        "creation_literal": "27/10/2026     14:10:02",
+        "directory_display_literal": "Tuesday, October 27, 2026 02:12 PM",
+        "display_minus_creation_literal_seconds": 118.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145833,
+        "creation_literal": "27/10/2026     14:31:02",
+        "directory_display_literal": "Tuesday, October 27, 2026 02:33 PM",
+        "display_minus_creation_literal_seconds": 118.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145834,
+        "creation_literal": "27/10/2026     15:10:44",
+        "directory_display_literal": "Tuesday, October 27, 2026 03:13 PM",
+        "display_minus_creation_literal_seconds": 136.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145835,
+        "creation_literal": "27/10/2026     15:57:04",
+        "directory_display_literal": "Tuesday, October 27, 2026 03:58 PM",
+        "display_minus_creation_literal_seconds": 56.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145836,
+        "creation_literal": "27/10/2026     16:54:50",
+        "directory_display_literal": "Tuesday, October 27, 2026 04:56 PM",
+        "display_minus_creation_literal_seconds": 70.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145837,
+        "creation_literal": "27/10/2026     17:07:40",
+        "directory_display_literal": "Tuesday, October 27, 2026 05:09 PM",
+        "display_minus_creation_literal_seconds": 80.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      },
+      {
+        "notice_id": 145838,
+        "creation_literal": "27/10/2026     19:09:50",
+        "directory_display_literal": "Tuesday, October 27, 2026 07:12 PM",
+        "display_minus_creation_literal_seconds": 130.0,
+        "timezone_applied": false,
+        "interpretation": "字面日历值之差，仅证明两个字段不相同；不确立任一为首次公开。"
+      }
+    ]
+  },
+  "sampling": {
+    "candidate_count": 117,
+    "predecessors": 10,
+    "reviewed_notices": 127,
+    "reviewed_chains": 68,
+    "category_counts": {
+      "withdrawal": 2,
+      "postponement": 0,
+      "conflict": 0,
+      "revision": 2,
+      "cross_day": 0,
+      "initial": 2
+    },
+    "all_primary_chain_counts": {
+      "revision": 8,
+      "withdrawal": 46,
+      "initial": 14
+    },
+    "source_frame_complete": false,
+    "collection_status": "partial",
+    "missing": [
+      {
+        "from_notice_id": 145307,
+        "notice_id": 145162,
+        "reason": "chain_member_cap"
+      }
+    ],
+    "zero_cross_day_primary_means": "存在跨日次级特征，被修订/撤销更高优先级吸收；不是无跨日公告。"
+  },
+  "limitations": [
+    "研究agent源文裁定，没有外部真人金标准；本轮未评估抽取准确率、预测准确率或agent相对固定规则增益。",
+    "没有官方证明目录display或正文Creation Date的时区和首次公开语义；其不一致不是已证实泄漏。",
+    "fetched_at_utc在请求开始前记录，不能严格作为完整正文first_seen；保留原始记录，不回填伪精确完成时间。",
+    "Current index及空Archive不是完整历史证明。chain_audit.json顶层chain_complete=None不得解释为true；本报告所有selected complete_history_proven=false。",
+    "选中修订145754/145758的先前计划公告未知；公告内原计划/实际恢复可核验，不等于取得所有历史版本。",
+    "145831与145832/33可能是同一物理事件但没有显式跨链notice ID；保留关联疑点，不将链数解释为独立物理事件数。",
+    "145834标题23/10与正文27/10不一致；未修改源文或择一假装时间确定。",
+    "剩余两次真实模型调用保留未运行，未追加窗口、模型、地区或价格修正补救。"
+  ],
+  "evidence_sha256": {
+    "collection.json": "5b1454dc9f24b4f70bc73a987f498e8a8e90388481cc0f0aa2e77e285c8c923f",
+    "candidate_index.json": "f17e2e79c70e1f2e48c219ca4380b1f2e3bf2796dd8ef289485ffb9e5ff82046",
+    "fetch_manifest.json": "1264c76184d218c5233e7b6b92b61be410ed15228c618d245c13b686d502bdb5",
+    "notice_records.json": "23e5ccb0c717ee45a79fc0a3d69e219c4e259fce0782dbf5415e7d5984ae7955",
+    "manual_review.json": "2ad549ba5e9cfdeb686926baceddef29da5773270d8333f77c86c986d54ee6d6",
+    "chain_audit.json": "325b5bd0c63d633dec13a34ba72f7d9cb19d2440e1e64a621701e114ebc79f58",
+    "execution.json": "04ee07729754ff603c226ade48b099250877c5ce707cf59f2982901492af91c2"
+  }
+}

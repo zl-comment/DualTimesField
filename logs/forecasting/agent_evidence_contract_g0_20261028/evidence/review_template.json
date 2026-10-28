@@ -1,0 +1,5 @@
+{
+  "chains": [],
+  "excluded": [],
+  "instructions": "Partition every fetched candidate into one chain or an evidenced exclusion. Each chain has notice_ids, evidence=[{category,notice_id,quote,reason}], edges=[{from_notice_id,to_notice_id,quote,reason}], missing_notice_ids, source_clock_review, event_time_review. Categories use frozen priority; conflict means unresolved simultaneous incompatible claims, not a normal revision. Initial means observed initial only. Never infer absence from missing history."
+}

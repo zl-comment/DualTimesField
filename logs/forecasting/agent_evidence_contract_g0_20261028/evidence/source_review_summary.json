@@ -1,0 +1,80 @@
+{
+  "review_method": "research_agent_source_adjudication_no_human_gold",
+  "frozen_commit": "9740509d8a28b7b05ce3ce59286afa49d9180e85",
+  "selected_chain_count": 6,
+  "legal_numeric_paths": 0,
+  "facts_or_explanation_only": 6,
+  "decision": "STOP_CURRENT_COMBINATION",
+  "decision_scope": "仅停止冻结的2026公告×2022起报×既有输入schema组合；不是电价准确性失败，不否定所有新闻/agent方法。",
+  "resources": {
+    "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "python_version": "3.11.0 | packaged by conda-forge | (main, Oct 25 2022, 06:24:40) [GCC 10.4.0]",
+    "wall_seconds": 562.4118750058115,
+    "http_requests": 131,
+    "bytes_received": 366268,
+    "bytes_charged": 366268,
+    "failed_requests": 2,
+    "successful_requests": 129,
+    "maximum_attempts_per_url": 2,
+    "maximum_body_bytes": 159051,
+    "limits": {
+      "requests": 160,
+      "total_bytes": 16777216,
+      "response_bytes": 262144,
+      "candidates": 120,
+      "predecessors": 36,
+      "chain_members": 6,
+      "lookback_days": 30,
+      "wall_seconds": 600
+    },
+    "extra_fetches_after_collect": 0
+  },
+  "sampling": {
+    "candidate_count": 117,
+    "predecessors": 10,
+    "reviewed_notices": 127,
+    "reviewed_chains": 68,
+    "category_counts": {
+      "withdrawal": 2,
+      "postponement": 0,
+      "conflict": 0,
+      "revision": 2,
+      "cross_day": 0,
+      "initial": 2
+    },
+    "all_primary_chain_counts": {
+      "revision": 8,
+      "withdrawal": 46,
+      "initial": 14
+    },
+    "source_frame_complete": false,
+    "collection_status": "partial",
+    "missing": [
+      {
+        "from_notice_id": 145307,
+        "notice_id": 145162,
+        "reason": "chain_member_cap"
+      }
+    ],
+    "zero_cross_day_primary_means": "存在跨日次级特征，被修订/撤销更高优先级吸收；不是无跨日公告。"
+  },
+  "limitations": [
+    "研究agent源文裁定，没有外部真人金标准；本轮未评估抽取准确率、预测准确率或agent相对固定规则增益。",
+    "没有官方证明目录display或正文Creation Date的时区和首次公开语义；其不一致不是已证实泄漏。",
+    "fetched_at_utc在请求开始前记录，不能严格作为完整正文first_seen；保留原始记录，不回填伪精确完成时间。",
+    "Current index及空Archive不是完整历史证明。chain_audit.json顶层chain_complete=None不得解释为true；本报告所有selected complete_history_proven=false。",
+    "选中修订145754/145758的先前计划公告未知；公告内原计划/实际恢复可核验，不等于取得所有历史版本。",
+    "145831与145832/33可能是同一物理事件但没有显式跨链notice ID；保留关联疑点，不将链数解释为独立物理事件数。",
+    "145834标题23/10与正文27/10不一致；未修改源文或择一假装时间确定。",
+    "剩余两次真实模型调用保留未运行，未追加窗口、模型、地区或价格修正补救。"
+  ],
+  "selected_anchor_ids": [
+    145722,
+    145723,
+    145724,
+    145725,
+    145754,
+    145758
+  ],
+  "numeric_path_audit_sha256": "ccb63191de95ab3efbee2ecac1b812993ed364090b288e658581828cbdd12f12"
+}

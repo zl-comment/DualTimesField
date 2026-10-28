@@ -1,0 +1,57 @@
+{
+  "started_at_utc": "2026-10-28T10:45:15.561679+00:00",
+  "status": "passed",
+  "guard": {
+    "blocked_network_calls": 0,
+    "blocked_label_reads": 0
+  },
+  "model_identity": {
+    "checkpoint": {
+      "config.json": {
+        "sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+        "size_bytes": 1067
+      },
+      "model.safetensors": {
+        "sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+        "size_bytes": 477930472
+      }
+    },
+    "state_sha256_before": "c325f9b311d6b97f7a72ad22f0dc11d56a895c010edd089468be85f68e6f733e",
+    "state_sha256_after": "c325f9b311d6b97f7a72ad22f0dc11d56a895c010edd089468be85f68e6f733e",
+    "packages": {
+      "numpy": "2.4.6",
+      "chronos-forecasting": "2.3.2",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.20.2",
+      "psutil": "7.2.2"
+    },
+    "device": "cpu",
+    "dtype": "float32",
+    "torch_threads": 2,
+    "grad_enabled": false,
+    "training_calls": 0,
+    "quantile_levels": [
+      0.05,
+      0.1,
+      0.5,
+      0.9,
+      0.95
+    ],
+    "cross_learning": false,
+    "negative_values_preserved": true,
+    "native_crossing_count": 0
+  },
+  "input_sha256": "bbc2f7e76d808ab170cffc39724478d6e97136643c5ccf37d6b63cab01700dfc",
+  "forecast_sha256": "be525ef76c155b161701deffc3e5349ca5aae5317cb4bde0b8dd4bcde426e76b",
+  "shape": [
+    24,
+    5
+  ],
+  "future_labels_read": false,
+  "scores_computed": false,
+  "wall_seconds": 9.328824482858181,
+  "user_cpu_seconds": 8.686442,
+  "system_cpu_seconds": 1.447074,
+  "peak_rss_bytes": 1264910336,
+  "finished_at_utc": "2026-10-28T10:45:24.890501+00:00"
+}
