@@ -1,0 +1,8 @@
+{
+  "recorded_at_utc": "2026-10-28T14:04:44.675647+00:00",
+  "returncode": 0,
+  "log_path": "preflight_tests.txt",
+  "log_sha256": "3c84ea4ac21899975d1ec6a93f6136d18ea9cf111e022bca99fb2155d614d2ce",
+  "command": ".venv/bin/python -m pytest tests/test_g0a_predispatch_rrp.py -q > <run_dir>/preflight_tests.txt 2>&1; echo $? > <run_dir>/preflight_tests.exit",
+  "note": "returncode is pytest's own exit status read from the .exit file; no pipe status"
+}

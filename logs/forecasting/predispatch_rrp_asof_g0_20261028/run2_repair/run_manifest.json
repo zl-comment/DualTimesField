@@ -1,0 +1,44 @@
+{
+  "started_at_utc": "2026-10-28T14:04:48.008422+00:00",
+  "finished_at_utc": "2026-10-28T14:04:48.434322+00:00",
+  "wall_seconds": 0.425893,
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "python_version": "3.11.0",
+  "command": [
+    "scripts/audit_g0a_predispatch_rrp.py",
+    "audit",
+    "--config",
+    "configs/agent_forecasting/g0a_predispatch_rrp_20261028.json"
+  ],
+  "git_head": "5157786ccd7da42142c1dccf1614f296faa8ebf7",
+  "git_head_source": "in-process .git read (no subprocess)",
+  "sigalrm_deadline_seconds": 300,
+  "branch": "research/predispatch-rrp-asof-g0-20261028",
+  "base_commit": "708327098d1e50349726f76f55a10893ba11173d",
+  "network_disabled": true,
+  "npz_path": "data/aemo_exogenous_holdout/merged/nsw1_predispatch.npz",
+  "selection_rule": {
+    "rule": "even_index_stride_round_half_up",
+    "max_origins": 12,
+    "formula": "n<=12: all; else idx_k=(k*(n-1)+5)//11, k=0..11",
+    "inputs_used": [
+      "forecast_origin_unix only"
+    ],
+    "independent_of": [
+      "predispatch_covered",
+      "predispatch_rrp values",
+      "source_run_unix",
+      "source_run_seqno"
+    ],
+    "fixed_before_any_value_level_inspection": true
+  },
+  "source_sha256": {
+    "harness_module": "66aa656550636aefa962c7c237d3de0756ba910734f6c7ebdcc224593e6e22bf",
+    "audit_script": "01917a96f3b7f83b2431734328e3b1721856ed1a5c7d7cedfdce1de68a9aedf5",
+    "config": "8dd7dd2e4f2fea738df2b4ca1b6fea069ac2bad4056608eaee777379ce284b75",
+    "protocol": "a12d45a0cd7235ea45bcf90a3ff459f6738bb5eabc8bf18d3a87f880efc325d2",
+    "builder": "8ef49cdf31c342508b846ff188bb874950b4bfd690c225a0126949361eb00db9",
+    "npz": "6e5e6d73de75fdf3b8a761f1b26245491a4aa41deca1038c68349c2022720a16",
+    "tests": "fe7f072fd7a2f8b7536fca0114f0df157f2c0e30da3efef9381eb47852f848b6"
+  }
+}
