@@ -310,12 +310,27 @@ def check_publication_basis(run_unix, last_changed) -> dict:
     }
 
 
+# Protocol S4: the engineering gate covers these structural checks only;
+# coverage fills in the data feed quick_veto and never gate engineering.
+ENGINEERING_GATE_CHECKS = (
+    "schema",
+    "units_plausibility_aud_per_mwh",
+    "target_time_alignment",
+    "run_vintage_asof",
+    "publication_basis_archive_proxy",
+)
+
+
 def assemble_verdict(*, checks, budget, preflight, guard_violations) -> dict:
     statuses = {check["check"]: check["status"] for check in checks}
     tests_ok = preflight is not None and preflight.get("returncode") == 0
     budget_ok = budget is not None and budget.get("within_budget") is True
     guards_ok = guard_violations == []
-    checks_ok = all(status == "pass" for status in statuses.values())
+    checks_ok = all(
+        statuses[name] == "pass"
+        for name in ENGINEERING_GATE_CHECKS
+        if name in statuses
+    ) and all(name in statuses for name in ENGINEERING_GATE_CHECKS)
     veto_reasons = []
     for check in checks:
         veto_reasons.extend(check.get("veto_reasons", []))
@@ -329,7 +344,11 @@ def assemble_verdict(*, checks, budget, preflight, guard_violations) -> dict:
     if not guards_ok:
         problems.extend(f"guard violation: {v}" for v in guard_violations)
     if not checks_ok:
-        problems.extend(f"{k} failed" for k, s in statuses.items() if s != "pass")
+        problems.extend(
+            f"{name} failed"
+            for name in ENGINEERING_GATE_CHECKS
+            if statuses.get(name) != "pass"
+        )
     verdict = {
         "audit": "g0a_predispatch_rrp_asof_preaudit",
         "engineering": "ENGINEERING_PASS" if engineering_pass else "ENGINEERING_FAIL",
