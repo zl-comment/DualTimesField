@@ -8,19 +8,24 @@ audit:        run the six frozen checks on the frozen NPZ for the selected
 archive:      mirror the outputs run dir into the committed logs dir and
               write artifact_manifest.json (sha256 of every file).
 
-Gate-reliability contract (2026-10-28 repair round 2):
-- The budget clock is anchored at process start (best effort via
-  /proc/self/stat, else the first line of this module, always before the
-  numpy/harness imports) and covers module imports, CLI parsing, config
-  load, all checks, the final source hashes/HEAD, and evidence finalization;
-  budget elapsed is never smaller than the recorded full-run wall time.
+Gate-reliability contract (2026-10-28 repair rounds 2+3):
+- The budget clock is anchored at process start (/proc/self/stat starttime
+  converted through CLOCK_BOOTTIME, or /proc/uptime when the interpreter
+  lacks CLOCK_BOOTTIME; the first line of this module is the last-resort
+  fallback when /proc is unavailable) and covers module imports, CLI
+  parsing, config load, all checks, the final source hashes/HEAD, and
+  evidence finalization THROUGH publication: the staged accounting is
+  resampled after the last tree fsync, and a publication-complete record
+  (written next to the run dir) is sampled after the commit rename with no
+  fsynced write after it, so no fsync or publication tail goes unrecorded.
 - Success evidence is staged in a temporary directory and published with a
   single atomic rename only AFTER all final checks passed; partial success
   sets cannot appear in the run dir.
 - Any failure (including BudgetExceeded in the final phases or a publication
-  fault) exits non-zero and atomically writes an explicit ENGINEERING_FAIL
-  record next to the run dir; already-published evidence is never modified
-  or overwritten by a failed or rerun audit.
+  fault) exits non-zero, scrubs the staged success set so no success
+  evidence survives a failed audit anywhere, and atomically writes an
+  explicit ENGINEERING_FAIL record next to the run dir; already-published
+  evidence is never modified or overwritten by a failed or rerun audit.
 
 This script never reads labels, never touches the network, never modifies
 the NPZ, and cannot emit a strict as-of PASS.
@@ -45,16 +50,24 @@ PROCESS_IMPORT_STARTED = time.monotonic()  # captured before the numpy/harness i
 
 def _process_start_monotonic() -> float:
     """Best-effort interpreter start on the monotonic clock: /proc/self/stat
-    field 22 (starttime, clock ticks since boot) against CLOCK_BOOTTIME.
-    Falls back to the first line of this module when /proc is unavailable."""
+    field 22 (starttime, clock ticks since boot) converted into the monotonic
+    domain through the process age measured on a since-boot clock (CLOCK_BOOTTIME
+    when the interpreter has it, else /proc/uptime, which needs no special
+    clock support). Falls back to the first line of this module only when
+    /proc is unavailable."""
     try:
         stat_text = Path("/proc/self/stat").read_text()
         fields = stat_text.rsplit(")", 1)[1].split()
         start_ticks = float(fields[19])  # field 22 overall; here fields start at 3
         ticks_per_second = os.sysconf("SC_CLK_TCK")
-        boottime_elapsed = time.clock_gettime(time.CLOCK_BOOTTIME)
-        candidate = boottime_elapsed - start_ticks / ticks_per_second
-        return min(candidate, PROCESS_IMPORT_STARTED)
+        try:
+            now_since_boot = time.clock_gettime(time.CLOCK_BOOTTIME)
+        except (AttributeError, OSError, ValueError):
+            # No CLOCK_BOOTTIME on this interpreter: /proc/uptime is the same
+            # since-boot clock, so interpreter startup stays covered.
+            now_since_boot = float(Path("/proc/uptime").read_text().split()[0])
+        age = now_since_boot - start_ticks / ticks_per_second
+        return min(time.monotonic() - max(age, 0.0), PROCESS_IMPORT_STARTED)
     except Exception:
         return PROCESS_IMPORT_STARTED
 
@@ -193,7 +206,10 @@ def _fsync_tree(directory: Path) -> None:
         os.close(fd)
 
 
-def write_failure_record(*, run_dir, phase, exc, budget, staging, config_path) -> Path:
+def write_failure_record(
+    *, run_dir, phase, exc, budget, staging, config_path,
+    evidence_published=False, staging_scrubbed=None,
+) -> Path:
     """Atomically write an explicit ENGINEERING_FAIL record NEXT TO the run dir
     (never inside it, so existing evidence can never be touched). The record
     itself is staged then os.replace'd into place."""
@@ -221,7 +237,8 @@ def write_failure_record(*, run_dir, phase, exc, budget, staging, config_path) -
         "exception": str(exc),
         "traceback_tail": traceback.format_exception(type(exc), exc, exc.__traceback__)[-8:],
         "budget": budget_state,
-        "evidence_published": False,
+        "evidence_published": bool(evidence_published),
+        "staging_scrubbed": staging_scrubbed,
         "run_dir": str(run_dir) if run_dir is not None else None,
         "staging_dir": str(staging) if staging is not None else None,
         "config": str(config_path),
@@ -231,9 +248,10 @@ def write_failure_record(*, run_dir, phase, exc, budget, staging, config_path) -
         "pid": os.getpid(),
         "command": sys.argv,
         "note": (
-            "The audit failed before atomic publication; no success evidence set "
-            "exists in the run dir. If staging_dir is set, it holds the complete "
-            "unpublished evidence for manual recovery."
+            "The audit failed; any staged success set was scrubbed so no success "
+            "evidence survives a failed audit. evidence_published records whether "
+            "the atomic publication rename had already committed when the failure "
+            "occurred."
         ),
     }
     failures_dir.mkdir(parents=True, exist_ok=True)
@@ -309,6 +327,7 @@ def cmd_audit(args: argparse.Namespace) -> None:
     run_dir = None
     budget = None
     staging = None
+    published = False
     try:
         # Resource guard first (protocol §5): the budget is anchored at
         # process start and covers config load, the frozen-binding hashes,
@@ -430,68 +449,129 @@ def cmd_audit(args: argparse.Namespace) -> None:
             staging.mkdir(parents=True)
             (staging / "selected_origins.json").write_text(json.dumps(selected_rows, indent=2) + "\n")
             (staging / "g0a_verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
-            manifest_wall = round(time.monotonic() - AUDIT_STARTED_MONOTONIC, 6)
-            (staging / "run_manifest.json").write_text(
-                json.dumps(
-                    {
-                        "started_at_utc": started_utc,
-                        "finished_at_utc": utc_now(),
-                        "wall_seconds": manifest_wall,
-                        "wall_clock_anchor": "process_start",
-                        "phases": {"pre_audit_process_import_cli_s": round(pre_audit_s, 6)},
-                        "evidence_publication": {
-                            "mode": "staging_dir_single_atomic_rename",
-                            "partial_success_sets": "impossible",
-                        },
-                        "interpreter": sys.executable,
-                        "python_version": platform.python_version(),
-                        "command": sys.argv,
-                        "git_head": head,
-                        "git_head_source": "in-process .git read (no subprocess)",
-                        "sigalrm_deadline_seconds": g0a.WALL_SECONDS_BUDGET,
-                        "branch": config["branch"],
-                        "base_commit": config["base_commit"],
-                        "network_disabled": True,
-                        "npz_path": config["npz_path"],
-                        "selection_rule": config["origin_selection"],
-                        "source_sha256": source_sha256,
+
+            def _manifest_record(wall_seconds: float) -> dict:
+                return {
+                    "started_at_utc": started_utc,
+                    "finished_at_utc": utc_now(),
+                    "wall_seconds": wall_seconds,
+                    "wall_clock_anchor": "process_start",
+                    "phases": {"pre_audit_process_import_cli_s": round(pre_audit_s, 6)},
+                    "evidence_publication": {
+                        "mode": "staging_dir_single_atomic_rename",
+                        "partial_success_sets": "impossible",
                     },
-                    indent=2,
+                    "interpreter": sys.executable,
+                    "python_version": platform.python_version(),
+                    "command": sys.argv,
+                    "git_head": head,
+                    "git_head_source": "in-process .git read (no subprocess)",
+                    "sigalrm_deadline_seconds": g0a.WALL_SECONDS_BUDGET,
+                    "branch": config["branch"],
+                    "base_commit": config["base_commit"],
+                    "network_disabled": True,
+                    "npz_path": config["npz_path"],
+                    "selection_rule": config["origin_selection"],
+                    "source_sha256": source_sha256,
+                }
+
+            def _write_accounting(manifest_wall: float) -> None:
+                """(Re)write the two accounting files with a sample taken as
+                late as the caller arranged, so the recorded numbers cover the
+                finalization work already performed."""
+                (staging / "run_manifest.json").write_text(
+                    json.dumps(_manifest_record(manifest_wall), indent=2) + "\n"
                 )
-                + "\n"
-            )
+                budget_report = {
+                    **budget.report(),
+                    "wall_clock_anchor": "process_start",
+                    "phases": {
+                        "pre_audit_process_import_cli_s": round(pre_audit_s, 6),
+                        "checks_s": round(after_checks - audit_entry, 6),
+                        "final_hashes_head_s": round(after_hashes - after_checks, 6),
+                        "evidence_staging_s": round(time.monotonic() - after_hashes, 6),
+                        "total_monotonic_s": budget.report()["wall_seconds_elapsed"],
+                    },
+                }
+                if budget_report["wall_seconds_elapsed"] < manifest_wall:
+                    raise AuditPublishError(
+                        "budget accounting invariant violated: "
+                        f"{budget_report['wall_seconds_elapsed']}s < run wall {manifest_wall}s"
+                    )
+                (staging / "budget_report.json").write_text(json.dumps(budget_report, indent=2) + "\n")
+
+            _write_accounting(round(time.monotonic() - AUDIT_STARTED_MONOTONIC, 6))
             for name in PREFLIGHT_FILENAMES:
                 if (run_dir / name).exists():
                     shutil.copyfile(run_dir / name, staging / name)
             _fsync_tree(staging)
-            budget_report = {
-                **budget.report(),
-                "wall_clock_anchor": "process_start",
-                "phases": {
-                    "pre_audit_process_import_cli_s": round(pre_audit_s, 6),
-                    "checks_s": round(after_checks - audit_entry, 6),
-                    "final_hashes_head_s": round(after_hashes - after_checks, 6),
-                    "evidence_staging_s": round(time.monotonic() - after_hashes, 6),
-                    "total_monotonic_s": budget.report()["wall_seconds_elapsed"],
-                },
-            }
-            if budget_report["wall_seconds_elapsed"] < manifest_wall:
-                raise AuditPublishError(
-                    "budget accounting invariant violated: "
-                    f"{budget_report['wall_seconds_elapsed']}s < run wall {manifest_wall}s"
-                )
-            (staging / "budget_report.json").write_text(json.dumps(budget_report, indent=2) + "\n")
-            _fsync_tree(staging)
+            budget.check()
+
+            # Round-3 repair: resample the accounting AFTER the last tree
+            # fsync so the recorded elapsed includes the complete finalization
+            # tail (fsync latency included). The rewrite is deliberately not
+            # followed by another fsync: any post-sample fsync could re-open
+            # exactly the undercount this closes, and a crash can then only
+            # expose the older sample, itself a true lower bound of the run.
+            refresh_wall = round(time.monotonic() - AUDIT_STARTED_MONOTONIC, 6)
+            _write_accounting(refresh_wall)
+            refresh_elapsed = json.loads(
+                (staging / "budget_report.json").read_text()
+            )["wall_seconds_elapsed"]
             budget.check()
 
             phase = "publication"
             _publish_run_dir(run_dir, staging)
             staging = None  # published: nothing left to recover
+            published = True
+
+            # Round-3 repair: publication-complete accounting, sampled after
+            # every fsync and the commit rename. Nothing fsynced runs after
+            # this sample, so this number can never undercount the audited
+            # run. It is written next to the run dir so the published set
+            # stays exactly what the atomic rename committed.
+            phase = "publication_accounting"
+            completion_elapsed = round(time.monotonic() - AUDIT_STARTED_MONOTONIC, 6)
+            if completion_elapsed < refresh_elapsed:
+                raise AuditPublishError(
+                    "publication accounting invariant violated: completion "
+                    f"{completion_elapsed}s < staged budget accounting {refresh_elapsed}s"
+                )
+            completion_record = {
+                "record_kind": "g0a_publication_complete",
+                "audit": "g0a_predispatch_rrp_asof_preaudit",
+                "run_dir": str(run_dir),
+                "wall_clock_anchor": "process_start",
+                "wall_seconds_elapsed_at_publication_complete": completion_elapsed,
+                "staged_budget_report_elapsed": refresh_elapsed,
+                "staged_run_manifest_wall_seconds": refresh_wall,
+                "pid": os.getpid(),
+                "recorded_at_utc": utc_now(),
+            }
+            completion_tmp = run_dir.parent / f".tmp-{run_dir.name}.publication_record.{os.getpid()}.json"
+            completion_tmp.write_text(json.dumps(completion_record, indent=2) + "\n")
+            os.replace(
+                completion_tmp,
+                run_dir.parent / (run_dir.name + ".publication_record.json"),
+            )
     except BaseException as exc:  # every failure becomes an explicit record
+        staging_scrubbed = None
+        if staging is not None:
+            # Round-3 repair: no success evidence may survive a failed audit
+            # anywhere on disk, the staged set included.
+            try:
+                shutil.rmtree(staging)
+                staging_scrubbed = True
+            except FileNotFoundError:
+                staging_scrubbed = True
+            except Exception as scrub_exc:  # noqa: BLE001
+                staging_scrubbed = f"scrub failed: {scrub_exc!r}"
         try:
             write_failure_record(
                 run_dir=run_dir, phase=phase, exc=exc, budget=budget,
                 staging=staging, config_path=args.config,
+                evidence_published=published,
+                staging_scrubbed=staging_scrubbed,
             )
         except Exception as record_exc:  # noqa: BLE001
             print(f"FAILED TO WRITE FAILURE RECORD: {record_exc!r}", file=sys.stderr)
@@ -530,6 +610,14 @@ def cmd_archive(args: argparse.Namespace) -> None:
         files[str(relative)] = {
             "size_bytes": path.stat().st_size,
             "sha256": sha256_file(path),
+        }
+    publication_record = source.parent / (source.name + ".publication_record.json")
+    if publication_record.exists():
+        target = destination / "publication_record.json"
+        target.write_bytes(publication_record.read_bytes())
+        files["publication_record.json"] = {
+            "size_bytes": target.stat().st_size,
+            "sha256": sha256_file(target),
         }
     manifest = {
         "created_at_utc": utc_now(),

@@ -570,6 +570,24 @@ elif fault == "rename_publish":
     def _boom(src, dst):
         raise OSError("injected publication rename failure")
     runner.os.rename = _boom
+elif fault == "fsync_delay":
+    real_tree = runner._fsync_tree
+    def slow_tree(directory):
+        import time as _t
+        _t.sleep(0.25)
+        return real_tree(directory)
+    runner._fsync_tree = slow_tree
+elif fault in ("final_budget_check_exceeded", "final_budget_check_runtime"):
+    import pathlib as _pl
+    real_check = runner.g0a.BudgetGuard.check
+    run_dir_path = _pl.Path(os.environ["GATE_RUN_DIR"])
+    def check(self, *args, **kwargs):
+        if any(run_dir_path.parent.glob(run_dir_path.name + ".publish-*")):
+            if fault == "final_budget_check_exceeded":
+                raise runner.g0a.BudgetExceeded("injected final budget.check() failure")
+            raise RuntimeError("injected final budget.check() failure")
+        return real_check(self, *args, **kwargs)
+    runner.g0a.BudgetGuard.check = check
 
 sys.argv = ["audit_g0a_predispatch_rrp.py", "audit", "--config", os.environ["GATE_CONFIG_PATH"]]
 runner.main()
@@ -629,7 +647,7 @@ class GateRepairWorldMixin:
         config_path.write_text(json.dumps(config, indent=2))
         return config_path, run_dir
 
-    def run_audit_subprocess(self, config_path, tmp, fault=None):
+    def run_audit_subprocess(self, config_path, tmp, fault=None, run_dir=None):
         driver = Path(tmp) / "gate_fault_driver.py"
         driver.write_text(GATE_FAULT_DRIVER)
         env = dict(os.environ)
@@ -637,6 +655,8 @@ class GateRepairWorldMixin:
         env["GATE_CONFIG_PATH"] = str(config_path)
         if fault:
             env["GATE_FAULT"] = fault
+        if run_dir is not None:
+            env["GATE_RUN_DIR"] = str(run_dir)
         return subprocess.run(
             [sys.executable, str(driver)],
             capture_output=True,
@@ -645,6 +665,20 @@ class GateRepairWorldMixin:
             cwd=str(REPO_ROOT),
             timeout=180,
         )
+
+    def assert_clean_failure(self, proc, run_dir, expected_phase=None):
+        self.assertNotEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+        for name in EVIDENCE_FILENAMES:
+            self.assertFalse(
+                (run_dir / name).exists(),
+                f"{name} must not survive a failed audit (found in run dir)",
+            )
+        record = self.load_failure_record(run_dir)
+        self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
+        self.assertIn("exception_type", record)
+        if expected_phase is not None:
+            self.assertEqual(record["failed_phase"], expected_phase)
+        return record
 
     def load_failure_record(self, run_dir):
         failures_dir = run_dir.parent / (run_dir.name + "_failures")
@@ -663,20 +697,6 @@ class GateFinalizationFaultTests(GateRepairWorldMixin, unittest.TestCase):
     evidence, a success verdict, or a success budget/manifest behind; the
     process must exit non-zero and atomically write an explicit
     ENGINEERING_FAIL record."""
-
-    def assert_clean_failure(self, proc, run_dir, expected_phase=None):
-        self.assertNotEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
-        for name in EVIDENCE_FILENAMES:
-            self.assertFalse(
-                (run_dir / name).exists(),
-                f"{name} must not survive a failed audit (found in run dir)",
-            )
-        record = self.load_failure_record(run_dir)
-        self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
-        self.assertIn("exception_type", record)
-        if expected_phase is not None:
-            self.assertEqual(record["failed_phase"], expected_phase)
-        return record
 
     def test_source_hashes_runtime_error_leaves_no_success_evidence(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -713,17 +733,17 @@ class GateFinalizationFaultTests(GateRepairWorldMixin, unittest.TestCase):
             self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
 
     def test_publication_rename_failure_leaves_no_partial_success_set(self):
-        """Repair requirement 2 (write-path fault injection): if the atomic
-        publication rename itself fails, no partial success set may appear in
-        the run dir; the failure record must name the staging directory that
-        holds the complete unpublished set."""
+        """Repair requirement 2 + round-3 audit gap 3 (write-path fault
+        injection): if the atomic publication rename itself fails, no partial
+        success set may appear in the run dir AND no staged success evidence
+        may survive the failed audit anywhere on disk."""
         with tempfile.TemporaryDirectory() as tmp:
             config_path, run_dir = self.build_world(tmp)
             proc = self.run_audit_subprocess(config_path, tmp, fault="rename_publish")
             record = self.assert_clean_failure(proc, run_dir, expected_phase="publication")
-            staging = Path(record["staging_dir"])
-            self.assertTrue(staging.exists(), "staged evidence must be retained for recovery")
-            self.assertTrue((staging / "g0a_verdict.json").exists())
+            self.assertTrue(record["staging_scrubbed"])
+            leftovers = list(run_dir.parent.glob(run_dir.name + ".publish-*"))
+            self.assertEqual(leftovers, [], "staged success evidence survived a failed audit")
 
 
 class GatePublicationAtomicityTests(GateRepairWorldMixin, unittest.TestCase):
@@ -857,6 +877,223 @@ class GateEvidenceProtectionTests(GateRepairWorldMixin, unittest.TestCase):
             self.assertEqual(
                 json.loads((run_dir / "preflight_tests.json").read_text()), sentinel_preflight
             )
+
+
+ROUND3_ANCHOR_DRIVER = '''
+import importlib.util, json, os, sys, time
+
+mode = os.environ["ANCHOR_MODE"]
+
+if mode == "probe":
+    # Real process: a pre-import delay must be INSIDE the anchored elapsed.
+    t0 = time.monotonic()
+    time.sleep(4.0)
+    spec = importlib.util.spec_from_file_location(
+        "runner_anchor_probe", os.environ["RUNNER_PATH"])
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    elapsed_implied = time.monotonic() - runner.AUDIT_STARTED_MONOTONIC
+    print(json.dumps({
+        "elapsed_implied": elapsed_implied,
+        "true_since_t0": time.monotonic() - t0,
+    }))
+    sys.exit(0)
+
+# Controlled-clock modes: fake /proc + a faked since-boot clock, patched
+# BEFORE the runner import so the anchor computed at module load sees them.
+import pathlib
+
+REAL_READ_TEXT = pathlib.Path.read_text
+CLK = os.sysconf("SC_CLK_TCK")
+NOW_SINCE_BOOT = 1000000.50
+AGE = 5.0
+STAT_TICKS = int((NOW_SINCE_BOOT - AGE) * CLK)
+
+
+def fake_read_text(self, *args, **kwargs):
+    text = str(self)
+    if text == "/proc/uptime":
+        return "1000000.50 250000.00\\n"
+    if text == "/proc/self/stat":
+        fields = ["0"] * 44
+        fields[19] = str(STAT_TICKS)
+        return "12345 (fakename) " + " ".join(fields)
+    return REAL_READ_TEXT(self, *args, **kwargs)
+
+
+pathlib.Path.read_text = fake_read_text
+if mode == "fallback":
+    def no_boottime(*args, **kwargs):
+        raise AttributeError("CLOCK_BOOTTIME not available")
+    time.clock_gettime = no_boottime
+elif mode == "boottime":
+    time.clock_gettime = lambda *args, **kwargs: NOW_SINCE_BOOT
+else:
+    raise SystemExit("unknown ANCHOR_MODE " + mode)
+
+spec = importlib.util.spec_from_file_location(
+    "runner_anchor_fake", os.environ["RUNNER_PATH"])
+runner = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(runner)
+print(json.dumps({
+    "elapsed_implied": time.monotonic() - runner._process_start_monotonic(),
+}))
+'''
+
+
+class GateRound3AnchorTests(GateRepairWorldMixin, unittest.TestCase):
+    """Round-3 audit gap 1: the process-start anchor must be a genuine
+    monotonic-domain process-start anchor on every branch — boottime clock
+    present, CLOCK_BOOTTIME missing (/proc/uptime fallback), and a real child
+    process whose pre-import delay must land inside the anchored elapsed."""
+
+    def run_anchor_probe(self, tmp, mode):
+        driver = Path(tmp) / "round3_anchor_driver.py"
+        driver.write_text(ROUND3_ANCHOR_DRIVER)
+        env = dict(os.environ)
+        env["RUNNER_PATH"] = str(REPO_ROOT / "scripts" / "audit_g0a_predispatch_rrp.py")
+        env["ANCHOR_MODE"] = mode
+        proc = subprocess.run(
+            [sys.executable, str(driver)],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=str(REPO_ROOT),
+            timeout=120,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+        return json.loads(proc.stdout.strip().splitlines()[-1])
+
+    def test_real_child_anchor_covers_pre_import_delay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "probe")
+            self.assertGreaterEqual(
+                out["elapsed_implied"],
+                3.5,
+                "pre-import delay (4.0s sleep before the runner import) is "
+                "not covered by the budget anchor: the import-line fallback "
+                "undercounts interpreter startup and pre-import work",
+            )
+            self.assertLessEqual(
+                out["elapsed_implied"],
+                out["true_since_t0"] + 2.0,
+                "anchor-implied elapsed exceeds the child lifetime: the anchor "
+                "is not in the monotonic process-start domain (system-uptime "
+                "bug)",
+            )
+
+    def test_anchor_without_clock_boottime_uses_uptime_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "fallback")
+            self.assertGreaterEqual(out["elapsed_implied"], 4.5)
+            self.assertLessEqual(
+                out["elapsed_implied"],
+                5.5,
+                "without CLOCK_BOOTTIME the anchor undercounted the process "
+                "age (import-line fallback used while /proc was available)",
+            )
+
+    def test_anchor_boottime_branch_stays_in_monotonic_domain(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "boottime")
+            self.assertGreaterEqual(out["elapsed_implied"], 4.5)
+            self.assertLessEqual(
+                out["elapsed_implied"],
+                5.5,
+                "boottime branch returned the process AGE as the anchor, so "
+                "elapsed degenerates to system uptime",
+            )
+
+
+class GateRound3FinalizationTailTests(GateRepairWorldMixin, unittest.TestCase):
+    """Round-3 audit gap 2: the recorded budget accounting must cover the
+    finalization tail — fsync latency and publication. The staged accounting
+    is resampled after the last tree fsync and a publication-complete record
+    (sibling of the run dir) is sampled after the commit rename, so no later
+    fsync can undercount the run."""
+
+    def _child_wall_and_accounting(self, fault=None):
+        tmp_ctx = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp_ctx.cleanup)
+        config_path, run_dir = self.build_world(tmp_ctx.name)
+        t0 = time.monotonic()
+        proc = self.run_audit_subprocess(config_path, tmp_ctx.name, fault=fault, run_dir=run_dir)
+        child_wall = time.monotonic() - t0
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+        report = json.loads((run_dir / "budget_report.json").read_text())
+        return run_dir, child_wall, report
+
+    def test_budget_report_covers_fsync_and_publication_tail(self):
+        # Baseline run cancels child spawn/teardown overhead from the
+        # wall-clock comparison; each subprocess gets a fresh world.
+        _, wall0, report0 = self._child_wall_and_accounting()
+        overhead = wall0 - report0["wall_seconds_elapsed"]
+        run_dir, wall1, report1 = self._child_wall_and_accounting(fault="fsync_delay")
+        manifest = json.loads((run_dir / "run_manifest.json").read_text())
+        pub_path = run_dir.parent / (run_dir.name + ".publication_record.json")
+        self.assertTrue(pub_path.exists(), "publication-complete record missing")
+        pub = json.loads(pub_path.read_text())
+        self.assertGreaterEqual(
+            report1["wall_seconds_elapsed"],
+            wall1 - overhead - 0.05,
+            "budget report undercounts the run: the finalization tail "
+            "(second tree fsync + publication) is missing",
+        )
+        self.assertGreaterEqual(
+            pub["wall_seconds_elapsed_at_publication_complete"],
+            wall1 - overhead - 0.05,
+            "publication-complete record undercounts the run",
+        )
+        self.assertGreaterEqual(
+            pub["wall_seconds_elapsed_at_publication_complete"],
+            report1["wall_seconds_elapsed"],
+        )
+        self.assertGreaterEqual(
+            report1["wall_seconds_elapsed"], manifest["wall_seconds"]
+        )
+
+
+class GateRound3StagingScrubTests(GateRepairWorldMixin, unittest.TestCase):
+    """Round-3 audit gap 3: a failure at the final budget check (or any
+    failure after staging exists) must leave NO success evidence anywhere —
+    the staged set is scrubbed, the failure record discloses the scrub, and
+    no ENGINEERING_PASS content survives on disk."""
+
+    def assert_no_success_evidence_anywhere(self, run_dir):
+        for path in sorted(run_dir.parent.rglob("*.json")):
+            if path.name == "gate_config.json":
+                continue  # the config itself lists ENGINEERING_PASS as a level
+            self.assertNotIn(
+                "ENGINEERING_PASS",
+                path.read_text(),
+                f"success evidence survived a failed audit in {path}",
+            )
+        leftovers = list(run_dir.parent.glob(run_dir.name + ".publish-*"))
+        self.assertEqual(leftovers, [], "staging directory survived a failed audit")
+
+    def test_final_budget_exceeded_scrubs_staged_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(
+                config_path, tmp, fault="final_budget_check_exceeded", run_dir=run_dir
+            )
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="evidence_staging")
+            self.assertEqual(record["exception_type"], "BudgetExceeded")
+            self.assertTrue(record["staging_scrubbed"])
+            self.assertFalse(record["evidence_published"])
+            self.assert_no_success_evidence_anywhere(run_dir)
+
+    def test_final_generic_failure_scrubs_staged_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(
+                config_path, tmp, fault="final_budget_check_runtime", run_dir=run_dir
+            )
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="evidence_staging")
+            self.assertEqual(record["exception_type"], "RuntimeError")
+            self.assertTrue(record["staging_scrubbed"])
+            self.assertFalse(record["evidence_published"])
+            self.assert_no_success_evidence_anywhere(run_dir)
 
 
 if __name__ == "__main__":
