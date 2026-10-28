@@ -1,0 +1,121 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_ GateFinalizationFaultTests.test_publication_rename_failure_leaves_no_partial_success_set _
+
+self = <test_g0a_predispatch_rrp.GateFinalizationFaultTests testMethod=test_publication_rename_failure_leaves_no_partial_success_set>
+
+    def test_publication_rename_failure_leaves_no_partial_success_set(self):
+        """Repair requirement 2 + round-3 audit gap 3 (write-path fault
+        injection): if the atomic publication rename itself fails, no partial
+        success set may appear in the run dir AND no staged success evidence
+        may survive the failed audit anywhere on disk."""
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="rename_publish")
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="publication")
+>           self.assertTrue(record["staging_scrubbed"])
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'staging_scrubbed'
+
+tests/test_g0a_predispatch_rrp.py:744: KeyError
+_ GateRound3AnchorTests.test_anchor_boottime_branch_stays_in_monotonic_domain __
+
+self = <test_g0a_predispatch_rrp.GateRound3AnchorTests testMethod=test_anchor_boottime_branch_stays_in_monotonic_domain>
+
+    def test_anchor_boottime_branch_stays_in_monotonic_domain(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "boottime")
+>           self.assertGreaterEqual(out["elapsed_implied"], 4.5)
+E           AssertionError: 2.6372068263590336 not greater than or equal to 4.5
+
+tests/test_g0a_predispatch_rrp.py:999: AssertionError
+_ GateRound3AnchorTests.test_anchor_without_clock_boottime_uses_uptime_fallback _
+
+self = <test_g0a_predispatch_rrp.GateRound3AnchorTests testMethod=test_anchor_without_clock_boottime_uses_uptime_fallback>
+
+    def test_anchor_without_clock_boottime_uses_uptime_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "fallback")
+>           self.assertGreaterEqual(out["elapsed_implied"], 4.5)
+E           AssertionError: 2.495163768529892 not greater than or equal to 4.5
+
+tests/test_g0a_predispatch_rrp.py:988: AssertionError
+_____ GateRound3AnchorTests.test_real_child_anchor_covers_pre_import_delay _____
+
+self = <test_g0a_predispatch_rrp.GateRound3AnchorTests testMethod=test_real_child_anchor_covers_pre_import_delay>
+
+    def test_real_child_anchor_covers_pre_import_delay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.run_anchor_probe(tmp, "probe")
+>           self.assertGreaterEqual(
+                out["elapsed_implied"],
+                3.5,
+                "pre-import delay (4.0s sleep before the runner import) is "
+                "not covered by the budget anchor: the import-line fallback "
+                "undercounts interpreter startup and pre-import work",
+            )
+E           AssertionError: 2.5541264787316322 not greater than or equal to 3.5 : pre-import delay (4.0s sleep before the runner import) is not covered by the budget anchor: the import-line fallback undercounts interpreter startup and pre-import work
+
+tests/test_g0a_predispatch_rrp.py:970: AssertionError
+_ GateRound3FinalizationTailTests.test_budget_report_covers_fsync_and_publication_tail _
+
+self = <test_g0a_predispatch_rrp.GateRound3FinalizationTailTests testMethod=test_budget_report_covers_fsync_and_publication_tail>
+
+    def test_budget_report_covers_fsync_and_publication_tail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            # Baseline run cancels child spawn/teardown overhead from the
+            # wall-clock comparison.
+            _, wall0, report0 = self._child_wall_and_accounting(tmp)
+            overhead = wall0 - report0["wall_seconds_elapsed"]
+>           run_dir, wall1, report1 = self._child_wall_and_accounting(
+                tmp, fault="fsync_delay"
+            )
+
+tests/test_g0a_predispatch_rrp.py:1030: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_g0a_predispatch_rrp.py:1020: in _child_wall_and_accounting
+    self.assertEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+E   AssertionError: 3 != 0 :
+_ GateRound3StagingScrubTests.test_final_budget_exceeded_scrubs_staged_success_evidence _
+
+self = <test_g0a_predispatch_rrp.GateRound3StagingScrubTests testMethod=test_final_budget_exceeded_scrubs_staged_success_evidence>
+
+    def test_final_budget_exceeded_scrubs_staged_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(
+                config_path, tmp, fault="final_budget_check_exceeded", run_dir=run_dir
+            )
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="evidence_staging")
+            self.assertEqual(record["exception_type"], "BudgetExceeded")
+>           self.assertTrue(record["staging_scrubbed"])
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'staging_scrubbed'
+
+tests/test_g0a_predispatch_rrp.py:1083: KeyError
+_ GateRound3StagingScrubTests.test_final_generic_failure_scrubs_staged_success_evidence _
+
+self = <test_g0a_predispatch_rrp.GateRound3StagingScrubTests testMethod=test_final_generic_failure_scrubs_staged_success_evidence>
+
+    def test_final_generic_failure_scrubs_staged_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(
+                config_path, tmp, fault="final_budget_check_runtime", run_dir=run_dir
+            )
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="evidence_staging")
+            self.assertEqual(record["exception_type"], "RuntimeError")
+>           self.assertTrue(record["staging_scrubbed"])
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'staging_scrubbed'
+
+tests/test_g0a_predispatch_rrp.py:1095: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_g0a_predispatch_rrp.py::GateFinalizationFaultTests::test_publication_rename_failure_leaves_no_partial_success_set
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3AnchorTests::test_anchor_boottime_branch_stays_in_monotonic_domain
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3AnchorTests::test_anchor_without_clock_boottime_uses_uptime_fallback
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3AnchorTests::test_real_child_anchor_covers_pre_import_delay
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3FinalizationTailTests::test_budget_report_covers_fsync_and_publication_tail
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3StagingScrubTests::test_final_budget_exceeded_scrubs_staged_success_evidence
+FAILED tests/test_g0a_predispatch_rrp.py::GateRound3StagingScrubTests::test_final_generic_failure_scrubs_staged_success_evidence
+7 failed, 58 deselected in 34.40s
