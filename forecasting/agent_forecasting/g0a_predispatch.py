@@ -15,6 +15,7 @@ six pure checks. It reads no files itself and never modifies any value.
 from __future__ import annotations
 
 import re
+import signal
 import socket
 import time
 from contextlib import contextmanager
@@ -25,6 +26,7 @@ import numpy as np
 MAX_ORIGINS = 12
 STALE_SECONDS = 6 * 3600
 HOUR_SECONDS = 3600
+WALL_SECONDS_BUDGET = 300  # protocol §5; the runner asserts config agreement
 UNIT_ENVELOPE_AUD_PER_MWH = (-1000.0, 20000.0)
 REQUIRED_KEYS = (
     "forecast_origin_unix",
@@ -105,6 +107,33 @@ class BudgetGuard:
             "wall_seconds_elapsed": round(elapsed, 6),
             "within_budget": elapsed <= self.wall_seconds,
         }
+
+
+@contextmanager
+def wall_deadline(wall_seconds: float):
+    """Hard wall-clock deadline (protocol §5 "超限立即终止"): arms an ITIMER_REAL
+    timer so exceeding the budget interrupts the audit immediately, instead of
+    waiting for the next cooperative ``BudgetGuard.check()`` call. Main thread
+    only, as the audit is single-process."""
+    wall_seconds = float(wall_seconds)
+    if wall_seconds <= 0:
+        raise ValueError("wall_seconds must be positive")
+    if not hasattr(signal, "setitimer"):  # pragma: no cover - non-POSIX fallback
+        raise RuntimeError("wall_deadline requires signal.setitimer (POSIX)")
+    previous = signal.getsignal(signal.SIGALRM)
+
+    def _on_deadline(signum, frame):
+        raise BudgetExceeded(
+            f"wall deadline {wall_seconds:.3f}s reached: immediate interrupt"
+        )
+
+    signal.signal(signal.SIGALRM, _on_deadline)
+    signal.setitimer(signal.ITIMER_REAL, wall_seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous)
 
 
 def assert_allowed_path(path, allow_roots) -> Path:
@@ -253,32 +282,61 @@ def check_vintage(origins, run_unix, seqno, stale_seconds=STALE_SECONDS) -> dict
     }
 
 
-def check_coverage(origins, covered, run_unix, stale_seconds=STALE_SECONDS) -> dict:
+def check_coverage(origins, covered, run_unix, values, stale_seconds=STALE_SECONDS) -> dict:
+    """24-hour no-fill check. Beyond the covered flags, uncovered non-stale
+    rows are verified at value level against the last covered hour: the
+    ``tail_ffill_repeat`` label is only assigned when the uncovered values
+    measurably repeat the last covered value (exact equality of the stored
+    values), never inferred from the flag alone."""
     origins = np.asarray(origins)
     covered = np.asarray(covered, dtype=np.float64)
+    values = np.asarray(values, dtype=np.float64)
     stale = _stale_flags(origins, run_unix, stale_seconds)
     rows, fills = [], []
     for i in range(len(origins)):
         covered_hours = int((covered[i] == 1.0).sum())
-        if stale[i] and covered_hours == 24:
-            kind = "inconsistent_stale_but_fully_covered"
-        elif covered_hours == 24:
-            kind = "none"
+        row = {
+            "origin_unix": int(origins[i]),
+            "covered_hours": covered_hours,
+            "uncovered_hours": 24 - covered_hours,
+        }
+        if covered_hours == 24:
+            kind = "inconsistent_stale_but_fully_covered" if stale[i] else "none"
+            row.update(fill_kind=kind, tail_repeat_verified=None)
         elif stale[i]:
+            row.update(
+                fill_kind="stale_median_fill",
+                tail_repeat_verified=None,
+                note="stale run: median-fill semantics, not value-verified here",
+            )
             kind = "stale_median_fill"
         else:
-            kind = "tail_ffill_repeat"
-        rows.append(
-            {
-                "origin_unix": int(origins[i]),
-                "covered_hours": covered_hours,
-                "uncovered_hours": 24 - covered_hours,
-                "fill_kind": kind,
-            }
-        )
+            anchor = np.nonzero(covered[i] == 1.0)[0]
+            if len(anchor) == 0:
+                kind = "uncovered_no_anchor"
+                row.update(fill_kind=kind, tail_repeat_verified=None)
+            else:
+                last = int(anchor[-1])
+                uncovered = np.nonzero(covered[i] != 1.0)[0]
+                tail = uncovered[uncovered > last]
+                row.update(last_covered_hour=last, last_covered_value=float(values[i, last]))
+                if len(tail) == 0:
+                    kind = "gap_uncovered"
+                    row.update(fill_kind=kind, tail_repeat_verified=None)
+                else:
+                    verified = bool(np.all(values[i, tail] == values[i, last]))
+                    kind = "tail_ffill_repeat" if verified else "uncovered_non_repeat"
+                    row.update(
+                        fill_kind=kind,
+                        tail_repeat_verified=verified,
+                        tail_hours_after_last_covered=[int(t) for t in tail],
+                    )
+        rows.append(row)
         if covered_hours < 24:
+            verified = row.get("tail_repeat_verified")
+            suffix = "" if verified is None else f"; tail_repeat_verified={verified}"
             fills.append(
-                f"origin {int(origins[i])}: covered {covered_hours}/24 ({kind})"
+                f"origin {int(origins[i])}: covered {covered_hours}/24 ({kind}{suffix})"
             )
         elif kind == "inconsistent_stale_but_fully_covered":
             fills.append(

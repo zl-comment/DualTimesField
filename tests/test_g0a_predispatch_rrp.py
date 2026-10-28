@@ -1,13 +1,17 @@
-"""G0-A frozen-harness tests: budget guard, label isolation, units, coverage,
-no-fill classification, coverage-blind selection, schema, and source/data
-binding. All value-level tests use synthetic arrays; the only real file
-touched is the frozen NPZ/config hash binding (read-only, hash only)."""
+"""G0-A frozen-harness tests: budget guard + hard wall deadline, label
+isolation, units, coverage with value-level fill verification, coverage-blind
+selection, schema, single-process HEAD reading, and source/data binding.
+All value-level tests use synthetic arrays; the only real files touched are
+the frozen NPZ/config hash binding and the repo .git directory (read-only)."""
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import inspect
 import json
+import signal
 import socket
+import subprocess
 import tempfile
 import time
 import unittest
@@ -19,6 +23,15 @@ from forecasting.agent_forecasting import g0a_predispatch as g0a
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "configs/agent_forecasting/g0a_predispatch_rrp_20261028.json"
+
+
+def load_audit_runner():
+    spec = importlib.util.spec_from_file_location(
+        "audit_g0a_predispatch_rrp_under_test", REPO_ROOT / "scripts" / "audit_g0a_predispatch_rrp.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def sha256_file(path: Path) -> str:
@@ -56,6 +69,35 @@ class BudgetGuardTests(unittest.TestCase):
         self.assertTrue(report["within_budget"])
         self.assertEqual(report["wall_seconds_budget"], 30)
         self.assertGreaterEqual(report["wall_seconds_elapsed"], 0.0)
+
+
+@unittest.skipUnless(hasattr(signal, "setitimer"), "requires POSIX interval timers")
+class WallDeadlineTests(unittest.TestCase):
+    """External-audit finding 4: exceeding the budget must interrupt
+    immediately (SIGALRM), not wait for the next cooperative check."""
+
+    def test_deadline_interrupts_a_blocking_sleep(self):
+        with self.assertRaises(g0a.BudgetExceeded):
+            with g0a.wall_deadline(0.3):
+                time.sleep(5.0)
+        # timer disarmed: a long sleep after the context no longer raises
+        time.sleep(0.05)
+
+    def test_deadline_does_not_fire_within_budget(self):
+        with g0a.wall_deadline(30.0):
+            time.sleep(0.02)
+
+    def test_previous_sigalrm_handler_restored(self):
+        before = signal.getsignal(signal.SIGALRM)
+        with g0a.wall_deadline(30.0):
+            pass
+        self.assertEqual(signal.getsignal(signal.SIGALRM), before)
+
+    def test_non_positive_deadline_rejected(self):
+        for bad in (0, -1):
+            with self.assertRaises(ValueError):
+                with g0a.wall_deadline(bad):
+                    pass
 
 
 class LabelIsolationTests(unittest.TestCase):
@@ -172,25 +214,34 @@ class CoverageNoFillTests(unittest.TestCase):
         origins = np.array([1_700_000_000], dtype=np.int64)
         run = np.array([1_700_000_000 - 3600], dtype=np.int64)
         covered = np.ones((1, 24), dtype=np.float32)
-        result = g0a.check_coverage(origins, covered, run)
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
         self.assertEqual(result["status"], "pass")
         self.assertEqual(result["rows"][0]["fill_kind"], "none")
+        self.assertIsNone(result["rows"][0]["tail_repeat_verified"])
 
-    def test_tail_ffill_flagged(self):
+    def test_tail_ffill_flagged_when_values_repeat_last_covered(self):
         origins = np.array([1_700_000_000], dtype=np.int64)
         run = np.array([1_700_000_000 - 3600], dtype=np.int64)
         covered = np.ones((1, 24), dtype=np.float32)
         covered[0, 22:] = 0.0
-        result = g0a.check_coverage(origins, covered, run)
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
         self.assertEqual(result["status"], "fail")
         self.assertEqual(result["rows"][0]["uncovered_hours"], 2)
         self.assertEqual(result["rows"][0]["fill_kind"], "tail_ffill_repeat")
+        self.assertTrue(result["rows"][0]["tail_repeat_verified"])
+        self.assertEqual(result["rows"][0]["last_covered_hour"], 21)
+        self.assertEqual(result["rows"][0]["last_covered_value"], 71.5)
+        self.assertEqual(result["rows"][0]["tail_hours_after_last_covered"], [22, 23])
+        self.assertIn("tail_repeat_verified=True", result["fill_reasons"][0])
 
     def test_stale_median_fill_flagged(self):
         origins = np.array([1_700_000_000], dtype=np.int64)
         run = np.array([1_700_000_000 - 8 * 3600], dtype=np.int64)
         covered = np.zeros((1, 24), dtype=np.float32)
-        result = g0a.check_coverage(origins, covered, run)
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
         self.assertEqual(result["status"], "fail")
         self.assertEqual(result["rows"][0]["fill_kind"], "stale_median_fill")
 
@@ -198,9 +249,69 @@ class CoverageNoFillTests(unittest.TestCase):
         origins = np.array([1_700_000_000], dtype=np.int64)
         run = np.array([1_700_000_000 - 8 * 3600], dtype=np.int64)
         covered = np.ones((1, 24), dtype=np.float32)
-        result = g0a.check_coverage(origins, covered, run)
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
         self.assertEqual(result["status"], "fail")
         self.assertIn("inconsistent", result["fill_reasons"][0])
+
+
+class CoverageValueLevelTests(unittest.TestCase):
+    """External-audit finding 2: the repeat label must be measured on values,
+    never inferred from the covered flag alone."""
+
+    def one_row_world(self):
+        return (
+            np.array([1_700_000_000], dtype=np.int64),
+            np.array([1_700_000_000 - 3600], dtype=np.int64),
+        )
+
+    def test_uncovered_tail_with_different_value_is_not_labeled_repeat(self):
+        origins, run = self.one_row_world()
+        covered = np.ones((1, 24), dtype=np.float32)
+        covered[0, 21:] = 0.0
+        values = np.full((1, 24), 60.0, dtype=np.float32)
+        values[0, 22] = 61.0  # uncovered hour differs from last covered value
+        result = g0a.check_coverage(origins, covered, run, values)
+        self.assertEqual(result["status"], "fail")
+        self.assertEqual(result["rows"][0]["fill_kind"], "uncovered_non_repeat")
+        self.assertFalse(result["rows"][0]["tail_repeat_verified"])
+        self.assertIn("tail_repeat_verified=False", result["fill_reasons"][0])
+
+    def test_float32_stored_repeats_verify_exactly(self):
+        origins, run = self.one_row_world()
+        covered = np.ones((1, 24), dtype=np.float32)
+        covered[0, 18:] = 0.0
+        values = np.linspace(50.0, 75.0, 24).astype(np.float32).reshape(1, 24)
+        values[0, 18:] = values[0, 17]  # exact stored-value repeat
+        result = g0a.check_coverage(origins, covered, run, values)
+        self.assertEqual(result["rows"][0]["fill_kind"], "tail_ffill_repeat")
+        self.assertTrue(result["rows"][0]["tail_repeat_verified"])
+        self.assertEqual(result["rows"][0]["last_covered_value"], float(values[0, 17]))
+        self.assertEqual(result["rows"][0]["tail_hours_after_last_covered"], [18, 19, 20, 21, 22, 23])
+
+    def test_gap_without_tail_is_not_labeled_repeat(self):
+        origins, run = self.one_row_world()
+        covered = np.ones((1, 24), dtype=np.float32)
+        covered[0, 5] = 0.0  # uncovered positions exist but none after the last covered hour
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
+        self.assertEqual(result["status"], "fail")
+        self.assertEqual(result["rows"][0]["fill_kind"], "gap_uncovered")
+        self.assertIsNone(result["rows"][0]["tail_repeat_verified"])
+
+    def test_no_covered_anchor_is_reported_explicitly(self):
+        origins, run = self.one_row_world()
+        covered = np.zeros((1, 24), dtype=np.float32)
+        values = np.full((1, 24), 71.5, dtype=np.float32)
+        result = g0a.check_coverage(origins, covered, run, values)
+        self.assertEqual(result["status"], "fail")
+        self.assertEqual(result["rows"][0]["fill_kind"], "uncovered_no_anchor")
+        self.assertIsNone(result["rows"][0]["tail_repeat_verified"])
+
+    def test_values_argument_is_required(self):
+        origins, run = self.one_row_world()
+        with self.assertRaises(TypeError):
+            g0a.check_coverage(origins, np.ones((1, 24), dtype=np.float32), run)
 
 
 class PublicationBasisTests(unittest.TestCase):
@@ -265,7 +376,10 @@ class VerdictTests(unittest.TestCase):
                 world["forecast_origin_unix"], world["source_run_unix"], world["source_run_seqno"]
             ),
             g0a.check_coverage(
-                world["forecast_origin_unix"], world["predispatch_covered"], world["source_run_unix"]
+                world["forecast_origin_unix"],
+                world["predispatch_covered"],
+                world["source_run_unix"],
+                world["predispatch_rrp"],
             ),
             g0a.check_publication_basis(
                 world["source_run_unix"], world["source_last_changed_unix"]
@@ -300,7 +414,10 @@ class VerdictTests(unittest.TestCase):
         covered[7, 20:] = 0.0
         checks = self.base_checks()
         checks[4] = g0a.check_coverage(
-            world["forecast_origin_unix"], covered, world["source_run_unix"]
+            world["forecast_origin_unix"],
+            covered,
+            world["source_run_unix"],
+            world["predispatch_rrp"],
         )
         verdict = g0a.assemble_verdict(
             checks=checks,
@@ -322,6 +439,55 @@ class VerdictTests(unittest.TestCase):
         tampered = dict(verdict, strict_asof="STRICT_ASOF_PASS")
         with self.assertRaises(g0a.StrictPassNotGrantable):
             g0a.assert_never_strict_pass(tampered)
+
+
+class GitHeadReaderTests(unittest.TestCase):
+    """External-audit finding 4: HEAD must be read in-process (budget
+    processes=1), never via a git subprocess in the audit path. The tests
+    themselves may use git once, here, only to prove equivalence."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.runner = load_audit_runner()
+
+    def test_real_repo_head_matches_git(self):
+        head = self.runner.git_head(REPO_ROOT)
+        self.assertRegex(head, r"^[0-9a-f]{40}$")
+        expected = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True, text=True, check=True
+        ).stdout.strip()
+        self.assertEqual(head, expected)
+
+    def test_reads_ref_file_without_subprocess(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            git_dir = Path(tmp) / ".git"
+            (git_dir / "refs" / "heads" / "feature").mkdir(parents=True)
+            (git_dir / "HEAD").write_text("ref: refs/heads/feature/x\n")
+            (git_dir / "refs" / "heads" / "feature" / "x").write_text("a" * 40 + "\n")
+            self.assertEqual(self.runner.git_head(Path(tmp)), "a" * 40)
+
+    def test_reads_packed_refs_when_loose_ref_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            git_dir = Path(tmp) / ".git"
+            (git_dir / "refs" / "heads").mkdir(parents=True)
+            (git_dir / "HEAD").write_text("ref: refs/heads/packed\n")
+            (git_dir / "packed-refs").write_text("# pack-refs with: peeled fully-peeled \n" + "b" * 40 + " refs/heads/packed\n")
+            self.assertEqual(self.runner.git_head(Path(tmp)), "b" * 40)
+
+    def test_detached_head_returns_raw_commit_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            git_dir = Path(tmp) / ".git"
+            git_dir.mkdir()
+            (git_dir / "HEAD").write_text("c" * 40 + "\n")
+            self.assertEqual(self.runner.git_head(Path(tmp)), "c" * 40)
+
+    def test_missing_ref_raises(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            git_dir = Path(tmp) / ".git"
+            git_dir.mkdir()
+            (git_dir / "HEAD").write_text("ref: refs/heads/nowhere\n")
+            with self.assertRaises(FileNotFoundError):
+                self.runner.git_head(Path(tmp))
 
 
 class FrozenBindingTests(unittest.TestCase):
@@ -352,6 +518,12 @@ class FrozenBindingTests(unittest.TestCase):
         self.assertEqual(self.config["verdict_levels"]["strict_asof"], ["STRICT_ASOF_BLOCKED"])
         self.assertFalse(self.config["out_of_scope"]["g0b_g0c_g1_g2"])
         self.assertEqual(self.config["out_of_scope"]["live_collection_72h"], "not_started")
+
+    def test_config_budget_matches_frozen_protocol_constant(self):
+        self.assertEqual(
+            float(self.config["budget"]["wall_seconds"]), g0a.WALL_SECONDS_BUDGET
+        )
+        self.assertEqual(self.config["budget"]["processes"], 1)
 
 
 if __name__ == "__main__":

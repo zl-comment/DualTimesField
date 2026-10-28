@@ -17,7 +17,6 @@ import argparse
 import hashlib
 import json
 import platform
-import subprocess
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -49,11 +48,28 @@ def aest(unix: int) -> str:
     return datetime.fromtimestamp(int(unix), AEST).strftime("%Y-%m-%d %H:%M AEST")
 
 
-def git_head() -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True, text=True, check=True
-    )
-    return result.stdout.strip()
+def git_head(repo_root: Path = REPO_ROOT) -> str:
+    """Single-process HEAD reader (budget: processes=1): resolves .git/HEAD to
+    a commit id by reading the ref file or packed-refs directly. Never spawns
+    a git subprocess."""
+    git_dir = repo_root / ".git"
+    if git_dir.is_file():  # worktree/submodule gitdir pointer
+        pointer = git_dir.read_text().strip()
+        git_dir = Path(pointer.split(":", 1)[1].strip())
+        if not git_dir.is_absolute():
+            git_dir = (repo_root / git_dir).resolve()
+    head = (git_dir / "HEAD").read_text().strip()
+    if not head.startswith("ref: "):
+        return head  # detached HEAD already carries the commit id
+    ref = head[5:]
+    ref_file = git_dir.joinpath(*ref.split("/"))
+    if ref_file.exists():
+        return ref_file.read_text().strip()
+    for line in (git_dir / "packed-refs").read_text().splitlines():
+        parts = line.split()
+        if len(parts) == 2 and parts[1] == ref:
+            return parts[0]
+    raise RuntimeError(f"HEAD ref {ref} not found under {git_dir}")
 
 
 def load_config(path: str) -> dict:
@@ -110,124 +126,152 @@ def cmd_record_tests(args: argparse.Namespace) -> None:
 def cmd_audit(args: argparse.Namespace) -> None:
     started_utc = utc_now()
     started = time.monotonic()
-    config = load_config(args.config)
-    run_dir = REPO_ROOT / config["output_dir"]
-    npz = enforce_frozen_binding(config)
-    budget = g0a.BudgetGuard(float(config["budget"]["wall_seconds"]))
-    allow_roots = [REPO_ROOT / root for root in config["allow_roots"]]
-    guard_violations = []
-    for source_path, label in (
-        (config["harness_module"], "harness_module"),
-        (config["audit_script"], "audit_script"),
-    ):
-        hits = g0a.scan_source_for_forbidden((REPO_ROOT / source_path).read_text())
-        guard_violations.extend(f"static scan {label}: {hit}" for hit in hits)
-
-    with g0a.network_disabled():
-        opened = g0a.assert_allowed_path(npz, allow_roots)
-        arrays = dict(np.load(opened))
-        budget.check()
-        origins = np.asarray(arrays["forecast_origin_unix"])
-        indices = g0a.select_origin_indices(len(origins))
-        selected = {key: np.asarray(arrays[key])[indices] for key in g0a.REQUIRED_KEYS}
-        budget.check()
-        checks = [
-            g0a.check_schema(arrays),
-            g0a.check_units(selected["predispatch_rrp"], tuple(config["unit_envelope_aud_per_mwh"][k] for k in ("min", "max"))),
-            g0a.check_target_time(selected["forecast_origin_unix"], selected["predispatch_rrp"].shape[1]),
-            g0a.check_vintage(
-                selected["forecast_origin_unix"],
-                selected["source_run_unix"],
-                selected["source_run_seqno"],
-                stale_seconds=int(config["stale_seconds"]),
-            ),
-            g0a.check_coverage(
-                selected["forecast_origin_unix"],
-                selected["predispatch_covered"],
-                selected["source_run_unix"],
-                stale_seconds=int(config["stale_seconds"]),
-            ),
-            g0a.check_publication_basis(
-                selected["source_run_unix"], selected["source_last_changed_unix"]
-            ),
-        ]
-        budget.check()
-
-        vintage_rows = {row["origin_unix"]: row for row in checks[3]["rows"]}
-        coverage_rows = {row["origin_unix"]: row for row in checks[4]["rows"]}
-        rrp = np.asarray(selected["predispatch_rrp"], dtype=np.float64)
-        selected_rows = []
-        for position, origin in enumerate(selected["forecast_origin_unix"]):
-            origin = int(origin)
-            values = rrp[position]
-            selected_rows.append(
-                {
-                    "selection_index": int(indices[position]),
-                    "origin_unix": origin,
-                    "origin_aest": aest(origin),
-                    "origin_hour_aest": int(datetime.fromtimestamp(origin, AEST).hour),
-                    "target_window_aest": [aest(origin + 3600), aest(origin + 24 * 3600)],
-                    "rrp_min": float(values.min()),
-                    "rrp_max": float(values.max()),
-                    "rrp_mean": round(float(values.mean()), 6),
-                    **vintage_rows[origin],
-                    "covered_hours": coverage_rows[origin]["covered_hours"],
-                    "uncovered_hours": coverage_rows[origin]["uncovered_hours"],
-                    "fill_kind": coverage_rows[origin]["fill_kind"],
-                    "publication_basis": "archive_proxy",
-                }
+    # Resource guard first (protocol §5): the budget covers config load, the
+    # frozen-binding hashes, all checks, evidence writes, and the final source
+    # hashes; the SIGALRM deadline interrupts immediately if it expires.
+    budget = g0a.BudgetGuard(g0a.WALL_SECONDS_BUDGET)
+    with g0a.wall_deadline(g0a.WALL_SECONDS_BUDGET):
+        config = load_config(args.config)
+        if float(config["budget"]["wall_seconds"]) != g0a.WALL_SECONDS_BUDGET:
+            raise SystemExit(
+                "FROZEN_BINDING_VIOLATION: config wall_seconds disagrees with "
+                f"protocol budget {g0a.WALL_SECONDS_BUDGET}s"
             )
-        budget.check()
+        run_dir = REPO_ROOT / config["output_dir"]
+        npz = enforce_frozen_binding(config)
+        allow_roots = [REPO_ROOT / root for root in config["allow_roots"]]
+        guard_violations = []
+        for source_path, label in (
+            (config["harness_module"], "harness_module"),
+            (config["audit_script"], "audit_script"),
+        ):
+            hits = g0a.scan_source_for_forbidden((REPO_ROOT / source_path).read_text())
+            guard_violations.extend(f"static scan {label}: {hit}" for hit in hits)
 
-    preflight_path = run_dir / "preflight_tests.json"
-    preflight = json.loads(preflight_path.read_text()) if preflight_path.exists() else None
-    verdict = g0a.assemble_verdict(
-        checks=checks, budget=budget.report(), preflight=preflight, guard_violations=guard_violations
-    )
-    verdict["selected_origin_count"] = len(selected_rows)
-    verdict["config"] = "configs/agent_forecasting/g0a_predispatch_rrp_20261028.json"
+        with g0a.network_disabled():
+            opened = g0a.assert_allowed_path(npz, allow_roots)
+            arrays = dict(np.load(opened))
+            budget.check()
+            origins = np.asarray(arrays["forecast_origin_unix"])
+            indices = g0a.select_origin_indices(len(origins))
+            selected = {key: np.asarray(arrays[key])[indices] for key in g0a.REQUIRED_KEYS}
+            budget.check()
+            checks = [
+                g0a.check_schema(arrays),
+                g0a.check_units(selected["predispatch_rrp"], tuple(config["unit_envelope_aud_per_mwh"][k] for k in ("min", "max"))),
+                g0a.check_target_time(selected["forecast_origin_unix"], selected["predispatch_rrp"].shape[1]),
+                g0a.check_vintage(
+                    selected["forecast_origin_unix"],
+                    selected["source_run_unix"],
+                    selected["source_run_seqno"],
+                    stale_seconds=int(config["stale_seconds"]),
+                ),
+                g0a.check_coverage(
+                    selected["forecast_origin_unix"],
+                    selected["predispatch_covered"],
+                    selected["source_run_unix"],
+                    selected["predispatch_rrp"],
+                    stale_seconds=int(config["stale_seconds"]),
+                ),
+                g0a.check_publication_basis(
+                    selected["source_run_unix"], selected["source_last_changed_unix"]
+                ),
+            ]
+            budget.check()
 
-    budget.check()
-    (run_dir / "selected_origins.json").write_text(json.dumps(selected_rows, indent=2) + "\n")
-    (run_dir / "g0a_verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
-    (run_dir / "budget_report.json").write_text(
-        json.dumps({**budget.report(), "phases": {"total_monotonic_s": round(time.monotonic() - started, 6)}}, indent=2) + "\n"
-    )
-    (run_dir / "run_manifest.json").write_text(
-        json.dumps(
-            {
-                "started_at_utc": started_utc,
-                "finished_at_utc": utc_now(),
-                "wall_seconds": round(time.monotonic() - started, 6),
-                "interpreter": sys.executable,
-                "python_version": platform.python_version(),
-                "command": sys.argv,
-                "git_head": git_head(),
-                "branch": config["branch"],
-                "base_commit": config["base_commit"],
-                "network_disabled": True,
-                "npz_path": config["npz_path"],
-                "selection_rule": config["origin_selection"],
-                "source_sha256": source_hashes(config),
-            },
-            indent=2,
+            vintage_rows = {row["origin_unix"]: row for row in checks[3]["rows"]}
+            coverage_rows = {row["origin_unix"]: row for row in checks[4]["rows"]}
+            rrp = np.asarray(selected["predispatch_rrp"], dtype=np.float64)
+            selected_rows = []
+            for position, origin in enumerate(selected["forecast_origin_unix"]):
+                origin = int(origin)
+                values = rrp[position]
+                coverage = coverage_rows[origin]
+                selected_rows.append(
+                    {
+                        "selection_index": int(indices[position]),
+                        "origin_unix": origin,
+                        "origin_aest": aest(origin),
+                        "origin_hour_aest": int(datetime.fromtimestamp(origin, AEST).hour),
+                        "target_window_aest": [aest(origin + 3600), aest(origin + 24 * 3600)],
+                        "rrp_min": float(values.min()),
+                        "rrp_max": float(values.max()),
+                        "rrp_mean": round(float(values.mean()), 6),
+                        **vintage_rows[origin],
+                        "covered_hours": coverage["covered_hours"],
+                        "uncovered_hours": coverage["uncovered_hours"],
+                        "fill_kind": coverage["fill_kind"],
+                        "tail_repeat_verified": coverage.get("tail_repeat_verified"),
+                        **{
+                            k: coverage[k]
+                            for k in ("last_covered_hour", "last_covered_value", "tail_hours_after_last_covered")
+                            if k in coverage
+                        },
+                        "publication_basis": "archive_proxy",
+                    }
+                )
+            budget.check()
+
+        preflight_path = run_dir / "preflight_tests.json"
+        preflight = json.loads(preflight_path.read_text()) if preflight_path.exists() else None
+        verdict = g0a.assemble_verdict(
+            checks=checks, budget=budget.report(), preflight=preflight, guard_violations=guard_violations
         )
-        + "\n"
-    )
-    summary = {
-        "engineering": verdict["engineering"],
-        "strict_asof": verdict["strict_asof"],
-        "quick_veto": verdict["quick_veto"]["status"],
-        "checks": verdict["checks_status"],
-        "selected_origins": len(selected_rows),
-    }
-    print(json.dumps(summary, indent=2))
+        verdict["selected_origin_count"] = len(selected_rows)
+        verdict["config"] = "configs/agent_forecasting/g0a_predispatch_rrp_20261028.json"
+
+        (run_dir / "selected_origins.json").write_text(json.dumps(selected_rows, indent=2) + "\n")
+        (run_dir / "g0a_verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
+        (run_dir / "budget_report.json").write_text(
+            json.dumps({**budget.report(), "phases": {"total_monotonic_s": round(time.monotonic() - started, 6)}}, indent=2) + "\n"
+        )
+        # Final hashes and HEAD stay inside the guarded region (single process:
+        # HEAD is read from .git directly, no subprocess).
+        source_sha256 = source_hashes(config)
+        head = git_head()
+        budget.check()
+        (run_dir / "run_manifest.json").write_text(
+            json.dumps(
+                {
+                    "started_at_utc": started_utc,
+                    "finished_at_utc": utc_now(),
+                    "wall_seconds": round(time.monotonic() - started, 6),
+                    "interpreter": sys.executable,
+                    "python_version": platform.python_version(),
+                    "command": sys.argv,
+                    "git_head": head,
+                    "git_head_source": "in-process .git read (no subprocess)",
+                    "sigalrm_deadline_seconds": g0a.WALL_SECONDS_BUDGET,
+                    "branch": config["branch"],
+                    "base_commit": config["base_commit"],
+                    "network_disabled": True,
+                    "npz_path": config["npz_path"],
+                    "selection_rule": config["origin_selection"],
+                    "source_sha256": source_sha256,
+                },
+                indent=2,
+            )
+            + "\n"
+        )
+        budget.check()
+        summary = {
+            "engineering": verdict["engineering"],
+            "strict_asof": verdict["strict_asof"],
+            "quick_veto": verdict["quick_veto"]["status"],
+            "checks": verdict["checks_status"],
+            "selected_origins": len(selected_rows),
+        }
+        print(json.dumps(summary, indent=2))
 
 
 def cmd_archive(args: argparse.Namespace) -> None:
     config = load_config(args.config)
     source = REPO_ROOT / config["output_dir"]
     destination = REPO_ROOT / config["archive_dir"]
+    if getattr(args, "archive_subdir", None):
+        # Repair runs archive into a sibling subdir; committed earlier runs
+        # stay read-only (protocol §6 归档只读).
+        destination = destination / args.archive_subdir
     if not (source / "g0a_verdict.json").exists():
         raise SystemExit("refusing to archive: g0a_verdict.json missing")
     destination.mkdir(parents=True, exist_ok=True)
@@ -264,6 +308,11 @@ def main() -> None:
         sub = subparsers.add_parser(name)
         sub.set_defaults(handler=handler)
         sub.add_argument("--config", default="configs/agent_forecasting/g0a_predispatch_rrp_20261028.json")
+    subparsers.choices["archive"].add_argument(
+        "--archive-subdir",
+        default=None,
+        help="archive this run under a subdir instead of the canonical archive root",
+    )
     args = parser.parse_args()
     if not Path(args.config).is_absolute():
         args.config = str(REPO_ROOT / args.config)
