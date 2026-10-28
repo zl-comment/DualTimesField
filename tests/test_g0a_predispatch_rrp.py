@@ -2,16 +2,27 @@
 isolation, units, coverage with value-level fill verification, coverage-blind
 selection, schema, single-process HEAD reading, and source/data binding.
 All value-level tests use synthetic arrays; the only real files touched are
-the frozen NPZ/config hash binding and the repo .git directory (read-only)."""
+the frozen NPZ/config hash binding and the repo .git directory (read-only).
+
+Gate-reliability regression tests (2026-10-28 repair round 2) additionally
+pin the audit runner's failure semantics: a fault in the final
+source_hashes/HEAD/budget phase must leave no ENGINEERING_PASS evidence, must
+exit non-zero with an atomic ENGINEERING_FAIL record, success evidence must be
+published once via a staging directory + atomic rename after ALL final checks,
+budget timing must cover process start through evidence finalization, and no
+failure or rerun path may overwrite already-published evidence."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import importlib.util
 import inspect
 import json
+import os
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -524,6 +535,328 @@ class FrozenBindingTests(unittest.TestCase):
             float(self.config["budget"]["wall_seconds"]), g0a.WALL_SECONDS_BUDGET
         )
         self.assertEqual(self.config["budget"]["processes"], 1)
+
+
+EVIDENCE_FILENAMES = (
+    "g0a_verdict.json",
+    "budget_report.json",
+    "run_manifest.json",
+    "selected_origins.json",
+)
+
+GATE_FAULT_DRIVER = '''
+import importlib.util, os, sys
+
+spec = importlib.util.spec_from_file_location("runner_under_test", os.environ["RUNNER_PATH"])
+runner = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(runner)
+
+fault = os.environ.get("GATE_FAULT")
+if fault == "source_hashes_runtime":
+    def _boom(*args, **kwargs):
+        raise RuntimeError("injected final-phase source_hashes failure")
+    runner.source_hashes = _boom
+elif fault == "source_hashes_budget":
+    def _boom(*args, **kwargs):
+        raise runner.g0a.BudgetExceeded("injected final-phase BudgetExceeded")
+    runner.source_hashes = _boom
+elif fault == "git_head":
+    def _boom(*args, **kwargs):
+        raise RuntimeError("injected final-phase HEAD read failure")
+    runner.git_head = _boom
+elif fault == "deadline_at_entry":
+    runner.g0a.WALL_SECONDS_BUDGET = 0.05
+elif fault == "rename_publish":
+    def _boom(src, dst):
+        raise OSError("injected publication rename failure")
+    runner.os.rename = _boom
+
+sys.argv = ["audit_g0a_predispatch_rrp.py", "audit", "--config", os.environ["GATE_CONFIG_PATH"]]
+runner.main()
+'''
+
+
+class GateRepairWorldMixin:
+    """Builders for the gate-reliability tests: a complete synthetic frozen
+    world (NPZ + config with real frozen-binding hashes) and a fault-injection
+    subprocess driver so real process exit codes are observed."""
+
+    def build_world(self, tmp, wall_seconds=300.0):
+        tmp = Path(tmp)
+        npz_dir = tmp / "merged"
+        npz_dir.mkdir(parents=True, exist_ok=True)
+        npz_path = npz_dir / "synthetic_predispatch.npz"
+        np.savez(npz_path, **synthetic_world())
+        run_dir = tmp / "run"
+        run_dir.mkdir(exist_ok=True)
+        (run_dir / "preflight_tests.json").write_text(
+            json.dumps({"returncode": 0, "log_path": "preflight_tests.txt"})
+        )
+        config = {
+            "status": "frozen_g0a",
+            "execution_scope": "g0a_local_preaudit_only",
+            "base_commit": "synthetic-base",
+            "branch": "synthetic-gate-repair-test",
+            "protocol": "docs/research/agent_forecasting/g0a_predispatch_rrp_protocol_20261028.txt",
+            "harness_module": "forecasting/agent_forecasting/g0a_predispatch.py",
+            "audit_script": "scripts/audit_g0a_predispatch_rrp.py",
+            "tests": "tests/test_g0a_predispatch_rrp.py",
+            "region": "NSW1",
+            "field": "predispatch_rrp",
+            "npz_path": str(npz_path),
+            "npz_sha256_at_freeze": sha256_file(npz_path),
+            "builder_path": "forecasting/build_predispatch_exogenous.py",
+            "builder_sha256_at_freeze": sha256_file(
+                REPO_ROOT / "forecasting/build_predispatch_exogenous.py"
+            ),
+            "unit_envelope_aud_per_mwh": {"min": -1000.0, "max": 20000.0},
+            "stale_seconds": 21600,
+            "origin_selection": {"rule": "even_index_stride_round_half_up", "max_origins": 12},
+            "budget": {
+                "wall_seconds": wall_seconds,
+                "processes": 1,
+                "network": 0,
+                "gpu": 0,
+                "training": 0,
+                "model_calls": 0,
+                "package_installs": 0,
+            },
+            "allow_roots": [str(npz_dir), str(run_dir)],
+            "output_dir": str(run_dir),
+            "archive_dir": str(tmp / "archive"),
+        }
+        config_path = tmp / "gate_config.json"
+        config_path.write_text(json.dumps(config, indent=2))
+        return config_path, run_dir
+
+    def run_audit_subprocess(self, config_path, tmp, fault=None):
+        driver = Path(tmp) / "gate_fault_driver.py"
+        driver.write_text(GATE_FAULT_DRIVER)
+        env = dict(os.environ)
+        env["RUNNER_PATH"] = str(REPO_ROOT / "scripts" / "audit_g0a_predispatch_rrp.py")
+        env["GATE_CONFIG_PATH"] = str(config_path)
+        if fault:
+            env["GATE_FAULT"] = fault
+        return subprocess.run(
+            [sys.executable, str(driver)],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=str(REPO_ROOT),
+            timeout=180,
+        )
+
+    def load_failure_record(self, run_dir):
+        failures_dir = run_dir.parent / (run_dir.name + "_failures")
+        records = sorted(failures_dir.glob("g0a_failure_*.json"))
+        self.assertTrue(
+            records,
+            f"expected an ENGINEERING_FAIL failure record under {failures_dir}; "
+            f"contents: {sorted(p.name for p in run_dir.parent.iterdir())}",
+        )
+        return json.loads(records[-1].read_text())
+
+
+class GateFinalizationFaultTests(GateRepairWorldMixin, unittest.TestCase):
+    """Repair requirement 1: a BudgetExceeded or any other exception in the
+    final source_hashes/HEAD/budget phase must never leave ENGINEERING_PASS
+    evidence, a success verdict, or a success budget/manifest behind; the
+    process must exit non-zero and atomically write an explicit
+    ENGINEERING_FAIL record."""
+
+    def assert_clean_failure(self, proc, run_dir, expected_phase=None):
+        self.assertNotEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+        for name in EVIDENCE_FILENAMES:
+            self.assertFalse(
+                (run_dir / name).exists(),
+                f"{name} must not survive a failed audit (found in run dir)",
+            )
+        record = self.load_failure_record(run_dir)
+        self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
+        self.assertIn("exception_type", record)
+        if expected_phase is not None:
+            self.assertEqual(record["failed_phase"], expected_phase)
+        return record
+
+    def test_source_hashes_runtime_error_leaves_no_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="source_hashes_runtime")
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="final_hashes")
+            self.assertEqual(record["exception_type"], "RuntimeError")
+
+    def test_budget_exceeded_in_final_phase_leaves_no_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="source_hashes_budget")
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="final_hashes")
+            self.assertEqual(record["exception_type"], "BudgetExceeded")
+
+    def test_git_head_failure_leaves_no_success_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="git_head")
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="final_hashes")
+            self.assertEqual(record["exception_type"], "RuntimeError")
+
+    def test_exhausted_budget_from_process_start_fails_cleanly(self):
+        """With a budget already consumed by process startup itself, the audit
+        must fail before doing any work: no evidence, failure record, non-zero
+        exit. This pins the process-start budget anchor (requirement 3)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp, wall_seconds=0.05)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="deadline_at_entry")
+            self.assertNotEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+            for name in EVIDENCE_FILENAMES:
+                self.assertFalse((run_dir / name).exists())
+            record = self.load_failure_record(run_dir)
+            self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
+
+    def test_publication_rename_failure_leaves_no_partial_success_set(self):
+        """Repair requirement 2 (write-path fault injection): if the atomic
+        publication rename itself fails, no partial success set may appear in
+        the run dir; the failure record must name the staging directory that
+        holds the complete unpublished set."""
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp, fault="rename_publish")
+            record = self.assert_clean_failure(proc, run_dir, expected_phase="publication")
+            staging = Path(record["staging_dir"])
+            self.assertTrue(staging.exists(), "staged evidence must be retained for recovery")
+            self.assertTrue((staging / "g0a_verdict.json").exists())
+
+
+class GatePublicationAtomicityTests(GateRepairWorldMixin, unittest.TestCase):
+    """Repair requirements 2 and 3: success evidence is published exactly once
+    via a staging directory + atomic rename after ALL final checks, and the
+    budget clock covers process start through evidence finalization."""
+
+    def test_success_publishes_complete_set_with_process_start_budget(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            proc = self.run_audit_subprocess(config_path, tmp)
+            self.assertEqual(proc.returncode, 0, msg=proc.stderr[-2000:])
+            for name in EVIDENCE_FILENAMES:
+                self.assertTrue((run_dir / name).exists(), f"{name} missing after success")
+            # preflight inputs stay in the published run dir
+            self.assertTrue((run_dir / "preflight_tests.json").exists())
+            verdict = json.loads((run_dir / "g0a_verdict.json").read_text())
+            self.assertEqual(verdict["engineering"], "ENGINEERING_PASS")
+            budget_report = json.loads((run_dir / "budget_report.json").read_text())
+            manifest = json.loads((run_dir / "run_manifest.json").read_text())
+            # requirement 3: budget elapsed must not be smaller than the full
+            # run elapsed recorded in the manifest (same process-start anchor)
+            self.assertGreaterEqual(
+                budget_report["wall_seconds_elapsed"],
+                manifest["wall_seconds"],
+                "budget accounting must cover the full run wall time",
+            )
+            self.assertEqual(manifest["wall_clock_anchor"], "process_start")
+            phases = budget_report["phases"]
+            self.assertGreater(
+                phases["pre_audit_process_import_cli_s"],
+                0.0,
+                "budget timing must cover interpreter start, module imports and CLI parsing",
+            )
+            self.assertGreaterEqual(manifest["wall_seconds"], phases["pre_audit_process_import_cli_s"])
+            # no staging leftovers next to the published run dir
+            leftovers = list(run_dir.parent.glob(run_dir.name + ".publish-*"))
+            self.assertEqual(leftovers, [])
+
+    def test_evidence_not_published_before_final_checks(self):
+        """Write interception: when the final source hashes are computed, the
+        run dir must not yet contain any success evidence file — publication
+        may only happen after all final checks complete."""
+        runner = load_audit_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            observed = {}
+            real_source_hashes = runner.source_hashes
+
+            def spy(*args, **kwargs):
+                observed["occupants"] = sorted(p.name for p in run_dir.iterdir())
+                return real_source_hashes(*args, **kwargs)
+
+            runner.source_hashes = spy
+            try:
+                runner.cmd_audit(argparse.Namespace(config=str(config_path)))
+            finally:
+                runner.source_hashes = real_source_hashes
+            leaked = [n for n in observed["occupants"] if n in EVIDENCE_FILENAMES]
+            self.assertEqual(
+                leaked,
+                [],
+                "evidence files must not exist in the run dir before the final source hashes",
+            )
+
+
+class GateEvidenceProtectionTests(GateRepairWorldMixin, unittest.TestCase):
+    """Repair requirement 4: failure and rerun paths must never damage or
+    overwrite already-published evidence directories."""
+
+    def test_failed_audit_never_touches_published_evidence(self):
+        runner = load_audit_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            sentinel = {
+                "audit": "g0a_predispatch_rrp_asof_preaudit",
+                "engineering": "ENGINEERING_PASS",
+                "sentinel": "previously published run, do not touch",
+            }
+            (run_dir / "g0a_verdict.json").write_text(json.dumps(sentinel, indent=2))
+            verdict_before = sha256_file(run_dir / "g0a_verdict.json")
+
+            real_source_hashes = runner.source_hashes
+
+            def boom(*args, **kwargs):
+                raise runner.g0a.BudgetExceeded("injected final-phase BudgetExceeded")
+
+            runner.source_hashes = boom
+            try:
+                with self.assertRaises(SystemExit) as ctx:
+                    runner.cmd_audit(argparse.Namespace(config=str(config_path)))
+            finally:
+                runner.source_hashes = real_source_hashes
+            self.assertNotEqual(ctx.exception.code, 0)
+            self.assertEqual(
+                sha256_file(run_dir / "g0a_verdict.json"),
+                verdict_before,
+                "a failed audit must not modify published evidence",
+            )
+            record = self.load_failure_record(run_dir)
+            self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
+            self.assertFalse(record["evidence_published"])
+
+    def test_successful_rerun_refuses_to_overwrite_published_evidence(self):
+        runner = load_audit_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            sentinel = {"engineering": "ENGINEERING_PASS", "sentinel": "immutable"}
+            (run_dir / "g0a_verdict.json").write_text(json.dumps(sentinel))
+            verdict_before = sha256_file(run_dir / "g0a_verdict.json")
+            with self.assertRaises(SystemExit) as ctx:
+                runner.cmd_audit(argparse.Namespace(config=str(config_path)))
+            self.assertNotEqual(ctx.exception.code, 0)
+            self.assertEqual(sha256_file(run_dir / "g0a_verdict.json"), verdict_before)
+            record = self.load_failure_record(run_dir)
+            self.assertEqual(record["engineering"], "ENGINEERING_FAIL")
+            self.assertEqual(record["failed_phase"], "publication")
+
+    def test_record_tests_refuses_when_evidence_published(self):
+        runner = load_audit_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path, run_dir = self.build_world(tmp)
+            (run_dir / "preflight_tests.exit").write_text("0\n")
+            (run_dir / "preflight_tests.txt").write_text("3 passed\n")
+            sentinel_preflight = {"sentinel": "published preflight record"}
+            (run_dir / "preflight_tests.json").write_text(json.dumps(sentinel_preflight))
+            (run_dir / "g0a_verdict.json").write_text('{"engineering": "ENGINEERING_PASS"}')
+            with self.assertRaises(SystemExit) as ctx:
+                runner.cmd_record_tests(argparse.Namespace(config=str(config_path)))
+            self.assertNotEqual(ctx.exception.code, 0)
+            self.assertEqual(
+                json.loads((run_dir / "preflight_tests.json").read_text()), sentinel_preflight
+            )
 
 
 if __name__ == "__main__":

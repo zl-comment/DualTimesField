@@ -84,11 +84,14 @@ def select_origin_indices(n: int) -> list[int]:
 class BudgetGuard:
     """Monotonic wall-clock guard; refuses to continue once exceeded."""
 
-    def __init__(self, wall_seconds: float):
+    def __init__(self, wall_seconds: float, started_monotonic: float | None = None):
         if wall_seconds <= 0:
             raise ValueError("wall_seconds must be positive")
         self.wall_seconds = float(wall_seconds)
-        self._start = time.monotonic()
+        # The anchor defaults to guard construction; audit runners pass the
+        # process-start monotonic so the budget covers interpreter startup,
+        # imports and CLI parsing too (protocol §5: 从审计进程启动计).
+        self._start = time.monotonic() if started_monotonic is None else float(started_monotonic)
 
     @property
     def elapsed(self) -> float:
