@@ -1,0 +1,31 @@
+.............................F....                                       [100%]
+=================================== FAILURES ===================================
+_____ VerdictTests.test_fill_triggers_quick_veto_without_engineering_fail ______
+
+self = <test_g0a_predispatch_rrp.VerdictTests testMethod=test_fill_triggers_quick_veto_without_engineering_fail>
+
+    def test_fill_triggers_quick_veto_without_engineering_fail(self):
+        world = synthetic_world()
+        covered = world["predispatch_covered"].copy()
+        covered[7, 20:] = 0.0
+        checks = self.base_checks()
+        checks[4] = g0a.check_coverage(
+            world["forecast_origin_unix"], covered, world["source_run_unix"]
+        )
+        verdict = g0a.assemble_verdict(
+            checks=checks,
+            budget={"within_budget": True},
+            preflight={"returncode": 0},
+            guard_violations=[],
+        )
+>       self.assertEqual(verdict["engineering"], "ENGINEERING_PASS")
+E       AssertionError: 'ENGINEERING_FAIL' != 'ENGINEERING_PASS'
+E       - ENGINEERING_FAIL
+E       ?             ^ ^^
+E       + ENGINEERING_PASS
+E       ?             ^ ^^
+
+tests/test_g0a_predispatch_rrp.py:311: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_g0a_predispatch_rrp.py::VerdictTests::test_fill_triggers_quick_veto_without_engineering_fail
+1 failed, 33 passed in 2.82s

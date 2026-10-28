@@ -1,0 +1,65 @@
+..........................FF.F....                                       [100%]
+=================================== FAILURES ===================================
+_________ SchemaTests.test_target_time_needs_hour_grid_and_24_columns __________
+
+self = <test_g0a_predispatch_rrp.SchemaTests testMethod=test_target_time_needs_hour_grid_and_24_columns>
+
+    def test_target_time_needs_hour_grid_and_24_columns(self):
+        world = synthetic_world()
+        ok = g0a.check_target_time(world["forecast_origin_unix"], 24)
+>       self.assertEqual(ok["status"], "pass")
+E       AssertionError: 'fail' != 'pass'
+E       - fail
+E       + pass
+
+tests/test_g0a_predispatch_rrp.py:250: AssertionError
+_____ VerdictTests.test_clean_world_is_engineering_pass_but_strict_blocked _____
+
+self = <test_g0a_predispatch_rrp.VerdictTests testMethod=test_clean_world_is_engineering_pass_but_strict_blocked>
+
+    def test_clean_world_is_engineering_pass_but_strict_blocked(self):
+        verdict = g0a.assemble_verdict(
+            checks=self.base_checks(),
+            budget={"within_budget": True, "wall_seconds_budget": 300, "wall_seconds_elapsed": 0.1},
+            preflight={"returncode": 0},
+            guard_violations=[],
+        )
+>       self.assertEqual(verdict["engineering"], "ENGINEERING_PASS")
+E       AssertionError: 'ENGINEERING_FAIL' != 'ENGINEERING_PASS'
+E       - ENGINEERING_FAIL
+E       ?             ^ ^^
+E       + ENGINEERING_PASS
+E       ?             ^ ^^
+
+tests/test_g0a_predispatch_rrp.py:281: AssertionError
+_____ VerdictTests.test_fill_triggers_quick_veto_without_engineering_fail ______
+
+self = <test_g0a_predispatch_rrp.VerdictTests testMethod=test_fill_triggers_quick_veto_without_engineering_fail>
+
+    def test_fill_triggers_quick_veto_without_engineering_fail(self):
+        world = synthetic_world()
+        covered = world["predispatch_covered"].copy()
+        covered[7, 20:] = 0.0
+        checks = self.base_checks()
+        checks[4] = g0a.check_coverage(
+            world["forecast_origin_unix"], covered, world["source_run_unix"]
+        )
+        verdict = g0a.assemble_verdict(
+            checks=checks,
+            budget={"within_budget": True},
+            preflight={"returncode": 0},
+            guard_violations=[],
+        )
+>       self.assertEqual(verdict["engineering"], "ENGINEERING_PASS")
+E       AssertionError: 'ENGINEERING_FAIL' != 'ENGINEERING_PASS'
+E       - ENGINEERING_FAIL
+E       ?             ^ ^^
+E       + ENGINEERING_PASS
+E       ?             ^ ^^
+
+tests/test_g0a_predispatch_rrp.py:310: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_g0a_predispatch_rrp.py::SchemaTests::test_target_time_needs_hour_grid_and_24_columns
+FAILED tests/test_g0a_predispatch_rrp.py::VerdictTests::test_clean_world_is_engineering_pass_but_strict_blocked
+FAILED tests/test_g0a_predispatch_rrp.py::VerdictTests::test_fill_triggers_quick_veto_without_engineering_fail
+3 failed, 31 passed in 2.83s

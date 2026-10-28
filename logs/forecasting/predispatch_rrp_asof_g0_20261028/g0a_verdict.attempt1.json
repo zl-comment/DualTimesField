@@ -1,0 +1,36 @@
+{
+  "audit": "g0a_predispatch_rrp_asof_preaudit",
+  "engineering": "ENGINEERING_FAIL",
+  "engineering_problems": [
+    "preflight tests missing or failed (nonzero returncode)",
+    "coverage_24h_no_fill failed"
+  ],
+  "strict_asof": "STRICT_ASOF_BLOCKED",
+  "strict_block_reasons": [
+    "source_last_changed_unix is an archive proxy: MMSDM monthly-archive LASTCHANGED fetched at NPZ build time, not a live first-seen capture",
+    "backdated late revisions with retroactive LASTCHANGED cannot be excluded from a month-end archive",
+    "no prospective live capture was started in G0-A, so historical availability at each origin is unproven"
+  ],
+  "publication_basis": "archive_proxy",
+  "first_seen_claimed": false,
+  "quick_veto": {
+    "status": "TRIGGERED",
+    "reasons": [
+      "origin 1420052400: covered 23/24 (tail_ffill_repeat)",
+      "origin 1520456400: covered 21/24 (tail_ffill_repeat)",
+      "origin 1620856800: covered 20/24 (tail_ffill_repeat)",
+      "origin 1721260800: covered 18/24 (tail_ffill_repeat)"
+    ]
+  },
+  "checks_status": {
+    "schema": "pass",
+    "units_plausibility_aud_per_mwh": "pass",
+    "target_time_alignment": "pass",
+    "run_vintage_asof": "pass",
+    "coverage_24h_no_fill": "fail",
+    "publication_basis_archive_proxy": "pass"
+  },
+  "scope_note": "NPZ alone can quick-veto only; strict G0 PASS is not grantable from this artifact; 72h live collection not started",
+  "selected_origin_count": 12,
+  "config": "configs/agent_forecasting/g0a_predispatch_rrp_20261028.json"
+}
