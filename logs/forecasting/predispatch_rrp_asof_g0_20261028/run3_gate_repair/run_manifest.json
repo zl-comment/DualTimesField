@@ -1,0 +1,52 @@
+{
+  "started_at_utc": "2026-10-28T15:31:49.946814+00:00",
+  "finished_at_utc": "2026-10-28T15:31:50.367749+00:00",
+  "wall_seconds": 3.049254,
+  "wall_clock_anchor": "process_start",
+  "phases": {
+    "pre_audit_process_import_cli_s": 2.628335
+  },
+  "evidence_publication": {
+    "mode": "staging_dir_single_atomic_rename",
+    "partial_success_sets": "impossible"
+  },
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "python_version": "3.11.0",
+  "command": [
+    "scripts/audit_g0a_predispatch_rrp.py",
+    "audit",
+    "--config",
+    "configs/agent_forecasting/g0a_predispatch_rrp_20261028_run3_gate_repair.json"
+  ],
+  "git_head": "562608698f634e6dcebe9c9899558833648758bf",
+  "git_head_source": "in-process .git read (no subprocess)",
+  "sigalrm_deadline_seconds": 300,
+  "branch": "research/predispatch-rrp-g0a-gate-repair-20261028",
+  "base_commit": "708327098d1e50349726f76f55a10893ba11173d",
+  "network_disabled": true,
+  "npz_path": "data/aemo_exogenous_holdout/merged/nsw1_predispatch.npz",
+  "selection_rule": {
+    "rule": "even_index_stride_round_half_up",
+    "max_origins": 12,
+    "formula": "n<=12: all; else idx_k=(k*(n-1)+5)//11, k=0..11",
+    "inputs_used": [
+      "forecast_origin_unix only"
+    ],
+    "independent_of": [
+      "predispatch_covered",
+      "predispatch_rrp values",
+      "source_run_unix",
+      "source_run_seqno"
+    ],
+    "fixed_before_any_value_level_inspection": true
+  },
+  "source_sha256": {
+    "harness_module": "f8fb7c68c33d8d68289cf5dd9f655046d4cdba7e3040106d6fb005a668d54ce3",
+    "audit_script": "8ca0745372c97ff2e0113f0f87c35b3987d76e9871c1e417122cff7eb0d67057",
+    "config": "eea2acd3ab5c05c8946cf3896bb5fc814264037dbbce2a8de101916b16016edf",
+    "protocol": "a12d45a0cd7235ea45bcf90a3ff459f6738bb5eabc8bf18d3a87f880efc325d2",
+    "builder": "8ef49cdf31c342508b846ff188bb874950b4bfd690c225a0126949361eb00db9",
+    "npz": "6e5e6d73de75fdf3b8a761f1b26245491a4aa41deca1038c68349c2022720a16",
+    "tests": "51c2b99491eee7fc8fa45af92d26fb14394fe81c3378e7755dd8564186303183"
+  }
+}
