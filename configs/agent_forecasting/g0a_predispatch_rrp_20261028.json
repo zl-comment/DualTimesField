@@ -1,0 +1,69 @@
+{
+  "status": "frozen_g0a",
+  "execution_scope": "g0a_local_preaudit_only",
+  "base_commit": "708327098d1e50349726f76f55a10893ba11173d",
+  "branch": "research/predispatch-rrp-asof-g0-20261028",
+  "protocol": "docs/research/agent_forecasting/g0a_predispatch_rrp_protocol_20261028.txt",
+  "harness_module": "forecasting/agent_forecasting/g0a_predispatch.py",
+  "audit_script": "scripts/audit_g0a_predispatch_rrp.py",
+  "tests": "tests/test_g0a_predispatch_rrp.py",
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "region": "NSW1",
+  "npz_path": "data/aemo_exogenous_holdout/merged/nsw1_predispatch.npz",
+  "npz_sha256_at_freeze": "6e5e6d73de75fdf3b8a761f1b26245491a4aa41deca1038c68349c2022720a16",
+  "builder_path": "forecasting/build_predispatch_exogenous.py",
+  "builder_sha256_at_freeze": "8ef49cdf31c342508b846ff188bb874950b4bfd690c225a0126949361eb00db9",
+  "field": "predispatch_rrp",
+  "origin_selection": {
+    "rule": "even_index_stride_round_half_up",
+    "max_origins": 12,
+    "formula": "n<=12: all; else idx_k=(k*(n-1)+5)//11, k=0..11",
+    "inputs_used": ["forecast_origin_unix only"],
+    "independent_of": ["predispatch_covered", "predispatch_rrp values", "source_run_unix", "source_run_seqno"],
+    "fixed_before_any_value_level_inspection": true
+  },
+  "audit_checks": [
+    "schema",
+    "units_plausibility_aud_per_mwh",
+    "target_time_alignment",
+    "run_vintage_asof",
+    "coverage_24h_no_fill",
+    "publication_basis_archive_proxy"
+  ],
+  "unit_envelope_aud_per_mwh": {
+    "min": -1000.0,
+    "max": 20000.0,
+    "basis": "AEMO MMS data model: PREDISPATCHPRICE.RRP in AUD/MWh; market floor -1000 and administrative cap below 20000 over 2015-2026"
+  },
+  "stale_seconds": 21600,
+  "hour_seconds": 3600,
+  "verdict_levels": {
+    "engineering": ["ENGINEERING_PASS", "ENGINEERING_FAIL"],
+    "strict_asof": ["STRICT_ASOF_BLOCKED"],
+    "quick_veto": ["NOT_TRIGGERED", "TRIGGERED"]
+  },
+  "budget": {
+    "wall_seconds": 300,
+    "processes": 1,
+    "network": 0,
+    "gpu": 0,
+    "training": 0,
+    "model_calls": 0,
+    "package_installs": 0
+  },
+  "forbidden_basenames": ["actual.npy", "target.npy"],
+  "allow_roots": [
+    "data/aemo_exogenous_holdout/merged",
+    "outputs/forecasting/predispatch_rrp_asof_g0_20261028",
+    "logs/forecasting/predispatch_rrp_asof_g0_20261028"
+  ],
+  "output_dir": "outputs/forecasting/predispatch_rrp_asof_g0_20261028",
+  "archive_dir": "logs/forecasting/predispatch_rrp_asof_g0_20261028",
+  "out_of_scope": {
+    "live_collection_72h": "not_started",
+    "g0b_g0c_g1_g2": false,
+    "final_test_selection": false,
+    "push": false
+  },
+  "strict_note": "This NPZ can quick-veto as-of use only. A strict point-in-time PASS is not grantable from this artifact class: source_last_changed_unix is an archive proxy (MMSDM monthly archive LASTCHANGED fetched at NPZ build time, 2026-10-10), backdated late revisions cannot be excluded, and no prospective live capture was started in G0-A."
+}

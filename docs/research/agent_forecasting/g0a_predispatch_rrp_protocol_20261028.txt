@@ -1,0 +1,79 @@
+G0-A冻结协议：NSW1 predispatch_rrp 本地 as-of 预审
+日期：2026-10-28 UTC
+基点：708327098d1e50349726f76f55a10893ba11173d（research/agent-evidence-contract-g0-20261028）
+独立分支：research/predispatch-rrp-asof-g0-20261028
+配套配置：configs/agent_forecasting/g0a_predispatch_rrp_20261028.json
+配套实现：forecasting/agent_forecasting/g0a_predispatch.py（冻结守卫与纯检查函数）
+配套测试：tests/test_g0a_predispatch_rrp.py（source-bound，绑定配置与NPZ哈希）
+顺序：本协议、配置、守卫实现与测试必须先提交冻结；最小审计脚本与真实执行仅在其后。
+运行后不得修改冻结源码、配置、协议或测试；结果提交不得冒充执行源码提交。
+
+1. 目的与边界
+只回答一个问题：本地归档 data/aemo_exogenous_holdout/merged/nsw1_predispatch.npz 的
+predispatch_rrp 是否支持 as-of（起报时刻可见）使用，以及能否被快速否决。
+本NPZ只能做快速否决，不能单独给出 strict G0 PASS；verdict 必须区分
+ENGINEERING_PASS（工程与结构检查通过）与 STRICT_ASOF_BLOCKED（严格时点证明被阻断）。
+不启动72小时前瞻采集；不运行G0-B/G0-C/G1/G2；不做最终测试选择；不推送。
+
+2. 冻结范围与选择规则
+地区仅NSW1；字段仅predispatch_rrp；文件仅上述NPZ（sha256记录于配置）。
+origin选择规则与覆盖、单位、vintage等任何数值结果无关，先于检查冻结：
+  n = len(forecast_origin_unix)（升序）；n<=12全取；
+  否则 idx_k = (k*(n-1)+5)//11，k=0..11，最多12个origin。
+禁止：读取actual.npy、target.npy或任何标签/评分文件（运行时路径白名单+黑名单双守卫）；
+网络访问（运行时禁用socket）；调用模型；训练/GPU；新包安装；
+跨vintage拼接、尾部延伸、补零或其他任何填充（审计只读，不得修改数值；填充仅作发现记录）。
+
+3. 六项检查（值级检查仅对选中origins；schema为数组级结构检查）
+schema：必需键齐全；predispatch_rrp/predispatch_covered形状[n,24]且为浮点；
+  三个source元数组形状[n]；forecast_origin_unix一维、严格升序、步长恒为3600秒；
+  每个origin仅一个source_run_seqno（结构性反跨vintage拼接证据）。
+AUD/MWh单位：血缘=冻结builder读取MMSDM PREDISPATCHPRICE.RRP（builder sha256记录于配置，
+  AEMO数据模型中RRP单位为AUD/MWh）；检查选中值全部有限且在冻结包络[-1000,20000]内。
+  只做否决级检查；不声称由NPZ单独证明单位。
+目标时间：value[h]对应origin+(h+1)小时结束（AEST）的交易小时（两半点均值），
+  由冻结builder定义并经其哈希绑定；NPZ内部仅验证24列与小时网格一致性。
+run/vintage：source_run_unix<=origin，违者为未来信息泄漏否决；
+  run年龄=origin-source_run_unix<=21600秒，超者为stale中位数填充；
+  记录source_run_seqno与相邻选中origin是否同vintage（信息项）。
+24小时覆盖：predispatch_covered全1为无填充；非stale但covered<24为尾部ffill重复小时；
+  stale origin全24小时为2015-2021训练中位数填充。任一填充即触发对
+  “无填充as-of使用”的快速否决，并逐条列明。
+publication_basis：source_last_changed_unix必须逐元素等于source_run_unix（builder别名）；
+  语义一律标archive_proxy：其值来自NPZ构建时（2026-10-10抓取）的MMSDM月度归档LASTCHANGED，
+  不能证明历史first-seen，也无法排除带回填LASTCHANGED的事后修正。
+  禁止宣称historical first-seen。
+
+4. verdict语义
+ENGINEERING_PASS：定向测试真实退出码为0 + 预算守卫通过 + 无守卫违规
+  + schema/单位/目标时间/run-vintage/publication_basis别名检查全部pass。
+  工程通过不等于as-of成立，更不构成任何预测性能证据。
+ENGINEERING_FAIL：任一结构检查失败、测试失败、预算超限或守卫违规。
+STRICT_ASOF_BLOCKED：对本NPZ结构性恒成立（archive_proxy + 无法排除回填修正 + 未做前瞻采集）；
+  实现上禁止任何代码路径给出strict PASS。
+quick_veto：选中origins出现任一vintage违规或任一填充时置位并逐条列明；
+  未置位也不升级为strict PASS。
+
+5. 预算守卫
+墙钟<=300秒（monotonic，从审计进程启动计）；单进程；网络=0（socket禁用）；
+GPU=0；训练=0；模型调用=0。超限立即终止并如实记录，不重试、不换设备。
+
+6. 产物
+outputs/forecasting/predispatch_rrp_asof_g0_20261028/：
+  g0a_verdict.json、selected_origins.json、preflight_tests.txt/.exit/.json、
+  budget_report.json、run_manifest.json。
+归档logs/forecasting/predispatch_rrp_asof_g0_20261028/（含README与artifact_manifest.json，
+  全文件sha256）后本地提交；outputs/与data/在.gitignore中不入库。
+旧输出、正式主表、其他分支与归档只读；不覆盖他人工作。
+
+7. 可重放命令（仓库根目录、冻结提交之后）
+  .venv/bin/python -m pytest tests/test_g0a_predispatch_rrp.py -q \
+      > outputs/forecasting/predispatch_rrp_asof_g0_20261028/preflight_tests.txt 2>&1; \
+      echo $? > outputs/forecasting/predispatch_rrp_asof_g0_20261028/preflight_tests.exit
+  .venv/bin/python scripts/audit_g0a_predispatch_rrp.py record-tests \
+      --config configs/agent_forecasting/g0a_predispatch_rrp_20261028.json
+  .venv/bin/python scripts/audit_g0a_predispatch_rrp.py audit \
+      --config configs/agent_forecasting/g0a_predispatch_rrp_20261028.json
+  .venv/bin/python scripts/audit_g0a_predispatch_rrp.py archive \
+      --config configs/agent_forecasting/g0a_predispatch_rrp_20261028.json
+pytest直接重定向保留真实退出码（$?写入.exit文件），禁止用管道退出码冒充。
