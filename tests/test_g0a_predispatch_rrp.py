@@ -30,7 +30,8 @@ def sha256_file(path: Path) -> str:
 
 
 def synthetic_world(n=48):
-    origins = np.arange(1_700_000_000, 1_700_000_000 + 3600 * n, 3600, dtype=np.int64)
+    base = 1_700_002_800  # hour-aligned: 1_700_002_800 % 3600 == 0
+    origins = np.arange(base, base + 3600 * n, 3600, dtype=np.int64)
     return {
         "forecast_origin_unix": origins,
         "predispatch_rrp": np.full((n, 24), 71.5, dtype=np.float32),
