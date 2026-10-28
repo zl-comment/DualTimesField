@@ -1,0 +1,202 @@
+{
+  "review_date_utc": "2026-10-28",
+  "status": "read_only_source_review_no_execution",
+  "recommendation": "LangGraph runtime + frozen Chronos-2; borrow MoiraiAgent contextual tool design; use CastClaw as nearest prior work and TimeCopilot as adapter reference.",
+  "repositories": [
+    {
+      "repository": "langchain-ai/langgraph",
+      "commit": "eb8ec111b3e9d3108af5d7bdcac51e3e913637a0",
+      "license": "MIT",
+      "role": "recommended_runtime",
+      "training_boundary": "Framework has no forecast weights; can orchestrate frozen tools without task fitting.",
+      "limitations": [
+        "Does not supply AEMO acquisition or a price predictor."
+      ],
+      "evidence_paths": [
+        "libs/langgraph/langgraph/graph/state.py",
+        "libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py",
+        "libs/langgraph/pyproject.toml"
+      ],
+      "url": "https://github.com/langchain-ai/langgraph",
+      "evidence_urls": [
+        "https://github.com/langchain-ai/langgraph/blob/eb8ec111b3e9d3108af5d7bdcac51e3e913637a0/libs/langgraph/langgraph/graph/state.py",
+        "https://github.com/langchain-ai/langgraph/blob/eb8ec111b3e9d3108af5d7bdcac51e3e913637a0/libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py",
+        "https://github.com/langchain-ai/langgraph/blob/eb8ec111b3e9d3108af5d7bdcac51e3e913637a0/libs/langgraph/pyproject.toml"
+      ]
+    },
+    {
+      "repository": "amazon-science/chronos-forecasting",
+      "commit": "1224fafa91e1ecd6674f5204066b159e40b5e4a1",
+      "license": "Apache-2.0 (repository); pin and verify chosen weight revision separately",
+      "role": "frozen_numerical_forecaster_candidate",
+      "training_boundary": "Pretrained model supports zero-shot covariate forecasting; forbid fine-tune calls in the proposed strict arm.",
+      "limitations": [
+        "Numerical covariates require valid historical/future alignment; not a free-text event interpreter.",
+        "Our archived restricted-input run did not outperform LightGBM.",
+        "A current source commit is not the same as the already-tested local package/checkpoint."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "src/chronos/chronos2/pipeline.py"
+      ],
+      "paper": "https://arxiv.org/abs/2510.15821",
+      "url": "https://github.com/amazon-science/chronos-forecasting",
+      "evidence_urls": [
+        "https://github.com/amazon-science/chronos-forecasting/blob/1224fafa91e1ecd6674f5204066b159e40b5e4a1/README.md",
+        "https://github.com/amazon-science/chronos-forecasting/blob/1224fafa91e1ecd6674f5204066b159e40b5e4a1/src/chronos/chronos2/pipeline.py"
+      ]
+    },
+    {
+      "repository": "SalesforceAIResearch/uni2ts",
+      "commit": "cfd46d4510ed8896f263116f32928eede05b0a75",
+      "license": "Root Apache-2.0; moirai-agent README says research use; selector weights CC-BY-NC-4.0",
+      "role": "contextual_agent_method_reference",
+      "training_boundary": "ctx_forecast uses deployed LLM and frozen TSFM. Separate expert selector was trained on two million examples; deployment can freeze its supplied weights.",
+      "limitations": [
+        "Default contextual final contract is point sequence, not our 24x5 quantile contract.",
+        "Default tool wrapper exposes q10...q90 and univariate inputs; needs explicit q05/q95 and covariate adaptation.",
+        "No native AEMO publication-vintage data feed.",
+        "Do not copy free numeric editing or discrete-quantile pooling as calibrated probability inference."
+      ],
+      "evidence_paths": [
+        "project/moirai-agent/README.md",
+        "project/moirai-agent/ctx_forecast/src/ctx_forecast/tsf_agent.py",
+        "project/moirai-agent/ctx_forecast/src/tools/tsf_models.py",
+        "project/moirai-agent/gift_eval/agent.py"
+      ],
+      "official_description": "https://www.salesforce.com/blog/moiraiagent/",
+      "weight_card": "https://huggingface.co/Salesforce/moirai-agent/blob/main/README.md",
+      "url": "https://github.com/SalesforceAIResearch/uni2ts",
+      "evidence_urls": [
+        "https://github.com/SalesforceAIResearch/uni2ts/blob/cfd46d4510ed8896f263116f32928eede05b0a75/project/moirai-agent/README.md",
+        "https://github.com/SalesforceAIResearch/uni2ts/blob/cfd46d4510ed8896f263116f32928eede05b0a75/project/moirai-agent/ctx_forecast/src/ctx_forecast/tsf_agent.py",
+        "https://github.com/SalesforceAIResearch/uni2ts/blob/cfd46d4510ed8896f263116f32928eede05b0a75/project/moirai-agent/ctx_forecast/src/tools/tsf_models.py",
+        "https://github.com/SalesforceAIResearch/uni2ts/blob/cfd46d4510ed8896f263116f32928eede05b0a75/project/moirai-agent/gift_eval/agent.py"
+      ]
+    },
+    {
+      "repository": "TimeCopilot/timecopilot",
+      "commit": "6a108195113ca86405f20ecb4050391431d59ca2",
+      "license": "MIT",
+      "role": "forecast_tool_interface_reference",
+      "training_boundary": "Configurable model pool, not zero-training by default. Default pool includes fitted statistical methods and Prophet; explicitly allowlist frozen forecasters.",
+      "limitations": [
+        "Default agent uses MASE and retries when not beating seasonal naive.",
+        "Default agent forecast tool does not pass requested probabilistic quantiles/future_df in the inspected call.",
+        "GIFT-Eval reported strength is not by itself LLM decision-value evidence.",
+        "Large dependency set; no installation performed."
+      ],
+      "evidence_paths": [
+        "LICENSE",
+        "pyproject.toml",
+        "timecopilot/agent.py",
+        "timecopilot/forecaster.py",
+        "timecopilot/models/foundation/chronos.py"
+      ],
+      "paper": "https://arxiv.org/html/2509.00616v3",
+      "url": "https://github.com/TimeCopilot/timecopilot",
+      "evidence_urls": [
+        "https://github.com/TimeCopilot/timecopilot/blob/6a108195113ca86405f20ecb4050391431d59ca2/LICENSE",
+        "https://github.com/TimeCopilot/timecopilot/blob/6a108195113ca86405f20ecb4050391431d59ca2/pyproject.toml",
+        "https://github.com/TimeCopilot/timecopilot/blob/6a108195113ca86405f20ecb4050391431d59ca2/timecopilot/agent.py",
+        "https://github.com/TimeCopilot/timecopilot/blob/6a108195113ca86405f20ecb4050391431d59ca2/timecopilot/forecaster.py",
+        "https://github.com/TimeCopilot/timecopilot/blob/6a108195113ca86405f20ecb4050391431d59ca2/timecopilot/models/foundation/chronos.py"
+      ]
+    },
+    {
+      "repository": "ustc-time-series/CastClaw",
+      "commit": "bf7a99159219625127eae2de1f184ac2c2e29d38",
+      "license": "Root MIT; important parts of the inspected implementation absent from public source",
+      "role": "closest_electricity_agent_prior_work_not_wholesale_reuse",
+      "training_boundary": "Prediction Prior can skip model search but documented adjustment skills still learn/select from validation labels. No fully audited hard no-fit/no-rule-learning mode established.",
+      "limitations": [
+        "forecast.bundle.d.ts states implementation source removed.",
+        "Planner/forecaster/critic prompts are empty; comment says binary release only.",
+        "Python build targets binary-only wheel; training backend source absent from inspected tree.",
+        "Native multi-quantile pipeline not established; documented evaluation emphasizes point metrics.",
+        "README capability and published bundle may not match."
+      ],
+      "evidence_paths": [
+        "LICENSE",
+        "docs/en/usage.md",
+        "packages/castclaw/src/tool/forecast.bundle.d.ts",
+        "packages/castclaw/src/agent/agent.ts",
+        "python/build_wheel.py",
+        "python/pyproject.toml"
+      ],
+      "paper": "https://arxiv.org/abs/2608.30976",
+      "url": "https://github.com/ustc-time-series/CastClaw",
+      "evidence_urls": [
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/LICENSE",
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/docs/en/usage.md",
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/packages/castclaw/src/tool/forecast.bundle.d.ts",
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/packages/castclaw/src/agent/agent.ts",
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/python/build_wheel.py",
+        "https://github.com/ustc-time-series/CastClaw/blob/bf7a99159219625127eae2de1f184ac2c2e29d38/python/pyproject.toml"
+      ]
+    },
+    {
+      "repository": "MiroMindAI/MiroFlow",
+      "commit": "fca7b4a7fda30e5a17b5c7b73d780738a925869f",
+      "license": "Apache-2.0; model weight terms separate",
+      "role": "general_web_research_reference",
+      "training_boundary": "Can call frozen hosted/local models; no task training needed for inspected execution path.",
+      "limitations": [
+        "Not a ready numerical probability forecaster.",
+        "Quickstart single agent max_turns=-1; bound it before any use.",
+        "Requires as-of retrieval and structured forecast tools."
+      ],
+      "evidence_paths": [
+        "config/agent_quickstart_single_agent.yaml",
+        "src/core/orchestrator.py"
+      ],
+      "url": "https://github.com/MiroMindAI/MiroFlow",
+      "evidence_urls": [
+        "https://github.com/MiroMindAI/MiroFlow/blob/fca7b4a7fda30e5a17b5c7b73d780738a925869f/config/agent_quickstart_single_agent.yaml",
+        "https://github.com/MiroMindAI/MiroFlow/blob/fca7b4a7fda30e5a17b5c7b73d780738a925869f/src/core/orchestrator.py"
+      ]
+    },
+    {
+      "repository": "TauricResearch/TradingAgents",
+      "commit": "c4544913a14ed3df5f1ed7b9e8483270ce20682a",
+      "license": "Apache-2.0",
+      "role": "logging_and_tool_architecture_reference_only",
+      "training_boundary": "Inspected runtime uses deployed LLMs and tools, without task gradient training.",
+      "limitations": [
+        "Trading decisions and reports are not continuous electricity-price quantiles.",
+        "Do not transfer trading roles or economic PnL results as forecasting evidence."
+      ],
+      "evidence_paths": [
+        "tradingagents/agents/schemas.py",
+        "tradingagents/graph/trading_graph.py",
+        "pyproject.toml"
+      ],
+      "url": "https://github.com/TauricResearch/TradingAgents",
+      "evidence_urls": [
+        "https://github.com/TauricResearch/TradingAgents/blob/c4544913a14ed3df5f1ed7b9e8483270ce20682a/tradingagents/agents/schemas.py",
+        "https://github.com/TauricResearch/TradingAgents/blob/c4544913a14ed3df5f1ed7b9e8483270ce20682a/tradingagents/graph/trading_graph.py",
+        "https://github.com/TauricResearch/TradingAgents/blob/c4544913a14ed3df5f1ed7b9e8483270ce20682a/pyproject.toml"
+      ]
+    },
+    {
+      "repository": "AI4Finance-Foundation/FinRobot",
+      "commit": "63e1884a42ea7b729551a5424b4bd6a65af636e0",
+      "license": "Apache-2.0",
+      "role": "financial_analysis_reference_only",
+      "training_boundary": "Inspected V0 AutoGen assistant uses a deployed model without task gradient training.",
+      "limitations": [
+        "Valuation and reports are not 24h probabilistic price forecasts.",
+        "Multiple generations and substantial dependencies; default code-execution isolation requires review."
+      ],
+      "evidence_paths": [
+        "finrobot_autogen/finrobot/agents/workflow.py",
+        "finrobot_autogen/requirements.txt"
+      ],
+      "url": "https://github.com/AI4Finance-Foundation/FinRobot",
+      "evidence_urls": [
+        "https://github.com/AI4Finance-Foundation/FinRobot/blob/63e1884a42ea7b729551a5424b4bd6a65af636e0/finrobot_autogen/finrobot/agents/workflow.py",
+        "https://github.com/AI4Finance-Foundation/FinRobot/blob/63e1884a42ea7b729551a5424b4bd6a65af636e0/finrobot_autogen/requirements.txt"
+      ]
+    }
+  ]
+}
