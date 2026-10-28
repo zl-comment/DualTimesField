@@ -1,0 +1,95 @@
+{
+  "status": "frozen_g0",
+  "execution_scope": "g0_only",
+  "base_commit": "a090efe05766fcfb7ebad8d7e04305ffcbe74d3c",
+  "branch": "research/agent-evidence-contract-g0-20261028",
+  "source_files": [
+    "configs/agent_forecasting/g0_20261028.json",
+    "docs/research/agent_forecasting/g0_protocol_20261028.txt",
+    "forecasting/agent_forecasting/__init__.py",
+    "forecasting/agent_forecasting/contracts.py",
+    "forecasting/agent_forecasting/asof.py",
+    "forecasting/agent_forecasting/trace.py",
+    "forecasting/agent_forecasting/frozen_chronos.py",
+    "scripts/check_agent_forecast_contract.py",
+    "scripts/audit_agent_evidence_g0.py",
+    "tests/test_agent_forecast_contract.py",
+    "tests/test_agent_frozen_chronos.py",
+    "tests/test_agent_evidence_g0.py"
+  ],
+  "interpreter": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python",
+  "input": {
+    "directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection",
+    "region": "NSW1",
+    "row": 72,
+    "origin_unix": 1641218400,
+    "file_sha256": {
+      "metadata.json": "e9d9b1a7e348524337273240687332d549ce191bbe9b9321da032aed06f63df5",
+      "origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+      "input__history_values.npy": "9a477e06757ec244b102b36354815749fbe13a0109677332abaa489a51e3d4cd",
+      "input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+      "input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0"
+    }
+  },
+  "checkpoint": {
+    "directory": "/root/workspace/Code/DualTimesField/weights/hf_home/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "sha256": {
+      "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+    }
+  },
+  "resources": {
+    "cpu_threads": 2,
+    "max_model_calls": 3,
+    "max_basic_calls": 1,
+    "event_pair_calls_reserved": 2,
+    "per_call_wall_seconds": 300,
+    "total_wall_seconds": 900,
+    "rss_bytes": 8589934592,
+    "gpu": 0,
+    "external_llm_calls": 0,
+    "training": 0,
+    "downloads": 0
+  },
+  "numerical_tolerance": {
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "smoke_output": "outputs/forecasting/agent_evidence_contract_g0_20261028/basic_smoke",
+  "attempt_ledger": "outputs/forecasting/agent_evidence_contract_g0_20261028/model_attempts.jsonl",
+  "evidence": {
+    "directory_display_start": "2026-10-21",
+    "directory_display_end_exclusive": "2026-10-28",
+    "display_timezone": "unverified",
+    "max_primary_candidates": 120,
+    "max_predecessors": 36,
+    "max_chain_members": 6,
+    "lookback_start": "2026-09-21",
+    "class_priority": [
+      "withdrawal",
+      "postponement",
+      "conflict",
+      "revision",
+      "cross_day",
+      "initial"
+    ],
+    "per_class": 2,
+    "max_chains": 12,
+    "max_http_requests": 160,
+    "max_total_bytes": 16777216,
+    "max_response_bytes": 262144,
+    "per_request_timeout_seconds": 15,
+    "request_interval_seconds": 1,
+    "max_attempts_per_url": 2,
+    "max_wall_seconds": 600
+  },
+  "advance_to_g1_g2": false,
+  "packages": {
+    "numpy": "2.4.6",
+    "chronos-forecasting": "2.3.2",
+    "torch": "2.14.1+cu126",
+    "transformers": "5.20.2",
+    "psutil": "7.2.2"
+  }
+}
