@@ -1,0 +1,1084 @@
+=== run_logged_m1 id=01_red_m1_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py -q
+git_head: ef4d68e6ad400465bb4b0bf65041d8c5945c1e42
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T11:13:39.134732Z
+end_utc: 2026-10-29T11:13:45.828449Z
+--- output begin ---
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF          [100%]
+=================================== FAILURES ===================================
+_____ IdentityPinningTests.test_config_pins_recompute_against_the_worktree _____
+
+self = <test_agent_m1_contract.IdentityPinningTests testMethod=test_config_pins_recompute_against_the_worktree>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ IdentityPinningTests.test_import_guard_blocks_label_score_and_training_modules _
+
+self = <test_agent_m1_contract.IdentityPinningTests testMethod=test_import_guard_blocks_label_score_and_training_modules>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_____ IdentityPinningTests.test_mutated_m0_file_refuses_before_any_action ______
+
+self = <test_agent_m1_contract.IdentityPinningTests testMethod=test_mutated_m0_file_refuses_before_any_action>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ IdentityPinningTests.test_prompt_and_renderer_hashes_are_pinned_in_config ___
+
+self = <test_agent_m1_contract.IdentityPinningTests testMethod=test_prompt_and_renderer_hashes_are_pinned_in_config>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____ IdentityPinningTests.test_withdrawal_semantics_declared_not_applicable ____
+
+self = <test_agent_m1_contract.IdentityPinningTests testMethod=test_withdrawal_semantics_declared_not_applicable>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_____ ArmLeafDiffTests.test_c_one_call_envelope_equals_d_episode_envelope ______
+
+self = <test_agent_m1_contract.ArmLeafDiffTests testMethod=test_c_one_call_envelope_equals_d_episode_envelope>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ArmLeafDiffTests.test_common_budget_vector_is_equal_across_arms_and_fully_charged _
+
+self = <test_agent_m1_contract.ArmLeafDiffTests testMethod=test_common_budget_vector_is_equal_across_arms_and_fully_charged>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__________ ArmLeafDiffTests.test_leaf_diffs_equal_declared_whitelist ___________
+
+self = <test_agent_m1_contract.ArmLeafDiffTests testMethod=test_leaf_diffs_equal_declared_whitelist>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+________ ArmLeafDiffTests.test_shared_leaves_are_identical_across_arms _________
+
+self = <test_agent_m1_contract.ArmLeafDiffTests testMethod=test_shared_leaves_are_identical_across_arms>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_______ AsOfWrapperTests.test_bcd_share_one_immutable_snapshot_identity ________
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_bcd_share_one_immutable_snapshot_identity>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ AsOfWrapperTests.test_chain_and_body_binding_verified_before_any_clock_trust _
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_chain_and_body_binding_verified_before_any_clock_trust>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+___ AsOfWrapperTests.test_duplicate_folds_to_earliest_and_fork_fails_closed ____
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_duplicate_folds_to_earliest_and_fork_fails_closed>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ AsOfWrapperTests.test_materialize_filters_before_parsing_and_accepts_any_iterable _
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_materialize_filters_before_parsing_and_accepts_any_iterable>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ AsOfWrapperTests.test_newest_visible_only_and_omission_cannot_select_older_vintage _
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_newest_visible_only_and_omission_cannot_select_older_vintage>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ AsOfWrapperTests.test_post_origin_receipts_and_forks_cannot_change_origin_identity _
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_post_origin_receipts_and_forks_cannot_change_origin_identity>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+___________ AsOfWrapperTests.test_receipt_after_origin_is_invisible ____________
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_receipt_after_origin_is_invisible>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____________ AsOfWrapperTests.test_relation_equal_origin_is_visible ____________
+
+self = <test_agent_m1_contract.AsOfWrapperTests testMethod=test_relation_equal_origin_is_visible>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_______ TypedDerivationTests.test_exact_48_to_24_mapping_from_the_kernel _______
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_exact_48_to_24_mapping_from_the_kernel>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+___ TypedDerivationTests.test_gap_drift_and_timeout_refuse_with_no_fallback ____
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_gap_drift_and_timeout_refuse_with_no_fallback>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+________ TypedDerivationTests.test_no_fabricated_same_semantic_history _________
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_no_fabricated_same_semantic_history>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ TypedDerivationTests.test_region_mismatch_refuses_attach_as_identity_drift __
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_region_mismatch_refuses_attach_as_identity_drift>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____ TypedDerivationTests.test_series_identity_is_fetch_subset_independent _____
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_series_identity_is_fetch_subset_independent>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ TypedDerivationTests.test_tool_boundary_rederives_and_rejects_forged_inputs __
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_tool_boundary_rederives_and_rejects_forged_inputs>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ TypedDerivationTests.test_value_mutation_with_fixed_body_hash_fails_closed __
+
+self = <test_agent_m1_contract.TypedDerivationTests testMethod=test_value_mutation_with_fixed_body_hash_fails_closed>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:329: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+______ DigestAndPromptTests.test_c_parser_accepts_only_the_two_decisions _______
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_c_parser_accepts_only_the_two_decisions>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+___ DigestAndPromptTests.test_cost_accounting_uses_frozen_rates_in_micro_usd ___
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_cost_accounting_uses_frozen_rates_in_micro_usd>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____ DigestAndPromptTests.test_digest_fact_space_is_shared_between_c_and_d _____
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_digest_fact_space_is_shared_between_c_and_d>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+______ DigestAndPromptTests.test_digest_renderer_rejects_forbidden_facts _______
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_digest_renderer_rejects_forbidden_facts>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ DigestAndPromptTests.test_digest_renders_only_enums_bools_and_opaque_refs ___
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_digest_renders_only_enums_bools_and_opaque_refs>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____ DigestAndPromptTests.test_function_call_envelope_is_accepted_strictly _____
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_function_call_envelope_is_accepted_strictly>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_______ DigestAndPromptTests.test_parser_rejects_the_full_forbidden_zoo ________
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_parser_rejects_the_full_forbidden_zoo>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+________ DigestAndPromptTests.test_request_bytes_use_the_frozen_prompts ________
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_request_bytes_use_the_frozen_prompts>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ActionRegistryTests.test_fetch_refuses_repeats_and_respects_the_two_get_cap __
+
+self = <test_agent_m1_contract.ActionRegistryTests testMethod=test_fetch_refuses_repeats_and_respects_the_two_get_cap>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ActionRegistryTests.test_four_proposal_cap_is_charged_and_a_terminal_fourth_is_legal _
+
+self = <test_agent_m1_contract.ActionRegistryTests testMethod=test_four_proposal_cap_is_charged_and_a_terminal_fourth_is_legal>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_____ ActionRegistryTests.test_state_machine_enums_and_terminal_absorption _____
+
+self = <test_agent_m1_contract.ActionRegistryTests testMethod=test_state_machine_enums_and_terminal_absorption>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ActionRegistryTests.test_unknown_and_out_of_order_actions_have_zero_side_effects _
+
+self = <test_agent_m1_contract.ActionRegistryTests testMethod=test_unknown_and_out_of_order_actions_have_zero_side_effects>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ BudgetDeadlineTests.test_deadline_miss_routes_to_system_missing_or_exact_base _
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_deadline_miss_routes_to_system_missing_or_exact_base>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ BudgetDeadlineTests.test_every_cap_fails_at_cap_plus_one_with_no_side_effects _
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_every_cap_fails_at_cap_plus_one_with_no_side_effects>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_________ BudgetDeadlineTests.test_failure_matrix_retains_every_origin _________
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_failure_matrix_retains_every_origin>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_________ BudgetDeadlineTests.test_ledger_fold_equals_reported_totals __________
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_ledger_fold_equals_reported_totals>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____________ BudgetDeadlineTests.test_overrun_forbids_typed_success ____________
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_overrun_forbids_typed_success>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ BudgetDeadlineTests.test_reserve_without_settle_is_fully_consumed_and_tamper_detected _
+
+self = <test_agent_m1_contract.BudgetDeadlineTests testMethod=test_reserve_without_settle_is_fully_consumed_and_tamper_detected>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____ COneShotTests.test_bad_json_timeout_or_requery_cannot_trigger_followup ____
+
+self = <test_agent_m1_contract.COneShotTests testMethod=test_bad_json_timeout_or_requery_cannot_trigger_followup>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:703: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_____ COneShotTests.test_retrieval_trace_is_independent_of_the_llm_output ______
+
+self = <test_agent_m1_contract.COneShotTests testMethod=test_retrieval_trace_is_independent_of_the_llm_output>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:703: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ByteIdenticalTerminalTests.test_bcd_same_decision_produces_identical_hashes __
+
+self = <test_agent_m1_contract.ByteIdenticalTerminalTests testMethod=test_bcd_same_decision_produces_identical_hashes>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:732: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ ByteIdenticalTerminalTests.test_fallback_terminals_are_byte_identical_to_a __
+
+self = <test_agent_m1_contract.ByteIdenticalTerminalTests testMethod=test_fallback_terminals_are_byte_identical_to_a>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:732: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_____________ SingleSinkTests.test_max_two_forecast_calls_enforced _____________
+
+self = <test_agent_m1_contract.SingleSinkTests testMethod=test_max_two_forecast_calls_enforced>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:770: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ SingleSinkTests.test_output_bytes_are_published_unchanged_without_sorting_or_clipping _
+
+self = <test_agent_m1_contract.SingleSinkTests testMethod=test_output_bytes_are_published_unchanged_without_sorting_or_clipping>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:770: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+___ SingleSinkTests.test_unique_input_forecast_once_and_second_call_refused ____
+
+self = <test_agent_m1_contract.SingleSinkTests testMethod=test_unique_input_forecast_once_and_second_call_refused>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:770: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ AtomicPublicationTests.test_command_logger_unique_paths_and_real_exit_codes __
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_command_logger_unique_paths_and_real_exit_codes>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ AtomicPublicationTests.test_crash_before_commit_leaves_no_visible_success ___
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_crash_before_commit_leaves_no_visible_success>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+______ AtomicPublicationTests.test_extra_file_after_commit_breaks_closure ______
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_extra_file_after_commit_breaks_closure>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_______ AtomicPublicationTests.test_publish_verify_and_refuse_duplicates _______
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_publish_verify_and_refuse_duplicates>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ AtomicPublicationTests.test_run_arm_publishes_atomically_with_real_verdict __
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_run_arm_publishes_atomically_with_real_verdict>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_________ AtomicPublicationTests.test_tampered_payload_breaks_closure __________
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_tampered_payload_breaks_closure>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+____________ GateMappingTests.test_only_a_real_witness_blocks_stop _____________
+
+self = <test_agent_m1_contract.GateMappingTests testMethod=test_only_a_real_witness_blocks_stop>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:907: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+__ GateMappingTests.test_sufficiency_maps_to_stop_with_metrics_not_evaluated ___
+
+self = <test_agent_m1_contract.GateMappingTests testMethod=test_sufficiency_maps_to_stop_with_metrics_not_evaluated>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_contract.py:907: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 contract chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 contract chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_contract.py:44: AssertionError
+_ ReducerScenarioSpaceTests.test_d_trace_enumeration_is_closed_under_the_action_graph _
+
+self = <test_agent_m1_reducer.ReducerScenarioSpaceTests testMethod=test_d_trace_enumeration_is_closed_under_the_action_graph>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+________ ReducerScenarioSpaceTests.test_declared_axes_are_fully_crossed ________
+
+self = <test_agent_m1_reducer.ReducerScenarioSpaceTests testMethod=test_declared_axes_are_fully_crossed>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+_ ReducerGateTests.test_full_reducer_proves_fixed_rule_sufficiency_or_reports_witness _
+
+self = <test_agent_m1_reducer.ReducerGateTests testMethod=test_full_reducer_proves_fixed_rule_sufficiency_or_reports_witness>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+___ ReducerGateTests.test_gate_maps_reducer_verdict_to_the_scientific_state ____
+
+self = <test_agent_m1_reducer.ReducerGateTests testMethod=test_gate_maps_reducer_verdict_to_the_scientific_state>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+______ ReducerGateTests.test_non_vacuity_control_detects_a_weak_b_policy _______
+
+self = <test_agent_m1_reducer.ReducerGateTests testMethod=test_non_vacuity_control_detects_a_weak_b_policy>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+_ ReducerGateTests.test_reducer_terminal_metric_covers_verdict_input_and_tool_trace _
+
+self = <test_agent_m1_reducer.ReducerGateTests testMethod=test_reducer_terminal_metric_covers_verdict_input_and_tool_trace>
+
+    def setUp(self):
+>       _require_m1()
+
+tests/test_agent_m1_reducer.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_m1():
+        if _M1_IMPORT_ERROR is not None:
+>           raise AssertionError(f"M1 reducer chain unavailable: {_M1_IMPORT_ERROR}")
+E           AssertionError: M1 reducer chain unavailable: cannot import name 'm1_actions' from 'forecasting.agent_forecasting' (/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5/forecasting/agent_forecasting/__init__.py)
+
+tests/test_agent_m1_reducer.py:29: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_m1_contract.py::IdentityPinningTests::test_config_pins_recompute_against_the_worktree
+FAILED tests/test_agent_m1_contract.py::IdentityPinningTests::test_import_guard_blocks_label_score_and_training_modules
+FAILED tests/test_agent_m1_contract.py::IdentityPinningTests::test_mutated_m0_file_refuses_before_any_action
+FAILED tests/test_agent_m1_contract.py::IdentityPinningTests::test_prompt_and_renderer_hashes_are_pinned_in_config
+FAILED tests/test_agent_m1_contract.py::IdentityPinningTests::test_withdrawal_semantics_declared_not_applicable
+FAILED tests/test_agent_m1_contract.py::ArmLeafDiffTests::test_c_one_call_envelope_equals_d_episode_envelope
+FAILED tests/test_agent_m1_contract.py::ArmLeafDiffTests::test_common_budget_vector_is_equal_across_arms_and_fully_charged
+FAILED tests/test_agent_m1_contract.py::ArmLeafDiffTests::test_leaf_diffs_equal_declared_whitelist
+FAILED tests/test_agent_m1_contract.py::ArmLeafDiffTests::test_shared_leaves_are_identical_across_arms
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_bcd_share_one_immutable_snapshot_identity
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_chain_and_body_binding_verified_before_any_clock_trust
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_duplicate_folds_to_earliest_and_fork_fails_closed
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_materialize_filters_before_parsing_and_accepts_any_iterable
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_newest_visible_only_and_omission_cannot_select_older_vintage
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_post_origin_receipts_and_forks_cannot_change_origin_identity
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_receipt_after_origin_is_invisible
+FAILED tests/test_agent_m1_contract.py::AsOfWrapperTests::test_relation_equal_origin_is_visible
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_exact_48_to_24_mapping_from_the_kernel
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_gap_drift_and_timeout_refuse_with_no_fallback
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_no_fabricated_same_semantic_history
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_region_mismatch_refuses_attach_as_identity_drift
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_series_identity_is_fetch_subset_independent
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_tool_boundary_rederives_and_rejects_forged_inputs
+FAILED tests/test_agent_m1_contract.py::TypedDerivationTests::test_value_mutation_with_fixed_body_hash_fails_closed
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_c_parser_accepts_only_the_two_decisions
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_cost_accounting_uses_frozen_rates_in_micro_usd
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_digest_fact_space_is_shared_between_c_and_d
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_digest_renderer_rejects_forbidden_facts
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_digest_renders_only_enums_bools_and_opaque_refs
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_function_call_envelope_is_accepted_strictly
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_parser_rejects_the_full_forbidden_zoo
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_request_bytes_use_the_frozen_prompts
+FAILED tests/test_agent_m1_contract.py::ActionRegistryTests::test_fetch_refuses_repeats_and_respects_the_two_get_cap
+FAILED tests/test_agent_m1_contract.py::ActionRegistryTests::test_four_proposal_cap_is_charged_and_a_terminal_fourth_is_legal
+FAILED tests/test_agent_m1_contract.py::ActionRegistryTests::test_state_machine_enums_and_terminal_absorption
+FAILED tests/test_agent_m1_contract.py::ActionRegistryTests::test_unknown_and_out_of_order_actions_have_zero_side_effects
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_deadline_miss_routes_to_system_missing_or_exact_base
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_every_cap_fails_at_cap_plus_one_with_no_side_effects
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_failure_matrix_retains_every_origin
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_ledger_fold_equals_reported_totals
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_overrun_forbids_typed_success
+FAILED tests/test_agent_m1_contract.py::BudgetDeadlineTests::test_reserve_without_settle_is_fully_consumed_and_tamper_detected
+FAILED tests/test_agent_m1_contract.py::COneShotTests::test_bad_json_timeout_or_requery_cannot_trigger_followup
+FAILED tests/test_agent_m1_contract.py::COneShotTests::test_retrieval_trace_is_independent_of_the_llm_output
+FAILED tests/test_agent_m1_contract.py::ByteIdenticalTerminalTests::test_bcd_same_decision_produces_identical_hashes
+FAILED tests/test_agent_m1_contract.py::ByteIdenticalTerminalTests::test_fallback_terminals_are_byte_identical_to_a
+FAILED tests/test_agent_m1_contract.py::SingleSinkTests::test_max_two_forecast_calls_enforced
+FAILED tests/test_agent_m1_contract.py::SingleSinkTests::test_output_bytes_are_published_unchanged_without_sorting_or_clipping
+FAILED tests/test_agent_m1_contract.py::SingleSinkTests::test_unique_input_forecast_once_and_second_call_refused
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_command_logger_unique_paths_and_real_exit_codes
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_crash_before_commit_leaves_no_visible_success
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_extra_file_after_commit_breaks_closure
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_publish_verify_and_refuse_duplicates
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_run_arm_publishes_atomically_with_real_verdict
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_tampered_payload_breaks_closure
+FAILED tests/test_agent_m1_contract.py::GateMappingTests::test_only_a_real_witness_blocks_stop
+FAILED tests/test_agent_m1_contract.py::GateMappingTests::test_sufficiency_maps_to_stop_with_metrics_not_evaluated
+FAILED tests/test_agent_m1_reducer.py::ReducerScenarioSpaceTests::test_d_trace_enumeration_is_closed_under_the_action_graph
+FAILED tests/test_agent_m1_reducer.py::ReducerScenarioSpaceTests::test_declared_axes_are_fully_crossed
+FAILED tests/test_agent_m1_reducer.py::ReducerGateTests::test_full_reducer_proves_fixed_rule_sufficiency_or_reports_witness
+FAILED tests/test_agent_m1_reducer.py::ReducerGateTests::test_gate_maps_reducer_verdict_to_the_scientific_state
+FAILED tests/test_agent_m1_reducer.py::ReducerGateTests::test_non_vacuity_control_detects_a_weak_b_policy
+FAILED tests/test_agent_m1_reducer.py::ReducerGateTests::test_reducer_terminal_metric_covers_verdict_input_and_tool_trace
+63 failed in 5.42s
+--- output end ---
+EXIT_CODE=1
