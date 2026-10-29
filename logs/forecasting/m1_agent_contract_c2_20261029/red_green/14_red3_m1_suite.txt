@@ -1,0 +1,523 @@
+=== run_logged_m1 id=14_red3_m1_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py -q
+git_head: 0861e42db108fb603ebae724331120d546a06240
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T15:14:28.256532Z
+end_utc: 2026-10-29T15:15:57.968228Z
+--- output begin ---
+........................................................................ [ 60%]
+..................FFFFFFFFFFFFFFFFFFF.FF.......                          [100%]
+=================================== FAILURES ===================================
+______ Audit3IdentityClosureTests.test_arms_declaration_mutation_refuses _______
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_arms_declaration_mutation_refuses>
+
+    def test_arms_declaration_mutation_refuses(self):
+        def mutate(config):
+            config["arms"]["D"].append("FREE_FORM_PYTHON")
+>       self._assert_config_mutation_refuses(
+            mutate, "the frozen arms declaration is identity")
+
+tests/test_agent_m1_contract.py:1674: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : the frozen arms declaration is identity
+____ Audit3IdentityClosureTests.test_branch_and_provenance_mutation_refuses ____
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_branch_and_provenance_mutation_refuses>
+
+    def test_branch_and_provenance_mutation_refuses(self):
+        def mutate(config):
+            config["branch"] = "research/somebody-else"
+            config["run_provenance_commit"] = "0" * 40
+>       self._assert_config_mutation_refuses(
+            mutate, "run ancestry (branch/base/provenance) is identity")
+
+tests/test_agent_m1_contract.py:1668: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : run ancestry (branch/base/provenance) is identity
+_ Audit3IdentityClosureTests.test_deadline_and_llm_cost_and_tool_binding_mutations_refuse _
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_deadline_and_llm_cost_and_tool_binding_mutations_refuse>
+
+    def test_deadline_and_llm_cost_and_tool_binding_mutations_refuse(self):
+        def mutate(config):
+            config["deadline"]["http_timeout_seconds"] = 999
+            config["llm_cost"]["rate_input_usd_per_million"] = 0.0
+            config["forecast_tool"]["calls_max"] = 99
+>       self._assert_config_mutation_refuses(
+            mutate, "deadline/llm_cost/forecast_tool bindings are identity")
+
+tests/test_agent_m1_contract.py:1682: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : deadline/llm_cost/forecast_tool bindings are identity
+_ Audit3IdentityClosureTests.test_deleted_execution_pin_refuses_instead_of_verifying _
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_deleted_execution_pin_refuses_instead_of_verifying>
+
+    def test_deleted_execution_pin_refuses_instead_of_verifying(self):
+        def mutate(config):
+            del config["execution_modules"]["files_sha256"][
+                "forecasting/agent_forecasting/m1_runtime.py"]
+>       self._assert_config_mutation_refuses(
+            mutate, "a deleted pin must be drift, not a silently unchecked file")
+
+tests/test_agent_m1_contract.py:1645: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : a deleted pin must be drift, not a silently unchecked file
+_ Audit3IdentityClosureTests.test_evidence_root_and_source_files_mutations_refuse _
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_evidence_root_and_source_files_mutations_refuse>
+
+    def test_evidence_root_and_source_files_mutations_refuse(self):
+        def mutate(config):
+            config["evidence_root"] = "logs/elsewhere"
+            config["source_files"].append("smuggled_file.py")
+>       self._assert_config_mutation_refuses(
+            mutate, "the evidence root and the frozen source-file list are identity")
+
+tests/test_agent_m1_contract.py:1689: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : the evidence root and the frozen source-file list are identity
+_________ Audit3IdentityClosureTests.test_extra_execution_pin_refuses __________
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_extra_execution_pin_refuses>
+
+    def test_extra_execution_pin_refuses(self):
+        def mutate(config):
+            # a REAL existing file outside the frozen surface: the pin hash
+            # itself is honest, only the keyset is smuggled
+            config["execution_modules"]["files_sha256"][
+                "tests/test_agent_m1_reducer.py"] = m1_contract.sha256_file(
+                    ROOT / "tests/test_agent_m1_reducer.py")
+>       self._assert_config_mutation_refuses(
+            mutate, "an extra pin is an undeclared execution-surface change")
+
+tests/test_agent_m1_contract.py:1655: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : an extra pin is an undeclared execution-surface change
+_ Audit3IdentityClosureTests.test_run_entry_binds_git_head_tree_and_config_bytes _
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_run_entry_binds_git_head_tree_and_config_bytes>
+
+    def test_run_entry_binds_git_head_tree_and_config_bytes(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+>       self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+E       AssertionError: unexpectedly None : audit-3/H1: the run entry must bind git HEAD, a tracked-clean tree and the config file's committed bytes
+
+tests/test_agent_m1_contract.py:1694: AssertionError
+____ Audit3IdentityClosureTests.test_run_entry_refuses_a_dirty_tracked_tree ____
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_run_entry_refuses_a_dirty_tracked_tree>
+
+    def test_run_entry_refuses_a_dirty_tracked_tree(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+>       self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+E       AssertionError: unexpectedly None : audit-3/H1: the run entry must bind git HEAD, a tracked-clean tree and the config file's committed bytes
+
+tests/test_agent_m1_contract.py:1706: AssertionError
+____ Audit3IdentityClosureTests.test_run_entry_refuses_edited_config_bytes _____
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_run_entry_refuses_edited_config_bytes>
+
+    def test_run_entry_refuses_edited_config_bytes(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+>       self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+E       AssertionError: unexpectedly None : audit-3/H1: the run entry must bind git HEAD, a tracked-clean tree and the config file's committed bytes
+
+tests/test_agent_m1_contract.py:1720: AssertionError
+____ Audit3IdentityClosureTests.test_source_contract_field_mutation_refuses ____
+
+self = <test_agent_m1_contract.Audit3IdentityClosureTests testMethod=test_source_contract_field_mutation_refuses>
+
+    def test_source_contract_field_mutation_refuses(self):
+        def mutate(config):
+            config["source_contract"]["unit"] = "BANANAS"
+>       self._assert_config_mutation_refuses(
+            mutate, "the frozen source contract (unit/region/field) is identity")
+
+tests/test_agent_m1_contract.py:1661: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:1636: in _assert_config_mutation_refuses
+    with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+E   AssertionError: M1IdentityDrift not raised : the frozen source contract (unit/region/field) is identity
+_ Audit3AsOfBoundaryTests.test_arm_a_completes_when_receipt_structure_is_corrupt _
+
+self = <test_agent_m1_contract.Audit3AsOfBoundaryTests testMethod=test_arm_a_completes_when_receipt_structure_is_corrupt>
+
+    def test_arm_a_completes_when_receipt_structure_is_corrupt(self):
+        snapshot = _clean_snapshot()
+        stripped = tuple(
+            {key: value for key, value in event.items() if key != "ref"}
+            for event in snapshot["events"])
+        snapshot["events"] = stripped
+        try:
+>           result = _run("A", snapshot)
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1746: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:467: in run_arm
+    snapshot = M1SourceSnapshot.from_mapping(snapshot_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:202: in from_mapping
+    return cls(snapshot_id=data["snapshot_id"], origin_unix=data["origin_unix"],
+forecasting/agent_forecasting/m1_runtime.py:198: in __init__
+    self._event_by_ref = {event["ref"]: event for event in self.events}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <tuple_iterator object at 0x7f2e0b641ea0>
+
+>   self._event_by_ref = {event["ref"]: event for event in self.events}
+                          ^^^^^^^^^^^^
+E   KeyError: 'ref'
+
+forecasting/agent_forecasting/m1_runtime.py:198: KeyError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_m1_contract.Audit3AsOfBoundaryTests testMethod=test_arm_a_completes_when_receipt_structure_is_corrupt>
+
+    def test_arm_a_completes_when_receipt_structure_is_corrupt(self):
+        snapshot = _clean_snapshot()
+        stripped = tuple(
+            {key: value for key, value in event.items() if key != "ref"}
+            for event in snapshot["events"])
+        snapshot["events"] = stripped
+        try:
+            result = _run("A", snapshot)
+        except Exception as error:  # noqa: BLE001 - the failure IS the finding
+>           self.fail(f"arm A must not read the receipt chain: {error!r}")
+E           AssertionError: arm A must not read the receipt chain: KeyError('ref')
+
+tests/test_agent_m1_contract.py:1748: AssertionError
+_ Audit3AsOfBoundaryTests.test_derive_typed_evidence_rejects_unchained_caller_events _
+
+self = <test_agent_m1_contract.Audit3AsOfBoundaryTests testMethod=test_derive_typed_evidence_rejects_unchained_caller_events>
+
+    def test_derive_typed_evidence_rejects_unchained_caller_events(self):
+        snapshot = _two_ref_snapshot()
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        stripped = tuple(
+            {key: value for key, value in event.items()
+             if key not in ("chain_seq", "prev_sha256", "event_sha256")}
+            for event in visible)
+        fetch = _fetch_records_for(snapshot, visible)
+>       with self.assertRaises(m1_asof.M1TypedRejection) as ctx:
+E       AssertionError: M1TypedRejection not raised
+
+tests/test_agent_m1_contract.py:1761: AssertionError
+_ Audit3AsOfBoundaryTests.test_post_origin_corruption_preserves_earlier_origin _
+
+self = <test_agent_m1_contract.Audit3AsOfBoundaryTests testMethod=test_post_origin_corruption_preserves_earlier_origin>
+
+    def test_post_origin_corruption_preserves_earlier_origin(self):
+        base = _two_ref_snapshot()
+        events = [dict(event) for event in base["events"]]
+        extra = dict(events[-1])
+        extra.update({"ref": harness.opaque_ref("POST_ORIGIN_CORRUPT.zip"),
+                      "filename": "POST_ORIGIN_CORRUPT.zip",
+                      "receipt_complete_unix_ceil": harness.ORIGIN_UNIX + 600,
+                      "chain_seq": len(events),
+                      "prev_sha256": events[-1]["event_sha256"],
+                      "event_sha256": "0" * 64})  # corrupt: never recomputes
+        chained = tuple(events) + (extra,)
+        try:
+>           visible_late = m1_asof.materialize_visible_events(
+                chained, harness.ORIGIN_UNIX)
+
+tests/test_agent_m1_contract.py:1783: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+forecasting/agent_forecasting/m1_asof.py:125: in materialize_visible_events
+    verify_event_chain(records)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+events = ({'event': 'body_complete', 'ref': 'v_0146d84fffabcbef', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_202201032200_2...e': 'POST_ORIGIN_CORRUPT.zip', 'body_sha256': 'cc6e276a6f0eec8656d6c573f76e3721d3361c5d0d9cc1ab70e882d5499d580e', ...})
+
+    def verify_event_chain(events: Iterable[Mapping]) -> None:
+        """Verify append-only sequencing and every event hash before any clock is used."""
+        records = tuple(events)
+        prev = "0" * 64
+        seen_seq = -1
+        for record in records:
+            if record.get("event") != "body_complete":
+                raise ValueError("receipt chain carries an unknown event kind")
+            if record.get("chain_seq") != seen_seq + 1:
+                raise ValueError("receipt chain is not append-only sequential")
+            if record.get("prev_sha256") != prev:
+                raise ValueError("receipt chain prev hash mismatch")
+            payload = {key: value for key, value in record.items()
+                       if key != "event_sha256"}
+            expected = hashlib.sha256(
+                (json.dumps(payload, sort_keys=True, separators=(",", ":")) + prev)
+                .encode()).hexdigest()
+            if record.get("event_sha256") != expected:
+>               raise ValueError("receipt event hash mismatch")
+E               ValueError: receipt event hash mismatch
+
+forecasting/agent_forecasting/m1_asof.py:104: ValueError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_m1_contract.Audit3AsOfBoundaryTests testMethod=test_post_origin_corruption_preserves_earlier_origin>
+
+    def test_post_origin_corruption_preserves_earlier_origin(self):
+        base = _two_ref_snapshot()
+        events = [dict(event) for event in base["events"]]
+        extra = dict(events[-1])
+        extra.update({"ref": harness.opaque_ref("POST_ORIGIN_CORRUPT.zip"),
+                      "filename": "POST_ORIGIN_CORRUPT.zip",
+                      "receipt_complete_unix_ceil": harness.ORIGIN_UNIX + 600,
+                      "chain_seq": len(events),
+                      "prev_sha256": events[-1]["event_sha256"],
+                      "event_sha256": "0" * 64})  # corrupt: never recomputes
+        chained = tuple(events) + (extra,)
+        try:
+            visible_late = m1_asof.materialize_visible_events(
+                chained, harness.ORIGIN_UNIX)
+        except ValueError as error:
+>           self.fail("a corrupt post-origin receipt must not fail an earlier "
+                      f"origin: {error}")
+E           AssertionError: a corrupt post-origin receipt must not fail an earlier origin: receipt event hash mismatch
+
+tests/test_agent_m1_contract.py:1786: AssertionError
+_ Audit3FailureMappingTests.test_c_transport_internal_failure_maps_to_a_frozen_reason _
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_c_transport_internal_failure_maps_to_a_frozen_reason>
+
+    def test_c_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+>           result = _run("C", _clean_snapshot(), transport=transport)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1818: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:746: in run_arm
+    response = transport.generate("C", 1, request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests.ExplodingTransport object at 0x7f2e0b6fedd0>
+arm = 'C', turn = 1
+request_bytes = b'{"input":"arm=C\\ncontract_id=m1.agent_contract.c2.v1\\nThe controller has already executed the frozen maximal fixed...n","sha256":"caf59c8837aa7e453a306f10eefacd3efe19871a4de0efe99eac500535a2fd7e"},"store":false,"truncation":"disabled"}'
+
+    def generate(self, arm, turn, request_bytes):
+        self.calls += 1
+>       raise RuntimeError("adapter exploded")
+E       RuntimeError: adapter exploded
+
+tests/test_agent_m1_contract.py:1813: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_c_transport_internal_failure_maps_to_a_frozen_reason>
+
+    def test_c_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+            result = _run("C", _clean_snapshot(), transport=transport)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+>           self.fail(f"a transport-internal failure must map to a frozen "
+                      f"reason, never escape: {error!r}")
+E           AssertionError: a transport-internal failure must map to a frozen reason, never escape: RuntimeError('adapter exploded')
+
+tests/test_agent_m1_contract.py:1820: AssertionError
+_ Audit3FailureMappingTests.test_d_transport_internal_failure_maps_to_a_frozen_reason _
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_d_transport_internal_failure_maps_to_a_frozen_reason>
+
+    def test_d_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+>           result = _run("D", _clean_snapshot(), transport=transport)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1830: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:801: in run_arm
+    response = transport.generate("D", turn, request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests.ExplodingTransport object at 0x7f2e0b7201d0>
+arm = 'D', turn = 1
+request_bytes = b'{"input":"arm=D\\ncontract_id=m1.agent_contract.c2.v1\\nSTATE_DIGEST_JSON={\\"arm\\":\\"D\\",\\"budget\\":{\\"eviden...n","sha256":"1995e22f7f15ef7a3df4644e3a78fbcd3610427607c004388024cea0ecc150a6"},"store":false,"truncation":"disabled"}'
+
+    def generate(self, arm, turn, request_bytes):
+        self.calls += 1
+>       raise RuntimeError("adapter exploded")
+E       RuntimeError: adapter exploded
+
+tests/test_agent_m1_contract.py:1813: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_d_transport_internal_failure_maps_to_a_frozen_reason>
+
+    def test_d_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+            result = _run("D", _clean_snapshot(), transport=transport)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+>           self.fail(f"a transport-internal failure must map to a frozen "
+                      f"reason, never escape: {error!r}")
+E           AssertionError: a transport-internal failure must map to a frozen reason, never escape: RuntimeError('adapter exploded')
+
+tests/test_agent_m1_contract.py:1832: AssertionError
+_ Audit3FailureMappingTests.test_missing_fetch_behaviour_maps_to_a_frozen_reason _
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_missing_fetch_behaviour_maps_to_a_frozen_reason>
+
+    def test_missing_fetch_behaviour_maps_to_a_frozen_reason(self):
+        snapshot = _clean_snapshot()
+        victim = snapshot["listing"][0]["ref"]
+        del snapshot["fetch_behaviours"][victim]
+        try:
+>           result = _run("B", snapshot)
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1843: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:713: in run_arm
+    _fetch(ref)
+forecasting/agent_forecasting/m1_runtime.py:496: in _fetch
+    behaviour, body = snapshot.fetch(ref)  # the effect, after every reserve
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <forecasting.agent_forecasting.m1_runtime.M1SourceSnapshot object at 0x7f2e0b3c9590>
+ref = 'v_f9ff2be7410e01fd'
+
+    def fetch(self, ref: str) -> tuple[str, Optional[bytes]]:
+>       behaviour = self._behaviours[ref]
+                    ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'v_f9ff2be7410e01fd'
+
+forecasting/agent_forecasting/m1_runtime.py:211: KeyError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_m1_contract.Audit3FailureMappingTests testMethod=test_missing_fetch_behaviour_maps_to_a_frozen_reason>
+
+    def test_missing_fetch_behaviour_maps_to_a_frozen_reason(self):
+        snapshot = _clean_snapshot()
+        victim = snapshot["listing"][0]["ref"]
+        del snapshot["fetch_behaviours"][victim]
+        try:
+            result = _run("B", snapshot)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+>           self.fail(f"a replay adapter that omits a declared ref's behaviour "
+                      f"must map to a frozen reason, never escape: {error!r}")
+E           AssertionError: a replay adapter that omits a declared ref's behaviour must map to a frozen reason, never escape: KeyError('v_f9ff2be7410e01fd')
+
+tests/test_agent_m1_contract.py:1845: AssertionError
+_ Audit3PublicationIdentityTests.test_forecast_bytes_must_rebind_to_exactly_one_trace_entry _
+
+self = <test_agent_m1_contract.Audit3PublicationIdentityTests testMethod=test_forecast_bytes_must_rebind_to_exactly_one_trace_entry>
+
+    def test_forecast_bytes_must_rebind_to_exactly_one_trace_entry(self):
+        closure, payloads = self._real_archives()
+        payloads["forecast.bin"] = payloads["forecast.bin"] + b"x"
+>       with self.assertRaises(m1_publication.PublicationError):
+E       AssertionError: PublicationError not raised
+
+tests/test_agent_m1_contract.py:1909: AssertionError
+_ Audit3PublicationIdentityTests.test_forged_canonical_input_identity_refuses_publication _
+
+self = <test_agent_m1_contract.Audit3PublicationIdentityTests testMethod=test_forged_canonical_input_identity_refuses_publication>
+
+    def test_forged_canonical_input_identity_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        closure["canonical_model_input_sha256"] = "e" * 64
+>       with self.assertRaises(m1_publication.PublicationError):
+E       AssertionError: PublicationError not raised
+
+tests/test_agent_m1_contract.py:1897: AssertionError
+_ Audit3PublicationIdentityTests.test_forged_tool_identity_refuses_publication _
+
+self = <test_agent_m1_contract.Audit3PublicationIdentityTests testMethod=test_forged_tool_identity_refuses_publication>
+
+    def test_forged_tool_identity_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        closure["tool_identity_sha256"] = "f" * 64
+>       with self.assertRaises(m1_publication.PublicationError):
+E       AssertionError: PublicationError not raised
+
+tests/test_agent_m1_contract.py:1891: AssertionError
+_ Audit3PublicationIdentityTests.test_inflated_self_reported_caps_refuse_publication _
+
+self = <test_agent_m1_contract.Audit3PublicationIdentityTests testMethod=test_inflated_self_reported_caps_refuse_publication>
+
+    def test_inflated_self_reported_caps_refuse_publication(self):
+        closure, payloads = self._real_archives()
+        caps = dict(closure["budget_caps"])
+        caps["LLM_INPUT_TOKENS"] = caps["LLM_INPUT_TOKENS"] + 1
+        closure["budget_caps"] = caps
+>       with self.assertRaises(m1_publication.PublicationError):
+E       AssertionError: PublicationError not raised
+
+tests/test_agent_m1_contract.py:1885: AssertionError
+_ Audit3PublicationIdentityTests.test_missing_model_ledger_refuses_publication _
+
+self = <test_agent_m1_contract.Audit3PublicationIdentityTests testMethod=test_missing_model_ledger_refuses_publication>
+
+    def test_missing_model_ledger_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        del payloads["model_ledger.jsonl"]
+>       with self.assertRaises(m1_publication.PublicationError):
+E       AssertionError: PublicationError not raised
+
+tests/test_agent_m1_contract.py:1903: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_arms_declaration_mutation_refuses
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_branch_and_provenance_mutation_refuses
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_deadline_and_llm_cost_and_tool_binding_mutations_refuse
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_deleted_execution_pin_refuses_instead_of_verifying
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_evidence_root_and_source_files_mutations_refuse
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_extra_execution_pin_refuses
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_run_entry_binds_git_head_tree_and_config_bytes
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_run_entry_refuses_a_dirty_tracked_tree
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_run_entry_refuses_edited_config_bytes
+FAILED tests/test_agent_m1_contract.py::Audit3IdentityClosureTests::test_source_contract_field_mutation_refuses
+FAILED tests/test_agent_m1_contract.py::Audit3AsOfBoundaryTests::test_arm_a_completes_when_receipt_structure_is_corrupt
+FAILED tests/test_agent_m1_contract.py::Audit3AsOfBoundaryTests::test_derive_typed_evidence_rejects_unchained_caller_events
+FAILED tests/test_agent_m1_contract.py::Audit3AsOfBoundaryTests::test_post_origin_corruption_preserves_earlier_origin
+FAILED tests/test_agent_m1_contract.py::Audit3FailureMappingTests::test_c_transport_internal_failure_maps_to_a_frozen_reason
+FAILED tests/test_agent_m1_contract.py::Audit3FailureMappingTests::test_d_transport_internal_failure_maps_to_a_frozen_reason
+FAILED tests/test_agent_m1_contract.py::Audit3FailureMappingTests::test_missing_fetch_behaviour_maps_to_a_frozen_reason
+FAILED tests/test_agent_m1_contract.py::Audit3PublicationIdentityTests::test_forecast_bytes_must_rebind_to_exactly_one_trace_entry
+FAILED tests/test_agent_m1_contract.py::Audit3PublicationIdentityTests::test_forged_canonical_input_identity_refuses_publication
+FAILED tests/test_agent_m1_contract.py::Audit3PublicationIdentityTests::test_forged_tool_identity_refuses_publication
+FAILED tests/test_agent_m1_contract.py::Audit3PublicationIdentityTests::test_inflated_self_reported_caps_refuse_publication
+FAILED tests/test_agent_m1_contract.py::Audit3PublicationIdentityTests::test_missing_model_ledger_refuses_publication
+21 failed, 98 passed in 88.41s (0:01:28)
+--- output end ---
+EXIT_CODE=1

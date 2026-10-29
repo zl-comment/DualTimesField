@@ -1,0 +1,13 @@
+=== run_logged_m1 id=16_green3b_full_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py -q
+git_head: b6e36238d9845a5393a4d4c12874f7834453e6fb
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T15:58:41.170012Z
+end_utc: 2026-10-29T16:09:29.524938Z
+--- output begin ---
+....................................................... [ 29%]
+........................................................................ [ 67%]
+..............................................................           [100%]
+189 passed, 89 subtests passed in 646.85s (0:10:46)
+--- output end ---
+EXIT_CODE=0
