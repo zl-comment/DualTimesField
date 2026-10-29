@@ -89,14 +89,24 @@ class BudgetLedger:
         return record
 
     # -- admission control ------------------------------------------------
-    def reserve(self, budget_class: BudgetClass, amount: int, note: str = "") -> int:
+    def reserve(self, budget_class: BudgetClass, amount: int, note: str = "",
+                *, standalone: bool = False) -> int:
+        """Reserve before any effect; refusal appends a REFUSE record first.
+
+        ``standalone`` admits each amount against the cap alone, without
+        cross-amount accumulation: used for the per-body byte cap, where every
+        body is checked on its own (accumulating bodies would silently shrink
+        the per-body limit as bodies are fetched).
+        """
         if not isinstance(amount, int) or amount < 0:
             raise ValueError("reserve amount must be a nonnegative integer")
         cap = self.caps[budget_class]
         committed = self._committed[budget_class] + sum(self._open[budget_class].values())
-        if committed + amount > cap:
+        breach = amount > cap if standalone else committed + amount > cap
+        if breach:
             self._append({"cls": budget_class.name, "op": "REFUSE", "amount": amount,
-                          "committed_after": committed, "note": note})
+                          "committed_after": committed,
+                          "note": f"{note} standalone" if standalone else note})
             raise BudgetRefused(budget_class, cap, amount)
         entry = self._append({"cls": budget_class.name, "op": "RESERVE",
                               "amount": amount, "committed_after": committed + amount,
@@ -158,13 +168,31 @@ class BudgetLedger:
 
     @classmethod
     def from_entries(cls, entries: list[dict]) -> "BudgetLedger":
+        """Rebuild ONLY from an archive whose own hash chain verifies verbatim.
+
+        The archived seq/prev/sha256 values are checked exactly as recorded: a
+        tampered entry can never be silently re-chained into a new valid ledger
+        (audit-2: rebuilding fresh hashes would launder the archive).
+        """
         ledger = cls()
         ledger.entries = []
         ledger._head = "0" * 64
-        for raw in entries:
+        prev = "0" * 64
+        for expected_seq, raw in enumerate(entries):
+            if raw.get("seq") != expected_seq:
+                raise ValueError(
+                    f"budget ledger archive is not sequential at {expected_seq}")
+            if raw.get("prev") != prev:
+                raise ValueError(
+                    f"budget ledger archive prev hash mismatch at {expected_seq}")
+            payload = {key: value for key, value in raw.items()
+                       if key != "sha256"}
+            if raw.get("sha256") != _entry_hash(payload):
+                raise ValueError(
+                    f"budget ledger archive entry hash mismatch at {expected_seq}")
             entry = dict(raw)
-            ledger._append({key: value for key, value in entry.items()
-                            if key not in ("seq", "prev", "sha256")})
+            ledger.entries.append(entry)
+            ledger._head = entry["sha256"]
             budget_class = BudgetClass[entry["cls"]]
             if entry["op"] == "RESERVE":
                 ledger._open[budget_class][entry["seq"]] = entry["amount"]
@@ -174,6 +202,12 @@ class BudgetLedger:
                     if entry["amount"] > reserved:
                         ledger._overrun.add(budget_class)
                 ledger._committed[budget_class] += entry["amount"]
-        # recompute committed_after consistency is implicit; the chain verifies bytes
+            prev = entry["sha256"]
         ledger.verify_chain()
         return ledger
+
+    def max_reserved(self, budget_class: BudgetClass) -> int:
+        """The largest single RESERVE amount ever admitted for one class."""
+        return max((entry["amount"] for entry in self.entries
+                    if entry["cls"] == budget_class.name
+                    and entry["op"] == "RESERVE"), default=0)

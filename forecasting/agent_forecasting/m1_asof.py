@@ -15,7 +15,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Optional
 
 from . import m1_contract
 from .contracts import FrozenForecastInput, object_hash
@@ -60,6 +60,10 @@ class M1TypedEvidence:
     selected: dict
     publication_basis: str
     strict_asof: str
+    # the kernel derivation inputs: typed_input re-derives the tensor from these
+    # raw bytes and rejects any evidence whose claims do not recompute exactly
+    derivation_events: tuple = ()
+    derivation_fetch: Optional["M1FetchRecord"] = None
 
 
 def chain_events(events: Iterable[Mapping]) -> tuple[dict, ...]:
@@ -174,20 +178,41 @@ def derive_typed_evidence(origin_unix: int,
         earliest.values(),
         key=lambda record: _vintage_key(record["seqno"], record["runno"]))
     # resolve the in-run validation by BODY, not by ref: a duplicate republication
-    # of the same body may have been fetched through either of its refs
-    fetch = next((record for record in fetch_records.values()
-                  if record.body_sha256 == newest_event["body_sha256"]), None)
-    if fetch is None:
+    # of the same body may have been fetched through either of its refs.  Among
+    # the fetched mirrors of the newest body, any byte-validated fetch wins —
+    # a dead mirror must not veto a live one — and the choice is deterministic
+    # and independent of fetch order.
+    candidates = sorted(
+        (record for record in fetch_records.values()
+         if record.body_sha256 == newest_event["body_sha256"]),
+        key=lambda record: (record.ref, record.filename))
+    if not candidates:
         raise M1TypedRejection(
             "ACTION_PRECONDITION",
             f"the newest visible vintage {newest_event['seqno']}/"
             f"{newest_event['runno']} was never fetched and validated in-run")
-    if fetch.behaviour == "TIMEOUT":
-        raise M1TypedRejection("HTTP_TIMEOUT", fetch.ref)
-    if fetch.behaviour == "NOT_FOUND":
-        raise M1TypedRejection("HTTP_STATUS", fetch.ref)
-    if fetch.raw_body is None:
-        raise M1TypedRejection("SCHEMA_DRIFT", "no body bytes to validate")
+    byte_validated = [
+        record for record in candidates
+        if record.raw_body is not None and hashlib.sha256(
+            record.raw_body).hexdigest() == newest_event["body_sha256"]]
+    if byte_validated:
+        fetch = byte_validated[0]
+    elif any(record.behaviour == "TIMEOUT" for record in candidates):
+        raise M1TypedRejection(
+            "HTTP_TIMEOUT",
+            min(record.ref for record in candidates
+                if record.behaviour == "TIMEOUT"))
+    elif any(record.behaviour == "NOT_FOUND" for record in candidates):
+        raise M1TypedRejection(
+            "HTTP_STATUS",
+            min(record.ref for record in candidates
+                if record.behaviour == "NOT_FOUND"))
+    else:
+        with_bytes = [record for record in candidates
+                      if record.raw_body is not None]
+        if not with_bytes:
+            raise M1TypedRejection("SCHEMA_DRIFT", "no body bytes to validate")
+        fetch = with_bytes[0]
     actual_digest = hashlib.sha256(fetch.raw_body).hexdigest()
     if actual_digest != newest_event["body_sha256"] or actual_digest != fetch.body_sha256:
         raise M1TypedRejection("BODY_HASH_MISMATCH", fetch.ref)
@@ -195,8 +220,12 @@ def derive_typed_evidence(origin_unix: int,
         # M1 exercises synthetic/protocol probe replay only: the honest basis is the
         # synthetic fixture builder and can never claim first-seen strictness.  The
         # basis is granted by the frozen builder from the raw bytes, never chosen.
+        # The receipt is anchored at the EARLIEST VISIBLE receipt of the selected
+        # body (never at the fetched mirror's own clock, which may be post-origin
+        # for a late republication of the same pre-origin body).
+        anchor = earliest[newest_event["body_sha256"]]
         receipt = synthetic_receipt_from_raw_body(
-            fetch.raw_body, fetch.receipt_complete_unix_ceil, fetch.filename)
+            fetch.raw_body, anchor["receipt_complete_unix_ceil"], anchor["filename"])
     except ValueError:
         raise M1TypedRejection(
             "SCHEMA_DRIFT", f"raw bytes of {fetch.ref} failed the frozen parser") from None
@@ -242,12 +271,42 @@ def derive_typed_evidence(origin_unix: int,
         publication_basis=receipt.basis,
         strict_asof=(STRICT_ASOF_VERIFIED if receipt.basis == REAL_BASIS
                      else SYNTHETIC_STATUS),
+        derivation_events=tuple(visible_events),
+        derivation_fetch=fetch,
     )
+
+
+def verify_typed_evidence(evidence: "M1TypedEvidence") -> "M1TypedEvidence":
+    """Re-derive the tensor from the carried raw bytes; reject any mismatch.
+
+    The Python/tool boundary cannot inject numbers: a hand-built or edited
+    M1TypedEvidence must recompute every claimed field from its own derivation
+    inputs (visible ledger + selected raw body) or be refused.
+    """
+    if not isinstance(evidence, M1TypedEvidence):
+        raise BaseBoundaryError("CONTRACT_IDENTITY_DRIFT",
+                                "typed evidence must be kernel evidence")
+    if not evidence.derivation_events or evidence.derivation_fetch is None:
+        raise BaseBoundaryError(
+            "CONTRACT_IDENTITY_DRIFT",
+            "typed evidence carries no kernel derivation inputs")
+    rederived = derive_typed_evidence(
+        evidence.origin_unix, tuple(evidence.derivation_events),
+        {evidence.derivation_fetch.ref: evidence.derivation_fetch})
+    for name in ("origin_unix", "values", "per_point", "series_hash",
+                 "visible_ledger_hash", "selected", "publication_basis",
+                 "strict_asof"):
+        if getattr(rederived, name) != getattr(evidence, name):
+            raise BaseBoundaryError(
+                "CONTRACT_IDENTITY_DRIFT",
+                f"typed evidence field {name} failed kernel re-derivation")
+    return rederived
 
 
 def typed_input(base: FrozenForecastInput,
                 evidence: M1TypedEvidence) -> FrozenForecastInput:
     """Attach the kernel-derived tensor; the base boundary is enforced here."""
+    verify_typed_evidence(evidence)
     if not isinstance(base, FrozenForecastInput):
         raise BaseBoundaryError("CONTRACT_IDENTITY_DRIFT", "base must be frozen input")
     if base.metadata.get("region") != REGION:

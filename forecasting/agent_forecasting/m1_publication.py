@@ -2,12 +2,15 @@
 
 A result is visible ONLY when an immutable final directory contains a valid
 COMMIT.json whose manifest hash and full bidirectional inventory reverify.  The
-publisher: takes an exclusive per-run lock and refuses a committed identity;
-creates a same-filesystem O_EXCL staging directory; writes every payload and
-fsyncs it; generates a per-payload SHA-256/size manifest; re-verifies everything
-on disk; atomically renames staging to the final directory; and finally renames
-COMMIT.json.tmp -> COMMIT.json as the LAST evidence-root write.  Any crash before
-that point leaves no success.  Failure records use a separate O_EXCL directory.
+publisher: verifies the SEMANTIC closure (budget chain/fold/caps, deadline,
+as-of origin, input/tool identity) BEFORE writing anything; takes an exclusive
+per-run lock and refuses a committed identity; creates a same-filesystem O_EXCL
+staging directory; writes every payload and fsyncs it; generates a per-payload
+SHA-256/size manifest; re-verifies everything on disk; atomically renames
+staging to the final directory; and finally renames COMMIT.json.tmp ->
+COMMIT.json as the LAST evidence-root write.  Any crash before that point
+removes its own staging directory and lock and leaves no success.  Failure
+records use a separate O_EXCL directory.
 """
 from __future__ import annotations
 
@@ -15,11 +18,19 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import time
 from pathlib import Path
 from typing import Mapping
 
+from . import m1_budget, m1_contract
+
 _RUN_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
+_HEX64_RE = re.compile(r"[0-9a-f]{64}\Z")
+_CLOSURE_KEYS = frozenset({
+    "origin_unix", "deadline_unix", "clock_final", "budget_fold", "budget_caps",
+    "budget_chain_ok", "tool_identity_sha256", "input_hash",
+    "canonical_model_input_sha256"})
 
 
 class PublicationError(Exception):
@@ -55,8 +66,77 @@ def _write_exclusive(path: Path, payload: bytes) -> None:
         os.close(handle)
 
 
+def verify_publication_closure(closure: Mapping, payloads: Mapping[str, bytes]) -> dict:
+    """Semantic gate BEFORE any write: budget chain/fold/caps, deadline, identity.
+
+    Byte closure alone is not success: a run may only be published when its own
+    archived budget ledger re-verifies verbatim, its fold respects every cap
+    (the per-body byte cap is checked per largest single body), the final clock
+    is within the deadline, and the as-of origin/input/tool identities are
+    carried and consistent with the archived result record.
+    """
+    if not isinstance(closure, Mapping) or set(closure) != set(_CLOSURE_KEYS):
+        raise PublicationError(
+            "publication closure must carry exactly "
+            f"{sorted(_CLOSURE_KEYS)}, got {sorted(closure) if isinstance(closure, Mapping) else type(closure)!r}")
+    for key in ("tool_identity_sha256", "input_hash",
+                "canonical_model_input_sha256"):
+        if not _HEX64_RE.fullmatch(str(closure[key] or "")):
+            raise PublicationError(f"closure {key} is not a sha256 hex digest")
+    origin = closure["origin_unix"]
+    deadline = closure["deadline_unix"]
+    if not isinstance(origin, int) or not isinstance(deadline, int):
+        raise PublicationError("closure origin/deadline must be integers")
+    if deadline != origin + m1_contract.DEADLINE_OFFSET:
+        raise PublicationError(
+            f"closure deadline {deadline} is not origin+{m1_contract.DEADLINE_OFFSET}")
+    if closure["clock_final"] > deadline:
+        raise PublicationError(
+            f"closure clock {closure['clock_final']} missed the deadline {deadline}")
+    if closure["budget_chain_ok"] is not True:
+        raise PublicationError("closure budget chain did not verify")
+    ledger_payload = payloads.get("budget_ledger.jsonl")
+    if ledger_payload is None:
+        raise PublicationError("a publication must archive its budget ledger")
+    try:
+        entries = [json.loads(line) for line in ledger_payload.splitlines()
+                   if line.strip()]
+        ledger = m1_budget.BudgetLedger.from_entries(entries)
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise PublicationError(f"archived budget ledger is invalid: {exc}") from exc
+    fold = {cls.name: value for cls, value in ledger.fold().items()}
+    if fold != {str(k): int(v) for k, v in closure["budget_fold"].items()}:
+        raise PublicationError("closure budget fold disagrees with the archive")
+    caps = {str(k): int(v) for k, v in closure["budget_caps"].items()}
+    if set(fold) != set(caps):
+        raise PublicationError("closure budget class set drifted")
+    per_body = m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY.name
+    for name, value in sorted(fold.items()):
+        cap = caps[name]
+        if name == per_body:
+            if ledger.max_reserved(
+                    m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY) > cap:
+                raise PublicationError(
+                    "a single body exceeded the per-body byte cap")
+        elif value > cap:
+            raise PublicationError(
+                f"budget fold for {name} ({value}) exceeds its cap ({cap})")
+    record = payloads.get("result.json")
+    if record is None:
+        raise PublicationError("a publication must archive its result record")
+    try:
+        archived = json.loads(record)
+    except json.JSONDecodeError as exc:
+        raise PublicationError(f"result.json is not JSON: {exc}") from exc
+    if archived.get("origin_unix") != origin:
+        raise PublicationError("closure as-of origin disagrees with result.json")
+    if archived.get("input_hash") not in (None, closure["input_hash"]):
+        raise PublicationError("closure input identity disagrees with result.json")
+    return {"closure": dict(closure), "budget_fold": fold}
+
+
 def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
-                identity: Mapping) -> Path:
+                identity: Mapping, closure: Mapping) -> Path:
     """Atomically publish one run; returns the immutable final directory."""
     root = Path(root)
     if not _RUN_ID_RE.fullmatch(run_id or ""):
@@ -67,6 +147,7 @@ def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
         if not _RUN_ID_RE.fullmatch(name) or "/" in name or name in (
                 "manifest.json", "COMMIT.json", "COMMIT.json.tmp"):
             raise PublicationError(f"payload name {name!r} is not allowed")
+    semantic = verify_publication_closure(closure, payloads)
     runs = root / "runs"
     locks = root / "locks"
     staging_root = root / "staging"
@@ -81,6 +162,7 @@ def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
             f"run identity {run_id!r} exists without COMMIT; refusing to overwrite")
     lock = locks / f"{run_id}.lock"
     lock_handle = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+    staging: Path | None = None
     try:
         staging = staging_root / f"{run_id}.{os.getpid()}.{time.time_ns():x}"
         staging.mkdir(parents=True, exist_ok=False)
@@ -91,7 +173,7 @@ def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
             manifest_payloads[name] = {"sha256": _sha256_bytes(payload),
                                        "size_bytes": len(payload)}
         manifest = {"run_id": run_id, "identity": dict(identity),
-                    "payloads": manifest_payloads}
+                    "payloads": manifest_payloads, **semantic}
         _write_exclusive(staging / "manifest.json",
                          json.dumps(manifest, sort_keys=True,
                                     separators=(",", ":")).encode())
@@ -116,8 +198,17 @@ def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
         _fsync_dir(final)
         _fsync_dir(runs)
         return final
+    except BaseException:
+        # a crash anywhere inside the publisher removes its own staging tree
+        if staging is not None and staging.exists():
+            shutil.rmtree(staging, ignore_errors=True)
+        raise
     finally:
         os.close(lock_handle)
+        try:
+            os.unlink(lock)
+        except FileNotFoundError:
+            pass
 
 
 def verify_run_closure(final_dir: Path | str) -> dict:

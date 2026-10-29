@@ -1,48 +1,100 @@
 #!/usr/bin/env python3
 """Verify M1 evidence closure from OUTSIDE the evidence root.
 
-Checks: every commands.jsonl record has a unique id and an existing log whose tail
-carries the same real EXIT_CODE; every published run directory under runs/ passes
-bidirectional manifest/COMMIT closure; no orphan staging remains; no success
-artifact was amended after COMMIT.
+Checks (audit-2): every commands.jsonl record has a unique id AND a globally
+unique log path; every log exists, its header names the record id, its git_head
+provenance line equals the ledger record, and its exact final line is the real
+EXIT_CODE; the artifact manifest closes bidirectionally (every listed file
+exists with its sha256/size and every file on disk is listed); every published
+run directory under runs/ passes bidirectional manifest/COMMIT closure; no
+orphan staging or lock remains; and — unless suppressed for unit tests — the
+reducer recomputes to the archived report and gate.json equals the frozen
+verdict mapping over it.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
+from forecasting.agent_forecasting import m1_contract  # noqa: E402
 from forecasting.agent_forecasting.m1_publication import verify_run_closure  # noqa: E402
 
 
-def main() -> int:
-    if len(sys.argv) != 2:
-        print("usage: verify_m1_evidence.py <evidence_root>", file=sys.stderr)
-        return 2
-    root = Path(sys.argv[1])
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def check_ledger(root: Path):
+    """Ledger/log bijection, header provenance and exact exit-code tails."""
     problems: list[str] = []
-    records = []
+    records: list[dict] = []
     ledger = root / "commands.jsonl"
     if not ledger.exists():
-        problems.append("commands.jsonl missing")
-    else:
-        records = [json.loads(line) for line in ledger.read_text().splitlines()
-                   if line.strip()]
-        ids = [record["id"] for record in records]
-        if len(ids) != len(set(ids)):
-            problems.append("command ledger ids are not injective")
-        for record in records:
-            log = root / record["log_path"]
-            if not log.exists():
-                problems.append(f"log path missing: {record['log_path']}")
-                continue
-            text = log.read_text()
-            tail = text.rstrip().rsplit("EXIT_CODE=", 1)
-            if len(tail) != 2 or tail[1].strip() != str(record["exit_code"]):
-                problems.append(
-                    f"log {record['log_path']} tail exit code does not match ledger")
+        return ["commands.jsonl missing"], records
+    records = [json.loads(line) for line in ledger.read_text().splitlines()
+               if line.strip()]
+    ids = [record["id"] for record in records]
+    paths = [record["log_path"] for record in records]
+    if len(ids) != len(set(ids)):
+        problems.append("command ledger ids are not injective")
+    if len(paths) != len(set(paths)):
+        problems.append("command ledger log paths are not globally injective")
+    for record in records:
+        log = root / record["log_path"]
+        if not log.exists():
+            problems.append(f"log path missing: {record['log_path']}")
+            continue
+        lines = log.read_text().splitlines()
+        if not lines or lines[0] != f"=== run_logged_m1 id={record['id']} ===":
+            problems.append(
+                f"log {record['log_path']} header does not name {record['id']}")
+        head_line = next((line for line in lines
+                          if line.startswith("git_head: ")), None)
+        if head_line != f"git_head: {record['git_head']}":
+            problems.append(
+                f"log {record['log_path']} git_head provenance mismatch")
+        if not lines or lines[-1] != f"EXIT_CODE={record['exit_code']}":
+            problems.append(
+                f"log {record['log_path']} final line is not the exact exit code")
+    return problems, records
+
+
+def check_manifest(root: Path) -> list[str]:
+    """Bidirectional manifest closure over every file in the evidence root."""
+    problems: list[str] = []
+    manifest_path = root / "artifact_manifest.json"
+    if not manifest_path.exists():
+        return ["artifact_manifest.json missing"]
+    manifest = json.loads(manifest_path.read_text())
+    on_disk = {str(path.relative_to(root)): path
+               for path in sorted(root.rglob("*"))
+               if path.is_file() and path != manifest_path}
+    listed = set(manifest.get("files", {}))
+    for name in sorted(listed - set(on_disk)):
+        problems.append(f"manifest lists a missing file: {name}")
+    for name in sorted(set(on_disk) - listed):
+        problems.append(f"file on disk is not in the manifest: {name}")
+    for name, record in sorted(manifest.get("files", {}).items()):
+        path = on_disk.get(name)
+        if path is None:
+            continue
+        if (path.stat().st_size != record["size_bytes"]
+                or sha256_file(path) != record["sha256"]):
+            problems.append(f"manifest hash/size drift: {name}")
+    return problems
+
+
+def check_runs(root: Path) -> list[str]:
+    problems: list[str] = []
     runs = root / "runs"
     if runs.exists():
         for final in sorted(runs.iterdir()):
@@ -56,12 +108,95 @@ def main() -> int:
     staging = root / "staging"
     if staging.exists() and any(staging.iterdir()):
         problems.append("orphan staging directories remain")
+    locks = root / "locks"
+    if locks.exists() and any(locks.iterdir()):
+        problems.append("orphan lock files remain")
+    return problems
+
+
+def _resolve_suite_log(root: Path, suite_str: str) -> Path | None:
+    for candidate in (Path(suite_str), root / suite_str,
+                      root / Path(suite_str).name, root.parent / suite_str):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def check_gate_and_reducer(root: Path, *, recompute: bool) -> list[str]:
+    problems: list[str] = []
+    report_path = root / "reducibility" / "reducer_report.json"
+    gate_path = root / "gate.json"
+    if not report_path.exists():
+        return problems  # a pre-reducer evidence root is incomplete but checkable
+    report = json.loads(report_path.read_text())
+    if recompute:
+        from forecasting.agent_forecasting import m1_reducer
+        fresh = m1_reducer.run_reducer()
+        for key in ("verdict", "scenarios_total", "d_traces_enumerated",
+                    "llm_failures_checked", "internal_consistency_ok"):
+            if fresh[key] != report.get(key):
+                problems.append(
+                    f"reducer recompute mismatch on {key}: "
+                    f"{fresh[key]} != {report.get(key)}")
+        if len(fresh["witnesses"]) != len(report.get("witnesses", [])):
+            problems.append("reducer recompute witness count mismatch")
+    if not gate_path.exists():
+        problems.append("gate.json missing while a reducer report exists")
+        return problems
+    gate = json.loads(gate_path.read_text())
+    engineering = gate.get("engineering", {})
+    suite_log = _resolve_suite_log(root, engineering.get("suite_log", ""))
+    if suite_log is None:
+        problems.append(f"gate suite log missing: {engineering.get('suite_log')}")
+    else:
+        lines = suite_log.read_text().splitlines()
+        if not lines or lines[-1] != f"EXIT_CODE={engineering.get('suite_exit_code')}":
+            problems.append("gate suite exit code does not match the log tail")
+        passed = engineering.get("tests_passed")
+        if passed is not None and not any(
+                f"{passed} passed" in line for line in lines):
+            problems.append("gate tests_passed count not found in the suite log")
+    expected = m1_contract.map_gate({
+        "verdict": report["verdict"],
+        "engineering_green": engineering.get("suite_exit_code") == 0,
+    })
+    for key in ("scientific_decision", "stop_token", "metrics_status",
+                "advance_m1", "reducibility_verdict", "mission_goal_achieved"):
+        if gate.get(key) != expected.get(key):
+            problems.append(
+                f"gate field {key} does not match the frozen verdict mapping")
+    if gate.get("metrics_status") != "NOT_EVALUATED":
+        problems.append("gate must keep metrics NOT_EVALUATED")
+    return problems
+
+
+def verify_evidence_root(root: Path, *, recompute: bool = True) -> list[str]:
+    """All closure problems of one evidence root; an empty list means closed."""
+    problems, _records = check_ledger(root)
+    problems += check_manifest(root)
+    problems += check_runs(root)
+    problems += check_gate_and_reducer(root, recompute=recompute)
+    return problems
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("usage: verify_m1_evidence.py <evidence_root>", file=sys.stderr)
+        return 2
+    root = Path(sys.argv[1])
+    problems = verify_evidence_root(root)
+    ledger = root / "commands.jsonl"
+    count = 0
+    if ledger.exists():
+        count = len([line for line in ledger.read_text().splitlines()
+                     if line.strip()])
     if problems:
         print("CLOSURE FAILED")
         for problem in problems:
             print(f" - {problem}")
         return 1
-    print(f"CLOSURE OK: commands={len(records)} "
+    runs = root / "runs"
+    print(f"CLOSURE OK: commands={count} "
           f"runs={len(list(runs.iterdir())) if runs.exists() else 0}")
     return 0
 

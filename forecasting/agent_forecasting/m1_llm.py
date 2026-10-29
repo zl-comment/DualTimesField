@@ -101,7 +101,16 @@ def _parse_payload(response: M1LlmResponse) -> dict:
         if not isinstance(payload["arguments"], str):
             raise LlmParseError("LLM_MALFORMED", "function arguments must be a string")
         inner = parse_strict_json_object(payload["arguments"].encode())
+        # __function__ is reserved for the envelope: an inner key with this name
+        # must never override or erase the outer function identity
+        if "__function__" in inner:
+            raise LlmParseError(
+                "LLM_MALFORMED", "__function__ is reserved for the envelope")
         return {"__function__": payload["name"], **inner}
+    if "__function__" in payload:
+        raise LlmParseError(
+            "LLM_MALFORMED",
+            "__function__ may only come from a function-call envelope")
     return payload
 
 
@@ -148,7 +157,7 @@ def parse_d_action(response: M1LlmResponse, *,
 
 
 def build_request_bytes(arm: str, digest: str, repo_root: str | Path) -> bytes:
-    """Render the frozen request: byte-exact system prompt plus filled template."""
+    """Render the frozen request: byte-exact prompt plus bound schema and cap."""
     if arm not in ("C", "D"):
         raise ValueError("LLM requests exist only for arms C and D")
     directory = Path(repo_root) / m1_contract.PROMPT_DIRECTORY
@@ -159,6 +168,9 @@ def build_request_bytes(arm: str, digest: str, repo_root: str | Path) -> bytes:
     placeholder = "{{canonical_digest}}" if arm == "C" else "{{canonical_state}}"
     if placeholder not in template:
         raise ValueError(f"frozen {arm} template lost its digest placeholder")
+    schema_name = ("m1_c_decision_schema.json" if arm == "C"
+                   else "m1_d_action_schema.json")
+    schema_digest = m1_contract.sha256_file(directory / schema_name)
     user_message = template.replace(placeholder, digest)
     request = {
         "model": m1_contract.LLM_MODEL,
@@ -168,6 +180,12 @@ def build_request_bytes(arm: str, digest: str, repo_root: str | Path) -> bytes:
         "store": m1_contract.LLM_STORE,
         "truncation": m1_contract.LLM_TRUNCATION,
         "parallel_tool_calls": m1_contract.LLM_PARALLEL_TOOL_CALLS,
+        "max_output_tokens": m1_contract.PER_CALL_OUTPUT_TOKENS[arm],
+        "response_schema": {
+            "function": (C_FUNCTION_NAME if arm == "C" else D_FUNCTION_NAME),
+            "artifact": schema_name,
+            "sha256": schema_digest,
+        },
     }
     return json.dumps(request, sort_keys=True, separators=(",", ":"),
                       ensure_ascii=True).encode()

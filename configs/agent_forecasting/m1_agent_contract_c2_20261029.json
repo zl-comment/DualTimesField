@@ -1,147 +1,18 @@
 {
-  "status": "frozen_m1_contract",
-  "contract_id": "m1.agent_contract.c2.v1",
-  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
-  "execution_scope": "m1_contract_enforcement_only",
-  "branch": "research/agentic-m1-bounded-actions-c2-20261029-r5",
-  "base_branch": "research/agentic-asof-abs-predispatch-c2-20261029-r4",
-  "base_sha": "e458016386311b277e193ec5a35b94aad1436c92",
-  "run_provenance_commit": "9feb95fd41ee43b37cbb08b1d9ae3ef8428412f1",
-  "protocol_doc": "docs/research/agent_forecasting/m1_agent_contract_c2_20261029.txt",
-  "metrics_status": "NOT_EVALUATED",
   "advance_to_g1_g2": false,
-  "frozen_base": {
-    "files_sha256": {
-      "docs/research/agent_forecasting/m0_predispatch_td_abs_protocol_20261029.txt": "e776e258726e1a92803a0dfe32101da299e8e07758a6556a0b4a8fd3cb1d5121",
-      "configs/agent_forecasting/m0_predispatch_td_abs_c2_20261029.json": "3619dfbb8dfc6fc765ebfb61682933f0fa4469fb8e22c8fb648e76210d4a676e",
-      "forecasting/agent_forecasting/predispatch_td_abs.py": "0f82c92e32a591e08b0bb3c45443c8bc27030feac743d1bb065511ad7d380808",
-      "forecasting/agent_forecasting/contracts.py": "3b0a6975b799ead83f1f5ab12ef0c7341eb3056a492f974169d96c703503ef3d",
-      "forecasting/agent_forecasting/frozen_chronos.py": "c49ae8c42941a2e568e5d40daf6a2de8b2a21483cdda271e0d71daf23364e522"
-    },
-    "header_line_sha256": "2f013ba453d6ef05959d74895fa6db6f9cd2522b6c0f7d4356af09fadaaa529a",
-    "checkpoint": {
-      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
-      "config_json_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
-      "model_safetensors_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
-    },
-    "packages": {
-      "chronos-forecasting": "2.3.2",
-      "numpy": "2.4.6",
-      "psutil": "7.2.2",
-      "torch": "2.14.1+cu126",
-      "transformers": "5.20.2"
-    }
-  },
-  "source_contract": {
-    "url": "https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/",
-    "official_table": "PREDISPATCHREGIONSUM",
-    "csv_interface": "PREDISPATCH,REGION_SOLUTION,9",
-    "header_field_count": 131,
-    "field": "TOTALDEMAND",
-    "unit": "MW",
-    "region": "NSW1",
-    "intervention": 0,
-    "vintage_key": [
-      "PREDISPATCHSEQNO",
-      "RUNNO"
+  "arm_leaf_whitelist_diffs": {
+    "B_minus_A": [
+      "policy",
+      "typed_pipeline"
     ],
-    "visibility_rule": "receipt_complete_unix_ceil <= origin_unix",
-    "hour_mapping": "hour h is the mean of half-hour ends origin+(2h+1)*1800 and origin+(2h+2)*1800",
-    "withdrawal_semantics": "NOT_APPLICABLE",
-    "non_clocks": [
-      "filename timestamp",
-      "HTTP Date",
-      "HTTP Last-Modified",
-      "LASTCHANGED",
-      "directory order"
+    "C_minus_B": [
+      "llm_decision",
+      "policy"
+    ],
+    "D_minus_C": [
+      "llm_envelope_shape",
+      "policy"
     ]
-  },
-  "prompt_artifacts": {
-    "directory": "docs/research/agent_forecasting/m1_prompts",
-    "sha256": {
-      "m1_common_system_prompt.txt": "72196794c218643c3026b8b1d0e95f5e6acc943bd8ed4a96a228363cf5e0dd93",
-      "m1_c_prompt_template.txt": "5c2f48af93d24212462c8df35b87ff2d88b5b8ca5f5c9f2e013a0527e65bdaaa",
-      "m1_d_prompt_template.txt": "6bbb7a1651005f979e2e2801edc9bf40023073ea1f9f67c3da27d413b1f1f2a2",
-      "m1_c_decision_schema.json": "caf59c8837aa7e453a306f10eefacd3efe19871a4de0efe99eac500535a2fd7e",
-      "m1_d_action_schema.json": "1995e22f7f15ef7a3df4644e3a78fbcd3610427607c004388024cea0ecc150a6"
-    }
-  },
-  "digest_renderer": {
-    "path": "forecasting/agent_forecasting/m1_digest.py",
-    "sha256": "c70fd1a36e92b2ac2a787c6e83d132a4dec314b9ed40fb96d80b895dd4233f87"
-  },
-  "llm": {
-    "provider": "OpenAI",
-    "endpoint": "POST https://api.openai.com/v1/responses",
-    "input_token_endpoint": "POST https://api.openai.com/v1/responses/input_tokens",
-    "model": "gpt-5.4-2026-03-05",
-    "response_model_must_equal": "gpt-5.4-2026-03-05",
-    "reasoning": {
-      "effort": "none"
-    },
-    "store": false,
-    "truncation": "disabled",
-    "parallel_tool_calls": false,
-    "sampling_note": "No seed or determinism claim; unspecified sampling controls are not synthesized; raw request/response bytes and provider usage are the evidence.",
-    "raw_output_cap_bytes": 4096,
-    "timeout_seconds_each": 30,
-    "retries": 0
-  },
-  "llm_envelopes": {
-    "C": {
-      "generation_calls": 1,
-      "input_tokens_max": 16384,
-      "output_tokens_max": 1024
-    },
-    "D": {
-      "generation_calls_max": 4,
-      "input_tokens_max_per_call": 4096,
-      "output_tokens_max_per_call": 256
-    },
-    "shared_input_tokens_max": 16384,
-    "shared_output_tokens_max": 1024,
-    "shared_generation_calls_max": 4,
-    "input_token_count_requests_max": 4
-  },
-  "llm_cost": {
-    "rate_input_usd_per_million": 2.5,
-    "rate_output_usd_per_million": 15.0,
-    "worst_case_usd_at_token_caps": 0.05632,
-    "hard_cap_usd": 0.06,
-    "accounting_unit": "integer micro_usd"
-  },
-  "budgets": {
-    "logical_source_replay_calls": 3,
-    "logical_source_bytes_total": 16777216,
-    "logical_source_bytes_one_body": 8388608,
-    "llm_input_token_count_requests": 4,
-    "llm_generation_calls": 4,
-    "llm_input_tokens": 16384,
-    "llm_output_tokens": 1024,
-    "llm_cost_micro_usd": 60000,
-    "agent_action_proposals": 4,
-    "local_deterministic_tool_calls": 8,
-    "forecast_calls": 2,
-    "evidence_source_bytes": 16777216,
-    "evidence_llm_bytes": 524288,
-    "evidence_ledger_bytes": 2097152,
-    "evidence_total_bytes": 19398656,
-    "retries": 0
-  },
-  "deadline": {
-    "success_publish_by_offset_seconds": 600,
-    "whole_process_max_seconds": 900,
-    "typed_forecast_reserve_seconds": 300,
-    "publication_reserve_seconds": 30,
-    "http_timeout_seconds": 15,
-    "local_tool_timeout_seconds": 30,
-    "forecast_call_wall_seconds": 300
-  },
-  "forecast_tool": {
-    "binding": "identity-only; the frozen Chronos-2 CPU path from M0 is pinned via frozen_base checkpoint/packages and is NOT executed in M1 probes",
-    "calls_max": 2,
-    "unique_input_only": true,
-    "output_rule": "published bytes are the frozen tool bytes; no clip/sort/calibration/edit"
   },
   "arms": {
     "A": [
@@ -172,41 +43,166 @@
       "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
     ]
   },
-  "arm_leaf_whitelist_diffs": {
-    "B_minus_A": [
-      "policy",
-      "typed_pipeline"
-    ],
-    "C_minus_B": [
-      "llm_decision",
-      "policy"
-    ],
-    "D_minus_C": [
-      "llm_envelope_shape",
-      "policy"
-    ]
+  "base_branch": "research/agentic-asof-abs-predispatch-c2-20261029-r4",
+  "base_sha": "e458016386311b277e193ec5a35b94aad1436c92",
+  "branch": "research/agentic-m1-bounded-actions-c2-20261029-r5",
+  "budgets": {
+    "agent_action_proposals": 4,
+    "evidence_ledger_bytes": 2097152,
+    "evidence_llm_bytes": 524288,
+    "evidence_source_bytes": 16777216,
+    "evidence_total_bytes": 19398656,
+    "forecast_calls": 2,
+    "llm_cost_micro_usd": 60000,
+    "llm_generation_calls": 4,
+    "llm_input_token_count_requests": 4,
+    "llm_input_tokens": 16384,
+    "llm_output_tokens": 1024,
+    "local_deterministic_tool_calls": 8,
+    "logical_source_bytes_one_body": 8388608,
+    "logical_source_bytes_total": 16777216,
+    "logical_source_replay_calls": 3,
+    "retries": 0
   },
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "contract_id": "m1.agent_contract.c2.v1",
+  "deadline": {
+    "forecast_call_wall_seconds": 300,
+    "http_timeout_seconds": 15,
+    "local_tool_timeout_seconds": 30,
+    "publication_reserve_seconds": 30,
+    "success_publish_by_offset_seconds": 600,
+    "typed_forecast_reserve_seconds": 300,
+    "whole_process_max_seconds": 900
+  },
+  "digest_renderer": {
+    "path": "forecasting/agent_forecasting/m1_digest.py",
+    "sha256": "c70fd1a36e92b2ac2a787c6e83d132a4dec314b9ed40fb96d80b895dd4233f87"
+  },
+  "evidence_root": "logs/forecasting/m1_agent_contract_c2_20261029",
+  "execution_modules": {
+    "files_sha256": {
+      "docs/research/agent_forecasting/m1_agent_contract_c2_20261029.txt": "acb13d2e6dd2f617d6c4a97ae6e5187bd6a42014c7621cbfef0914108eca7013",
+      "forecasting/agent_forecasting/m1_actions.py": "95ad846bc58ae3adafcfcfb5c8b57b167675710fbda466ed79a6a8a421ba15ff",
+      "forecasting/agent_forecasting/m1_asof.py": "d6606b989317df1f2c19d5e9655570e372adeddd81f0571dd9e19d198363ccfd",
+      "forecasting/agent_forecasting/m1_budget.py": "af15e49720cecd3e9dcfe8c34ba5dc137a50e2883d1d67d859a06f1e8865f5af",
+      "forecasting/agent_forecasting/m1_contract.py": "b9ae1214a7fd5a9ab34790c4adca10951bdf35a08f6a1f8441ecb881f12ba626",
+      "forecasting/agent_forecasting/m1_llm.py": "2a216854c92f06d752c3b9cae21bdfc4485b483a456f5766d7b323e5d2e122d9",
+      "forecasting/agent_forecasting/m1_publication.py": "2c346b15e4949789a63e3f6ffdbf8221ca83471d64d39787cac2e9198f64e963",
+      "forecasting/agent_forecasting/m1_reducer.py": "47f15d79f515e51c5857654e5bd4547dde748de15e91b8643267026ab9560296",
+      "forecasting/agent_forecasting/m1_runtime.py": "3f3fefc2b50fba89bd9a4ac72d088ae5e468b0260a96a95166761e6e62f47efe",
+      "scripts/build_m1_gate.py": "6eface6b596eb51381151abc17483a6f0ea02c297e290b551caad97584bfc4de",
+      "scripts/build_m1_manifest.py": "bf40a2fec33a16b4dde5ecb9958bcacad082380e1164a25d297c3fe0236f1dc4",
+      "scripts/run_logged_m1.sh": "8c1e0111d3b3561b836acfe7d061126494b86fdd7b0b6469a14751c80db110b5",
+      "scripts/run_m1_reducer.py": "cbbb5c2db92ee46b687ff53b744e4d95e2722b1491d93ec0bd42e09a3099f7b9",
+      "scripts/verify_m1_evidence.py": "8e4e67eebd0832b9fd0992a6291420f8cb9082b35afc88edd5278b4f9b553dc4",
+      "tests/fixtures/agent_forecasting/m1_scenario_harness.py": "0782092451dcea079af48e4a2e8cfb20da5f071a53b78b2cccebc021913750e1"
+    }
+  },
+  "execution_scope": "m1_contract_enforcement_only",
+  "forecast_tool": {
+    "binding": "identity-only; the frozen Chronos-2 CPU path from M0 is pinned via frozen_base checkpoint/packages and is NOT executed in M1 probes",
+    "calls_max": 2,
+    "output_rule": "published bytes are the frozen tool bytes; no clip/sort/calibration/edit",
+    "unique_input_only": true
+  },
+  "frozen_base": {
+    "checkpoint": {
+      "config_json_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "model_safetensors_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c"
+    },
+    "files_sha256": {
+      "configs/agent_forecasting/m0_predispatch_td_abs_c2_20261029.json": "3619dfbb8dfc6fc765ebfb61682933f0fa4469fb8e22c8fb648e76210d4a676e",
+      "docs/research/agent_forecasting/m0_predispatch_td_abs_protocol_20261029.txt": "e776e258726e1a92803a0dfe32101da299e8e07758a6556a0b4a8fd3cb1d5121",
+      "forecasting/agent_forecasting/contracts.py": "3b0a6975b799ead83f1f5ab12ef0c7341eb3056a492f974169d96c703503ef3d",
+      "forecasting/agent_forecasting/frozen_chronos.py": "c49ae8c42941a2e568e5d40daf6a2de8b2a21483cdda271e0d71daf23364e522",
+      "forecasting/agent_forecasting/predispatch_td_abs.py": "0f82c92e32a591e08b0bb3c45443c8bc27030feac743d1bb065511ad7d380808"
+    },
+    "header_line_sha256": "2f013ba453d6ef05959d74895fa6db6f9cd2522b6c0f7d4356af09fadaaa529a",
+    "packages": {
+      "chronos-forecasting": "2.3.2",
+      "numpy": "2.4.6",
+      "psutil": "7.2.2",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.20.2"
+    }
+  },
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "llm": {
+    "endpoint": "POST https://api.openai.com/v1/responses",
+    "input_token_endpoint": "POST https://api.openai.com/v1/responses/input_tokens",
+    "model": "gpt-5.4-2026-03-05",
+    "parallel_tool_calls": false,
+    "provider": "OpenAI",
+    "raw_output_cap_bytes": 4096,
+    "reasoning": {
+      "effort": "none"
+    },
+    "response_model_must_equal": "gpt-5.4-2026-03-05",
+    "retries": 0,
+    "sampling_note": "No seed or determinism claim; unspecified sampling controls are not synthesized; raw request/response bytes and provider usage are the evidence.",
+    "store": false,
+    "timeout_seconds_each": 30,
+    "truncation": "disabled"
+  },
+  "llm_cost": {
+    "accounting_unit": "integer micro_usd",
+    "hard_cap_usd": 0.06,
+    "rate_input_usd_per_million": 2.5,
+    "rate_output_usd_per_million": 15.0,
+    "worst_case_usd_at_token_caps": 0.05632
+  },
+  "llm_envelopes": {
+    "C": {
+      "generation_calls": 1,
+      "input_tokens_max": 16384,
+      "output_tokens_max": 1024
+    },
+    "D": {
+      "generation_calls_max": 4,
+      "input_tokens_max_per_call": 4096,
+      "output_tokens_max_per_call": 256
+    },
+    "input_token_count_requests_max": 4,
+    "shared_generation_calls_max": 4,
+    "shared_input_tokens_max": 16384,
+    "shared_output_tokens_max": 1024
+  },
+  "metrics_status": "NOT_EVALUATED",
+  "prompt_artifacts": {
+    "directory": "docs/research/agent_forecasting/m1_prompts",
+    "sha256": {
+      "m1_c_decision_schema.json": "caf59c8837aa7e453a306f10eefacd3efe19871a4de0efe99eac500535a2fd7e",
+      "m1_c_prompt_template.txt": "5c2f48af93d24212462c8df35b87ff2d88b5b8ca5f5c9f2e013a0527e65bdaaa",
+      "m1_common_system_prompt.txt": "72196794c218643c3026b8b1d0e95f5e6acc943bd8ed4a96a228363cf5e0dd93",
+      "m1_d_action_schema.json": "1995e22f7f15ef7a3df4644e3a78fbcd3610427607c004388024cea0ecc150a6",
+      "m1_d_prompt_template.txt": "6bbb7a1651005f979e2e2801edc9bf40023073ea1f9f67c3da27d413b1f1f2a2"
+    }
+  },
+  "protocol_doc": "docs/research/agent_forecasting/m1_agent_contract_c2_20261029.txt",
   "reason_codes": [
-    "NO_VISIBLE_RECEIPT",
-    "RECEIPT_AFTER_ORIGIN",
-    "INCOMPLETE_NEWEST_VINTAGE",
-    "SCHEMA_DRIFT",
-    "BODY_HASH_MISMATCH",
-    "FORK",
-    "CLOCK_UNHEALTHY",
-    "HTTP_TIMEOUT",
-    "HTTP_STATUS",
-    "LLM_TIMEOUT",
-    "LLM_REFUSAL",
-    "LLM_INCOMPLETE",
-    "LLM_MALFORMED",
     "ACTION_PRECONDITION",
+    "AGENT_ABSTAIN",
+    "BODY_HASH_MISMATCH",
     "BUDGET_EXHAUSTED",
     "BUDGET_OVERRUN",
+    "CLOCK_UNHEALTHY",
+    "CONTRACT_IDENTITY_DRIFT",
     "DEADLINE_MISSED",
+    "EVIDENCE_PUBLICATION_FAILED",
     "FORECAST_TOOL_FAILURE",
-    "AGENT_ABSTAIN",
-    "CONTRACT_IDENTITY_DRIFT"
+    "FORK",
+    "HTTP_STATUS",
+    "HTTP_TIMEOUT",
+    "INCOMPLETE_NEWEST_VINTAGE",
+    "LLM_INCOMPLETE",
+    "LLM_MALFORMED",
+    "LLM_REFUSAL",
+    "LLM_TIMEOUT",
+    "NO_VISIBLE_RECEIPT",
+    "RECEIPT_AFTER_ORIGIN",
+    "SCHEMA_DRIFT"
   ],
   "run_hard_stop_reasons": [
     "CONTRACT_IDENTITY_DRIFT",
@@ -214,8 +210,31 @@
     "FORBIDDEN_SOURCE_TOOL_ACTION",
     "SOURCE_TERMS_CHANGE"
   ],
-  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
-  "evidence_root": "logs/forecasting/m1_agent_contract_c2_20261029",
+  "run_provenance_commit": "9feb95fd41ee43b37cbb08b1d9ae3ef8428412f1",
+  "source_contract": {
+    "csv_interface": "PREDISPATCH,REGION_SOLUTION,9",
+    "field": "TOTALDEMAND",
+    "header_field_count": 131,
+    "hour_mapping": "hour h is the mean of half-hour ends origin+(2h+1)*1800 and origin+(2h+2)*1800",
+    "intervention": 0,
+    "non_clocks": [
+      "filename timestamp",
+      "HTTP Date",
+      "HTTP Last-Modified",
+      "LASTCHANGED",
+      "directory order"
+    ],
+    "official_table": "PREDISPATCHREGIONSUM",
+    "region": "NSW1",
+    "unit": "MW",
+    "url": "https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/",
+    "vintage_key": [
+      "PREDISPATCHSEQNO",
+      "RUNNO"
+    ],
+    "visibility_rule": "receipt_complete_unix_ceil <= origin_unix",
+    "withdrawal_semantics": "NOT_APPLICABLE"
+  },
   "source_files": [
     "configs/agent_forecasting/m1_agent_contract_c2_20261029.json",
     "docs/research/agent_forecasting/m1_agent_contract_c2_20261029.txt",
@@ -241,5 +260,6 @@
     "tests/fixtures/agent_forecasting/m1_scenario_harness.py",
     "tests/test_agent_m1_contract.py",
     "tests/test_agent_m1_reducer.py"
-  ]
+  ],
+  "status": "frozen_m1_contract"
 }

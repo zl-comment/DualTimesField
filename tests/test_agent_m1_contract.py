@@ -1158,9 +1158,15 @@ class FailClosedBudgetTests(unittest.TestCase):
                            "receipt_complete_unix_ceil": clock,
                            "size_bytes": len(body),
                            "clock_health": {"wall_monotonic_consistent": True}})
-        return {"origin_unix": harness.ORIGIN_UNIX, "listing": tuple(listing),
-                "events": m1_asof.chain_events(events), "bodies": bodies,
-                "fetch_behaviours": behaviours}
+        snapshot = {"origin_unix": harness.ORIGIN_UNIX,
+                    "listing": tuple(listing),
+                    "events": m1_asof.chain_events(events), "bodies": bodies,
+                    "fetch_behaviours": behaviours}
+        snapshot["snapshot_id"] = "snap_" + hashlib.sha256(json.dumps(
+            {key: snapshot[key] for key in ("origin_unix", "listing", "events",
+                                            "fetch_behaviours")},
+            sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:16]
+        return snapshot
 
     def test_oversized_body_refused_before_any_byte_is_read(self):
         cap = m1_budget.CAPS[m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY]
@@ -1337,7 +1343,7 @@ class PublicationSemanticClosureTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def _publish(self, run_id, closure):
+    def _publish(self, run_id, closure_overrides=None, drop=()):
         ledger = m1_budget.BudgetLedger()
         ledger.charge(m1_budget.BudgetClass.SOURCE_REPLAY_CALLS, 1, "probe")
         payloads = {
@@ -1349,16 +1355,11 @@ class PublicationSemanticClosureTests(unittest.TestCase):
                 json.dumps(entry, sort_keys=True, separators=(",", ":"))
                 for entry in ledger.entries) + "\n").encode(),
         }
-        return m1_publication.publish_run(self.root, run_id, payloads,
-                                          identity={"contract_id": "probe"},
-                                          closure=closure)
-
-    def _closure(self, **overrides):
         closure = {
             "origin_unix": harness.ORIGIN_UNIX,
             "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
             "clock_final": harness.ORIGIN_UNIX + 1,
-            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_fold": {cls.name: value for cls, value in ledger.fold().items()},
             "budget_caps": {cls.name: value
                             for cls, value in m1_budget.CAPS.items()},
             "budget_chain_ok": True,
@@ -1366,11 +1367,15 @@ class PublicationSemanticClosureTests(unittest.TestCase):
             "input_hash": "1" * 64,
             "canonical_model_input_sha256": "2" * 64,
         }
-        closure.update(overrides)
-        return closure
+        closure.update(closure_overrides or {})
+        for key in drop:
+            del closure[key]
+        return m1_publication.publish_run(self.root, run_id, payloads,
+                                          identity={"contract_id": "probe"},
+                                          closure=closure)
 
     def test_valid_closure_publishes_and_is_recorded_in_the_manifest(self):
-        final = self._publish("run_ok", self._closure())
+        final = self._publish("run_ok")
         manifest = json.loads((final / "manifest.json").read_text())
         self.assertEqual(manifest["closure"]["input_hash"], "1" * 64)
         self.assertTrue(m1_publication.verify_run_closure(final)["status"] == "CLOSED")
@@ -1380,22 +1385,20 @@ class PublicationSemanticClosureTests(unittest.TestCase):
         fold = dict(caps)
         fold["LLM_INPUT_TOKENS"] = caps["LLM_INPUT_TOKENS"] + 1
         with self.assertRaises(m1_publication.PublicationError):
-            self._publish("run_fold", self._closure(budget_fold=fold))
+            self._publish("run_fold", {"budget_fold": fold})
 
     def test_deadline_breach_refuses_publication(self):
         with self.assertRaises(m1_publication.PublicationError):
-            self._publish("run_late", self._closure(
-                clock_final=harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET + 1))
+            self._publish("run_late", {
+                "clock_final": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET + 1})
 
     def test_broken_budget_chain_refuses_publication(self):
         with self.assertRaises(m1_publication.PublicationError):
-            self._publish("run_chain", self._closure(budget_chain_ok=False))
+            self._publish("run_chain", {"budget_chain_ok": False})
 
     def test_missing_closure_field_refuses_publication(self):
-        closure = self._closure()
-        del closure["input_hash"]
         with self.assertRaises(m1_publication.PublicationError):
-            self._publish("run_missing", closure)
+            self._publish("run_missing", drop=("input_hash",))
 
     def test_run_arm_converts_publication_failure_into_a_failure_record(self):
         publish_root = self.root / "ev"
@@ -1448,7 +1451,7 @@ class PublicationSemanticClosureTests(unittest.TestCase):
         module._write_exclusive = flaky
         try:
             with self.assertRaises(OSError):
-                self._publish("run_clean", self._closure())
+                self._publish("run_clean")
         finally:
             module._write_exclusive = original
         staging = self.root / "staging"

@@ -104,7 +104,7 @@ class ReducerScenarioSpaceTests(unittest.TestCase):
                     dup_outcome = "COMPLETE_VALID" if failing == "NEW" else failure
                     expected.append({"listing": "TWO_REFS",
                                      "new_outcome": new_outcome,
-                                     "old_outcome": new_outcome,
+                                     "old_outcome": "COMPLETE_VALID",
                                      "relation": relation,
                                      "body_relation": "DUPLICATE_SAME_BODY",
                                      "dup_outcome": dup_outcome})
