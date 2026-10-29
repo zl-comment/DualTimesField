@@ -1,0 +1,24 @@
+=== run_logged_m1 id=12_reducer2_full ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/run_m1_reducer.py logs/forecasting/m1_agent_contract_c2_20261029/reducibility/reducer_report.json
+git_head: 2e3305f3395e4ac1e63e1cfea5394c181928b7c7
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T14:10:24.616088Z
+end_utc: 2026-10-29T14:11:07.720233Z
+--- output begin ---
+{
+  "d_traces_enumerated": 1832,
+  "internal_consistency_ok": true,
+  "llm_failures_checked": 1737,
+  "non_vacuity_control": {
+    "detected": true,
+    "policy": "weak_B_fetches_only_the_superseded_ref",
+    "weak_b_diff_scenarios": 16
+  },
+  "scenarios_total": 193,
+  "uses_labels_or_scores": false,
+  "verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+  "witness_count": 0
+}
+wrote logs/forecasting/m1_agent_contract_c2_20261029/reducibility/reducer_report.json
+--- output end ---
+EXIT_CODE=0

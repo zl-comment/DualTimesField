@@ -1,0 +1,38 @@
+=== run_logged_m1 id=13b_gate2_build ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/build_m1_gate.py logs/forecasting/m1_agent_contract_c2_20261029/red_green/11_green2_full_suite.txt logs/forecasting/m1_agent_contract_c2_20261029/reducibility/reducer_report.json logs/forecasting/m1_agent_contract_c2_20261029/gate.json
+git_head: 2e3305f3395e4ac1e63e1cfea5394c181928b7c7
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T14:12:00.927848Z
+end_utc: 2026-10-29T14:12:04.164495Z
+--- output begin ---
+{
+  "advance_m1": false,
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "contract_id": "m1.agent_contract.c2.v1",
+  "engineering": {
+    "suite_exit_code": 0,
+    "suite_log": "logs/forecasting/m1_agent_contract_c2_20261029/red_green/11_green2_full_suite.txt",
+    "tests_passed": 167
+  },
+  "engineering_green": true,
+  "metrics_status": "NOT_EVALUATED",
+  "mission_goal_achieved": false,
+  "reducibility": {
+    "d_traces_enumerated": 1832,
+    "internal_consistency_ok": true,
+    "llm_failures_checked": 1737,
+    "non_vacuity_control": {
+      "detected": true,
+      "policy": "weak_B_fetches_only_the_superseded_ref",
+      "weak_b_diff_scenarios": 16
+    },
+    "scenarios_total": 193,
+    "uses_labels_or_scores": false,
+    "verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED"
+  },
+  "reducibility_verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+  "scientific_decision": "STOP",
+  "stop_token": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED"
+}
+--- output end ---
+EXIT_CODE=0

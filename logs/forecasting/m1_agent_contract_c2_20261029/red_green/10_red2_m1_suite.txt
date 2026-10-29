@@ -1,0 +1,1154 @@
+=== run_logged_m1 id=10_red2_m1_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py -q
+git_head: 86d0f89af25c9382f4c9117758422fbfe84cb76c
+branch: research/agentic-m1-bounded-actions-c2-20261029-r5
+start_utc: 2026-10-29T13:26:42.655468Z
+end_utc: 2026-10-29T13:27:41.332150Z
+--- output begin ---
+...............................F..................FFF.FFFFF.FFFFFFFFFFFF [ 74%]
+FFFFFFFFFFFFFFFF....F....                                                [100%]
+=================================== FAILURES ===================================
+________ DigestAndPromptTests.test_request_bytes_use_the_frozen_prompts ________
+
+self = <test_agent_m1_contract.DigestAndPromptTests testMethod=test_request_bytes_use_the_frozen_prompts>
+
+    def test_request_bytes_use_the_frozen_prompts(self):
+        request = m1_llm.build_request_bytes("C", '{"state":"FETCHED"}', ROOT)
+        payload = json.loads(request)
+        config = m1_contract.load_config(ROOT)
+        directory = ROOT / config["prompt_artifacts"]["directory"]
+        system = (directory / "m1_common_system_prompt.txt").read_text()
+        template = (directory / "m1_c_prompt_template.txt").read_text()
+        self.assertEqual(payload["instructions"], system)
+        self.assertEqual(payload["input"],
+                         template.replace("{{canonical_digest}}",
+                                          '{"state":"FETCHED"}'))
+        self.assertEqual(payload["model"], m1_contract.LLM_MODEL)
+        self.assertEqual(payload["reasoning"], {"effort": "none"})
+        self.assertFalse(payload["store"])
+        self.assertEqual(payload["truncation"], "disabled")
+        self.assertFalse(payload["parallel_tool_calls"])
+>       self.assertEqual(set(payload),
+                         {"model", "instructions", "input", "reasoning", "store",
+                          "truncation", "parallel_tool_calls", "max_output_tokens",
+                          "response_schema"})
+E       AssertionError: Items in the second set but not the first:
+E       'max_output_tokens'
+E       'response_schema'
+
+tests/test_agent_m1_contract.py:506: AssertionError
+__ AtomicPublicationTests.test_crash_before_commit_leaves_no_visible_success ___
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_crash_before_commit_leaves_no_visible_success>
+
+    def test_crash_before_commit_leaves_no_visible_success(self):
+        import forecasting.agent_forecasting.m1_publication as module
+        original = module.os.rename
+        counter = {"n": 0}
+    
+        def flaky(src, dst):
+            counter["n"] += 1
+            if counter["n"] == 1:  # crash at the staging -> final rename
+                raise OSError("injected crash")
+            return original(src, dst)
+    
+        module.os.rename = flaky
+        try:
+            with self.assertRaises(OSError):
+                m1_publication.publish_run(self.root, "run_crash", self._payloads(),
+                                           identity={"contract_id": "x"},
+>                                          closure=self._closure())
+                                                   ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:922: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _closure(self, **overrides):
+        ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {cls.name: value
+                            for cls, value in ledger.fold().items()},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:861: AttributeError
+______ AtomicPublicationTests.test_extra_file_after_commit_breaks_closure ______
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_extra_file_after_commit_breaks_closure>
+
+    def test_extra_file_after_commit_breaks_closure(self):
+        final = m1_publication.publish_run(self.root, "run_extra", self._payloads(),
+                                           identity={"contract_id": "x"},
+>                                          closure=self._closure())
+                                                   ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:901: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_extra_file_after_commit_breaks_closure>
+overrides = {}
+
+    def _closure(self, **overrides):
+        ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {cls.name: value
+                            for cls, value in ledger.fold().items()},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:861: AttributeError
+_______ AtomicPublicationTests.test_publish_verify_and_refuse_duplicates _______
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_publish_verify_and_refuse_duplicates>
+
+    def test_publish_verify_and_refuse_duplicates(self):
+        final = m1_publication.publish_run(
+            self.root, "B_1641218400_x", self._payloads(),
+            identity={"contract_id": m1_contract.CONTRACT_ID},
+>           closure=self._closure())
+                    ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:879: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_publish_verify_and_refuse_duplicates>
+overrides = {}
+
+    def _closure(self, **overrides):
+        ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {cls.name: value
+                            for cls, value in ledger.fold().items()},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:861: AttributeError
+_________ AtomicPublicationTests.test_tampered_payload_breaks_closure __________
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_tampered_payload_breaks_closure>
+
+    def test_tampered_payload_breaks_closure(self):
+        final = m1_publication.publish_run(self.root, "run_tamper", self._payloads(),
+                                           identity={"contract_id": "x"},
+>                                          closure=self._closure())
+                                                   ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.AtomicPublicationTests testMethod=test_tampered_payload_breaks_closure>
+overrides = {}
+
+    def _closure(self, **overrides):
+        ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {cls.name: value
+                            for cls, value in ledger.fold().items()},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:861: AttributeError
+___ MirrorFairnessTests.test_asymmetric_mirrors_keep_bcd_terminals_identical ___
+
+self = <test_agent_m1_contract.MirrorFairnessTests testMethod=test_asymmetric_mirrors_keep_bcd_terminals_identical>
+
+    def test_asymmetric_mirrors_keep_bcd_terminals_identical(self):
+        snapshot = _asym_snapshot("NEW", "TIMEOUT")
+        dup = harness.opaque_ref(harness.NEW_FILENAME_B)
+        b = _run("B", snapshot)
+        c = _run("C", snapshot, transport=_c_transport("USE_TYPED"))
+        d = _run("D", snapshot,
+                 transport=_d_transport(("LIST", "NONE"), ("FETCH_REF", dup),
+                                        ("FINALIZE_TYPED", "NONE")))
+>       self.assertEqual(b.verdict, "PUBLISHED_TYPED")
+E       AssertionError: 'PUBLISHED_BASE_FALLBACK' != 'PUBLISHED_TYPED'
+E       - PUBLISHED_BASE_FALLBACK
+E       + PUBLISHED_TYPED
+
+tests/test_agent_m1_contract.py:1018: AssertionError
+_ MirrorFairnessTests.test_b_fetches_both_mirrors_and_survives_one_transport_death _
+
+self = <test_agent_m1_contract.MirrorFairnessTests testMethod=test_b_fetches_both_mirrors_and_survives_one_transport_death>
+
+    def test_b_fetches_both_mirrors_and_survives_one_transport_death(self):
+        for failing in ("NEW", "DUP"):
+            for failure in harness.TRANSPORT_FAILURES:
+                snapshot = _asym_snapshot(failing, failure)
+                result = _run("B", snapshot)
+>               self.assertEqual(result.verdict, "PUBLISHED_TYPED",
+                                 msg=f"{failing}/{failure}")
+E               AssertionError: 'PUBLISHED_BASE_FALLBACK' != 'PUBLISHED_TYPED'
+E               - PUBLISHED_BASE_FALLBACK
+E               + PUBLISHED_TYPED
+E                : NEW/TIMEOUT
+
+tests/test_agent_m1_contract.py:987: AssertionError
+___ MirrorFairnessTests.test_b_survives_when_only_the_dead_mirror_is_visible ___
+
+self = <test_agent_m1_contract.MirrorFairnessTests testMethod=test_b_survives_when_only_the_dead_mirror_is_visible>
+
+    def test_b_survives_when_only_the_dead_mirror_is_visible(self):
+        # AFTER cutoff: only the dead mirror's receipt is visible while the live
+        # mirror is a listed ref with a post-origin receipt; the fixed plan still
+        # spends its second GET there and publishes the same pre-origin body
+        result = _run("B", _asym_snapshot("DUP", "TIMEOUT", "AFTER_ORIGIN"))
+>       self.assertEqual(result.verdict, "PUBLISHED_TYPED")
+E       AssertionError: 'PUBLISHED_BASE_FALLBACK' != 'PUBLISHED_TYPED'
+E       - PUBLISHED_BASE_FALLBACK
+E       + PUBLISHED_TYPED
+
+tests/test_agent_m1_contract.py:1006: AssertionError
+_ MirrorFairnessTests.test_canonical_plan_prefers_both_mirrors_of_the_newest_visible_body _
+
+self = <test_agent_m1_contract.MirrorFairnessTests testMethod=test_canonical_plan_prefers_both_mirrors_of_the_newest_visible_body>
+
+    def test_canonical_plan_prefers_both_mirrors_of_the_newest_visible_body(self):
+        snapshot = m1_runtime.M1SourceSnapshot.from_mapping(
+            _asym_snapshot("NEW", "TIMEOUT"))
+        plan = snapshot.canonical_fetch_refs(harness.ORIGIN_UNIX)
+>       self.assertEqual(set(plan), {harness.opaque_ref(harness.NEW_FILENAME),
+                                     harness.opaque_ref(harness.NEW_FILENAME_B)})
+E       AssertionError: Items in the second set but not the first:
+E       'v_fe3a548d39b6bc9a'
+
+tests/test_agent_m1_contract.py:1052: AssertionError
+_____ MirrorFairnessTests.test_typed_derivation_is_fetch_order_independent _____
+
+self = <test_agent_m1_contract.MirrorFairnessTests testMethod=test_typed_derivation_is_fetch_order_independent>
+
+    def test_typed_derivation_is_fetch_order_independent(self):
+        snapshot = _asym_snapshot("NEW", "TIMEOUT")
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        records = {}
+        for event in visible:  # honest in-run fetch of every visible mirror
+            behaviour = snapshot["fetch_behaviours"][event["ref"]]
+            records[event["ref"]] = m1_asof.M1FetchRecord(
+                ref=event["ref"], filename=event["filename"], behaviour=behaviour,
+                receipt_complete_unix_ceil=event["receipt_complete_unix_ceil"],
+                body_sha256=event["body_sha256"],
+                raw_body=(snapshot["bodies"][event["body_sha256"]]
+                          if behaviour in harness.BODY_LEVEL_OUTCOMES else None))
+>       first = m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, visible, records)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1039: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+origin_unix = 1641218400
+visible_events = ({'event': 'body_complete', 'ref': 'v_f9ff2be7410e01fd', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_202201032330_2...201032340_20220103234500.zip', 'body_sha256': 'cc6e276a6f0eec8656d6c573f76e3721d3361c5d0d9cc1ab70e882d5499d580e', ...})
+fetch_records = {'v_f9ff2be7410e01fd': M1FetchRecord(ref='v_f9ff2be7410e01fd', filename='SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_20220103233...\x00\x00SYNTHETIC_PREDISPATCHIS_SECTION.csvPK\x05\x06\x00\x00\x00\x00\x01\x00\x01\x00Q\x00\x00\x00wj\x00\x00\x00\x00')}
+
+    def derive_typed_evidence(origin_unix: int,
+                              visible_events: tuple[dict, ...],
+                              fetch_records: Mapping[str, M1FetchRecord],
+                              ) -> M1TypedEvidence:
+        """Derive the 24-value typed tensor from raw bytes under newest-visible-only."""
+        if any(record["receipt_complete_unix_ceil"] > origin_unix
+               for record in visible_events):
+            raise M1TypedRejection("RECEIPT_AFTER_ORIGIN",
+                                   "visible tuple must be pre-filtered at origin")
+        if not visible_events:
+            raise M1TypedRejection("NO_VISIBLE_RECEIPT", "no body-complete receipt at "
+                                   "or before origin")
+        _fork_check(visible_events)
+        ledger = visible_ledger_hash(visible_events)
+        earliest = _dedupe_visible(visible_events)
+        newest_event = max(
+            earliest.values(),
+            key=lambda record: _vintage_key(record["seqno"], record["runno"]))
+        # resolve the in-run validation by BODY, not by ref: a duplicate republication
+        # of the same body may have been fetched through either of its refs
+        fetch = next((record for record in fetch_records.values()
+                      if record.body_sha256 == newest_event["body_sha256"]), None)
+        if fetch is None:
+            raise M1TypedRejection(
+                "ACTION_PRECONDITION",
+                f"the newest visible vintage {newest_event['seqno']}/"
+                f"{newest_event['runno']} was never fetched and validated in-run")
+        if fetch.behaviour == "TIMEOUT":
+>           raise M1TypedRejection("HTTP_TIMEOUT", fetch.ref)
+E           forecasting.agent_forecasting.m1_asof.M1TypedRejection: typed path rejected: HTTP_TIMEOUT v_f9ff2be7410e01fd
+
+forecasting/agent_forecasting/m1_asof.py:186: M1TypedRejection
+__ FailClosedBudgetTests.test_forecast_budget_refusal_maps_to_a_frozen_reason __
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_forecast_budget_refusal_maps_to_a_frozen_reason>
+
+    def test_forecast_budget_refusal_maps_to_a_frozen_reason(self):
+        for arm in ("A", "B"):
+            caps = dict(m1_budget.CAPS)
+            caps[m1_budget.BudgetClass.FORECAST_CALLS] = 0
+>           result = _run(arm, _clean_snapshot(),
+                          budget=m1_budget.BudgetLedger(caps=caps))
+
+tests/test_agent_m1_contract.py:1114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+arm = 'A'
+snapshot = {'origin_unix': 1641218400, 'listing': ({'ref': 'v_f9ff2be7410e01fd', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_2...x00SYNTHETIC_PREDISPATCHIS_SECTION.csvPK\x05\x06\x00\x00\x00\x00\x01\x00\x01\x00Q\x00\x00\x00wj\x00\x00\x00\x00'}, ...}
+transport = None, tool = None, clock = None, publish_root = None
+region = 'NSW1'
+budget = <forecasting.agent_forecasting.m1_budget.BudgetLedger object at 0x7fdb934e4850>
+
+    def _run(arm, snapshot, *, transport=None, tool=None, clock=None,
+             publish_root=None, region="NSW1", budget=None):
+        _require_m1()
+        extra = {"budget": budget} if budget is not None else {}
+>       return m1_runtime.run_arm(
+            arm, snapshot, base_input=_base_input(region),
+            tool=tool if tool is not None else m1_runtime.DeterministicForecastStub(),
+            transport=transport, clock=clock, publish_root=publish_root, **extra)
+E       TypeError: run_arm() got an unexpected keyword argument 'budget'
+
+tests/test_agent_m1_contract.py:97: TypeError
+_____ FailClosedBudgetTests.test_forecast_tool_runtime_error_is_contained ______
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_forecast_tool_runtime_error_is_contained>
+
+    def test_forecast_tool_runtime_error_is_contained(self):
+        class ExplodingTool:
+            identity = {"kind": "exploding_probe_stub", "version": 1}
+    
+            def predict(self, model_input, params=None):
+                raise RuntimeError("boom")
+    
+>       base_result = _run("A", _clean_snapshot(), tool=ExplodingTool())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:513: in run_arm
+    base_bytes = sink.forecast_once(base_model_input, phase="base", budget=budget)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:134: in forecast_once
+    output = self.tool.predict(model_input, params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.FailClosedBudgetTests.test_forecast_tool_runtime_error_is_contained.<locals>.ExplodingTool object at 0x7fdb93ce58d0>
+model_input = {'target': array([ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13.,
+       14., 15., 16., 17., 18., 19....., 61., 62., 63., 64., 65.,
+       66., 67., 68., 69., 70., 71., 72.]), 'past_covariates': {}, 'future_covariates': {}}
+params = None
+
+    def predict(self, model_input, params=None):
+>       raise RuntimeError("boom")
+E       RuntimeError: boom
+
+tests/test_agent_m1_contract.py:1125: RuntimeError
+__ FailClosedBudgetTests.test_generation_cap_zero_never_touches_the_transport __
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_generation_cap_zero_never_touches_the_transport>
+
+    def test_generation_cap_zero_never_touches_the_transport(self):
+        caps = dict(m1_budget.CAPS)
+        caps[m1_budget.BudgetClass.LLM_GENERATIONS] = 0
+        transport = _c_transport("USE_TYPED")
+>       result = _run("C", _clean_snapshot(), transport=transport,
+                      budget=m1_budget.BudgetLedger(caps=caps))
+
+tests/test_agent_m1_contract.py:1082: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+arm = 'C'
+snapshot = {'origin_unix': 1641218400, 'listing': ({'ref': 'v_f9ff2be7410e01fd', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_2...x00SYNTHETIC_PREDISPATCHIS_SECTION.csvPK\x05\x06\x00\x00\x00\x00\x01\x00\x01\x00Q\x00\x00\x00wj\x00\x00\x00\x00'}, ...}
+transport = <forecasting.agent_forecasting.m1_runtime.ScriptedTransport object at 0x7fdb934f1f10>
+tool = None, clock = None, publish_root = None, region = 'NSW1'
+budget = <forecasting.agent_forecasting.m1_budget.BudgetLedger object at 0x7fdb941b6ad0>
+
+    def _run(arm, snapshot, *, transport=None, tool=None, clock=None,
+             publish_root=None, region="NSW1", budget=None):
+        _require_m1()
+        extra = {"budget": budget} if budget is not None else {}
+>       return m1_runtime.run_arm(
+            arm, snapshot, base_input=_base_input(region),
+            tool=tool if tool is not None else m1_runtime.DeterministicForecastStub(),
+            transport=transport, clock=clock, publish_root=publish_root, **extra)
+E       TypeError: run_arm() got an unexpected keyword argument 'budget'
+
+tests/test_agent_m1_contract.py:97: TypeError
+__ FailClosedBudgetTests.test_oversized_body_refused_before_any_byte_is_read ___
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_oversized_body_refused_before_any_byte_is_read>
+
+    def test_oversized_body_refused_before_any_byte_is_read(self):
+        cap = m1_budget.CAPS[m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY]
+        body = b"\x00" * (cap + 1)
+        snapshot = self._body_snapshot(
+            [("BIG.zip", harness.NEW_SEQNO, harness.ORIGIN_UNIX - 600, body,
+              "COMPLETE_VALID")])
+>       result = _run("B", snapshot)
+                 ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1171: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:399: in run_arm
+    snapshot = M1SourceSnapshot.from_mapping(snapshot_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'forecasting.agent_forecasting.m1_runtime.M1SourceSnapshot'>
+data = {'origin_unix': 1641218400, 'listing': ({'ref': 'v_7b5ba2e8a46d372f', 'filename': 'BIG.zip'},), 'events': ({'event': '...x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'}, ...}
+
+    @classmethod
+    def from_mapping(cls, data: Mapping) -> "M1SourceSnapshot":
+>       return cls(snapshot_id=data["snapshot_id"], origin_unix=data["origin_unix"],
+                               ^^^^^^^^^^^^^^^^^^^
+                   listing=tuple(data["listing"]), events=tuple(data["events"]),
+                   bodies=data["bodies"], fetch_behaviours=data["fetch_behaviours"])
+E       KeyError: 'snapshot_id'
+
+forecasting/agent_forecasting/m1_runtime.py:199: KeyError
+____ FailClosedBudgetTests.test_transport_timeout_is_billed_like_a_success _____
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_transport_timeout_is_billed_like_a_success>
+
+    def test_transport_timeout_is_billed_like_a_success(self):
+        class RaisingTransport:
+            identity = {"kind": "raising_probe_transport", "version": 1}
+    
+            def __init__(self):
+                self.calls = 0
+    
+            def generate(self, arm, turn, request_bytes):
+                self.calls += 1
+                raise TimeoutError("provider timeout")
+    
+        transport = RaisingTransport()
+        result = _run("C", _clean_snapshot(), transport=transport)
+        self.assertEqual(transport.calls, 1)
+        self.assertEqual(result.reason_code, "LLM_TIMEOUT")
+        fold = result.budget_fold
+>       self.assertEqual(fold[m1_budget.BudgetClass.LLM_GENERATIONS], 1)
+E       AssertionError: 0 != 1
+
+tests/test_agent_m1_contract.py:1104: AssertionError
+_ FailClosedBudgetTests.test_two_mid_size_bodies_do_not_accumulate_into_the_per_body_cap _
+
+self = <test_agent_m1_contract.FailClosedBudgetTests testMethod=test_two_mid_size_bodies_do_not_accumulate_into_the_per_body_cap>
+
+    def test_two_mid_size_bodies_do_not_accumulate_into_the_per_body_cap(self):
+        cap = m1_budget.CAPS[m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY]
+        size = cap // 2 + 1  # two of them exceed the cap when summed
+        first = b"\x01" * size
+        second = b"\x02" * size
+        snapshot = self._body_snapshot([
+            ("MID_OLD.zip", harness.OLD_SEQNO, harness.ORIGIN_UNIX - 3600, first,
+             "COMPLETE_VALID"),
+            ("MID_NEW.zip", harness.NEW_SEQNO, harness.ORIGIN_UNIX - 600, second,
+             "COMPLETE_VALID")])
+>       result = _run("B", snapshot)
+                 ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:399: in run_arm
+    snapshot = M1SourceSnapshot.from_mapping(snapshot_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'forecasting.agent_forecasting.m1_runtime.M1SourceSnapshot'>
+data = {'origin_unix': 1641218400, 'listing': ({'ref': 'v_975cbd3a1f78aa40', 'filename': 'MID_OLD.zip'}, {'ref': 'v_eeab41703...x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02'}, ...}
+
+    @classmethod
+    def from_mapping(cls, data: Mapping) -> "M1SourceSnapshot":
+>       return cls(snapshot_id=data["snapshot_id"], origin_unix=data["origin_unix"],
+                               ^^^^^^^^^^^^^^^^^^^
+                   listing=tuple(data["listing"]), events=tuple(data["events"]),
+                   bodies=data["bodies"], fetch_behaviours=data["fetch_behaviours"])
+E       KeyError: 'snapshot_id'
+
+forecasting/agent_forecasting/m1_runtime.py:199: KeyError
+_ ArmSnapshotBoundaryTests.test_arm_a_never_touches_the_snapshot_receipt_chain _
+
+self = <test_agent_m1_contract.ArmSnapshotBoundaryTests testMethod=test_arm_a_never_touches_the_snapshot_receipt_chain>
+
+    def test_arm_a_never_touches_the_snapshot_receipt_chain(self):
+>       result = _run("A", self._broken_snapshot(),
+                      publish_root=self.publish_root / "ev_a")
+
+tests/test_agent_m1_contract.py:1216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:545: in run_arm
+    return finish("PUBLISHED_BASE_FALLBACK", "AGENT_ABSTAIN",
+forecasting/agent_forecasting/m1_runtime.py:480: in finish
+    snapshot.visible_events(origin)]},
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:220: in visible_events
+    return m1_asof.materialize_visible_events(self.events, origin_unix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_asof.py:121: in materialize_visible_events
+    verify_event_chain(records)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+events = ({'event': 'body_complete', 'ref': 'v_f9ff2be7410e01fd', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_202201032330_20220103233000.zip', 'body_sha256': 'cc6e276a6f0eec8656d6c573f76e3721d3361c5d0d9cc1ab70e882d5499d580e', ...},)
+
+    def verify_event_chain(events: Iterable[Mapping]) -> None:
+        """Verify append-only sequencing and every event hash before any clock is used."""
+        records = tuple(events)
+        prev = "0" * 64
+        seen_seq = -1
+        for record in records:
+            if record.get("event") != "body_complete":
+                raise ValueError("receipt chain carries an unknown event kind")
+            if record.get("chain_seq") != seen_seq + 1:
+                raise ValueError("receipt chain is not append-only sequential")
+            if record.get("prev_sha256") != prev:
+                raise ValueError("receipt chain prev hash mismatch")
+            payload = {key: value for key, value in record.items()
+                       if key != "event_sha256"}
+            expected = hashlib.sha256(
+                (json.dumps(payload, sort_keys=True, separators=(",", ":")) + prev)
+                .encode()).hexdigest()
+            if record.get("event_sha256") != expected:
+>               raise ValueError("receipt event hash mismatch")
+E               ValueError: receipt event hash mismatch
+
+forecasting/agent_forecasting/m1_asof.py:100: ValueError
+_ ArmSnapshotBoundaryTests.test_broken_chain_maps_to_a_frozen_reason_for_b_and_d _
+
+self = <test_agent_m1_contract.ArmSnapshotBoundaryTests testMethod=test_broken_chain_maps_to_a_frozen_reason_for_b_and_d>
+
+    def test_broken_chain_maps_to_a_frozen_reason_for_b_and_d(self):
+        snapshot = self._broken_snapshot()
+>       b = _run("B", snapshot)
+            ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:557: in run_arm
+    for ref in snapshot.canonical_fetch_refs(origin):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:225: in canonical_fetch_refs
+    visible = self.visible_events(origin_unix)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:220: in visible_events
+    return m1_asof.materialize_visible_events(self.events, origin_unix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_asof.py:121: in materialize_visible_events
+    verify_event_chain(records)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+events = ({'event': 'body_complete', 'ref': 'v_f9ff2be7410e01fd', 'filename': 'SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_202201032330_20220103233000.zip', 'body_sha256': 'cc6e276a6f0eec8656d6c573f76e3721d3361c5d0d9cc1ab70e882d5499d580e', ...},)
+
+    def verify_event_chain(events: Iterable[Mapping]) -> None:
+        """Verify append-only sequencing and every event hash before any clock is used."""
+        records = tuple(events)
+        prev = "0" * 64
+        seen_seq = -1
+        for record in records:
+            if record.get("event") != "body_complete":
+                raise ValueError("receipt chain carries an unknown event kind")
+            if record.get("chain_seq") != seen_seq + 1:
+                raise ValueError("receipt chain is not append-only sequential")
+            if record.get("prev_sha256") != prev:
+                raise ValueError("receipt chain prev hash mismatch")
+            payload = {key: value for key, value in record.items()
+                       if key != "event_sha256"}
+            expected = hashlib.sha256(
+                (json.dumps(payload, sort_keys=True, separators=(",", ":")) + prev)
+                .encode()).hexdigest()
+            if record.get("event_sha256") != expected:
+>               raise ValueError("receipt event hash mismatch")
+E               ValueError: receipt event hash mismatch
+
+forecasting/agent_forecasting/m1_asof.py:100: ValueError
+___ TrustBoundaryTests.test_budget_ledger_rebuild_detects_a_tampered_archive ___
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_budget_ledger_rebuild_detects_a_tampered_archive>
+
+    def test_budget_ledger_rebuild_detects_a_tampered_archive(self):
+        result = _run("B", _clean_snapshot())
+        tampered = [dict(entry) for entry in result.budget_entries]
+        victim = next(entry for entry in tampered if entry["op"] == "SETTLE")
+        victim["amount"] = 0  # silent discount attempt
+>       with self.assertRaises(ValueError):
+E       AssertionError: ValueError not raised
+
+tests/test_agent_m1_contract.py:1325: AssertionError
+_ TrustBoundaryTests.test_execution_modules_protocol_and_config_fields_are_pinned _
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_execution_modules_protocol_and_config_fields_are_pinned>
+
+    def test_execution_modules_protocol_and_config_fields_are_pinned(self):
+        config = m1_contract.load_config(ROOT)
+>       pins = config["execution_modules"]["files_sha256"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'execution_modules'
+
+tests/test_agent_m1_contract.py:1306: KeyError
+_ TrustBoundaryTests.test_forged_typed_evidence_cannot_attach_arbitrary_values _
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_forged_typed_evidence_cannot_attach_arbitrary_values>
+
+    def test_forged_typed_evidence_cannot_attach_arbitrary_values(self):
+        snapshot = _clean_snapshot()
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        fetch = _fetch_records_for(snapshot, visible)
+        evidence = m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, visible, fetch)
+        forged = dataclasses.replace(evidence, values=(999999.0,) * 24)
+>       with self.assertRaises(m1_asof.BaseBoundaryError):
+E       AssertionError: BaseBoundaryError not raised
+
+tests/test_agent_m1_contract.py:1247: AssertionError
+_ TrustBoundaryTests.test_function_envelope_cannot_override_the_function_identity _
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_function_envelope_cannot_override_the_function_identity>
+
+    def test_function_envelope_cannot_override_the_function_identity(self):
+        shell = (b'{"name":"m1_d_action","arguments":"{\\"__function__\\":null,'
+                 b'\\"decision\\":\\"USE_TYPED\\",\\"evidence_ref\\":\\"NONE\\"}"}')
+>       with self.assertRaises(m1_llm.LlmParseError):
+E       AssertionError: LlmParseError not raised
+
+tests/test_agent_m1_contract.py:1257: AssertionError
+_____ TrustBoundaryTests.test_identity_recomputation_is_not_cached_by_path _____
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_identity_recomputation_is_not_cached_by_path>
+
+    def test_identity_recomputation_is_not_cached_by_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tree = Path(tmp)
+            for relative in (*m1_contract.PINNED_RELATIVE_PATHS,
+                              m1_contract.CONFIG_PATH):
+                source = ROOT / relative
+                target = tree / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(source, target)
+            self.assertEqual(
+                m1_contract.verify_run_identity(tree)["status"], "VERIFIED")
+            victim = tree / "forecasting/agent_forecasting/m1_runtime.py"
+>           victim.write_bytes(victim.read_bytes() + b"\n# drift\n")
+                               ^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/anaconda3/envs/reranker/lib/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/tmpkiniuuvq/forecasting/agent_forecasting/m1_runtime.py')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmpkiniuuvq/forecasting/agent_forecasting/m1_runtime.py'
+
+/root/anaconda3/envs/reranker/lib/python3.11/pathlib.py:1044: FileNotFoundError
+_ TrustBoundaryTests.test_request_binds_the_frozen_schema_and_output_cap_for_both_arms _
+
+self = <test_agent_m1_contract.TrustBoundaryTests testMethod=test_request_binds_the_frozen_schema_and_output_cap_for_both_arms>
+
+    def test_request_binds_the_frozen_schema_and_output_cap_for_both_arms(self):
+        config = m1_contract.load_config(ROOT)
+        directory = ROOT / config["prompt_artifacts"]["directory"]
+        for arm in ("C", "D"):
+            request = json.loads(m1_llm.build_request_bytes(
+                arm, '{"state":"FETCHED"}', ROOT))
+>           self.assertEqual(request["max_output_tokens"],
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             m1_contract.PER_CALL_OUTPUT_TOKENS[arm], msg=arm)
+E           KeyError: 'max_output_tokens'
+
+tests/test_agent_m1_contract.py:1275: KeyError
+_ PublicationSemanticClosureTests.test_broken_budget_chain_refuses_publication _
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_broken_budget_chain_refuses_publication>
+
+    def test_broken_budget_chain_refuses_publication(self):
+        with self.assertRaises(m1_publication.PublicationError):
+>           self._publish("run_chain", self._closure(budget_chain_ok=False))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1359: AttributeError
+_ PublicationSemanticClosureTests.test_crash_cleanup_removes_staging_and_lock __
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_crash_cleanup_removes_staging_and_lock>
+
+    def test_crash_cleanup_removes_staging_and_lock(self):
+        import forecasting.agent_forecasting.m1_publication as module
+        original = module._write_exclusive
+        counter = {"n": 0}
+    
+        def flaky(path, payload):
+            counter["n"] += 1
+            if counter["n"] == 2:
+                raise OSError("injected crash mid staging")
+            return original(path, payload)
+    
+        module._write_exclusive = flaky
+        try:
+            with self.assertRaises(OSError):
+>               self._publish("run_clean", self._closure())
+                                           ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1359: AttributeError
+___ PublicationSemanticClosureTests.test_deadline_breach_refuses_publication ___
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_deadline_breach_refuses_publication>
+
+    def test_deadline_breach_refuses_publication(self):
+        with self.assertRaises(m1_publication.PublicationError):
+            self._publish("run_late", self._closure(
+>               clock_final=harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET + 1))
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1388: AttributeError
+____ PublicationSemanticClosureTests.test_fold_over_cap_refuses_publication ____
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_fold_over_cap_refuses_publication>
+
+    def test_fold_over_cap_refuses_publication(self):
+        caps = {cls.name: value for cls, value in m1_budget.CAPS.items()}
+        fold = dict(caps)
+        fold["LLM_INPUT_TOKENS"] = caps["LLM_INPUT_TOKENS"] + 1
+        with self.assertRaises(m1_publication.PublicationError):
+>           self._publish("run_fold", self._closure(budget_fold=fold))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1383: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1359: AttributeError
+_ PublicationSemanticClosureTests.test_missing_closure_field_refuses_publication _
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_missing_closure_field_refuses_publication>
+
+    def test_missing_closure_field_refuses_publication(self):
+>       closure = self._closure()
+                  ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_missing_closure_field_refuses_publication>
+overrides = {}
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1359: AttributeError
+_ PublicationSemanticClosureTests.test_published_runs_archive_llm_wire_and_digests _
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_published_runs_archive_llm_wire_and_digests>
+
+    def test_published_runs_archive_llm_wire_and_digests(self):
+        publish_root = self.root / "ev"
+        dup = harness.opaque_ref(harness.NEW_FILENAME_B)
+        result = _run("D", _asym_snapshot("NEW", "TIMEOUT"),
+                      transport=_d_transport(("LIST", "NONE"),
+                                             ("FETCH_REF", dup),
+                                             ("FINALIZE_TYPED", "NONE")),
+                      publish_root=publish_root)
+        self.assertEqual(result.verdict, "PUBLISHED_TYPED")
+        final = Path(result.publish_dir)
+        wire = [json.loads(line) for line in
+>               (final / "llm_wire.jsonl").read_text().splitlines()]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1427: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/anaconda3/envs/reranker/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/tmpw9dtonry/ev/runs/D_1641218400_snap_34d0d13e0ac85013/llm_wire.jsonl')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmpw9dtonry/ev/runs/D_1641218400_snap_34d0d13e0ac85013/llm_wire.jsonl'
+
+/root/anaconda3/envs/reranker/lib/python3.11/pathlib.py:1044: FileNotFoundError
+_ PublicationSemanticClosureTests.test_run_arm_converts_publication_failure_into_a_failure_record _
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_run_arm_converts_publication_failure_into_a_failure_record>
+
+    def test_run_arm_converts_publication_failure_into_a_failure_record(self):
+        publish_root = self.root / "ev"
+        original = m1_runtime.publish_run
+        try:
+            m1_runtime.publish_run = lambda *a, **k: (_ for _ in ()).throw(
+                m1_publication.PublicationError("injected refusal"))
+>           result = _run("B", _clean_snapshot(), publish_root=publish_root)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1406: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_agent_m1_contract.py:97: in _run
+    return m1_runtime.run_arm(
+forecasting/agent_forecasting/m1_runtime.py:567: in run_arm
+    return typed_terminal(evidence)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agent_forecasting/m1_runtime.py:536: in typed_terminal
+    result = finish("PUBLISHED_TYPED", "PUBLISHED_TYPED",
+forecasting/agent_forecasting/m1_runtime.py:497: in finish
+    final = publish_run(publish_root, run_id, payloads,
+tests/test_agent_m1_contract.py:1404: in <lambda>
+    m1_runtime.publish_run = lambda *a, **k: (_ for _ in ()).throw(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <tuple_iterator object at 0x7fdb9326b3a0>
+
+>   m1_runtime.publish_run = lambda *a, **k: (_ for _ in ()).throw(
+        m1_publication.PublicationError("injected refusal"))
+E   forecasting.agent_forecasting.m1_publication.PublicationError: injected refusal
+
+tests/test_agent_m1_contract.py:1404: PublicationError
+_ PublicationSemanticClosureTests.test_valid_closure_publishes_and_is_recorded_in_the_manifest _
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_valid_closure_publishes_and_is_recorded_in_the_manifest>
+
+    def test_valid_closure_publishes_and_is_recorded_in_the_manifest(self):
+>       final = self._publish("run_ok", self._closure())
+                                        ^^^^^^^^^^^^^^^
+
+tests/test_agent_m1_contract.py:1373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_agent_m1_contract.PublicationSemanticClosureTests testMethod=test_valid_closure_publishes_and_is_recorded_in_the_manifest>
+overrides = {}
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+>           "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+E       AttributeError: module 'forecasting.agent_forecasting.m1_contract' has no attribute 'DEADLINE_OFFSET'
+
+tests/test_agent_m1_contract.py:1359: AttributeError
+_____________ EvidenceClosureVerifierTests.test_clean_root_passes ______________
+
+self = <test_agent_m1_contract.EvidenceClosureVerifierTests testMethod=test_clean_root_passes>
+
+    def test_clean_root_passes(self):
+        record = self._write_log("red_green/g.txt", ident="g", head="H" * 40)
+        self._write_ledger(record)
+        self._write_manifest()
+>       self.assertEqual(self.verifier.verify_evidence_root(
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            self.root, recompute=False), [])
+E       AttributeError: module 'verify_m1_evidence' has no attribute 'verify_evidence_root'
+
+tests/test_agent_m1_contract.py:1509: AttributeError
+_ EvidenceClosureVerifierTests.test_detects_duplicate_log_path_and_missing_tail _
+
+self = <test_agent_m1_contract.EvidenceClosureVerifierTests testMethod=test_detects_duplicate_log_path_and_missing_tail>
+
+    def test_detects_duplicate_log_path_and_missing_tail(self):
+        first = self._write_log("a.txt", ident="a", head="H" * 40)
+        second = self._write_log("a.txt", ident="b", head="H" * 40,
+                                 tail="EXIT_CODE=3\nEXTRA\n")
+        self._write_ledger(first, second)
+        self._write_manifest()
+>       problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'verify_m1_evidence' has no attribute 'verify_evidence_root'
+
+tests/test_agent_m1_contract.py:1518: AttributeError
+_ EvidenceClosureVerifierTests.test_detects_gate_inconsistent_with_the_reducer_report _
+
+self = <test_agent_m1_contract.EvidenceClosureVerifierTests testMethod=test_detects_gate_inconsistent_with_the_reducer_report>
+
+    def test_detects_gate_inconsistent_with_the_reducer_report(self):
+        record = self._write_log("red_green/02_green_full_suite.txt", ident="g",
+                                 head="H" * 40, tail="81 passed in 2s\nEXIT_CODE=0\n")
+        self._write_ledger(record)
+        report = {"verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+                  "scenarios_total": 193, "d_traces_enumerated": 1700,
+                  "llm_failures_checked": 1500, "witnesses": [],
+                  "uses_labels_or_scores": False, "internal_consistency_ok": True}
+        (self.root / "reducibility").mkdir()
+        (self.root / "reducibility" / "reducer_report.json").write_text(
+            json.dumps(report))
+        gate = m1_contract.map_gate({"verdict": report["verdict"],
+                                     "engineering_green": True})
+        gate["engineering"] = {"suite_exit_code": 0,
+                               "suite_log": "red_green/02_green_full_suite.txt",
+                               "tests_passed": 81}
+        gate["advance_m1"] = True  # the exact forbidden mutation
+        (self.root / "gate.json").write_text(json.dumps(gate))
+        self._write_manifest()
+>       problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'verify_m1_evidence' has no attribute 'verify_evidence_root'
+
+tests/test_agent_m1_contract.py:1557: AttributeError
+_____ EvidenceClosureVerifierTests.test_detects_header_provenance_mismatch _____
+
+self = <test_agent_m1_contract.EvidenceClosureVerifierTests testMethod=test_detects_header_provenance_mismatch>
+
+    def test_detects_header_provenance_mismatch(self):
+        record = self._write_log("a.txt", ident="a", head="H" * 40)
+        record["git_head"] = "O" * 40  # ledger disagrees with the log header
+        self._write_ledger(record)
+        self._write_manifest()
+>       problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'verify_m1_evidence' has no attribute 'verify_evidence_root'
+
+tests/test_agent_m1_contract.py:1527: AttributeError
+___________ EvidenceClosureVerifierTests.test_detects_manifest_drift ___________
+
+self = <test_agent_m1_contract.EvidenceClosureVerifierTests testMethod=test_detects_manifest_drift>
+
+    def test_detects_manifest_drift(self):
+        record = self._write_log("a.txt", ident="a", head="H" * 40)
+        self._write_ledger(record)
+        self._write_manifest()
+        (self.root / "smuggled.txt").write_bytes(b"x")
+>       problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'verify_m1_evidence' has no attribute 'verify_evidence_root'
+
+tests/test_agent_m1_contract.py:1535: AttributeError
+_ ReducerScenarioSpaceTests.test_scenario_space_equals_the_independently_derived_protocol_cross _
+
+self = <test_agent_m1_reducer.ReducerScenarioSpaceTests testMethod=test_scenario_space_equals_the_independently_derived_protocol_cross>
+
+    def test_scenario_space_equals_the_independently_derived_protocol_cross(self):
+        """No hardcoded total: the expectation set is rebuilt axis by axis."""
+        expected = [
+            {"listing": "EMPTY", "new_outcome": "COMPLETE_VALID",
+             "old_outcome": "COMPLETE_VALID", "relation": "BEFORE_ORIGIN",
+             "body_relation": "DISTINCT_VINTAGES", "dup_outcome": ""},
+        ]
+        for outcome in harness.FETCH_OUTCOMES:          # ONE_REF: 5 x 3
+            for relation in harness.RELATIONS:
+                expected.append({"listing": "ONE_REF", "new_outcome": outcome,
+                                 "old_outcome": "COMPLETE_VALID",
+                                 "relation": relation,
+                                 "body_relation": "DISTINCT_VINTAGES",
+                                 "dup_outcome": ""})
+        for body_relation in ("DISTINCT_VINTAGES",   # TWO_REFS: 2 x 25 x 3
+                              "FORK_SAME_VINTAGE"):
+            for old in harness.FETCH_OUTCOMES:
+                for new in harness.FETCH_OUTCOMES:
+                    for relation in harness.RELATIONS:
+                        expected.append({"listing": "TWO_REFS",
+                                         "new_outcome": new,
+                                         "old_outcome": old,
+                                         "relation": relation,
+                                         "body_relation": body_relation,
+                                         "dup_outcome": ""})
+        for outcome in harness.FETCH_OUTCOMES:          # symmetric duplicates: 5 x 3
+            for relation in harness.RELATIONS:
+                expected.append({"listing": "TWO_REFS", "new_outcome": outcome,
+                                 "old_outcome": outcome, "relation": relation,
+                                 "body_relation": "DUPLICATE_SAME_BODY",
+                                 "dup_outcome": outcome})
+        for failure in harness.TRANSPORT_FAILURES:      # asymmetric mirrors: 2 x 2 x 3
+            for failing in ("NEW", "DUP"):
+                for relation in harness.RELATIONS:
+                    new_outcome = failure if failing == "NEW" else "COMPLETE_VALID"
+                    dup_outcome = "COMPLETE_VALID" if failing == "NEW" else failure
+                    expected.append({"listing": "TWO_REFS",
+                                     "new_outcome": new_outcome,
+                                     "old_outcome": new_outcome,
+                                     "relation": relation,
+                                     "body_relation": "DUPLICATE_SAME_BODY",
+                                     "dup_outcome": dup_outcome})
+        self.assertEqual(len(expected),
+                         1 + 5 * 3 + 2 * 25 * 3 + 5 * 3 + 2 * 2 * 3)
+        actual = [json.loads(json.dumps(snapshot["scenario"], sort_keys=True))
+                  for snapshot in harness.scenario_space()]
+        key = lambda scenario: json.dumps(scenario, sort_keys=True)  # noqa: E731
+>       self.assertEqual(sorted(map(key, actual)), sorted(map(key, expected)))
+E       AssertionError: Lists differ: ['{"b[16333 chars]e": "COMPLETE_VALID", "relation": "AFTER_ORIGI[17076 chars]N"}'] != ['{"b[16333 chars]e": "NOT_FOUND", "relation": "AFTER_ORIGIN"}',[17040 chars]N"}']
+E       
+E       First differing element 94:
+E       '{"bo[119 chars], "old_outcome": "COMPLETE_VALID", "relation": "AFTER_ORIGIN"}'
+E       '{"bo[119 chars], "old_outcome": "NOT_FOUND", "relation": "AFTER_ORIGIN"}'
+E       
+E       Diff is 37268 characters long. Set self.maxDiff to None to see it.
+
+tests/test_agent_m1_reducer.py:116: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_m1_contract.py::DigestAndPromptTests::test_request_bytes_use_the_frozen_prompts
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_crash_before_commit_leaves_no_visible_success
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_extra_file_after_commit_breaks_closure
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_publish_verify_and_refuse_duplicates
+FAILED tests/test_agent_m1_contract.py::AtomicPublicationTests::test_tampered_payload_breaks_closure
+FAILED tests/test_agent_m1_contract.py::MirrorFairnessTests::test_asymmetric_mirrors_keep_bcd_terminals_identical
+FAILED tests/test_agent_m1_contract.py::MirrorFairnessTests::test_b_fetches_both_mirrors_and_survives_one_transport_death
+FAILED tests/test_agent_m1_contract.py::MirrorFairnessTests::test_b_survives_when_only_the_dead_mirror_is_visible
+FAILED tests/test_agent_m1_contract.py::MirrorFairnessTests::test_canonical_plan_prefers_both_mirrors_of_the_newest_visible_body
+FAILED tests/test_agent_m1_contract.py::MirrorFairnessTests::test_typed_derivation_is_fetch_order_independent
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_forecast_budget_refusal_maps_to_a_frozen_reason
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_forecast_tool_runtime_error_is_contained
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_generation_cap_zero_never_touches_the_transport
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_oversized_body_refused_before_any_byte_is_read
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_transport_timeout_is_billed_like_a_success
+FAILED tests/test_agent_m1_contract.py::FailClosedBudgetTests::test_two_mid_size_bodies_do_not_accumulate_into_the_per_body_cap
+FAILED tests/test_agent_m1_contract.py::ArmSnapshotBoundaryTests::test_arm_a_never_touches_the_snapshot_receipt_chain
+FAILED tests/test_agent_m1_contract.py::ArmSnapshotBoundaryTests::test_broken_chain_maps_to_a_frozen_reason_for_b_and_d
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_budget_ledger_rebuild_detects_a_tampered_archive
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_execution_modules_protocol_and_config_fields_are_pinned
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_forged_typed_evidence_cannot_attach_arbitrary_values
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_function_envelope_cannot_override_the_function_identity
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_identity_recomputation_is_not_cached_by_path
+FAILED tests/test_agent_m1_contract.py::TrustBoundaryTests::test_request_binds_the_frozen_schema_and_output_cap_for_both_arms
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_broken_budget_chain_refuses_publication
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_crash_cleanup_removes_staging_and_lock
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_deadline_breach_refuses_publication
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_fold_over_cap_refuses_publication
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_missing_closure_field_refuses_publication
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_published_runs_archive_llm_wire_and_digests
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_run_arm_converts_publication_failure_into_a_failure_record
+FAILED tests/test_agent_m1_contract.py::PublicationSemanticClosureTests::test_valid_closure_publishes_and_is_recorded_in_the_manifest
+FAILED tests/test_agent_m1_contract.py::EvidenceClosureVerifierTests::test_clean_root_passes
+FAILED tests/test_agent_m1_contract.py::EvidenceClosureVerifierTests::test_detects_duplicate_log_path_and_missing_tail
+FAILED tests/test_agent_m1_contract.py::EvidenceClosureVerifierTests::test_detects_gate_inconsistent_with_the_reducer_report
+FAILED tests/test_agent_m1_contract.py::EvidenceClosureVerifierTests::test_detects_header_provenance_mismatch
+FAILED tests/test_agent_m1_contract.py::EvidenceClosureVerifierTests::test_detects_manifest_drift
+FAILED tests/test_agent_m1_reducer.py::ReducerScenarioSpaceTests::test_scenario_space_equals_the_independently_derived_protocol_cross
+38 failed, 59 passed in 57.25s
+--- output end ---
+EXIT_CODE=1
