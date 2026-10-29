@@ -94,7 +94,7 @@ class RawBodyParserTests(unittest.TestCase):
         self.assertEqual(parsed.seqno, FIXTURE_SEQNO)
         self.assertEqual(parsed.runno, FIXTURE_RUNNO)
         self.assertEqual(len(parsed.rows), 70)
-        self.assertEqual(parsed.rows[0], (FIXTURE_ORIGIN_UNIX, values[0]))
+        self.assertEqual(parsed.rows[0], (FIXTURE_ORIGIN_UNIX + 1800, values[0]))
         self.assertEqual(parsed.rows[-1], (FIXTURE_ORIGIN_UNIX + 70 * 1800, values[-1]))
         again = self._parse(build_body_bytes())
         self.assertEqual(parsed.body_sha256, again.body_sha256)
@@ -151,7 +151,11 @@ class RawBodyParserTests(unittest.TestCase):
         import io
         import zipfile
 
-        def rezip(text):
+        def rezip(mutated_lines):
+            # keep the frozen trailer invariant: the count equals total rows
+            mutated_lines = list(mutated_lines)
+            mutated_lines[-1] = f"C,END OF REPORT,{len(mutated_lines)}"
+            text = "\n".join(mutated_lines)
             buffer = io.BytesIO()
             info = zipfile.ZipInfo("x.csv", date_time=(2022, 1, 3, 23, 0, 0))
             info.compress_type = zipfile.ZIP_STORED
@@ -169,15 +173,15 @@ class RawBodyParserTests(unittest.TestCase):
         data_line = lines[target_first + 1]
         truncated = ",".join(data_line.split(",")[:-1])
         with self.assertRaisesRegex(ValueError, "width"):
-            module.parse_body(rezip("\n".join(
-                lines[:target_first + 1] + [truncated] + lines[target_first + 2:])))
-        duplicated = "\n".join(lines[:target_first + 2] + [data_line] + lines[target_first + 2:])
+            module.parse_body(rezip(
+                lines[:target_first + 1] + [truncated] + lines[target_first + 2:]))
+        duplicated = lines[:target_first + 2] + [data_line] + lines[target_first + 2:]
         with self.assertRaisesRegex(ValueError, "duplicate primary key"):
             module.parse_body(rezip(duplicated))
         other_vintage = data_line.replace(FIXTURE_SEQNO, "2022010399")
         with self.assertRaisesRegex(ValueError, "exactly one vintage"):
-            module.parse_body(rezip("\n".join(
-                lines[:target_first + 1] + [data_line, other_vintage] + lines[target_first + 2:])))
+            module.parse_body(rezip(
+                lines[:target_first + 1] + [data_line, other_vintage] + lines[target_first + 2:]))
 
     def test_builder_duplicate_and_drop_mutations(self):
         module = self._module()
@@ -225,18 +229,12 @@ class RawBodyParserTests(unittest.TestCase):
         lines = [line for line in text.splitlines()
                  if not (line.startswith("D,PREDISPATCH,REGION_SOLUTION,9")
                          and ",NSW1," in line)]
+        lines[-1] = f"C,END OF REPORT,{len(lines)}"  # retotal the single trailer
         buffer = io.BytesIO()
         info = zipfile.ZipInfo("x.csv", date_time=(2022, 1, 3, 23, 0, 0))
         info.compress_type = zipfile.ZIP_STORED
-        rows = [row.split(",") for row in lines]
-        rows.append(["C", "END OF REPORT", str(len(rows) + 1)])
-        import csv as _csv
-        sink = io.StringIO(newline="")
-        writer = _csv.writer(sink, lineterminator="\n")
-        for row in rows:
-            writer.writerow(row)
         with zipfile.ZipFile(buffer, "w") as out_zip:
-            out_zip.writestr(info, sink.getvalue().encode())
+            out_zip.writestr(info, "\n".join(lines).encode())
         with self.assertRaisesRegex(ValueError, "no NSW1"):
             module.parse_body(buffer.getvalue())
 

@@ -1,0 +1,87 @@
+{
+  "status": "frozen_m0",
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "execution_scope": "m0_protocol_only",
+  "branch": "research/agentic-asof-abs-predispatch-c2-20261029-r4",
+  "protocol_doc": "docs/research/agent_forecasting/m0_predispatch_td_abs_protocol_20261029.txt",
+  "source_files": [
+    "configs/agent_forecasting/m0_predispatch_td_abs_c2_20261029.json",
+    "docs/research/agent_forecasting/m0_predispatch_td_abs_protocol_20261029.txt",
+    "forecasting/agent_forecasting/predispatch_td_abs.py",
+    "forecasting/agent_forecasting/contracts.py",
+    "forecasting/agent_forecasting/frozen_chronos.py",
+    "scripts/capture_predispatchis.py",
+    "scripts/verify_predispatch_capture.py",
+    "scripts/check_m0_predispatch_td_response.py",
+    "scripts/run_logged.sh",
+    "tests/fixtures/agent_forecasting/predispatchis_td_v2_fixture.py",
+    "tests/fixtures/agent_forecasting/predispatchis_td_v2_synthetic.zip",
+    "tests/fixtures/agent_forecasting/predispatchis_td_v2_synthetic.json",
+    "tests/test_agent_predispatch_td_v2.py"
+  ],
+  "interpreter": "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python",
+  "input": {
+    "directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection",
+    "region": "NSW1",
+    "row": 72,
+    "origin_unix": 1641218400,
+    "file_sha256": {
+      "metadata.json": "e9d9b1a7e348524337273240687332d549ce191bbe9b9321da032aed06f63df5",
+      "origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+      "input__history_values.npy": "9a477e06757ec244b102b36354815749fbe13a0109677332abaa489a51e3d4cd",
+      "input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+      "input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0"
+    }
+  },
+  "checkpoint": {
+    "directory": "/root/workspace/Code/DualTimesField/weights/hf_home/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "sha256": {
+      "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+    }
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "chronos-forecasting": "2.3.2",
+    "torch": "2.14.1+cu126",
+    "transformers": "5.20.2",
+    "psutil": "7.2.2"
+  },
+  "resources": {
+    "cpu_threads": 2,
+    "max_model_calls": 4,
+    "per_call_wall_seconds": 300,
+    "total_wall_seconds": 900,
+    "rss_bytes": 8589934592,
+    "gpu": 0,
+    "external_llm_calls": 0,
+    "training": 0,
+    "downloads": 0
+  },
+  "numerical_tolerance": {
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "response_check": {
+    "runs_per_input": 2,
+    "min_output_delta_abs": 1e-06,
+    "fixture_zip": "tests/fixtures/agent_forecasting/predispatchis_td_v2_synthetic.zip",
+    "fixture_zip_sha256": "ab1debd78a497090cf17d0e4695353ee51c7a2942f8034fdb1fb5f664b4f361d",
+    "fixture_basis": "synthetic_fixture",
+    "evidence_dir": "logs/forecasting/m0_predispatch_td_abs_c2_20261029/response_check"
+  },
+  "capture": {
+    "url": "https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/",
+    "max_listing": 1,
+    "max_zip_gets": 2,
+    "max_total_bytes": 16777216,
+    "per_request_timeout_seconds": 15,
+    "request_interval_seconds": 1,
+    "retries": 0,
+    "declared_origin_unix": 1793260800,
+    "evidence_dir": "logs/forecasting/m0_predispatch_td_abs_c2_20261029/capture"
+  },
+  "evidence_root": "logs/forecasting/m0_predispatch_td_abs_c2_20261029",
+  "advance_to_g1_g2": false
+}

@@ -5,6 +5,13 @@ It deliberately does not accept an AlignedSplit, NPZ, labels, or an opaque conte
 object.  Tuples and copied read-only mappings also close PredictionView's shallow
 immutability gap.  Validation cannot establish a data supplier's truthfulness:
 the loader must separately prove the provenance and availability of each value.
+
+The ``future_forecasts`` mapping is the candidate-2 typed future-forecast
+extension: a known-future forecast tensor (e.g. predispatch TOTALDEMAND)
+that legitimately has NO same-semantic past observations.  It is exempt
+from the calendar rule that future covariates need same-named past values;
+inventing a past history to satisfy that rule is forbidden, and the frozen
+tool instead encodes the honest absence itself.
 """
 from __future__ import annotations
 
@@ -22,6 +29,7 @@ from typing import Mapping
 CALENDAR_NAMES = tuple(f"cal_{index}" for index in range(10))
 PAST_COVARIATE_NAMES = frozenset(("demand_std", *CALENDAR_NAMES))
 FUTURE_COVARIATE_NAMES = frozenset(CALENDAR_NAMES)
+TYPED_FUTURE_FORECAST_NAMES = frozenset(("predispatchis_totaldemand_mw",))
 METADATA_NAMES = frozenset({"region", "snapshot_id", "input_profile",
                             "source_manifest_sha256", "transform_sha256"})
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,127}\Z")
@@ -85,6 +93,7 @@ class FrozenForecastInput:
     price_history: tuple[float, ...]
     past_covariates: Mapping[str, tuple[float, ...]] = field(default_factory=dict)
     future_covariates: Mapping[str, tuple[float, ...]] = field(default_factory=dict)
+    future_forecasts: Mapping[str, tuple[float, ...]] = field(default_factory=dict)
     metadata: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -107,6 +116,10 @@ class FrozenForecastInput:
         past, future = mappings
         if not set(future).issubset(past):
             raise ValueError("future covariates need same-semantic past covariates")
+        if not isinstance(self.future_forecasts, Mapping) or not set(self.future_forecasts).issubset(TYPED_FUTURE_FORECAST_NAMES):
+            raise ValueError("future_forecasts contains unapproved fields")
+        forecasts = {key: _finite_tuple(self.future_forecasts[key], 24, f"future_forecasts.{key}")
+                     for key in sorted(self.future_forecasts)}
         if not isinstance(self.metadata, Mapping) or not set(self.metadata).issubset(METADATA_NAMES):
             raise ValueError("metadata contains unapproved fields")
         meta = {}
@@ -123,6 +136,7 @@ class FrozenForecastInput:
         object.__setattr__(self, "price_history", price)
         object.__setattr__(self, "past_covariates", MappingProxyType(past))
         object.__setattr__(self, "future_covariates", MappingProxyType(future))
+        object.__setattr__(self, "future_forecasts", MappingProxyType(forecasts))
         object.__setattr__(self, "metadata", MappingProxyType(meta))
 
     def to_dict(self) -> dict:
@@ -132,12 +146,14 @@ class FrozenForecastInput:
                 "price_history": list(self.price_history),
                 "past_covariates": {k: list(v) for k, v in self.past_covariates.items()},
                 "future_covariates": {k: list(v) for k, v in self.future_covariates.items()},
+                "future_forecasts": {k: list(v) for k, v in self.future_forecasts.items()},
                 "metadata": dict(self.metadata)}
 
     @classmethod
     def from_dict(cls, payload: Mapping) -> "FrozenForecastInput":
         required = {"origin_unix", "target_time_unix", "price_history"}
-        allowed = required | {"past_covariates", "future_covariates", "metadata"}
+        allowed = required | {"past_covariates", "future_covariates",
+                              "future_forecasts", "metadata"}
         if not isinstance(payload, Mapping) or not required.issubset(payload) or not set(payload).issubset(allowed):
             raise ValueError("forecast input has missing or unapproved fields")
         return cls(**dict(payload))

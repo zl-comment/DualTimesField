@@ -15,6 +15,7 @@ INPUT_FILES = (
     "metadata.json", "origin_unix.npy", "input__history_values.npy",
     "input__history_calendar.npy", "input__future_calendar.npy",
 )
+TYPED_FUTURE_PAST_ENCODING = "all_nan_honest_absence"
 
 
 def sha256_file(path: str | Path) -> str:
@@ -97,6 +98,30 @@ def validate_output(array) -> np.ndarray:
     return values
 
 
+def build_model_input(request: FrozenForecastInput) -> dict:
+    """Map one frozen request to the Chronos-2 list-of-dicts entry format.
+
+    A typed future forecast has no same-semantic past observations.  Chronos-2
+    requires every future-covariate name to exist in the past stream and masks
+    NaN context entries natively, so the honest absence is encoded as an
+    all-NaN past of the same length as the target history; no past value is
+    invented and the real 24 future values pass through unchanged.
+    """
+    history_length = len(request.price_history)
+    past = {key: np.asarray(value, dtype=np.float64)
+            for key, value in request.past_covariates.items()}
+    future = {key: np.asarray(value, dtype=np.float64)
+              for key, value in request.future_covariates.items()}
+    for name, values in request.future_forecasts.items():
+        past[name] = np.full(history_length, np.nan, dtype=np.float64)
+        future[name] = np.asarray(values, dtype=np.float64)
+    return {
+        "target": np.asarray(request.price_history, dtype=np.float64),
+        "past_covariates": past,
+        "future_covariates": future,
+    }
+
+
 def _parameter_hash(model) -> str:
     import torch
     digest = hashlib.sha256()
@@ -139,11 +164,7 @@ def predict_frozen(request: FrozenForecastInput, config: dict) -> tuple[np.ndarr
             raise RuntimeError("non-CPU parameter")
         parameter.requires_grad_(False)
     before = _parameter_hash(pipeline.model)
-    model_input = {
-        "target": np.asarray(request.price_history, dtype=np.float64),
-        "past_covariates": {k: np.asarray(v, dtype=np.float64) for k, v in request.past_covariates.items()},
-        "future_covariates": {k: np.asarray(v, dtype=np.float64) for k, v in request.future_covariates.items()},
-    }
+    model_input = build_model_input(request)
     with torch.inference_mode():
         quantiles, _ = pipeline.predict_quantiles(
             [model_input], prediction_length=24, quantile_levels=list(QUANTILES),
@@ -164,4 +185,8 @@ def predict_frozen(request: FrozenForecastInput, config: dict) -> tuple[np.ndarr
         "quantile_levels": list(QUANTILES), "cross_learning": False,
         "negative_values_preserved": True,
         "native_crossing_count": int(np.sum(np.diff(output, axis=1) < 0)),
+        "typed_future_forecasts": {name: {
+            "past_encoding": TYPED_FUTURE_PAST_ENCODING,
+            "future_values": 24,
+        } for name in request.future_forecasts},
     }
