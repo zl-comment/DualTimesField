@@ -1,0 +1,134 @@
+M0 candidate 2 protocol — predispatchis_absolute_totaldemand_future_v1
+Branch: research/agentic-asof-abs-predispatch-c2-20261029-r4 (frozen before implementation)
+Date: 2026-10-29 (UTC)
+
+1. Candidate and scope
+- candidate_id: predispatchis_absolute_totaldemand_future_v1
+- source: official AEMO CURRENT PredispatchIS_Reports (HTTPS, default certificate
+  verification, zero retries).
+- value: NSW1 TOTALDEMAND (MW) from ONE exact PREDISPATCHIS vintage, mapped to 24
+  hourly future covariate values for a declared origin.
+- mission milestone: M0 AGENT_LEGAL_NUMERIC_PATH protocol layer only.  No labels,
+  no scores, no fitting/calibration, no model download, no GPU, no G1/G2, no
+  collector, no push/merge/rebase.
+
+2. Frozen source identity (discovered from authenticated raw bytes 2026-10-29)
+- table: PREDISPATCH,REGION_SOLUTION,9 (I/D rows; table identity repeated in
+  fields 1-3 of every D row).
+- file layout: CSV inside a single-member ZIP; row 0 is the C preamble
+  (C,NEMP.WORLD,PREDISPATCHIS,AEMO,PUBLIC,...,PREDISPATCHIS,...); sections start
+  at I rows; the LAST row is C,END OF REPORT,<N> with N == total row count of
+  the file; any other C row is rejected.
+- REGION_SOLUTION header: exactly 131 CSV fields; the 127 data column names and
+  the full header-line SHA-256 are frozen in
+  forecasting/agent_forecasting/predispatch_td_abs.py (HEADER_COLUMNS,
+  HEADER_LINE_SHA256 = 2f013ba453d6ef05959d74895fa6db6f9cd2522b6c0f7d4356af09fadaaa529a).
+  The same hash was independently reported by the upstream read-only research
+  node from a separate download of the same publication — two independent
+  captures agree.
+- field: TOTALDEMAND, unit MW, region NSW1, INTERVENTION=0; DATETIME is AEST
+  (UTC+10, no DST) period END on the half-hour grid; LASTCHANGED and filename
+  timestamps are declared metadata, never clocks.
+- row key: (PREDISPATCHSEQNO, RUNNO, REGIONID, INTERVENTION, DATETIME); a body
+  carries exactly one (PREDISPATCHSEQNO, RUNNO) across the whole table.
+
+3. Receipt visibility
+- The only visibility clock is receipt_complete_unix: the local UTC wall clock
+  read in the same process at stream EOF, ceiled to the next whole second (the
+  recorded instant is never earlier than the true EOF), stored beside a
+  monotonic reading and a clock-health record (wall/monotonic advances).
+- Raw bodies are stored write-once under bodies/<sha256>.zip; receipt events are
+  appended to events.jsonl.  load_receipt_store re-reads and re-hashes every
+  body and re-parses it through receipt_from_raw_body; any drift fails closed.
+- HTTP Date/Last-Modified, Content-Length, LASTCHANGED, filename time and
+  directory ordering never grant visibility.
+
+4. Revision, duplicates, conflicts
+- Same (seqno, runno, body_sha256) received again: all receipt events are kept,
+  the signal folds to the EARLIEST body-complete instant.
+- Same (seqno, runno) with two different body hashes: fork, fail closed, no
+  last-write-wins.
+- Header/column/version drift, a second REGION_SOLUTION section, orphan D rows,
+  duplicate primary keys, empty or non-finite TOTALDEMAND, off-grid DATETIME,
+  wrong trailer count: rejected, no repair, no migration.
+- Caller-supplied rows, values, body hashes or basis strings can never build or
+  promote a receipt: construction exists only via receipt_from_raw_body
+  (first_seen_receipt) and synthetic_receipt_from_raw_body (synthetic_fixture);
+  both re-parse the raw bytes on every (re)construction; dataclasses.replace
+  cannot flip basis, rows or hashes.
+
+5. Target-time mapping and no-fill
+- All AEMO times are AEST (UTC+10, no DST).  Target hour h in [0,24) is the
+  delivery hour [origin+h, origin+(h+1)) (origin must be hour-aligned UTC).
+- The value for hour h is the exact arithmetic mean of the two half-hour rows
+  ending at origin+(2h+1)*1800 and origin+(2h+2)*1800, taken from ONE vintage.
+- Selection: among deduplicated receipts visible at origin (receipt_complete <=
+  origin), only the NEWEST (seqno, runno) is examined.  If it does not carry all
+  48 exact half-hour ends, the origin is UNCOVERED: no fallback to older or
+  longer runs, no archive, no cross-vintage splice, no forward/back/median/zero
+  fill of any kind.
+- Rows outside the 48-end window are ignored (never spliced in).
+
+6. Typed input contract extension
+- FrozenForecastInput gains a future_forecasts mapping allowlisted to
+  predispatchis_totaldemand_mw, length 24, finite MW, bound in metadata to
+  source_manifest_sha256 = series_hash (origin, values, vintage identity, body
+  and header hashes, ledger hash).
+- The typed field is exempt from the calendar rule "future covariates need
+  same-named past covariates".  Inventing a 72h past for this series is
+  forbidden; the name cannot appear in past_covariates at all.
+- Tool encoding (frozen): Chronos-2 (chronos-forecasting 2.3.2) rejects a
+  future covariate whose name has no past stream (validated empirically:
+  from_list_of_dicts raises "must be a subset of past_covariates"), and masks
+  NaN context entries natively (model.py _prepare_patched_context /
+  _prepare_patched_future).  frozen_chronos.build_model_input therefore encodes
+  the honest absence as an all-NaN 72-step past for the typed name and passes
+  the 24 real future values through unchanged.  No past value is invented; the
+  response check records this encoding in every trace.
+
+7. Paired deterministic response check
+- Base input: the frozen development input (row 72, origin 1641218400, pinned
+  file hashes).  Candidate input: base + the typed future tensor from the
+  committed synthetic fixture (PREDISPATCHIS-format bytes, basis
+  synthetic_fixture, receipt at origin-600s, single vintage covering all 48
+  ends).
+- Each call runs in a fresh child process (predict_frozen is one-call-per-
+  process); base x2 and candidate x2, frozen settings, CPU only, offline.
+- PASS requires: candidate and base input hashes differ; each pair of identical
+  inputs reproduces bytewise within atol=rtol=1e-6; max|candidate - base| >
+  1e-6 on the 24x5 native quantiles; model state hash and checkpoint hashes
+  identical before/after; training calls 0; no label file is opened.
+
+8. Budgets actually used by this M0 run
+- Source access: 1 directory listing + 2 exact ZIP GETs (2,451,206 bytes total
+  < 16 MiB), 15 s per request, >= 1 s interval, zero retries; the offline
+  re-discovery step performed no network access.
+- Model: 4 local CPU calls (base x2, candidate x2) <= 300 s each, 900 s total,
+  2 CPU threads, offline, CUDA hidden.  GPU 0, training 0, downloads 0,
+  external LLM 0, labels 0, scores 0.
+- Test suite: repo interpreter with pytest; no model import in tests.
+
+9. Evidence closure
+- Every command runs through scripts/run_logged.sh: unique log path (reuse
+  refused, exit 99), argv + git HEAD + UTC timestamps + real EXIT_CODE line,
+  one JSONL record per command in commands.jsonl.
+- evidence root: logs/forecasting/m0_predispatch_td_abs_c2_20261029/ with
+  red_green/, capture/, response_check/, artifact_manifest.json (per-file
+  sha256 + size), README.
+- RED commit: tests + fixture builder + protocol + scripts, suite exit 1.
+  GREEN commit: module + contract/tool extension + fixture + config, suite
+  exit 0.  EVIDENCE commit: capture + verify + response check + manifest.
+
+10. Verdict semantics
+- The real capture proves: a genuine body-complete receipt strictly before the
+  declared origin, a single vintage supplying all 48 exact NSW1 half-hours, and
+  a deterministic 24-value tensor — STRICT_ASOF_VERIFIED for that origin under
+  the receipt-clock protocol.
+- The model-facing candidate tensor in this M0 uses the synthetic fixture
+  (honest basis synthetic_fixture); promoting the real captured vintage into a
+  model input requires a capture whose vintage covers the frozen development
+  origin — impossible retroactively and out of M0 scope (the M1 forward capture
+  path is the module's receipt store, already exercised).
+- STOP conditions from ACTIVE_ROUND are not triggered by this run; the verdict
+  for the instantiated candidate is BLOCKED_PENDING_INSTANTIATION resolved into
+  a delivered protocol layer awaiting independent final review.
