@@ -71,9 +71,12 @@ def verify_publication_closure(closure: Mapping, payloads: Mapping[str, bytes]) 
 
     Byte closure alone is not success: a run may only be published when its own
     archived budget ledger re-verifies verbatim, its fold respects every cap
-    (the per-body byte cap is checked per largest single body), the final clock
-    is within the deadline, and the as-of origin/input/tool identities are
-    carried and consistent with the archived result record.
+    (the per-body byte cap is checked per largest single body) with the FROZEN
+    ledger caps — never caller-supplied caps (audit-3/H4) — the final clock is
+    within the deadline, and the as-of origin/input/tool identities are carried
+    and consistent with the archived result record AND recomputed from the
+    archived model ledger and forecast trace (audit-3/H4: a hex-shaped hash is
+    not an identity; tool/input identity must recompute from the archives).
     """
     if not isinstance(closure, Mapping) or set(closure) != set(_CLOSURE_KEYS):
         raise PublicationError(
@@ -107,7 +110,13 @@ def verify_publication_closure(closure: Mapping, payloads: Mapping[str, bytes]) 
     fold = {cls.name: value for cls, value in ledger.fold().items()}
     if fold != {str(k): int(v) for k, v in closure["budget_fold"].items()}:
         raise PublicationError("closure budget fold disagrees with the archive")
-    caps = {str(k): int(v) for k, v in closure["budget_caps"].items()}
+    # the caps are the FROZEN contract caps, and the closure must carry exactly
+    # them: a self-reported cap vector can never authorize an over-cap fold
+    caps = {cls.name: value for cls, value in m1_budget.CAPS.items()}
+    if {str(k): int(v) for k, v in closure["budget_caps"].items()} != caps:
+        raise PublicationError(
+            "closure budget_caps are not the frozen contract caps "
+            "(self-reported caps cannot authorize publication)")
     if set(fold) != set(caps):
         raise PublicationError("closure budget class set drifted")
     per_body = m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY.name
@@ -132,7 +141,60 @@ def verify_publication_closure(closure: Mapping, payloads: Mapping[str, bytes]) 
         raise PublicationError("closure as-of origin disagrees with result.json")
     if archived.get("input_hash") not in (None, closure["input_hash"]):
         raise PublicationError("closure input identity disagrees with result.json")
+    if closure["input_hash"] != closure["canonical_model_input_sha256"]:
+        raise PublicationError(
+            "the canonical model input hash and the input hash are the same "
+            "canonical serialization and must be equal")
+    _verify_publication_identities(closure, payloads)
     return {"closure": dict(closure), "budget_fold": fold}
+
+
+def _verify_publication_identities(closure: Mapping,
+                                   payloads: Mapping[str, bytes]) -> None:
+    """Recompute tool/input identity from the archived model ledger and trace.
+
+    The model ledger is mandatory: the tool identity hash must recompute from
+    its recorded tool identity object.  When a forecast was published, its
+    bytes must hash to exactly one archived forecast trace entry, and that
+    entry's input hash must equal the closure's canonical input hash; when no
+    forecast bytes are archived, the trace must be empty.  A well-formed hex
+    digest supplied by the caller is never sufficient (audit-3/H4).
+    """
+    model_payload = payloads.get("model_ledger.jsonl")
+    if model_payload is None:
+        raise PublicationError("a publication must archive its model ledger")
+    try:
+        model_ledger = json.loads(model_payload)
+    except json.JSONDecodeError as exc:
+        raise PublicationError(f"model_ledger.jsonl is not JSON: {exc}") from exc
+    if not isinstance(model_ledger, dict) or not isinstance(
+            model_ledger.get("trace"), list) or not isinstance(
+                model_ledger.get("tool"), dict):
+        raise PublicationError("model ledger is not a tool/trace record")
+    recomputed_tool = hashlib.sha256(json.dumps(
+        model_ledger["tool"], sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    if recomputed_tool != closure["tool_identity_sha256"]:
+        raise PublicationError(
+            "closure tool identity does not recompute from the archived model ledger")
+    forecast = payloads.get("forecast.bin")
+    if forecast is None:
+        if model_ledger["trace"]:
+            raise PublicationError(
+                "no forecast bytes archived while the model ledger traces a call")
+        return
+    forecast_digest = hashlib.sha256(forecast).hexdigest()
+    matches = [entry for entry in model_ledger["trace"]
+               if isinstance(entry, dict)
+               and entry.get("output_sha256") == forecast_digest]
+    if len(matches) != 1:
+        raise PublicationError(
+            "the published forecast bytes must hash to exactly one archived "
+            f"forecast trace entry (matched {len(matches)})")
+    if matches[0].get("input_hash") != closure["canonical_model_input_sha256"]:
+        raise PublicationError(
+            "the canonical model input hash does not recompute from the "
+            "archived forecast trace")
 
 
 def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,

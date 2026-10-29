@@ -114,17 +114,68 @@ def verify_event_chain(events: Iterable[Mapping]) -> None:
         raise ValueError("receipt chain must start at seq 0")
 
 
+def verify_visible_chain(visible_events: tuple[Mapping, ...]) -> None:
+    """Verify the receipt chain over the VISIBLE subsequence only.
+
+    Every visible record must satisfy the structural checks of
+    verify_event_chain and be self-consistent: its own event hash recomputes
+    from its payload and its recorded prev link, and chain_seq order is
+    strictly increasing.  Adjacent visible records must additionally link
+    directly.  A visible record whose predecessor is invisible (a window not
+    starting at seq 0, or a gap left by an invisible post-origin predecessor)
+    is anchored at its recorded prev link: an origin cannot observe receipts
+    it has not seen.  Verifying only the visible window is what keeps an
+    earlier origin's identity immune to a corrupted post-origin event.
+    """
+    prev_seq: int | None = None
+    prev_hash: str | None = None
+    for record in visible_events:
+        if record.get("event") != "body_complete":
+            raise ValueError("receipt chain carries an unknown event kind")
+        seq = record.get("chain_seq")
+        if not isinstance(seq, int) or isinstance(seq, bool):
+            raise ValueError("receipt chain is not append-only sequential")
+        if prev_seq is not None and seq <= prev_seq:
+            raise ValueError("receipt chain is not append-only sequential")
+        prev_link = record.get("prev_sha256")
+        if (prev_seq is not None and seq == prev_seq + 1
+                and prev_link != prev_hash):
+            raise ValueError("receipt chain prev hash mismatch")
+        payload = {key: value for key, value in record.items()
+                   if key != "event_sha256"}
+        expected = hashlib.sha256(
+            (json.dumps(payload, sort_keys=True, separators=(",", ":"))
+             + str(prev_link)).encode()).hexdigest()
+        if record.get("event_sha256") != expected:
+            raise ValueError("receipt event hash mismatch")
+        digest = record.get("body_sha256")
+        if not isinstance(digest, str) or len(digest) != 64:
+            raise ValueError("event body hash is malformed")
+        filename = record.get("filename")
+        if not isinstance(filename, str) or "/" in filename or "\\" in filename:
+            raise ValueError("event filename is malformed")
+        prev_seq, prev_hash = seq, record["event_sha256"]
+    if (visible_events and visible_events[0].get("chain_seq") == 0
+            and visible_events[0].get("prev_sha256") != "0" * 64):
+        raise ValueError("receipt chain must start at seq 0")
+
+
 def materialize_visible_events(events: Iterable[Mapping],
                                origin_unix: int) -> tuple[dict, ...]:
-    """Filter by the receipt clock BEFORE any body is opened; materialize once.
+    """Filter by the receipt clock BEFORE any chain trust; materialize once.
 
     Accepts any iterable (tuple, list, generator): the sequence is consumed exactly
-    once and the result is an immutable tuple shared by every later stage.
+    once and the result is an immutable tuple shared by every later stage.  The
+    chain is verified over the VISIBLE subsequence only: identity at an origin
+    depends on the visible window alone, so a corrupted post-origin event can
+    no longer make an earlier origin fail (audit-3/H2: post-origin corruption
+    must not pollute earlier origins).
     """
     records = tuple(events)
-    verify_event_chain(records)
-    return tuple(record for record in records
-                 if record["receipt_complete_unix_ceil"] <= origin_unix)
+    visible = tuple(record for record in records
+                    if record["receipt_complete_unix_ceil"] <= origin_unix)
+    verify_visible_chain(visible)
+    return visible
 
 
 def visible_ledger_hash(visible_events: tuple[Mapping, ...]) -> str:
@@ -171,6 +222,16 @@ def derive_typed_evidence(origin_unix: int,
     if not visible_events:
         raise M1TypedRejection("NO_VISIBLE_RECEIPT", "no body-complete receipt at "
                                "or before origin")
+    # the typed boundary never trusts caller-supplied receipts: the visible
+    # tuple must itself be a verifiable chain fragment (audit-3/H2: events
+    # without chain_seq/prev_sha256/event_sha256 must not reach typed input)
+    try:
+        verify_visible_chain(tuple(visible_events))
+    except ValueError as error:
+        raise M1TypedRejection(
+            "SCHEMA_DRIFT",
+            f"visible events are not a verifiable receipt chain: {error}"
+            ) from error
     _fork_check(visible_events)
     ledger = visible_ledger_hash(visible_events)
     earliest = _dedupe_visible(visible_events)
@@ -290,9 +351,18 @@ def verify_typed_evidence(evidence: "M1TypedEvidence") -> "M1TypedEvidence":
         raise BaseBoundaryError(
             "CONTRACT_IDENTITY_DRIFT",
             "typed evidence carries no kernel derivation inputs")
-    rederived = derive_typed_evidence(
-        evidence.origin_unix, tuple(evidence.derivation_events),
-        {evidence.derivation_fetch.ref: evidence.derivation_fetch})
+    try:
+        rederived = derive_typed_evidence(
+            evidence.origin_unix, tuple(evidence.derivation_events),
+            {evidence.derivation_fetch.ref: evidence.derivation_fetch})
+    except M1TypedRejection as rejection:
+        # the carried derivation inputs failed the chain/kernel checks on
+        # re-derivation: a frozen rejection at the base boundary, never an
+        # escape (audit-3/H2: the re-derivation entry is chain-verified too)
+        raise BaseBoundaryError(
+            rejection.reason_code,
+            "carried derivation inputs failed kernel re-derivation"
+            ) from rejection
     for name in ("origin_unix", "values", "per_point", "series_hash",
                  "visible_ledger_hash", "selected", "publication_basis",
                  "strict_asof"):

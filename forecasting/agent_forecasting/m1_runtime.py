@@ -184,7 +184,13 @@ class SimulatedUsageTransport:
 
 
 class M1SourceSnapshot:
-    """Immutable read-only replay of one captured source state; no live access."""
+    """Immutable read-only replay of one captured source state; no live access.
+
+    The receipt events are stored opaquely and indexed LAZILY on first access:
+    constructing the snapshot never reads any receipt structure, so arm A —
+    which never consults the as-of view — cannot be made to fail by corrupted
+    receipt events (audit-3/H2: arm A must not depend on the receipt chain).
+    """
 
     def __init__(self, *, snapshot_id: str, origin_unix: int, listing: tuple,
                  events: tuple, bodies: Mapping[str, bytes],
@@ -195,7 +201,12 @@ class M1SourceSnapshot:
         self.events = tuple(events)
         self._bodies = dict(bodies)
         self._behaviours = dict(fetch_behaviours)
-        self._event_by_ref = {event["ref"]: event for event in self.events}
+        self._events_index: Optional[dict] = None
+
+    def _event_by_ref(self) -> dict:
+        if self._events_index is None:
+            self._events_index = {event["ref"]: event for event in self.events}
+        return self._events_index
 
     @classmethod
     def from_mapping(cls, data: Mapping) -> "M1SourceSnapshot":
@@ -208,16 +219,21 @@ class M1SourceSnapshot:
                     if entry["ref"] == ref)
 
     def fetch(self, ref: str) -> tuple[str, Optional[bytes]]:
-        behaviour = self._behaviours[ref]
+        behaviour = self._behaviours.get(ref)
+        if behaviour is None:
+            # the replay adapter broke its frozen schema by not declaring an
+            # outcome for a listed ref: a frozen rejection, never an escape
+            # (audit-3/H3: every adapter exception maps to a frozen reason)
+            return "SCHEMA_DRIFT", None
         if behaviour not in _FETCHABLE_BEHAVIOURS:
             return behaviour, None
-        event = self._event_by_ref.get(ref)
+        event = self._event_by_ref().get(ref)
         if event is None:
             return behaviour, None
         return behaviour, self._bodies[event["body_sha256"]]
 
     def event_for(self, ref: str) -> Optional[dict]:
-        return self._event_by_ref.get(ref)
+        return self._event_by_ref().get(ref)
 
     def visible_events(self, origin_unix: int) -> tuple:
         return m1_asof.materialize_visible_events(self.events, origin_unix)
@@ -463,7 +479,7 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
     if arm not in ("A", "B", "C", "D"):
         raise ValueError("arm must be one of A/B/C/D")
     repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
-    identity_report = m1_contract.verify_run_identity(repo_root)
+    identity_report = m1_contract.verify_run_entry(repo_root)
     snapshot = M1SourceSnapshot.from_mapping(snapshot_data)
     origin = snapshot.origin_unix
     deadline = origin + DEADLINE_OFFSET
@@ -744,8 +760,12 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
                                  else "BUDGET_EXHAUSTED")
         try:
             response = transport.generate("C", 1, request)
-        except TimeoutError:
-            return base_terminal("LLM_TIMEOUT")  # reserves stay consumed at close
+        except Exception:  # noqa: BLE001 - any transport failure (timeout or
+            # adapter-internal crash) yields no endpoint response within the
+            # frozen per-call window: the frozen no-response bucket is
+            # LLM_TIMEOUT with its reserves fully consumed at close
+            # (audit-3/H3: adapter exceptions map to a frozen reason, never escape)
+            return base_terminal("LLM_TIMEOUT")
         llm_wire.append(_wire_entry("C", 1, request, response))
         try:
             _settle_llm_call(budget, seqs, request=request, response=response)
@@ -799,8 +819,12 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
                                  else "BUDGET_EXHAUSTED")
         try:
             response = transport.generate("D", turn, request)
-        except TimeoutError:
-            return base_terminal("LLM_TIMEOUT")  # reserves stay consumed at close
+        except Exception:  # noqa: BLE001 - any transport failure (timeout or
+            # adapter-internal crash) yields no endpoint response within the
+            # frozen per-call window: the frozen no-response bucket is
+            # LLM_TIMEOUT with its reserves fully consumed at close
+            # (audit-3/H3: adapter exceptions map to a frozen reason, never escape)
+            return base_terminal("LLM_TIMEOUT")
         llm_wire.append(_wire_entry("D", turn, request, response))
         try:
             _settle_llm_call(budget, seqs, request=request, response=response)

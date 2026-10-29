@@ -170,6 +170,41 @@ def check_gate_and_reducer(root: Path, *, recompute: bool) -> list[str]:
     return problems
 
 
+def check_run_entry(root: Path) -> list[str]:
+    """Audit-3/H1: the closure verifier itself enters through verify_run_entry.
+
+    The evidence tree must close at a resolvable git HEAD over a tracked-clean
+    tree whose frozen config file equals its committed bytes, and every ledger
+    record's git_head must be a commit reachable from the current HEAD (a log
+    claiming a head outside this branch's history is not provenance).
+    """
+    problems: list[str] = []
+    try:
+        report = m1_contract.verify_run_entry(ROOT)
+    except m1_contract.M1IdentityDrift as drift:
+        return [f"run entry identity drift: {drift}"]
+    head = report["git_head"]
+    ledger = root / "commands.jsonl"
+    if not ledger.exists():
+        return problems
+    import subprocess
+    for line in ledger.read_text().splitlines():
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        recorded = record.get("git_head")
+        if recorded == head:
+            continue
+        reachable = subprocess.run(
+            ["git", "-C", str(ROOT), "merge-base", "--is-ancestor",
+             str(recorded), head], capture_output=True, check=False)
+        if reachable.returncode != 0:
+            problems.append(
+                f"ledger record {record.get('id')} git_head {recorded} is not "
+                "reachable from the current HEAD")
+    return problems
+
+
 def verify_evidence_root(root: Path, *, recompute: bool = True) -> list[str]:
     """All closure problems of one evidence root; an empty list means closed."""
     problems, _records = check_ledger(root)
@@ -185,6 +220,7 @@ def main() -> int:
         return 2
     root = Path(sys.argv[1])
     problems = verify_evidence_root(root)
+    problems += check_run_entry(root)
     ledger = root / "commands.jsonl"
     count = 0
     if ledger.exists():
