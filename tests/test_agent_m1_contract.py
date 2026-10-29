@@ -841,18 +841,35 @@ class AtomicPublicationTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def _payloads(self):
+        # audit-3/H4 fixture honesty: the closure must recompute from real
+        # archives (model ledger + forecast trace), so the probe payloads carry
+        # a self-consistent tool/trace/input identity instead of fake hexes
         ledger = m1_budget.BudgetLedger()
         ledger.charge(m1_budget.BudgetClass.SOURCE_REPLAY_CALLS, 1, "probe")
         entries = ("\n".join(json.dumps(entry, sort_keys=True,
                                         separators=(",", ":"))
                              for entry in ledger.entries) + "\n").encode()
         self._ledger = ledger
+        self._forecast = b"\x00\x01quantile-bytes"
+        self._input_hash = hashlib.sha256(b"canonical-probe-input").hexdigest()
+        tool = m1_runtime.DeterministicForecastStub.identity
+        self._tool_hash = hashlib.sha256(json.dumps(
+            tool, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        model_ledger = json.dumps(
+            {"tool": tool,
+             "trace": [{"phase": "base", "input_hash": self._input_hash,
+                        "params_hash": hashlib.sha256(b"{}").hexdigest(),
+                        "output_sha256": hashlib.sha256(
+                            self._forecast).hexdigest(),
+                        "output_bytes": len(self._forecast)}],
+             "llm_calls": 0}, sort_keys=True, separators=(",", ":")).encode()
         return {"result.json": json.dumps(
                     {"verdict": "PUBLISHED_TYPED", "origin_unix": harness.ORIGIN_UNIX,
-                     "input_hash": "1" * 64}, sort_keys=True,
+                     "input_hash": self._input_hash}, sort_keys=True,
                     separators=(",", ":")).encode(),
-                "forecast.bin": b"\x00\x01quantile-bytes",
-                "budget_ledger.jsonl": entries}
+                "forecast.bin": self._forecast,
+                "budget_ledger.jsonl": entries,
+                "model_ledger.jsonl": model_ledger}
 
     def _closure(self, **overrides):
         ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
@@ -865,9 +882,14 @@ class AtomicPublicationTests(unittest.TestCase):
             "budget_caps": {cls.name: value
                             for cls, value in m1_budget.CAPS.items()},
             "budget_chain_ok": True,
-            "tool_identity_sha256": "0" * 64,
-            "input_hash": "1" * 64,
-            "canonical_model_input_sha256": "2" * 64,
+            "tool_identity_sha256": getattr(self, "_tool_hash", None)
+            or hashlib.sha256(json.dumps(
+                m1_runtime.DeterministicForecastStub.identity,
+                sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+            "input_hash": getattr(self, "_input_hash", None)
+            or hashlib.sha256(b"canonical-probe-input").hexdigest(),
+            "canonical_model_input_sha256": getattr(self, "_input_hash", None)
+            or hashlib.sha256(b"canonical-probe-input").hexdigest(),
         }
         closure.update(overrides)
         return closure
@@ -881,7 +903,7 @@ class AtomicPublicationTests(unittest.TestCase):
         self.assertEqual(report["status"], "CLOSED")
         self.assertEqual(sorted(report["inventory"]),
                          ["COMMIT.json", "budget_ledger.jsonl", "forecast.bin",
-                          "manifest.json", "result.json"])
+                          "manifest.json", "model_ledger.jsonl", "result.json"])
         with self.assertRaises(m1_publication.PublicationError):
             m1_publication.publish_run(self.root, "B_1641218400_x", self._payloads(),
                                        identity={"contract_id": m1_contract.CONTRACT_ID},
@@ -1343,41 +1365,44 @@ class PublicationSemanticClosureTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def _publish(self, run_id, closure_overrides=None, drop=()):
-        ledger = m1_budget.BudgetLedger()
-        ledger.charge(m1_budget.BudgetClass.SOURCE_REPLAY_CALLS, 1, "probe")
-        payloads = {
-            "result.json": json.dumps(
-                {"verdict": "PUBLISHED_TYPED", "origin_unix": harness.ORIGIN_UNIX,
-                 "input_hash": "1" * 64}, sort_keys=True,
-                separators=(",", ":")).encode(),
-            "budget_ledger.jsonl": ("\n".join(
-                json.dumps(entry, sort_keys=True, separators=(",", ":"))
-                for entry in ledger.entries) + "\n").encode(),
-        }
-        closure = {
-            "origin_unix": harness.ORIGIN_UNIX,
-            "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
-            "clock_final": harness.ORIGIN_UNIX + 1,
-            "budget_fold": {cls.name: value for cls, value in ledger.fold().items()},
-            "budget_caps": {cls.name: value
-                            for cls, value in m1_budget.CAPS.items()},
-            "budget_chain_ok": True,
-            "tool_identity_sha256": "0" * 64,
-            "input_hash": "1" * 64,
-            "canonical_model_input_sha256": "2" * 64,
-        }
+    def _real_archives(self):
+        """Honest closure/payloads read back from one real published B run.
+
+        audit-3/H4 fixture honesty: the semantic-closure tests must exercise a
+        closure whose identities recompute from real archives, so the source of
+        truth is a genuine run_arm publication, not fabricated hex digests.
+        """
+        if getattr(self, "_archives_cache", None) is None:
+            publish_root = self.root / "ev_src"
+            result = _run("B", _clean_snapshot(), publish_root=publish_root)
+            self.assertTrue(result.published)
+            final = Path(result.publish_dir)
+            payloads = {name: (final / name).read_bytes()
+                        for name in os.listdir(final)
+                        if name not in ("manifest.json", "COMMIT.json")}
+            manifest = json.loads((final / "manifest.json").read_text())
+            self._archives_cache = (dict(manifest["closure"]), payloads)
+        return self._archives_cache
+
+    def _publish(self, run_id, closure_overrides=None, drop=(), payload_drop=()):
+        closure, payloads = self._real_archives()
+        closure = dict(closure)
+        payloads = dict(payloads)
         closure.update(closure_overrides or {})
         for key in drop:
             del closure[key]
+        for name in payload_drop:
+            payloads.pop(name, None)
         return m1_publication.publish_run(self.root, run_id, payloads,
                                           identity={"contract_id": "probe"},
                                           closure=closure)
 
     def test_valid_closure_publishes_and_is_recorded_in_the_manifest(self):
+        closure, _payloads = self._real_archives()
         final = self._publish("run_ok")
         manifest = json.loads((final / "manifest.json").read_text())
-        self.assertEqual(manifest["closure"]["input_hash"], "1" * 64)
+        self.assertEqual(manifest["closure"]["input_hash"],
+                         closure["input_hash"])
         self.assertTrue(m1_publication.verify_run_closure(final)["status"] == "CLOSED")
 
     def test_fold_over_cap_refuses_publication(self):
@@ -1440,6 +1465,9 @@ class PublicationSemanticClosureTests(unittest.TestCase):
     def test_crash_cleanup_removes_staging_and_lock(self):
         import forecasting.agent_forecasting.m1_publication as module
         original = module._write_exclusive
+        # warm the honest-archive cache first: the injected crash must hit the
+        # TARGET publication's staging writes, not the fixture-producing run
+        self._real_archives()
         counter = {"n": 0}
 
         def flaky(path, payload):
@@ -1584,6 +1612,302 @@ class GateMappingTests(unittest.TestCase):
         gate = m1_contract.map_gate({"verdict": "REDUCER_NON_VACUITY_FAILED",
                                      "engineering_green": True})
         self.assertEqual(gate["scientific_decision"], "BLOCKED")
+
+
+class Audit3IdentityClosureTests(unittest.TestCase):
+    """Read-only audit #2 / H1: identity must fail closed over the WHOLE config.
+
+    A deleted execution pin, an extra pin, a mutated source contract, branch,
+    arms declaration, deadline reserve, LLM cost, forecast-tool binding,
+    evidence root or source-file list must each refuse the run BEFORE any
+    action; the run entry must additionally bind git HEAD, a tracked-clean
+    tree and the config file's own committed bytes.
+    """
+
+    def setUp(self):
+        _require_m1()
+
+    def _assert_config_mutation_refuses(self, mutate, label):
+        config = m1_contract.load_config(ROOT)
+        mutate(config)
+        original = m1_contract.load_config
+        m1_contract.load_config = lambda _root: config
+        try:
+            with self.assertRaises(m1_contract.M1IdentityDrift, msg=label):
+                m1_contract.verify_run_identity(ROOT)
+        finally:
+            m1_contract.load_config = original
+
+    def test_deleted_execution_pin_refuses_instead_of_verifying(self):
+        def mutate(config):
+            del config["execution_modules"]["files_sha256"][
+                "forecasting/agent_forecasting/m1_runtime.py"]
+        self._assert_config_mutation_refuses(
+            mutate, "a deleted pin must be drift, not a silently unchecked file")
+
+    def test_extra_execution_pin_refuses(self):
+        def mutate(config):
+            # a REAL existing file outside the frozen surface: the pin hash
+            # itself is honest, only the keyset is smuggled
+            config["execution_modules"]["files_sha256"][
+                "tests/test_agent_m1_reducer.py"] = m1_contract.sha256_file(
+                    ROOT / "tests/test_agent_m1_reducer.py")
+        self._assert_config_mutation_refuses(
+            mutate, "an extra pin is an undeclared execution-surface change")
+
+    def test_source_contract_field_mutation_refuses(self):
+        def mutate(config):
+            config["source_contract"]["unit"] = "BANANAS"
+        self._assert_config_mutation_refuses(
+            mutate, "the frozen source contract (unit/region/field) is identity")
+
+    def test_branch_and_provenance_mutation_refuses(self):
+        def mutate(config):
+            config["branch"] = "research/somebody-else"
+            config["run_provenance_commit"] = "0" * 40
+        self._assert_config_mutation_refuses(
+            mutate, "run ancestry (branch/base/provenance) is identity")
+
+    def test_arms_declaration_mutation_refuses(self):
+        def mutate(config):
+            config["arms"]["D"].append("FREE_FORM_PYTHON")
+        self._assert_config_mutation_refuses(
+            mutate, "the frozen arms declaration is identity")
+
+    def test_deadline_and_llm_cost_and_tool_binding_mutations_refuse(self):
+        def mutate(config):
+            config["deadline"]["http_timeout_seconds"] = 999
+            config["llm_cost"]["rate_input_usd_per_million"] = 0.0
+            config["forecast_tool"]["calls_max"] = 99
+        self._assert_config_mutation_refuses(
+            mutate, "deadline/llm_cost/forecast_tool bindings are identity")
+
+    def test_evidence_root_and_source_files_mutations_refuse(self):
+        def mutate(config):
+            config["evidence_root"] = "logs/elsewhere"
+            config["source_files"].append("smuggled_file.py")
+        self._assert_config_mutation_refuses(
+            mutate, "the evidence root and the frozen source-file list are identity")
+
+    def test_run_entry_binds_git_head_tree_and_config_bytes(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+        self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+        report = entry(ROOT)
+        self.assertEqual(report["status"], "VERIFIED")
+        self.assertTrue(report["tracked_tree_clean"])
+        self.assertTrue(report["git_head"])
+        with self.assertRaises(m1_contract.M1IdentityDrift):
+            entry(ROOT, expected_head="0" * 40)
+
+    def test_run_entry_refuses_a_dirty_tracked_tree(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+        self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+        victim = ROOT / "tests" / "test_agent_m1_reducer.py"
+        original_bytes = victim.read_bytes()
+        victim.write_bytes(original_bytes + b"\n# transient audit-3 probe\n")
+        try:
+            with self.assertRaises(m1_contract.M1IdentityDrift):
+                entry(ROOT)
+        finally:
+            victim.write_bytes(original_bytes)
+
+    def test_run_entry_refuses_edited_config_bytes(self):
+        entry = getattr(m1_contract, "verify_run_entry", None)
+        self.assertIsNotNone(
+            entry, "audit-3/H1: the run entry must bind git HEAD, a "
+            "tracked-clean tree and the config file's committed bytes")
+        victim = ROOT / m1_contract.CONFIG_PATH
+        original_bytes = victim.read_bytes()
+        victim.write_bytes(original_bytes + b"\n")  # same JSON, different bytes
+        try:
+            with self.assertRaises(m1_contract.M1IdentityDrift):
+                entry(ROOT)
+        finally:
+            victim.write_bytes(original_bytes)
+
+
+class Audit3AsOfBoundaryTests(unittest.TestCase):
+    """Read-only audit #2 / H2: A isolation and typed provenance closure."""
+
+    def setUp(self):
+        _require_m1()
+
+    def test_arm_a_completes_when_receipt_structure_is_corrupt(self):
+        snapshot = _clean_snapshot()
+        stripped = tuple(
+            {key: value for key, value in event.items() if key != "ref"}
+            for event in snapshot["events"])
+        snapshot["events"] = stripped
+        try:
+            result = _run("A", snapshot)
+        except Exception as error:  # noqa: BLE001 - the failure IS the finding
+            self.fail(f"arm A must not read the receipt chain: {error!r}")
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "AGENT_ABSTAIN")
+
+    def test_derive_typed_evidence_rejects_unchained_caller_events(self):
+        snapshot = _two_ref_snapshot()
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        stripped = tuple(
+            {key: value for key, value in event.items()
+             if key not in ("chain_seq", "prev_sha256", "event_sha256")}
+            for event in visible)
+        fetch = _fetch_records_for(snapshot, visible)
+        with self.assertRaises(m1_asof.M1TypedRejection) as ctx:
+            m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, stripped, fetch)
+        self.assertEqual(ctx.exception.reason_code, "SCHEMA_DRIFT")
+        # the re-derivation boundary refuses the same forgery, never escapes
+        forged = m1_asof.derive_typed_evidence(
+            harness.ORIGIN_UNIX, visible, fetch)
+        poisoned = dataclasses.replace(forged, derivation_events=stripped)
+        with self.assertRaises(m1_asof.BaseBoundaryError):
+            m1_asof.verify_typed_evidence(poisoned)
+
+    def test_post_origin_corruption_preserves_earlier_origin(self):
+        base = _two_ref_snapshot()
+        events = [dict(event) for event in base["events"]]
+        extra = dict(events[-1])
+        extra.update({"ref": harness.opaque_ref("POST_ORIGIN_CORRUPT.zip"),
+                      "filename": "POST_ORIGIN_CORRUPT.zip",
+                      "receipt_complete_unix_ceil": harness.ORIGIN_UNIX + 600,
+                      "chain_seq": len(events),
+                      "prev_sha256": events[-1]["event_sha256"],
+                      "event_sha256": "0" * 64})  # corrupt: never recomputes
+        chained = tuple(events) + (extra,)
+        try:
+            visible_late = m1_asof.materialize_visible_events(
+                chained, harness.ORIGIN_UNIX)
+        except ValueError as error:
+            self.fail("a corrupt post-origin receipt must not fail an earlier "
+                      f"origin: {error}")
+        visible_base = m1_asof.materialize_visible_events(
+            tuple(events), harness.ORIGIN_UNIX)
+        self.assertEqual(visible_late, visible_base)
+        self.assertEqual(m1_asof.visible_ledger_hash(visible_late),
+                         m1_asof.visible_ledger_hash(visible_base))
+        # at the later origin the corruption IS visible and must still fail
+        with self.assertRaises(ValueError):
+            m1_asof.materialize_visible_events(chained,
+                                               harness.ORIGIN_UNIX + 1200)
+
+
+class Audit3FailureMappingTests(unittest.TestCase):
+    """Read-only audit #2 / H3: every adapter/transport exception is frozen."""
+
+    def setUp(self):
+        _require_m1()
+
+    class ExplodingTransport:
+        identity = {"kind": "exploding_probe_transport", "version": 1}
+
+        def __init__(self):
+            self.calls = 0
+
+        def generate(self, arm, turn, request_bytes):
+            self.calls += 1
+            raise RuntimeError("adapter exploded")
+
+    def test_c_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+            result = _run("C", _clean_snapshot(), transport=transport)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+            self.fail(f"a transport-internal failure must map to a frozen "
+                      f"reason, never escape: {error!r}")
+        self.assertEqual(transport.calls, 1)
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "LLM_TIMEOUT")
+        self.assertIn("LLM_TIMEOUT", m1_contract.ORIGIN_REASON_CODES)
+
+    def test_d_transport_internal_failure_maps_to_a_frozen_reason(self):
+        transport = self.ExplodingTransport()
+        try:
+            result = _run("D", _clean_snapshot(), transport=transport)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+            self.fail(f"a transport-internal failure must map to a frozen "
+                      f"reason, never escape: {error!r}")
+        self.assertEqual(transport.calls, 1)
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "LLM_TIMEOUT")
+
+    def test_missing_fetch_behaviour_maps_to_a_frozen_reason(self):
+        snapshot = _clean_snapshot()
+        victim = snapshot["listing"][0]["ref"]
+        del snapshot["fetch_behaviours"][victim]
+        try:
+            result = _run("B", snapshot)
+        except Exception as error:  # noqa: BLE001 - the escape IS the finding
+            self.fail(f"a replay adapter that omits a declared ref's behaviour "
+                      f"must map to a frozen reason, never escape: {error!r}")
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "SCHEMA_DRIFT")
+
+
+class Audit3PublicationIdentityTests(unittest.TestCase):
+    """Read-only audit #2 / H4: publication binds FROZEN caps and recomputes
+    tool/input identity from the archived model ledger and forecast trace."""
+
+    def setUp(self):
+        _require_m1()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _real_archives(self):
+        publish_root = self.root / "ev_src"
+        result = _run("B", _clean_snapshot(), publish_root=publish_root)
+        self.assertTrue(result.published)
+        final = Path(result.publish_dir)
+        payloads = {name: (final / name).read_bytes()
+                    for name in os.listdir(final)
+                    if name not in ("manifest.json", "COMMIT.json")}
+        manifest = json.loads((final / "manifest.json").read_text())
+        return dict(manifest["closure"]), payloads
+
+    def test_honest_archives_verify(self):
+        closure, payloads = self._real_archives()
+        report = m1_publication.verify_publication_closure(closure, payloads)
+        self.assertEqual(report["budget_fold"]["LLM_INPUT_TOKENS"],
+                         closure["budget_fold"]["LLM_INPUT_TOKENS"])
+
+    def test_inflated_self_reported_caps_refuse_publication(self):
+        closure, payloads = self._real_archives()
+        caps = dict(closure["budget_caps"])
+        caps["LLM_INPUT_TOKENS"] = caps["LLM_INPUT_TOKENS"] + 1
+        closure["budget_caps"] = caps
+        with self.assertRaises(m1_publication.PublicationError):
+            m1_publication.verify_publication_closure(closure, payloads)
+
+    def test_forged_tool_identity_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        closure["tool_identity_sha256"] = "f" * 64
+        with self.assertRaises(m1_publication.PublicationError):
+            m1_publication.verify_publication_closure(closure, payloads)
+
+    def test_forged_canonical_input_identity_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        closure["canonical_model_input_sha256"] = "e" * 64
+        with self.assertRaises(m1_publication.PublicationError):
+            m1_publication.verify_publication_closure(closure, payloads)
+
+    def test_missing_model_ledger_refuses_publication(self):
+        closure, payloads = self._real_archives()
+        del payloads["model_ledger.jsonl"]
+        with self.assertRaises(m1_publication.PublicationError):
+            m1_publication.verify_publication_closure(closure, payloads)
+
+    def test_forecast_bytes_must_rebind_to_exactly_one_trace_entry(self):
+        closure, payloads = self._real_archives()
+        payloads["forecast.bin"] = payloads["forecast.bin"] + b"x"
+        with self.assertRaises(m1_publication.PublicationError):
+            m1_publication.verify_publication_closure(closure, payloads)
 
 
 if __name__ == "__main__":
