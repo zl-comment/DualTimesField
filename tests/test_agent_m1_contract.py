@@ -8,6 +8,7 @@ no GPU, no live LLM call.
 """
 from __future__ import annotations
 
+import base64
 import dataclasses
 import hashlib
 import json
@@ -61,6 +62,16 @@ def _two_ref_snapshot() -> dict:
                                   body_relation="DISTINCT_VINTAGES")
 
 
+def _asym_snapshot(failing: str, failure: str,
+                   relation: str = "BEFORE_ORIGIN") -> dict:
+    """Duplicate same-body snapshot whose `failing` mirror breaks at transport."""
+    return harness.build_snapshot(
+        listing="TWO_REFS", body_relation="DUPLICATE_SAME_BODY",
+        new_outcome=(failure if failing == "NEW" else "COMPLETE_VALID"),
+        dup_outcome=("COMPLETE_VALID" if failing == "NEW" else failure),
+        relation=relation)
+
+
 def _ok_response(payload: bytes) -> "m1_llm.M1LlmResponse":
     return m1_llm.M1LlmResponse(status="COMPLETED", model=m1_contract.LLM_MODEL,
                                 output_raw=payload)
@@ -80,12 +91,13 @@ def _c_transport(decision: str) -> "m1_runtime.ScriptedTransport":
 
 
 def _run(arm, snapshot, *, transport=None, tool=None, clock=None,
-         publish_root=None, region="NSW1"):
+         publish_root=None, region="NSW1", budget=None):
     _require_m1()
+    extra = {"budget": budget} if budget is not None else {}
     return m1_runtime.run_arm(
         arm, snapshot, base_input=_base_input(region),
         tool=tool if tool is not None else m1_runtime.DeterministicForecastStub(),
-        transport=transport, clock=clock, publish_root=publish_root)
+        transport=transport, clock=clock, publish_root=publish_root, **extra)
 
 
 def _fetch_records_for(snapshot: dict, visible: tuple) -> dict:
@@ -493,7 +505,17 @@ class DigestAndPromptTests(unittest.TestCase):
         self.assertFalse(payload["parallel_tool_calls"])
         self.assertEqual(set(payload),
                          {"model", "instructions", "input", "reasoning", "store",
-                          "truncation", "parallel_tool_calls"})
+                          "truncation", "parallel_tool_calls", "max_output_tokens",
+                          "response_schema"})
+        self.assertEqual(payload["max_output_tokens"],
+                         m1_contract.PER_CALL_OUTPUT_TOKENS["C"])
+        schema = payload["response_schema"]
+        self.assertEqual(schema["artifact"], "m1_c_decision_schema.json")
+        self.assertEqual(schema["sha256"],
+                         config["prompt_artifacts"]["sha256"][
+                             "m1_c_decision_schema.json"])
+        self.assertEqual(schema["sha256"],
+                         m1_contract.sha256_file(directory / "m1_c_decision_schema.json"))
 
     def test_parser_rejects_the_full_forbidden_zoo(self):
         bad = [
@@ -819,14 +841,42 @@ class AtomicPublicationTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def _payloads(self):
-        return {"result.json": b'{"verdict":"PUBLISHED_TYPED"}',
+        ledger = m1_budget.BudgetLedger()
+        ledger.charge(m1_budget.BudgetClass.SOURCE_REPLAY_CALLS, 1, "probe")
+        entries = ("\n".join(json.dumps(entry, sort_keys=True,
+                                        separators=(",", ":"))
+                             for entry in ledger.entries) + "\n").encode()
+        self._ledger = ledger
+        return {"result.json": json.dumps(
+                    {"verdict": "PUBLISHED_TYPED", "origin_unix": harness.ORIGIN_UNIX,
+                     "input_hash": "1" * 64}, sort_keys=True,
+                    separators=(",", ":")).encode(),
                 "forecast.bin": b"\x00\x01quantile-bytes",
-                "budget_ledger.jsonl": b'{"seq":1}\n'}
+                "budget_ledger.jsonl": entries}
+
+    def _closure(self, **overrides):
+        ledger = getattr(self, "_ledger", None) or m1_budget.BudgetLedger()
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+            "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {cls.name: value
+                            for cls, value in ledger.fold().items()},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+        closure.update(overrides)
+        return closure
 
     def test_publish_verify_and_refuse_duplicates(self):
         final = m1_publication.publish_run(
             self.root, "B_1641218400_x", self._payloads(),
-            identity={"contract_id": m1_contract.CONTRACT_ID})
+            identity={"contract_id": m1_contract.CONTRACT_ID},
+            closure=self._closure())
         report = m1_publication.verify_run_closure(final)
         self.assertEqual(report["status"], "CLOSED")
         self.assertEqual(sorted(report["inventory"]),
@@ -834,18 +884,21 @@ class AtomicPublicationTests(unittest.TestCase):
                           "manifest.json", "result.json"])
         with self.assertRaises(m1_publication.PublicationError):
             m1_publication.publish_run(self.root, "B_1641218400_x", self._payloads(),
-                                       identity={"contract_id": m1_contract.CONTRACT_ID})
+                                       identity={"contract_id": m1_contract.CONTRACT_ID},
+                                       closure=self._closure())
 
     def test_tampered_payload_breaks_closure(self):
         final = m1_publication.publish_run(self.root, "run_tamper", self._payloads(),
-                                           identity={"contract_id": "x"})
+                                           identity={"contract_id": "x"},
+                                           closure=self._closure())
         (final / "forecast.bin").write_bytes(b"edited")
         with self.assertRaises(m1_publication.PublicationError):
             m1_publication.verify_run_closure(final)
 
     def test_extra_file_after_commit_breaks_closure(self):
         final = m1_publication.publish_run(self.root, "run_extra", self._payloads(),
-                                           identity={"contract_id": "x"})
+                                           identity={"contract_id": "x"},
+                                           closure=self._closure())
         (final / "smuggled.txt").write_bytes(b"x")
         with self.assertRaises(m1_publication.PublicationError):
             m1_publication.verify_run_closure(final)
@@ -865,7 +918,8 @@ class AtomicPublicationTests(unittest.TestCase):
         try:
             with self.assertRaises(OSError):
                 m1_publication.publish_run(self.root, "run_crash", self._payloads(),
-                                           identity={"contract_id": "x"})
+                                           identity={"contract_id": "x"},
+                                           closure=self._closure())
         finally:
             module.os.rename = original
         runs = (self.root / "runs")
@@ -911,6 +965,597 @@ class AtomicPublicationTests(unittest.TestCase):
         self.assertEqual([record["id"] for record in records], ["t_ok"])
         self.assertEqual(records[0]["exit_code"], 7)
         self.assertEqual(records[0]["log_path"], "t_ok.txt")
+
+
+class MirrorFairnessTests(unittest.TestCase):
+    """Audit-2 blocker 1: same body, multiple refs, per-ref transport outcomes.
+
+    The duplicate-same-body harness axis used to force both mirrors to one
+    outcome, so B/C never faced a legitimately half-dead mirror pair; B deduped
+    by body hash before fetching, wasted its second GET, and fell back to the
+    base forecast while D published typed.  B must be the maximal fixed policy.
+    """
+
+    def setUp(self):
+        _require_m1()
+
+    def test_b_fetches_both_mirrors_and_survives_one_transport_death(self):
+        for failing in ("NEW", "DUP"):
+            for failure in harness.TRANSPORT_FAILURES:
+                snapshot = _asym_snapshot(failing, failure)
+                result = _run("B", snapshot)
+                self.assertEqual(result.verdict, "PUBLISHED_TYPED",
+                                 msg=f"{failing}/{failure}")
+                self.assertEqual(result.reason_code, "PUBLISHED_TYPED",
+                                 msg=f"{failing}/{failure}")
+                self.assertEqual(result.source_replay_calls, 3,
+                                 msg=f"{failing}/{failure}")  # LIST + both GETs
+                dead_name = (harness.NEW_FILENAME if failing == "NEW"
+                             else harness.NEW_FILENAME_B)
+                dead = harness.opaque_ref(dead_name)
+                outcomes = {entry["ref"]: entry["outcome"]
+                            for entry in result.retrieval_trace
+                            if entry["step"] == "FETCH_REF"}
+                self.assertEqual(outcomes[dead], failure, msg=f"{failing}/{failure}")
+
+    def test_b_survives_when_only_the_dead_mirror_is_visible(self):
+        # AFTER cutoff: only the dead mirror's receipt is visible while the live
+        # mirror is a listed ref with a post-origin receipt; the fixed plan still
+        # spends its second GET there and publishes the same pre-origin body
+        result = _run("B", _asym_snapshot("DUP", "TIMEOUT", "AFTER_ORIGIN"))
+        self.assertEqual(result.verdict, "PUBLISHED_TYPED")
+        self.assertEqual(result.reason_code, "PUBLISHED_TYPED")
+        self.assertEqual(result.source_replay_calls, 3)
+
+    def test_asymmetric_mirrors_keep_bcd_terminals_identical(self):
+        snapshot = _asym_snapshot("NEW", "TIMEOUT")
+        dup = harness.opaque_ref(harness.NEW_FILENAME_B)
+        b = _run("B", snapshot)
+        c = _run("C", snapshot, transport=_c_transport("USE_TYPED"))
+        d = _run("D", snapshot,
+                 transport=_d_transport(("LIST", "NONE"), ("FETCH_REF", dup),
+                                        ("FINALIZE_TYPED", "NONE")))
+        self.assertEqual(b.verdict, "PUBLISHED_TYPED")
+        for arm, result in (("C", c), ("D", d)):
+            self.assertEqual(
+                (result.verdict, result.input_hash, result.series_hash,
+                 result.tool_trace_hash),
+                (b.verdict, b.input_hash, b.series_hash, b.tool_trace_hash),
+                msg=arm)
+
+    def test_typed_derivation_is_fetch_order_independent(self):
+        snapshot = _asym_snapshot("NEW", "TIMEOUT")
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        records = {}
+        for event in visible:  # honest in-run fetch of every visible mirror
+            behaviour = snapshot["fetch_behaviours"][event["ref"]]
+            records[event["ref"]] = m1_asof.M1FetchRecord(
+                ref=event["ref"], filename=event["filename"], behaviour=behaviour,
+                receipt_complete_unix_ceil=event["receipt_complete_unix_ceil"],
+                body_sha256=event["body_sha256"],
+                raw_body=(snapshot["bodies"][event["body_sha256"]]
+                          if behaviour in harness.BODY_LEVEL_OUTCOMES else None))
+        first = m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, visible, records)
+        flipped = m1_asof.derive_typed_evidence(
+            harness.ORIGIN_UNIX, visible,
+            dict(reversed(list(records.items()))))
+        self.assertEqual(first.values, flipped.values)
+        self.assertEqual(first.series_hash, flipped.series_hash)
+        self.assertEqual(first.selected, flipped.selected)
+        self.assertEqual(first.publication_basis, flipped.publication_basis)
+
+    def test_canonical_plan_prefers_both_mirrors_of_the_newest_visible_body(self):
+        snapshot = m1_runtime.M1SourceSnapshot.from_mapping(
+            _asym_snapshot("NEW", "TIMEOUT"))
+        plan = snapshot.canonical_fetch_refs(harness.ORIGIN_UNIX)
+        self.assertEqual(set(plan), {harness.opaque_ref(harness.NEW_FILENAME),
+                                     harness.opaque_ref(harness.NEW_FILENAME_B)})
+        late = m1_runtime.M1SourceSnapshot.from_mapping(
+            _asym_snapshot("DUP", "TIMEOUT", "AFTER_ORIGIN"))
+        self.assertEqual(len(late.canonical_fetch_refs(harness.ORIGIN_UNIX)), 2)
+
+    def test_harness_rejects_same_body_with_different_body_level_outcomes(self):
+        with self.assertRaises(ValueError):
+            harness.build_snapshot(listing="TWO_REFS",
+                                   body_relation="DUPLICATE_SAME_BODY",
+                                   new_outcome="COMPLETE_VALID",
+                                   dup_outcome="INCOMPLETE",
+                                   relation="BEFORE_ORIGIN")
+        with self.assertRaises(ValueError):
+            harness.build_snapshot(listing="ONE_REF", new_outcome="COMPLETE_VALID",
+                                   relation="BEFORE_ORIGIN",
+                                   body_relation="DISTINCT_VINTAGES",
+                                   dup_outcome="COMPLETE_VALID")
+
+
+class FailClosedBudgetTests(unittest.TestCase):
+    """Audit-2 blocker 2: reserve precedes every effect; refusals never escape."""
+
+    def setUp(self):
+        _require_m1()
+
+    def test_generation_cap_zero_never_touches_the_transport(self):
+        caps = dict(m1_budget.CAPS)
+        caps[m1_budget.BudgetClass.LLM_GENERATIONS] = 0
+        transport = _c_transport("USE_TYPED")
+        result = _run("C", _clean_snapshot(), transport=transport,
+                      budget=m1_budget.BudgetLedger(caps=caps))
+        self.assertEqual(transport.calls, 0)  # fail closed BEFORE the effect
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "BUDGET_EXHAUSTED")
+
+    def test_transport_timeout_is_billed_like_a_success(self):
+        class RaisingTransport:
+            identity = {"kind": "raising_probe_transport", "version": 1}
+
+            def __init__(self):
+                self.calls = 0
+
+            def generate(self, arm, turn, request_bytes):
+                self.calls += 1
+                raise TimeoutError("provider timeout")
+
+        transport = RaisingTransport()
+        result = _run("C", _clean_snapshot(), transport=transport)
+        self.assertEqual(transport.calls, 1)
+        self.assertEqual(result.reason_code, "LLM_TIMEOUT")
+        fold = result.budget_fold
+        self.assertEqual(fold[m1_budget.BudgetClass.LLM_GENERATIONS], 1)
+        self.assertEqual(fold[m1_budget.BudgetClass.LLM_INPUT_TOKENS],
+                         m1_runtime.C_PER_CALL_INPUT_TOKENS)
+        self.assertEqual(fold[m1_budget.BudgetClass.LLM_OUTPUT_TOKENS],
+                         m1_runtime.C_PER_CALL_OUTPUT_TOKENS)
+
+    def test_forecast_budget_refusal_maps_to_a_frozen_reason(self):
+        for arm in ("A", "B"):
+            caps = dict(m1_budget.CAPS)
+            caps[m1_budget.BudgetClass.FORECAST_CALLS] = 0
+            result = _run(arm, _clean_snapshot(),
+                          budget=m1_budget.BudgetLedger(caps=caps))
+            self.assertIn(result.verdict,
+                          ("SYSTEM_MISSING", "PUBLISHED_BASE_FALLBACK"), msg=arm)
+            self.assertEqual(result.reason_code, "BUDGET_EXHAUSTED", msg=arm)
+
+    def test_forecast_tool_runtime_error_is_contained(self):
+        class ExplodingTool:
+            identity = {"kind": "exploding_probe_stub", "version": 1}
+
+            def predict(self, model_input, params=None):
+                raise RuntimeError("boom")
+
+        base_result = _run("A", _clean_snapshot(), tool=ExplodingTool())
+        self.assertEqual(base_result.verdict, "SYSTEM_MISSING")
+        self.assertEqual(base_result.reason_code, "FORECAST_TOOL_FAILURE")
+
+        class SecondCallExplodes:
+            identity = {"kind": "second_call_explodes", "version": 1}
+
+            def __init__(self):
+                self.calls = 0
+
+            def predict(self, model_input, params=None):
+                self.calls += 1
+                if self.calls > 1:
+                    raise RuntimeError("boom on the typed call")
+                return b'{"quantiles": [[1.0] * 5] * 24}'
+
+        typed_result = _run("B", _two_ref_snapshot(), tool=SecondCallExplodes())
+        self.assertEqual(typed_result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(typed_result.reason_code, "FORECAST_TOOL_FAILURE")
+
+    def _body_snapshot(self, bodies_spec):
+        events, listing, bodies, behaviours = [], [], {}, {}
+        for filename, seqno, clock, body, behaviour in bodies_spec:
+            ref = harness.opaque_ref(filename)
+            digest = hashlib.sha256(body).hexdigest()
+            listing.append({"ref": ref, "filename": filename})
+            bodies[digest] = body
+            behaviours[ref] = behaviour
+            events.append({"event": "body_complete", "ref": ref,
+                           "filename": filename, "body_sha256": digest,
+                           "seqno": seqno, "runno": "1",
+                           "receipt_complete_unix_ceil": clock,
+                           "size_bytes": len(body),
+                           "clock_health": {"wall_monotonic_consistent": True}})
+        return {"origin_unix": harness.ORIGIN_UNIX, "listing": tuple(listing),
+                "events": m1_asof.chain_events(events), "bodies": bodies,
+                "fetch_behaviours": behaviours}
+
+    def test_oversized_body_refused_before_any_byte_is_read(self):
+        cap = m1_budget.CAPS[m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY]
+        body = b"\x00" * (cap + 1)
+        snapshot = self._body_snapshot(
+            [("BIG.zip", harness.NEW_SEQNO, harness.ORIGIN_UNIX - 600, body,
+              "COMPLETE_VALID")])
+        result = _run("B", snapshot)
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "BUDGET_EXHAUSTED")
+        self.assertEqual(
+            result.budget_fold[m1_budget.BudgetClass.SOURCE_BYTES_TOTAL], 0)
+        self.assertEqual(
+            result.budget_fold[m1_budget.BudgetClass.SOURCE_REPLAY_CALLS], 1)
+
+    def test_two_mid_size_bodies_do_not_accumulate_into_the_per_body_cap(self):
+        cap = m1_budget.CAPS[m1_budget.BudgetClass.SOURCE_BYTES_ONE_BODY]
+        size = cap // 2 + 1  # two of them exceed the cap when summed
+        first = b"\x01" * size
+        second = b"\x02" * size
+        snapshot = self._body_snapshot([
+            ("MID_OLD.zip", harness.OLD_SEQNO, harness.ORIGIN_UNIX - 3600, first,
+             "COMPLETE_VALID"),
+            ("MID_NEW.zip", harness.NEW_SEQNO, harness.ORIGIN_UNIX - 600, second,
+             "COMPLETE_VALID")])
+        result = _run("B", snapshot)
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "SCHEMA_DRIFT")  # probe bytes, not ZIPs
+        fold = result.budget_fold
+        self.assertEqual(fold[m1_budget.BudgetClass.SOURCE_REPLAY_CALLS], 3)
+        self.assertEqual(fold[m1_budget.BudgetClass.SOURCE_BYTES_TOTAL], size * 2)
+
+
+class ArmSnapshotBoundaryTests(unittest.TestCase):
+    """Audit-2: A never touches the snapshot; broken chains map to frozen reasons."""
+
+    def setUp(self):
+        _require_m1()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.publish_root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _broken_snapshot(self) -> dict:
+        snapshot = _clean_snapshot()
+        broken = [dict(event) for event in snapshot["events"]]
+        broken[0]["receipt_complete_unix_ceil"] += 1  # stale chain hashes now
+        snapshot["events"] = tuple(broken)
+        return snapshot
+
+    def test_arm_a_never_touches_the_snapshot_receipt_chain(self):
+        result = _run("A", self._broken_snapshot(),
+                      publish_root=self.publish_root / "ev_a")
+        self.assertEqual(result.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(result.reason_code, "AGENT_ABSTAIN")
+        names = set(os.listdir(Path(result.publish_dir)))
+        self.assertNotIn("asof_snapshot.json", names)
+
+    def test_broken_chain_maps_to_a_frozen_reason_for_b_and_d(self):
+        snapshot = self._broken_snapshot()
+        b = _run("B", snapshot)
+        self.assertEqual(b.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertEqual(b.reason_code, "SCHEMA_DRIFT")
+        d = _run("D", snapshot,
+                 transport=_d_transport(("LIST", "NONE"), ("FINALIZE_BASE", "NONE")))
+        self.assertEqual(d.verdict, "PUBLISHED_BASE_FALLBACK")
+        self.assertIn(d.reason_code, m1_contract.ORIGIN_REASON_CODES)
+
+
+class TrustBoundaryTests(unittest.TestCase):
+    """Audit-2 blockers 3/4: numeric injection, parser shell games, request binding."""
+
+    def setUp(self):
+        _require_m1()
+
+    def test_forged_typed_evidence_cannot_attach_arbitrary_values(self):
+        snapshot = _clean_snapshot()
+        visible = m1_asof.materialize_visible_events(snapshot["events"],
+                                                     harness.ORIGIN_UNIX)
+        fetch = _fetch_records_for(snapshot, visible)
+        evidence = m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, visible, fetch)
+        forged = dataclasses.replace(evidence, values=(999999.0,) * 24)
+        with self.assertRaises(m1_asof.BaseBoundaryError):
+            m1_asof.typed_input(_base_input(), forged)
+        honest = m1_asof.typed_input(_base_input(), evidence)
+        from forecasting.agent_forecasting.predispatch_td_abs import COVARIATE_NAME
+        self.assertEqual(tuple(honest.future_forecasts[COVARIATE_NAME]),
+                         evidence.values)
+
+    def test_function_envelope_cannot_override_the_function_identity(self):
+        shell = (b'{"name":"m1_d_action","arguments":"{\\"__function__\\":null,'
+                 b'\\"decision\\":\\"USE_TYPED\\",\\"evidence_ref\\":\\"NONE\\"}"}')
+        with self.assertRaises(m1_llm.LlmParseError):
+            m1_llm.parse_c_decision(_ok_response(shell),
+                                    enabled_evidence_refs=())
+        inner_named = (b'{"name":"m1_c_decision","arguments":"{\\"__function__\\":'
+                       b'\\"m1_d_action\\",\\"action\\":\\"LIST\\",\\"ref\\":'
+                       b'\\"NONE\\"}"}')
+        with self.assertRaises(m1_llm.LlmParseError):
+            m1_llm.parse_d_action(_ok_response(inner_named), enabled_refs=())
+        plain = b'{"__function__":null,"action":"LIST","ref":"NONE"}'
+        with self.assertRaises(m1_llm.LlmParseError):
+            m1_llm.parse_d_action(_ok_response(plain), enabled_refs=())
+
+    def test_request_binds_the_frozen_schema_and_output_cap_for_both_arms(self):
+        config = m1_contract.load_config(ROOT)
+        directory = ROOT / config["prompt_artifacts"]["directory"]
+        for arm in ("C", "D"):
+            request = json.loads(m1_llm.build_request_bytes(
+                arm, '{"state":"FETCHED"}', ROOT))
+            self.assertEqual(request["max_output_tokens"],
+                             m1_contract.PER_CALL_OUTPUT_TOKENS[arm], msg=arm)
+            schema_name = ("m1_c_decision_schema.json" if arm == "C"
+                           else "m1_d_action_schema.json")
+            schema = request["response_schema"]
+            self.assertEqual(schema["artifact"], schema_name, msg=arm)
+            self.assertEqual(schema["sha256"],
+                             config["prompt_artifacts"]["sha256"][schema_name],
+                             msg=arm)
+            self.assertEqual(schema["sha256"],
+                             m1_contract.sha256_file(directory / schema_name),
+                             msg=arm)
+
+    def test_identity_recomputation_is_not_cached_by_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tree = Path(tmp)
+            for relative in (*m1_contract.PINNED_RELATIVE_PATHS,
+                              m1_contract.CONFIG_PATH):
+                source = ROOT / relative
+                target = tree / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(source, target)
+            self.assertEqual(
+                m1_contract.verify_run_identity(tree)["status"], "VERIFIED")
+            victim = tree / "forecasting/agent_forecasting/m1_runtime.py"
+            victim.write_bytes(victim.read_bytes() + b"\n# drift\n")
+            with self.assertRaises(m1_contract.M1IdentityDrift):
+                m1_contract.verify_run_identity(tree)
+
+    def test_execution_modules_protocol_and_config_fields_are_pinned(self):
+        config = m1_contract.load_config(ROOT)
+        pins = config["execution_modules"]["files_sha256"]
+        for required in ("forecasting/agent_forecasting/m1_runtime.py",
+                         "forecasting/agent_forecasting/m1_budget.py",
+                         "forecasting/agent_forecasting/m1_reducer.py",
+                         config["protocol_doc"],
+                         "tests/fixtures/agent_forecasting/m1_scenario_harness.py"):
+            self.assertIn(required, pins)
+        for relative, digest in pins.items():
+            self.assertEqual(m1_contract.sha256_file(ROOT / relative), digest,
+                             msg=relative)
+        report = m1_contract.verify_run_identity(ROOT)
+        self.assertEqual(report["status"], "VERIFIED")
+        self.assertGreaterEqual(report["pinned_files"], len(pins))
+
+    def test_budget_ledger_rebuild_detects_a_tampered_archive(self):
+        result = _run("B", _clean_snapshot())
+        tampered = [dict(entry) for entry in result.budget_entries]
+        victim = next(entry for entry in tampered if entry["op"] == "SETTLE")
+        victim["amount"] = 0  # silent discount attempt
+        with self.assertRaises(ValueError):
+            m1_budget.BudgetLedger.from_entries(tampered)
+
+
+class PublicationSemanticClosureTests(unittest.TestCase):
+    """Audit-2 blocker 5: publication verifies budget/deadline/identity semantics."""
+
+    def setUp(self):
+        _require_m1()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _publish(self, run_id, closure):
+        ledger = m1_budget.BudgetLedger()
+        ledger.charge(m1_budget.BudgetClass.SOURCE_REPLAY_CALLS, 1, "probe")
+        payloads = {
+            "result.json": json.dumps(
+                {"verdict": "PUBLISHED_TYPED", "origin_unix": harness.ORIGIN_UNIX,
+                 "input_hash": "1" * 64}, sort_keys=True,
+                separators=(",", ":")).encode(),
+            "budget_ledger.jsonl": ("\n".join(
+                json.dumps(entry, sort_keys=True, separators=(",", ":"))
+                for entry in ledger.entries) + "\n").encode(),
+        }
+        return m1_publication.publish_run(self.root, run_id, payloads,
+                                          identity={"contract_id": "probe"},
+                                          closure=closure)
+
+    def _closure(self, **overrides):
+        closure = {
+            "origin_unix": harness.ORIGIN_UNIX,
+            "deadline_unix": harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET,
+            "clock_final": harness.ORIGIN_UNIX + 1,
+            "budget_fold": {"SOURCE_REPLAY_CALLS": 1},
+            "budget_caps": {cls.name: value
+                            for cls, value in m1_budget.CAPS.items()},
+            "budget_chain_ok": True,
+            "tool_identity_sha256": "0" * 64,
+            "input_hash": "1" * 64,
+            "canonical_model_input_sha256": "2" * 64,
+        }
+        closure.update(overrides)
+        return closure
+
+    def test_valid_closure_publishes_and_is_recorded_in_the_manifest(self):
+        final = self._publish("run_ok", self._closure())
+        manifest = json.loads((final / "manifest.json").read_text())
+        self.assertEqual(manifest["closure"]["input_hash"], "1" * 64)
+        self.assertTrue(m1_publication.verify_run_closure(final)["status"] == "CLOSED")
+
+    def test_fold_over_cap_refuses_publication(self):
+        caps = {cls.name: value for cls, value in m1_budget.CAPS.items()}
+        fold = dict(caps)
+        fold["LLM_INPUT_TOKENS"] = caps["LLM_INPUT_TOKENS"] + 1
+        with self.assertRaises(m1_publication.PublicationError):
+            self._publish("run_fold", self._closure(budget_fold=fold))
+
+    def test_deadline_breach_refuses_publication(self):
+        with self.assertRaises(m1_publication.PublicationError):
+            self._publish("run_late", self._closure(
+                clock_final=harness.ORIGIN_UNIX + m1_contract.DEADLINE_OFFSET + 1))
+
+    def test_broken_budget_chain_refuses_publication(self):
+        with self.assertRaises(m1_publication.PublicationError):
+            self._publish("run_chain", self._closure(budget_chain_ok=False))
+
+    def test_missing_closure_field_refuses_publication(self):
+        closure = self._closure()
+        del closure["input_hash"]
+        with self.assertRaises(m1_publication.PublicationError):
+            self._publish("run_missing", closure)
+
+    def test_run_arm_converts_publication_failure_into_a_failure_record(self):
+        publish_root = self.root / "ev"
+        original = m1_runtime.publish_run
+        try:
+            m1_runtime.publish_run = lambda *a, **k: (_ for _ in ()).throw(
+                m1_publication.PublicationError("injected refusal"))
+            result = _run("B", _clean_snapshot(), publish_root=publish_root)
+        finally:
+            m1_runtime.publish_run = original
+        self.assertFalse(result.published)
+        self.assertEqual(result.verdict, "TERMINAL_FAILED_NO_COMMIT")
+        self.assertEqual(result.reason_code, "EVIDENCE_PUBLICATION_FAILED")
+        self.assertIn("EVIDENCE_PUBLICATION_FAILED",
+                      m1_contract.ORIGIN_REASON_CODES)
+        self.assertTrue(list((publish_root / "failures").glob("*.json")))
+
+    def test_published_runs_archive_llm_wire_and_digests(self):
+        publish_root = self.root / "ev"
+        dup = harness.opaque_ref(harness.NEW_FILENAME_B)
+        result = _run("D", _asym_snapshot("NEW", "TIMEOUT"),
+                      transport=_d_transport(("LIST", "NONE"),
+                                             ("FETCH_REF", dup),
+                                             ("FINALIZE_TYPED", "NONE")),
+                      publish_root=publish_root)
+        self.assertEqual(result.verdict, "PUBLISHED_TYPED")
+        final = Path(result.publish_dir)
+        wire = [json.loads(line) for line in
+                (final / "llm_wire.jsonl").read_text().splitlines()]
+        self.assertEqual(len(wire), result.llm_calls)
+        for entry in wire:
+            request = base64.b64decode(entry["request_b64"])
+            self.assertEqual(hashlib.sha256(request).hexdigest(),
+                             entry["request_sha256"])
+            self.assertIn(b"max_output_tokens", request)
+        digests = (final / "digests.jsonl").read_text().splitlines()
+        self.assertEqual(len(digests), len(result.digests))
+
+    def test_crash_cleanup_removes_staging_and_lock(self):
+        import forecasting.agent_forecasting.m1_publication as module
+        original = module._write_exclusive
+        counter = {"n": 0}
+
+        def flaky(path, payload):
+            counter["n"] += 1
+            if counter["n"] == 2:
+                raise OSError("injected crash mid staging")
+            return original(path, payload)
+
+        module._write_exclusive = flaky
+        try:
+            with self.assertRaises(OSError):
+                self._publish("run_clean", self._closure())
+        finally:
+            module._write_exclusive = original
+        staging = self.root / "staging"
+        locks = self.root / "locks"
+        self.assertTrue(not staging.exists() or not any(staging.iterdir()))
+        self.assertTrue(not locks.exists() or not any(locks.iterdir()))
+        self.assertFalse((self.root / "runs" / "run_clean").exists())
+
+
+class EvidenceClosureVerifierTests(unittest.TestCase):
+    """Audit-2 blocker 6: the closure verifier checks provenance and manifest."""
+
+    def setUp(self):
+        _require_m1()
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import verify_m1_evidence as verifier  # noqa: E402
+        self.verifier = verifier
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name) / "evidence"
+        self.root.mkdir(parents=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write_log(self, relative, *, ident, head, exit_code=0, tail=None):
+        log = self.root / relative
+        log.parent.mkdir(parents=True, exist_ok=True)
+        body = (f"=== run_logged_m1 id={ident} ===\nargv: probe\ngit_head: {head}\n"
+                f"branch: research/agentic-m1-bounded-actions-c2-20261029-r5\n"
+                f"start_utc: t0\nend_utc: t1\n--- output begin ---\nprobe\n"
+                f"--- output end ---\n")
+        log.write_text(body + (tail if tail is not None
+                               else f"EXIT_CODE={exit_code}\n"))
+        return {"id": ident, "argv": ["probe"], "log_path": relative,
+                "git_head": head, "start_utc": "t0", "end_utc": "t1",
+                "exit_code": exit_code}
+
+    def _write_ledger(self, *records):
+        (self.root / "commands.jsonl").write_text(
+            "".join(json.dumps(record) + "\n" for record in records))
+
+    def _write_manifest(self):
+        manifest = self.root / "artifact_manifest.json"
+        files = {}
+        for path in sorted(self.root.rglob("*")):
+            if path.is_file() and path != manifest:
+                files[str(path.relative_to(self.root))] = {
+                    "sha256": m1_contract.sha256_file(path),
+                    "size_bytes": path.stat().st_size}
+        manifest.write_text(json.dumps(
+            {"evidence_root": str(self.root), "files": files}, indent=2,
+            sort_keys=True) + "\n")
+
+    def test_clean_root_passes(self):
+        record = self._write_log("red_green/g.txt", ident="g", head="H" * 40)
+        self._write_ledger(record)
+        self._write_manifest()
+        self.assertEqual(self.verifier.verify_evidence_root(
+            self.root, recompute=False), [])
+
+    def test_detects_duplicate_log_path_and_missing_tail(self):
+        first = self._write_log("a.txt", ident="a", head="H" * 40)
+        second = self._write_log("a.txt", ident="b", head="H" * 40,
+                                 tail="EXIT_CODE=3\nEXTRA\n")
+        self._write_ledger(first, second)
+        self._write_manifest()
+        problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+        self.assertTrue(any("injective" in problem for problem in problems))
+        self.assertTrue(any("final line" in problem for problem in problems))
+
+    def test_detects_header_provenance_mismatch(self):
+        record = self._write_log("a.txt", ident="a", head="H" * 40)
+        record["git_head"] = "O" * 40  # ledger disagrees with the log header
+        self._write_ledger(record)
+        self._write_manifest()
+        problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+        self.assertTrue(any("provenance" in problem for problem in problems))
+
+    def test_detects_manifest_drift(self):
+        record = self._write_log("a.txt", ident="a", head="H" * 40)
+        self._write_ledger(record)
+        self._write_manifest()
+        (self.root / "smuggled.txt").write_bytes(b"x")
+        problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+        self.assertTrue(any("smuggled" in problem for problem in problems))
+
+    def test_detects_gate_inconsistent_with_the_reducer_report(self):
+        record = self._write_log("red_green/02_green_full_suite.txt", ident="g",
+                                 head="H" * 40, tail="81 passed in 2s\nEXIT_CODE=0\n")
+        self._write_ledger(record)
+        report = {"verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+                  "scenarios_total": 193, "d_traces_enumerated": 1700,
+                  "llm_failures_checked": 1500, "witnesses": [],
+                  "uses_labels_or_scores": False, "internal_consistency_ok": True}
+        (self.root / "reducibility").mkdir()
+        (self.root / "reducibility" / "reducer_report.json").write_text(
+            json.dumps(report))
+        gate = m1_contract.map_gate({"verdict": report["verdict"],
+                                     "engineering_green": True})
+        gate["engineering"] = {"suite_exit_code": 0,
+                               "suite_log": "red_green/02_green_full_suite.txt",
+                               "tests_passed": 81}
+        gate["advance_m1"] = True  # the exact forbidden mutation
+        (self.root / "gate.json").write_text(json.dumps(gate))
+        self._write_manifest()
+        problems = self.verifier.verify_evidence_root(self.root, recompute=False)
+        self.assertTrue(any("advance_m1" in problem for problem in problems))
 
 
 class GateMappingTests(unittest.TestCase):

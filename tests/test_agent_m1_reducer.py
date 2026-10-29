@@ -6,6 +6,7 @@ snapshot; a seeded weak-B control must prove the detector is not vacuous.
 """
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -46,13 +47,73 @@ class ReducerScenarioSpaceTests(unittest.TestCase):
         self.assertEqual(body_relations, set(harness.BODY_RELATIONS))
         outcomes = {snapshot["scenario"]["new_outcome"] for snapshot in two_ref}
         self.assertEqual(outcomes, set(harness.FETCH_OUTCOMES))
-        # duplicate same-body scenarios must repeat one outcome for both refs
+        # duplicate same-body scenarios either repeat one outcome for both refs
+        # (the symmetric axis) or break at transport level on exactly one mirror
+        # (the asymmetric fairness axis)
         duplicates = [snapshot for snapshot in two_ref
                       if snapshot["scenario"]["body_relation"] == "DUPLICATE_SAME_BODY"]
         self.assertTrue(duplicates)
         for snapshot in duplicates:
             scenario = snapshot["scenario"]
-            self.assertEqual(scenario["old_outcome"], scenario["new_outcome"])
+            new_outcome, dup_outcome = (scenario["new_outcome"],
+                                        scenario["dup_outcome"])
+            if new_outcome == dup_outcome:
+                self.assertEqual(scenario["old_outcome"], new_outcome)
+            else:  # exactly one mirror broke at transport level
+                self.assertEqual(
+                    {new_outcome, dup_outcome} - {"COMPLETE_VALID"},
+                    {new_outcome, dup_outcome} & set(harness.TRANSPORT_FAILURES),
+                    msg=str(scenario))
+                self.assertIn("COMPLETE_VALID", {new_outcome, dup_outcome})
+
+    def test_scenario_space_equals_the_independently_derived_protocol_cross(self):
+        """No hardcoded total: the expectation set is rebuilt axis by axis."""
+        expected = [
+            {"listing": "EMPTY", "new_outcome": "COMPLETE_VALID",
+             "old_outcome": "COMPLETE_VALID", "relation": "BEFORE_ORIGIN",
+             "body_relation": "DISTINCT_VINTAGES", "dup_outcome": ""},
+        ]
+        for outcome in harness.FETCH_OUTCOMES:          # ONE_REF: 5 x 3
+            for relation in harness.RELATIONS:
+                expected.append({"listing": "ONE_REF", "new_outcome": outcome,
+                                 "old_outcome": "COMPLETE_VALID",
+                                 "relation": relation,
+                                 "body_relation": "DISTINCT_VINTAGES",
+                                 "dup_outcome": ""})
+        for body_relation in ("DISTINCT_VINTAGES",   # TWO_REFS: 2 x 25 x 3
+                              "FORK_SAME_VINTAGE"):
+            for old in harness.FETCH_OUTCOMES:
+                for new in harness.FETCH_OUTCOMES:
+                    for relation in harness.RELATIONS:
+                        expected.append({"listing": "TWO_REFS",
+                                         "new_outcome": new,
+                                         "old_outcome": old,
+                                         "relation": relation,
+                                         "body_relation": body_relation,
+                                         "dup_outcome": ""})
+        for outcome in harness.FETCH_OUTCOMES:          # symmetric duplicates: 5 x 3
+            for relation in harness.RELATIONS:
+                expected.append({"listing": "TWO_REFS", "new_outcome": outcome,
+                                 "old_outcome": outcome, "relation": relation,
+                                 "body_relation": "DUPLICATE_SAME_BODY",
+                                 "dup_outcome": outcome})
+        for failure in harness.TRANSPORT_FAILURES:      # asymmetric mirrors: 2 x 2 x 3
+            for failing in ("NEW", "DUP"):
+                for relation in harness.RELATIONS:
+                    new_outcome = failure if failing == "NEW" else "COMPLETE_VALID"
+                    dup_outcome = "COMPLETE_VALID" if failing == "NEW" else failure
+                    expected.append({"listing": "TWO_REFS",
+                                     "new_outcome": new_outcome,
+                                     "old_outcome": new_outcome,
+                                     "relation": relation,
+                                     "body_relation": "DUPLICATE_SAME_BODY",
+                                     "dup_outcome": dup_outcome})
+        self.assertEqual(len(expected),
+                         1 + 5 * 3 + 2 * 25 * 3 + 5 * 3 + 2 * 2 * 3)
+        actual = [json.loads(json.dumps(snapshot["scenario"], sort_keys=True))
+                  for snapshot in harness.scenario_space()]
+        key = lambda scenario: json.dumps(scenario, sort_keys=True)  # noqa: E731
+        self.assertEqual(sorted(map(key, actual)), sorted(map(key, expected)))
 
     def test_d_trace_enumeration_is_closed_under_the_action_graph(self):
         snapshot = harness.build_snapshot(
@@ -82,9 +143,9 @@ class ReducerGateTests(unittest.TestCase):
         self.assertIn(report["verdict"],
                       ("FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
                        "REDUCIBILITY_REFUTED", "REDUCER_NON_VACUITY_FAILED"))
-        # the exhaustive cross: EMPTY(1) + ONE_REF(5x3) + TWO_REFS
-        # (DISTINCT 25x3 + DUPLICATE 5x3 + FORK 25x3)
-        self.assertEqual(report["scenarios_total"], 181)
+        # the exhaustive cross is the independently derived expectation set
+        # (see test_scenario_space_equals_the_independently_derived_protocol_cross)
+        self.assertEqual(report["scenarios_total"], len(harness.scenario_space()))
         self.assertGreater(report["d_traces_enumerated"], 1500)
         self.assertGreater(report["llm_failures_checked"], 1400)
         self.assertTrue(report["internal_consistency_ok"])

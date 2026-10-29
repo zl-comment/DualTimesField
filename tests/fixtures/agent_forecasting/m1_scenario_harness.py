@@ -36,6 +36,10 @@ RELATIONS = ("BEFORE_ORIGIN", "EQUAL_ORIGIN", "AFTER_ORIGIN")
 BODY_RELATIONS = ("DISTINCT_VINTAGES", "DUPLICATE_SAME_BODY", "FORK_SAME_VINTAGE")
 LLM_RESULTS = ("VALID_ENABLED_ACTION", "INVALID_ACTION", "REFUSAL", "INCOMPLETE", "TIMEOUT")
 LISTING_KINDS = ("EMPTY", "ONE_REF", "TWO_REFS")
+# body-level outcomes are properties of the shared bytes; transport outcomes are
+# properties of one ref's replay fetch and MAY differ between same-body mirrors
+BODY_LEVEL_OUTCOMES = ("COMPLETE_VALID", "INCOMPLETE", "SCHEMA_DRIFT")
+TRANSPORT_FAILURES = ("TIMEOUT", "NOT_FOUND")
 
 
 def _rezip_text(text: str, *, member: str = "SYNTHETIC_PREDISPATCHIS_SECTION.csv") -> bytes:
@@ -98,12 +102,27 @@ def build_body(*, seqno: str, outcome: str, fork_shift: bool = False) -> bytes:
 
 def build_snapshot(*, listing: str, new_outcome: str, relation: str,
                    body_relation: str, old_outcome: str = "COMPLETE_VALID",
+                   dup_outcome: str = "",
                    origin_unix: int = ORIGIN_UNIX) -> dict:
     """A plain-data immutable source snapshot for one reducer scenario.
 
     Refs whose replay behaviour is TIMEOUT/NOT_FOUND never produced a body-complete
-    receipt, so they carry no receipt event and are invisible at any origin.
+    receipt, so they carry no receipt event and are invisible at any origin —
+    except in DUPLICATE_SAME_BODY scenarios, where the shared body WAS collected
+    (both mirrors carry receipt events) and only the per-ref runtime replay may
+    fail: ``dup_outcome`` overrides the duplicate mirror's replay outcome and may
+    differ from ``new_outcome`` only across the transport axis (TIMEOUT/NOT_FOUND
+    vs a fetchable outcome), because the underlying bytes are identical.
     """
+    if dup_outcome and body_relation != "DUPLICATE_SAME_BODY":
+        raise ValueError("dup_outcome is defined only for DUPLICATE_SAME_BODY")
+    resolved_dup_outcome = dup_outcome or new_outcome
+    if (body_relation == "DUPLICATE_SAME_BODY"
+            and new_outcome != resolved_dup_outcome
+            and new_outcome in BODY_LEVEL_OUTCOMES
+            and resolved_dup_outcome in BODY_LEVEL_OUTCOMES):
+        raise ValueError("same-body refs must realize the same body-level outcome; "
+                         "only transport outcomes may differ per ref")
     bodies: dict[str, bytes] = {}
     behaviours: dict[str, str] = {}
     events: list[dict] = []
@@ -126,11 +145,13 @@ def build_snapshot(*, listing: str, new_outcome: str, relation: str,
 
     if listing == "TWO_REFS":
         if body_relation == "DUPLICATE_SAME_BODY":
-            # two filenames republishing one identical body: both refs realize the
-            # same outcome because the bytes are the same
+            # two filenames republishing one identical body: both refs carry a
+            # receipt for the collected bytes, while the runtime replay outcome is
+            # per ref and may break at transport level on either mirror
             body = build_body(seqno=NEW_SEQNO, outcome=new_outcome)
             add_ref(NEW_FILENAME, NEW_SEQNO, new_outcome, _relation_clock(relation), body)
-            add_ref(NEW_FILENAME_B, NEW_SEQNO, new_outcome, ORIGIN_UNIX - 300, body)
+            add_ref(NEW_FILENAME_B, NEW_SEQNO, resolved_dup_outcome,
+                    ORIGIN_UNIX - 300, body)
         elif body_relation == "FORK_SAME_VINTAGE":
             add_ref(NEW_FILENAME, NEW_SEQNO, new_outcome, _relation_clock(relation),
                     build_body(seqno=NEW_SEQNO, outcome=new_outcome))
@@ -156,7 +177,10 @@ def build_snapshot(*, listing: str, new_outcome: str, relation: str,
         "fetch_behaviours": dict(behaviours),
         "scenario": {"listing": listing, "new_outcome": new_outcome,
                      "old_outcome": old_outcome, "relation": relation,
-                     "body_relation": body_relation},
+                     "body_relation": body_relation,
+                     "dup_outcome": (resolved_dup_outcome
+                                     if body_relation == "DUPLICATE_SAME_BODY"
+                                     else "")},
     }
     snapshot["snapshot_id"] = "snap_" + hashlib.sha256(
         json.dumps({key: snapshot[key] for key in
@@ -191,6 +215,21 @@ def scenario_space() -> list[dict]:
                         listing=listing, new_outcome=new_outcome,
                         relation=relation, body_relation=body_relation,
                         old_outcome=old_outcome))
+        if listing == "TWO_REFS":
+            # the per-ref transport-asymmetry axis over duplicate same-body refs:
+            # one mirror's replay breaks at transport level while the other
+            # delivers the very same pre-origin body, in both directions and all
+            # three cutoff relations (12 additional scenarios)
+            for failure in TRANSPORT_FAILURES:
+                for failing in ("NEW", "DUP"):
+                    for relation in RELATIONS:
+                        scenarios.append(build_snapshot(
+                            listing=listing, body_relation="DUPLICATE_SAME_BODY",
+                            new_outcome=(failure if failing == "NEW"
+                                         else "COMPLETE_VALID"),
+                            dup_outcome=("COMPLETE_VALID" if failing == "NEW"
+                                         else failure),
+                            relation=relation))
     return scenarios
 
 
