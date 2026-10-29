@@ -41,11 +41,20 @@
     "unit": "MW",
     "region": "NSW1",
     "intervention": 0,
-    "vintage_key": ["PREDISPATCHSEQNO", "RUNNO"],
+    "vintage_key": [
+      "PREDISPATCHSEQNO",
+      "RUNNO"
+    ],
     "visibility_rule": "receipt_complete_unix_ceil <= origin_unix",
     "hour_mapping": "hour h is the mean of half-hour ends origin+(2h+1)*1800 and origin+(2h+2)*1800",
     "withdrawal_semantics": "NOT_APPLICABLE",
-    "non_clocks": ["filename timestamp", "HTTP Date", "HTTP Last-Modified", "LASTCHANGED", "directory order"]
+    "non_clocks": [
+      "filename timestamp",
+      "HTTP Date",
+      "HTTP Last-Modified",
+      "LASTCHANGED",
+      "directory order"
+    ]
   },
   "prompt_artifacts": {
     "directory": "docs/research/agent_forecasting/m1_prompts",
@@ -59,7 +68,7 @@
   },
   "digest_renderer": {
     "path": "forecasting/agent_forecasting/m1_digest.py",
-    "sha256": "MUST_BIND_AT_IMPLEMENTATION_COMMIT"
+    "sha256": "c70fd1a36e92b2ac2a787c6e83d132a4dec314b9ed40fb96d80b895dd4233f87"
   },
   "llm": {
     "provider": "OpenAI",
@@ -67,7 +76,9 @@
     "input_token_endpoint": "POST https://api.openai.com/v1/responses/input_tokens",
     "model": "gpt-5.4-2026-03-05",
     "response_model_must_equal": "gpt-5.4-2026-03-05",
-    "reasoning": {"effort": "none"},
+    "reasoning": {
+      "effort": "none"
+    },
     "store": false,
     "truncation": "disabled",
     "parallel_tool_calls": false,
@@ -77,8 +88,16 @@
     "retries": 0
   },
   "llm_envelopes": {
-    "C": {"generation_calls": 1, "input_tokens_max": 16384, "output_tokens_max": 1024},
-    "D": {"generation_calls_max": 4, "input_tokens_max_per_call": 4096, "output_tokens_max_per_call": 256},
+    "C": {
+      "generation_calls": 1,
+      "input_tokens_max": 16384,
+      "output_tokens_max": 1024
+    },
+    "D": {
+      "generation_calls_max": 4,
+      "input_tokens_max_per_call": 4096,
+      "output_tokens_max_per_call": 256
+    },
     "shared_input_tokens_max": 16384,
     "shared_output_tokens_max": 1024,
     "shared_generation_calls_max": 4,
@@ -125,18 +144,76 @@
     "output_rule": "published bytes are the frozen tool bytes; no clip/sort/calibration/edit"
   },
   "arms": {
-    "A": ["RUN_BASE_FORECAST", "ATOMIC_PUBLISH_BASE"],
-    "B": ["RUN_BASE_FORECAST", "LIST", "FETCH_CANONICAL_NEWEST_VISIBLE_1", "FETCH_CANONICAL_NEWEST_VISIBLE_2_IF_PRESENT", "DETERMINISTIC_VALIDATE_DERIVE_ATTACH", "RUN_TYPED_FORECAST_IF_READY", "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"],
-    "C": ["RUN_BASE_FORECAST", "BYTE_IDENTICAL_B_RETRIEVAL_VALIDATION", "ONE_FROZEN_LLM_DECISION", "RUN_TYPED_FORECAST_IF_READY_AND_SELECTED", "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"],
-    "D": ["RUN_BASE_FORECAST", "UP_TO_FOUR_TYPED_ACTION_PROPOSALS", "CONTROLLER_EXECUTES_ONLY_PRECONDITION_VALID_ACTIONS", "RUN_TYPED_FORECAST_AT_MOST_ONCE", "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"]
+    "A": [
+      "RUN_BASE_FORECAST",
+      "ATOMIC_PUBLISH_BASE"
+    ],
+    "B": [
+      "RUN_BASE_FORECAST",
+      "LIST",
+      "FETCH_CANONICAL_NEWEST_VISIBLE_1",
+      "FETCH_CANONICAL_NEWEST_VISIBLE_2_IF_PRESENT",
+      "DETERMINISTIC_VALIDATE_DERIVE_ATTACH",
+      "RUN_TYPED_FORECAST_IF_READY",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ],
+    "C": [
+      "RUN_BASE_FORECAST",
+      "BYTE_IDENTICAL_B_RETRIEVAL_VALIDATION",
+      "ONE_FROZEN_LLM_DECISION",
+      "RUN_TYPED_FORECAST_IF_READY_AND_SELECTED",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ],
+    "D": [
+      "RUN_BASE_FORECAST",
+      "UP_TO_FOUR_TYPED_ACTION_PROPOSALS",
+      "CONTROLLER_EXECUTES_ONLY_PRECONDITION_VALID_ACTIONS",
+      "RUN_TYPED_FORECAST_AT_MOST_ONCE",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ]
   },
   "arm_leaf_whitelist_diffs": {
-    "B_minus_A": ["policy", "typed_pipeline"],
-    "C_minus_B": ["llm_decision", "policy"],
-    "D_minus_C": ["llm_envelope_shape", "policy"]
+    "B_minus_A": [
+      "policy",
+      "typed_pipeline"
+    ],
+    "C_minus_B": [
+      "llm_decision",
+      "policy"
+    ],
+    "D_minus_C": [
+      "llm_envelope_shape",
+      "policy"
+    ]
   },
-  "reason_codes": ["NO_VISIBLE_RECEIPT", "RECEIPT_AFTER_ORIGIN", "INCOMPLETE_NEWEST_VINTAGE", "SCHEMA_DRIFT", "BODY_HASH_MISMATCH", "FORK", "CLOCK_UNHEALTHY", "HTTP_TIMEOUT", "HTTP_STATUS", "LLM_TIMEOUT", "LLM_REFUSAL", "LLM_INCOMPLETE", "LLM_MALFORMED", "ACTION_PRECONDITION", "BUDGET_EXHAUSTED", "BUDGET_OVERRUN", "DEADLINE_MISSED", "FORECAST_TOOL_FAILURE", "AGENT_ABSTAIN", "CONTRACT_IDENTITY_DRIFT"],
-  "run_hard_stop_reasons": ["CONTRACT_IDENTITY_DRIFT", "LABEL_OR_SCORE_ACCESS", "FORBIDDEN_SOURCE_TOOL_ACTION", "SOURCE_TERMS_CHANGE"],
+  "reason_codes": [
+    "NO_VISIBLE_RECEIPT",
+    "RECEIPT_AFTER_ORIGIN",
+    "INCOMPLETE_NEWEST_VINTAGE",
+    "SCHEMA_DRIFT",
+    "BODY_HASH_MISMATCH",
+    "FORK",
+    "CLOCK_UNHEALTHY",
+    "HTTP_TIMEOUT",
+    "HTTP_STATUS",
+    "LLM_TIMEOUT",
+    "LLM_REFUSAL",
+    "LLM_INCOMPLETE",
+    "LLM_MALFORMED",
+    "ACTION_PRECONDITION",
+    "BUDGET_EXHAUSTED",
+    "BUDGET_OVERRUN",
+    "DEADLINE_MISSED",
+    "FORECAST_TOOL_FAILURE",
+    "AGENT_ABSTAIN",
+    "CONTRACT_IDENTITY_DRIFT"
+  ],
+  "run_hard_stop_reasons": [
+    "CONTRACT_IDENTITY_DRIFT",
+    "LABEL_OR_SCORE_ACCESS",
+    "FORBIDDEN_SOURCE_TOOL_ACTION",
+    "SOURCE_TERMS_CHANGE"
+  ],
   "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
   "evidence_root": "logs/forecasting/m1_agent_contract_c2_20261029",
   "source_files": [

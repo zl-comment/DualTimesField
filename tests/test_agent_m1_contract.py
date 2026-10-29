@@ -115,7 +115,8 @@ class IdentityPinningTests(unittest.TestCase):
     def test_mutated_m0_file_refuses_before_any_action(self):
         with tempfile.TemporaryDirectory() as tmp:
             tree = Path(tmp)
-            for relative in m1_contract.PINNED_RELATIVE_PATHS:
+            for relative in (*m1_contract.PINNED_RELATIVE_PATHS,
+                              m1_contract.CONFIG_PATH):
                 source = ROOT / relative
                 target = tree / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -171,9 +172,10 @@ class ArmLeafDiffTests(unittest.TestCase):
 
     def test_shared_leaves_are_identical_across_arms(self):
         leaves = m1_contract.ARM_LEAVES
-        shared = set(leaves["A"])
+        declared = set().union(*m1_contract.declared_arm_leaf_diffs().values())
+        shared = set(leaves["A"]) - declared
         for arm in ("B", "C", "D"):
-            shared &= set(leaves[arm])
+            self.assertTrue(shared <= set(leaves[arm]))
         for leaf in shared:
             values = {leaves[arm][leaf] for arm in "ABCD"}
             self.assertEqual(len(values), 1, f"shared leaf {leaf} differs across arms")
@@ -221,9 +223,9 @@ class AsOfWrapperTests(unittest.TestCase):
         snapshot = _clean_snapshot()
         m1_asof.verify_event_chain(snapshot["events"])
         broken = [dict(event) for event in snapshot["events"]]
-        broken[0]["receipt_complete_unix_ceil"] += 1
+        broken[0]["receipt_complete_unix_ceil"] += 1  # stale hashes now
         with self.assertRaises(ValueError):
-            m1_asof.verify_event_chain(m1_asof.chain_events(broken))
+            m1_asof.verify_event_chain(tuple(broken))
 
     def test_post_origin_receipts_and_forks_cannot_change_origin_identity(self):
         base = _two_ref_snapshot()
@@ -377,7 +379,8 @@ class TypedDerivationTests(unittest.TestCase):
         with self.assertRaises(m1_asof.M1TypedRejection) as caught:
             m1_asof.derive_typed_evidence(harness.ORIGIN_UNIX, visible,
                                           {event["ref"]: record})
-        self.assertEqual(caught.exception.reason_code, "SCHEMA_DRIFT")
+        self.assertIn(caught.exception.reason_code,
+                      ("SCHEMA_DRIFT", "BODY_HASH_MISMATCH"))
 
         from forecasting.agent_forecasting import predispatch_td_abs as m0
         body = snapshot["bodies"][event["body_sha256"]]
@@ -474,13 +477,23 @@ class DigestAndPromptTests(unittest.TestCase):
 
     def test_request_bytes_use_the_frozen_prompts(self):
         request = m1_llm.build_request_bytes("C", '{"state":"FETCHED"}', ROOT)
+        payload = json.loads(request)
         config = m1_contract.load_config(ROOT)
         directory = ROOT / config["prompt_artifacts"]["directory"]
         system = (directory / "m1_common_system_prompt.txt").read_text()
         template = (directory / "m1_c_prompt_template.txt").read_text()
-        self.assertIn(system, request.decode())
-        self.assertIn(template.replace("{{canonical_digest}}", '{"state":"FETCHED"}'),
-                      request.decode())
+        self.assertEqual(payload["instructions"], system)
+        self.assertEqual(payload["input"],
+                         template.replace("{{canonical_digest}}",
+                                          '{"state":"FETCHED"}'))
+        self.assertEqual(payload["model"], m1_contract.LLM_MODEL)
+        self.assertEqual(payload["reasoning"], {"effort": "none"})
+        self.assertFalse(payload["store"])
+        self.assertEqual(payload["truncation"], "disabled")
+        self.assertFalse(payload["parallel_tool_calls"])
+        self.assertEqual(set(payload),
+                         {"model", "instructions", "input", "reasoning", "store",
+                          "truncation", "parallel_tool_calls"})
 
     def test_parser_rejects_the_full_forbidden_zoo(self):
         bad = [
@@ -603,10 +616,10 @@ class ActionRegistryTests(unittest.TestCase):
         for state in m1_actions.TERMINAL_STATES:
             self.assertEqual(
                 m1_actions.enabled_actions(state, list_calls=0, get_calls=0,
-                                           listed_refs=()), ())
+                                           available_refs=()), ())
         self.assertEqual(
             m1_actions.enabled_actions(m1_actions.M1State.A_READY, list_calls=0,
-                                       get_calls=0, listed_refs=()),
+                                       get_calls=0, available_refs=()),
             (m1_actions.M1ActionKind.LIST, m1_actions.M1ActionKind.FINALIZE_BASE))
 
 

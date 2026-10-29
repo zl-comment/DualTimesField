@@ -82,8 +82,12 @@ class ReducerGateTests(unittest.TestCase):
         self.assertIn(report["verdict"],
                       ("FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
                        "REDUCIBILITY_REFUTED", "REDUCER_NON_VACUITY_FAILED"))
-        self.assertGreater(report["scenarios_total"], 800)
-        self.assertGreater(report["d_traces_enumerated"], 1000)
+        # the exhaustive cross: EMPTY(1) + ONE_REF(5x3) + TWO_REFS
+        # (DISTINCT 25x3 + DUPLICATE 5x3 + FORK 25x3)
+        self.assertEqual(report["scenarios_total"], 181)
+        self.assertGreater(report["d_traces_enumerated"], 1500)
+        self.assertGreater(report["llm_failures_checked"], 1400)
+        self.assertTrue(report["internal_consistency_ok"])
         self.assertFalse(report["uses_labels_or_scores"])
         if report["verdict"] == "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED":
             self.assertEqual(report["witnesses"], [])
