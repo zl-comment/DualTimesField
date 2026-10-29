@@ -61,3 +61,11 @@ ref) is classified non-reducible in 10 scenarios, proving the detector is not
 vacuous.  Therefore the frozen contract's scientific terminal state for
 candidate 2 is STOP / FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED; metrics remain
 NOT_EVALUATED and no ADVANCE_M1 is emitted by this round.
+
+## Evidence repair record
+- repair 1 (fb550713): verify_m1_evidence.py repo-root path order fix; the
+  05 closure run executed these exact bytes from the working tree before the
+  fix was committed.  05b_evidence_closure_repair re-ran the closure check at
+  the committed fix HEAD: CLOSURE OK (commands=8, runs=0), exit 0.
+- the artifact manifest is regenerated directly after repair logging as the
+  last write into this root; nothing is appended afterwards.
