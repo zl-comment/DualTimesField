@@ -1,0 +1,112 @@
+=== run_logged id=04_green_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py -q
+git_head: 5039cdb2e2238aeaa03191cb1de615b2ae04c8f4
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:08:56.948808Z
+end_utc: 2026-10-29T08:09:01.921176Z
+--- output begin ---
+............................................F....FF.... [ 78%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+_______________ RawBodyParserTests.test_accepts_well_formed_body _______________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_accepts_well_formed_body>
+
+    def test_accepts_well_formed_body(self):
+        parsed = self._parse(build_body_bytes())
+        values = fixture_values(70)
+        self.assertEqual(parsed.seqno, FIXTURE_SEQNO)
+        self.assertEqual(parsed.runno, FIXTURE_RUNNO)
+        self.assertEqual(len(parsed.rows), 70)
+>       self.assertEqual(parsed.rows[0], (FIXTURE_ORIGIN_UNIX, values[0]))
+E       AssertionError: Tuples differ: (1641220200, 5037.5) != (1641218400, 5037.5)
+E       
+E       First differing element 0:
+E       1641220200
+E       1641218400
+E       
+E       - (1641220200, 5037.5)
+E       ?       ^^^
+E       
+E       + (1641218400, 5037.5)
+E       ?       ^^^
+
+tests/test_agent_predispatch_td_v2.py:97: AssertionError
+_ RawBodyParserTests.test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages _
+ValueError: table file must end with 'END OF REPORT' carrying the total row count; got ['C', 'END OF REPORT', '77']
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages>
+
+    def test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages(self):
+        module = self._module()
+        import io
+        import zipfile
+    
+        def rezip(text):
+            buffer = io.BytesIO()
+            info = zipfile.ZipInfo("x.csv", date_time=(2022, 1, 3, 23, 0, 0))
+            info.compress_type = zipfile.ZIP_STORED
+            with zipfile.ZipFile(buffer, "w") as out_zip:
+                out_zip.writestr(info, text.encode())
+            return buffer.getvalue()
+    
+        body = build_body_bytes()
+        archive = zipfile.ZipFile(io.BytesIO(body))
+        text = archive.read(archive.namelist()[0]).decode()
+        archive.close()
+        lines = text.splitlines()
+        target_first = next(i for i, line in enumerate(lines)
+                            if line.startswith("I,PREDISPATCH,REGION_SOLUTION,9"))
+        data_line = lines[target_first + 1]
+        truncated = ",".join(data_line.split(",")[:-1])
+        with self.assertRaisesRegex(ValueError, "width"):
+            module.parse_body(rezip("\n".join(
+                lines[:target_first + 1] + [truncated] + lines[target_first + 2:])))
+        duplicated = "\n".join(lines[:target_first + 2] + [data_line] + lines[target_first + 2:])
+>       with self.assertRaisesRegex(ValueError, "duplicate primary key"):
+E       AssertionError: "duplicate primary key" does not match "table file must end with 'END OF REPORT' carrying the total row count; got ['C', 'END OF REPORT', '77']"
+
+tests/test_agent_predispatch_td_v2.py:175: AssertionError
+________________ RawBodyParserTests.test_rejects_scopeless_body ________________
+ValueError: a control row inside the data area is rejected
+
+During handling of the above exception, another exception occurred:
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_scopeless_body>
+
+    def test_rejects_scopeless_body(self):
+        module = self._module()
+        body = build_body_bytes()
+        import io
+        import zipfile
+        archive = zipfile.ZipFile(io.BytesIO(body))
+        text = archive.read(archive.namelist()[0]).decode()
+        archive.close()
+        lines = [line for line in text.splitlines()
+                 if not (line.startswith("D,PREDISPATCH,REGION_SOLUTION,9")
+                         and ",NSW1," in line)]
+        buffer = io.BytesIO()
+        info = zipfile.ZipInfo("x.csv", date_time=(2022, 1, 3, 23, 0, 0))
+        info.compress_type = zipfile.ZIP_STORED
+        rows = [row.split(",") for row in lines]
+        rows.append(["C", "END OF REPORT", str(len(rows) + 1)])
+        import csv as _csv
+        sink = io.StringIO(newline="")
+        writer = _csv.writer(sink, lineterminator="\n")
+        for row in rows:
+            writer.writerow(row)
+        with zipfile.ZipFile(buffer, "w") as out_zip:
+            out_zip.writestr(info, sink.getvalue().encode())
+>       with self.assertRaisesRegex(ValueError, "no NSW1"):
+E       AssertionError: "no NSW1" does not match "a control row inside the data area is rejected"
+
+tests/test_agent_predispatch_td_v2.py:240: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_accepts_well_formed_body
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_scopeless_body
+3 failed, 67 passed, 89 subtests passed in 3.38s
+--- output end ---
+EXIT_CODE=1

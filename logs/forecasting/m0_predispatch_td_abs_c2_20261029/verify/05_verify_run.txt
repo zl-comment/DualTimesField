@@ -1,0 +1,10 @@
+=== run_logged id=05_verify_capture ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/verify_predispatch_capture.py
+git_head: 97d7aa7eeb1bea48890893d711fc874b586e98b2
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:11:20.309888Z
+end_utc: 2026-10-29T08:11:26.064417Z
+--- output begin ---
+reverified 2 receipts; selected seqno=2026102928 run=1 receipt_margin=610s basis=first_seen_receipt strict=STRICT_ASOF_VERIFIED series_sha256=a92d99cfe3e97590baad318daa2ecdd62156c8316d5658daf07bebe2ab608bb4
+--- output end ---
+EXIT_CODE=0

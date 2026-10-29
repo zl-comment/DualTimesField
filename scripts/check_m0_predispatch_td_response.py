@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -109,6 +110,12 @@ def main() -> int:
         return child_call(workdir, request_path)
 
     started_monotonic = time.monotonic()
+    # CPU-only offline guards must hold in every child process (predict_frozen
+    # refuses to run otherwise); children inherit this environment.
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    os.environ.setdefault("OMP_NUM_THREADS", "4")
     config = json.loads((ROOT / args.config).read_text())
     spec = config["response_check"]
     tolerance = config["numerical_tolerance"]

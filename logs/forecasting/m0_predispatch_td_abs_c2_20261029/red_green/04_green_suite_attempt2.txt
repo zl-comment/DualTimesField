@@ -1,0 +1,12 @@
+=== run_logged id=04_green_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py -q
+git_head: 5039cdb2e2238aeaa03191cb1de615b2ae04c8f4
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:10:50.184786Z
+end_utc: 2026-10-29T08:10:54.989378Z
+--- output begin ---
+....................................................... [ 78%]
+...............                                                          [100%]
+70 passed, 89 subtests passed in 3.14s
+--- output end ---
+EXIT_CODE=0

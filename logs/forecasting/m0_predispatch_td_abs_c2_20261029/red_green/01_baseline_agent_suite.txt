@@ -1,0 +1,11 @@
+=== run_logged id=01_baseline_agent_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py -q
+git_head: a0a95abbfb672cb89d887dbe7a8f6d9b54fd439d
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T07:49:08.533351Z
+end_utc: 2026-10-29T07:49:12.723163Z
+--- output begin ---
+.......................................                 [100%]
+39 passed, 89 subtests passed in 2.90s
+--- output end ---
+EXIT_CODE=0

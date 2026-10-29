@@ -1,0 +1,22 @@
+=== run_logged id=06_response_check ===
+argv: /root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python -B scripts/check_m0_predispatch_td_response.py
+git_head: 97d7aa7eeb1bea48890893d711fc874b586e98b2
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:12:18.841000Z
+end_utc: 2026-10-29T08:13:08.506465Z
+--- output begin ---
+{
+  "checks": {
+    "input_hashes_differ": true,
+    "base_deterministic": true,
+    "candidate_deterministic": true,
+    "model_state_unchanged": true,
+    "checkpoint_identity_stable": true,
+    "training_calls_zero": true,
+    "typed_encoding_recorded": true,
+    "response_diff_above_tolerance": true
+  },
+  "max_abs_delta": 10.991744995117188
+}
+--- output end ---
+EXIT_CODE=0

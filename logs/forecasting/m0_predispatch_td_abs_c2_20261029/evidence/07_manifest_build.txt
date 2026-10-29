@@ -1,0 +1,13 @@
+=== run_logged id=07_manifest_build ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B /tmp/build_manifest.py
+git_head: 97d7aa7eeb1bea48890893d711fc874b586e98b2
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:14:44.469920Z
+end_utc: 2026-10-29T08:14:44.492916Z
+--- output begin ---
+  File "/tmp/build_manifest.py", line 12
+    print(f"manifest: {len(entries)} files, total {sum(e[\"size_bytes\"] for e in entries)} bytes")
+                                                                                                  ^
+SyntaxError: f-string expression part cannot include a backslash
+--- output end ---
+EXIT_CODE=1

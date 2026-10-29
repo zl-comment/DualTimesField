@@ -1,0 +1,11 @@
+=== run_logged id=02b_rediscover_offline ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/capture_predispatchis.py --re-discover-from-store
+git_head: a0a95abbfb672cb89d887dbe7a8f6d9b54fd439d
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T07:53:22.062972Z
+end_utc: 2026-10-29T07:53:23.089150Z
+--- output begin ---
+re-discovered PUBLIC_PREDISPATCHIS_202610291800_20261029173204.zip origin_end_anchored=1793296800 aligned=True
+re-discovered PUBLIC_PREDISPATCHIS_202610291730_20261029170208.zip origin_end_anchored=1793296800 aligned=True
+--- output end ---
+EXIT_CODE=0

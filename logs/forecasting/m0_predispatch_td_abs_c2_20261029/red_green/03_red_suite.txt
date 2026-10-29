@@ -1,0 +1,520 @@
+=== run_logged id=03_red_suite ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py -q
+git_head: a0a95abbfb672cb89d887dbe7a8f6d9b54fd439d
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:07:13.978806Z
+end_utc: 2026-10-29T08:07:19.300987Z
+--- output begin ---
+........................................FFF.FFFFFFFFFFF [ 78%]
+FFFFFFFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+_ TypedFutureContractTests.test_typed_future_accepted_without_same_named_past __
+
+self = <test_agent_predispatch_td_v2.TypedFutureContractTests testMethod=test_typed_future_accepted_without_same_named_past>
+
+    def test_typed_future_accepted_without_same_named_past(self):
+        values = tuple(6000.0 + h for h in range(24))
+>       request = _input(future_forecasts={self.COVARIATE: values})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_predispatch_td_v2.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'future_forecasts': {'predispatchis_totaldemand_mw': (6000.0, 6001.0, 6002.0, 6003.0, 6004.0, 6005.0, ...)}}
+
+    def _input(**overrides):
+        payload = {
+            "origin_unix": 1641218400,
+            "target_time_unix": tuple(1641218400 + 3600 * h for h in range(24)),
+            "price_history": tuple(float(v) for v in range(1, 73)),
+        }
+        payload.update(overrides)
+>       return FrozenForecastInput(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: FrozenForecastInput.__init__() got an unexpected keyword argument 'future_forecasts'
+
+tests/test_agent_predispatch_td_v2.py:43: TypeError
+___ TypedFutureContractTests.test_typed_future_input_hash_differs_from_base ____
+
+self = <test_agent_predispatch_td_v2.TypedFutureContractTests testMethod=test_typed_future_input_hash_differs_from_base>
+
+    def test_typed_future_input_hash_differs_from_base(self):
+        base = _input()
+>       candidate = _input(future_forecasts={self.COVARIATE: tuple(6000.0 + h for h in range(24))})
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agent_predispatch_td_v2.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'future_forecasts': {'predispatchis_totaldemand_mw': (6000.0, 6001.0, 6002.0, 6003.0, 6004.0, 6005.0, ...)}}
+
+    def _input(**overrides):
+        payload = {
+            "origin_unix": 1641218400,
+            "target_time_unix": tuple(1641218400 + 3600 * h for h in range(24)),
+            "price_history": tuple(float(v) for v in range(1, 73)),
+        }
+        payload.update(overrides)
+>       return FrozenForecastInput(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: FrozenForecastInput.__init__() got an unexpected keyword argument 'future_forecasts'
+
+tests/test_agent_predispatch_td_v2.py:43: TypeError
+_ TypedFutureContractTests.test_typed_future_rejects_unknown_name_length_and_nonfinite _
+
+self = <test_agent_predispatch_td_v2.TypedFutureContractTests testMethod=test_typed_future_rejects_unknown_name_length_and_nonfinite>
+
+    def test_typed_future_rejects_unknown_name_length_and_nonfinite(self):
+        with self.assertRaisesRegex(ValueError, "unapproved"):
+>           _input(future_forecasts={"rrp_future": tuple(1.0 for _ in range(24))})
+
+tests/test_agent_predispatch_td_v2.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _input(**overrides):
+        payload = {
+            "origin_unix": 1641218400,
+            "target_time_unix": tuple(1641218400 + 3600 * h for h in range(24)),
+            "price_history": tuple(float(v) for v in range(1, 73)),
+        }
+        payload.update(overrides)
+>       return FrozenForecastInput(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: FrozenForecastInput.__init__() got an unexpected keyword argument 'future_forecasts'
+
+tests/test_agent_predispatch_td_v2.py:43: TypeError
+_______________ RawBodyParserTests.test_accepts_well_formed_body _______________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_accepts_well_formed_body>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_________ RawBodyParserTests.test_builder_duplicate_and_drop_mutations _________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_builder_duplicate_and_drop_mutations>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_____________ RawBodyParserTests.test_rejects_header_column_drift ______________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_header_column_drift>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+____ RawBodyParserTests.test_rejects_missing_trailer_count_and_bad_preamble ____
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_missing_trailer_count_and_bad_preamble>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+________ RawBodyParserTests.test_rejects_non_zip_and_wrong_member_count ________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_non_zip_and_wrong_member_count>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_ RawBodyParserTests.test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages _
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+________________ RawBodyParserTests.test_rejects_scopeless_body ________________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_scopeless_body>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_____________ RawBodyParserTests.test_rejects_table_version_drift ______________
+
+self = <test_agent_predispatch_td_v2.RawBodyParserTests testMethod=test_rejects_table_version_drift>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+__ ReceiptTrustTests.test_direct_construction_and_replace_promotion_rejected ___
+
+self = <test_agent_predispatch_td_v2.ReceiptTrustTests testMethod=test_direct_construction_and_replace_promotion_rejected>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+________ ReceiptTrustTests.test_receipt_from_raw_body_grants_first_seen ________
+
+self = <test_agent_predispatch_td_v2.ReceiptTrustTests testMethod=test_receipt_from_raw_body_grants_first_seen>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+______ ReceiptTrustTests.test_synthetic_never_claims_strict_verification _______
+
+self = <test_agent_predispatch_td_v2.ReceiptTrustTests testMethod=test_synthetic_never_claims_strict_verification>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_____ ReceiptTrustTests.test_value_tamper_with_same_body_hash_fails_closed _____
+
+self = <test_agent_predispatch_td_v2.ReceiptTrustTests testMethod=test_value_tamper_with_same_body_hash_fails_closed>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+______ DedupeSelectionTests.test_duplicate_body_folds_to_earliest_receipt ______
+
+self = <test_agent_predispatch_td_v2.DedupeSelectionTests testMethod=test_duplicate_body_folds_to_earliest_receipt>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_____ DedupeSelectionTests.test_invisible_newer_vintage_excluded_by_clock ______
+
+self = <test_agent_predispatch_td_v2.DedupeSelectionTests testMethod=test_invisible_newer_vintage_excluded_by_clock>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+__ DedupeSelectionTests.test_newest_visible_vintage_selected_without_fallback __
+
+self = <test_agent_predispatch_td_v2.DedupeSelectionTests testMethod=test_newest_visible_vintage_selected_without_fallback>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_________ DedupeSelectionTests.test_same_vintage_two_bodies_is_a_fork __________
+
+self = <test_agent_predispatch_td_v2.DedupeSelectionTests testMethod=test_same_vintage_two_bodies_is_a_fork>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+______ DedupeSelectionTests.test_uncovered_origin_without_visible_receipt ______
+
+self = <test_agent_predispatch_td_v2.DedupeSelectionTests testMethod=test_uncovered_origin_without_visible_receipt>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+________ SeriesMappingTests.test_missing_half_hour_refuses_with_no_fill ________
+
+self = <test_agent_predispatch_td_v2.SeriesMappingTests testMethod=test_missing_half_hour_refuses_with_no_fill>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_____________ SeriesMappingTests.test_origin_must_be_hour_aligned ______________
+
+self = <test_agent_predispatch_td_v2.SeriesMappingTests testMethod=test_origin_must_be_hour_aligned>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+____ SeriesMappingTests.test_series_is_exact_pair_means_over_48_half_hours _____
+
+self = <test_agent_predispatch_td_v2.SeriesMappingTests testMethod=test_series_is_exact_pair_means_over_48_half_hours>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_________________ SeriesMappingTests.test_shifted_grid_refuses _________________
+
+self = <test_agent_predispatch_td_v2.SeriesMappingTests testMethod=test_shifted_grid_refuses>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+_______ AttachAdapterTests.test_attach_adds_only_the_typed_future_field ________
+
+self = <test_agent_predispatch_td_v2.AttachAdapterTests testMethod=test_attach_adds_only_the_typed_future_field>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+__ AttachAdapterTests.test_attach_refuses_origin_mismatch_and_second_manifest __
+
+self = <test_agent_predispatch_td_v2.AttachAdapterTests testMethod=test_attach_refuses_origin_mismatch_and_second_manifest>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+__ ToolMappingTests.test_model_input_encodes_honest_absence_for_typed_future ___
+
+self = <test_agent_predispatch_td_v2.ToolMappingTests testMethod=test_model_input_encodes_honest_absence_for_typed_future>
+
+    def test_model_input_encodes_honest_absence_for_typed_future(self):
+>       from forecasting.agent_forecasting.frozen_chronos import build_model_input
+E       ImportError: cannot import name 'build_model_input' from 'forecasting.agent_forecasting.frozen_chronos' (/root/workspace/Code/DualTimesField-worktrees/agentic-asof-abs-predispatch-c2-20261029-r4/forecasting/agent_forecasting/frozen_chronos.py)
+
+tests/test_agent_predispatch_td_v2.py:453: ImportError
+_______ ToolMappingTests.test_model_input_unchanged_without_typed_future _______
+
+self = <test_agent_predispatch_td_v2.ToolMappingTests testMethod=test_model_input_unchanged_without_typed_future>
+
+    def test_model_input_unchanged_without_typed_future(self):
+>       from forecasting.agent_forecasting.frozen_chronos import build_model_input
+E       ImportError: cannot import name 'build_model_input' from 'forecasting.agent_forecasting.frozen_chronos' (/root/workspace/Code/DualTimesField-worktrees/agentic-asof-abs-predispatch-c2-20261029-r4/forecasting/agent_forecasting/frozen_chronos.py)
+
+tests/test_agent_predispatch_td_v2.py:465: ImportError
+______ ReceiptStoreTests.test_store_reload_reverifies_and_rejects_tamper _______
+
+self = <test_agent_predispatch_td_v2.ReceiptStoreTests testMethod=test_store_reload_reverifies_and_rejects_tamper>
+
+    def setUp(self):
+>       _require_fixture()
+
+tests/test_agent_predispatch_td_v2.py:475: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _require_fixture():
+        if _FIXTURE_IMPORT_ERROR is not None:
+>           raise AssertionError(f"candidate fixture chain unavailable: {_FIXTURE_IMPORT_ERROR}")
+E           AssertionError: candidate fixture chain unavailable: No module named 'forecasting.agent_forecasting.predispatch_td_abs'
+
+tests/test_agent_predispatch_td_v2.py:33: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_predispatch_td_v2.py::TypedFutureContractTests::test_typed_future_accepted_without_same_named_past
+FAILED tests/test_agent_predispatch_td_v2.py::TypedFutureContractTests::test_typed_future_input_hash_differs_from_base
+FAILED tests/test_agent_predispatch_td_v2.py::TypedFutureContractTests::test_typed_future_rejects_unknown_name_length_and_nonfinite
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_accepts_well_formed_body
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_builder_duplicate_and_drop_mutations
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_header_column_drift
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_missing_trailer_count_and_bad_preamble
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_non_zip_and_wrong_member_count
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_row_width_mismatch_duplicate_pk_and_two_vintages
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_scopeless_body
+FAILED tests/test_agent_predispatch_td_v2.py::RawBodyParserTests::test_rejects_table_version_drift
+FAILED tests/test_agent_predispatch_td_v2.py::ReceiptTrustTests::test_direct_construction_and_replace_promotion_rejected
+FAILED tests/test_agent_predispatch_td_v2.py::ReceiptTrustTests::test_receipt_from_raw_body_grants_first_seen
+FAILED tests/test_agent_predispatch_td_v2.py::ReceiptTrustTests::test_synthetic_never_claims_strict_verification
+FAILED tests/test_agent_predispatch_td_v2.py::ReceiptTrustTests::test_value_tamper_with_same_body_hash_fails_closed
+FAILED tests/test_agent_predispatch_td_v2.py::DedupeSelectionTests::test_duplicate_body_folds_to_earliest_receipt
+FAILED tests/test_agent_predispatch_td_v2.py::DedupeSelectionTests::test_invisible_newer_vintage_excluded_by_clock
+FAILED tests/test_agent_predispatch_td_v2.py::DedupeSelectionTests::test_newest_visible_vintage_selected_without_fallback
+FAILED tests/test_agent_predispatch_td_v2.py::DedupeSelectionTests::test_same_vintage_two_bodies_is_a_fork
+FAILED tests/test_agent_predispatch_td_v2.py::DedupeSelectionTests::test_uncovered_origin_without_visible_receipt
+FAILED tests/test_agent_predispatch_td_v2.py::SeriesMappingTests::test_missing_half_hour_refuses_with_no_fill
+FAILED tests/test_agent_predispatch_td_v2.py::SeriesMappingTests::test_origin_must_be_hour_aligned
+FAILED tests/test_agent_predispatch_td_v2.py::SeriesMappingTests::test_series_is_exact_pair_means_over_48_half_hours
+FAILED tests/test_agent_predispatch_td_v2.py::SeriesMappingTests::test_shifted_grid_refuses
+FAILED tests/test_agent_predispatch_td_v2.py::AttachAdapterTests::test_attach_adds_only_the_typed_future_field
+FAILED tests/test_agent_predispatch_td_v2.py::AttachAdapterTests::test_attach_refuses_origin_mismatch_and_second_manifest
+FAILED tests/test_agent_predispatch_td_v2.py::ToolMappingTests::test_model_input_encodes_honest_absence_for_typed_future
+FAILED tests/test_agent_predispatch_td_v2.py::ToolMappingTests::test_model_input_unchanged_without_typed_future
+FAILED tests/test_agent_predispatch_td_v2.py::ReceiptStoreTests::test_store_reload_reverifies_and_rejects_tamper
+29 failed, 41 passed, 89 subtests passed in 3.83s
+--- output end ---
+EXIT_CODE=1

@@ -1,0 +1,68 @@
+{
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "base_input_hash": "6d7885d56254112fd0a91b81cc715e55984192521dd0a763f4c9204b8ce1b200",
+  "candidate_input_hash": "9f2ce552ceb7f43a7bd6614791d263e25b758dafcf75f68a5979eceba599f64f",
+  "fixture_zip_sha256": "ab1debd78a497090cf17d0e4695353ee51c7a2942f8034fdb1fb5f664b4f361d",
+  "series_hash": "a37c2b17c6cb04b331cf5390e2c9370a586eda36703cd2eb9ce4d2e1b2a42609",
+  "series_publication_basis": "synthetic_fixture",
+  "series_strict_asof": "SYNTHETIC_FIXTURE",
+  "max_abs_delta": 10.991744995117188,
+  "min_output_delta_abs": 1e-06,
+  "tolerance": {
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "checks": {
+    "input_hashes_differ": true,
+    "base_deterministic": true,
+    "candidate_deterministic": true,
+    "model_state_unchanged": true,
+    "checkpoint_identity_stable": true,
+    "training_calls_zero": true,
+    "typed_encoding_recorded": true,
+    "response_diff_above_tolerance": true
+  },
+  "walls": {
+    "base_0": 10.366138339042664,
+    "base_1": 10.385327976197004,
+    "candidate_0": 10.437248054891825,
+    "candidate_1": 10.299917105585337
+  },
+  "state_hashes": [
+    "c325f9b311d6b97f7a72ad22f0dc11d56a895c010edd089468be85f68e6f733e"
+  ],
+  "tool_probes": {
+    "future_only_name": "REJECTED: Expected keys in `future_covariates` must be a subset of `past_covariates` [], but found ['probe_onl",
+    "nan_past_real_future": {
+      "accepted": true,
+      "past_all_nan": true,
+      "future_all_finite": true,
+      "n_future_covariates": 1
+    }
+  },
+  "base_provenance": {
+    "files_read": [
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/metadata.json",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/origin_unix.npy",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__history_values.npy",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__history_calendar.npy",
+      "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__future_calendar.npy"
+    ],
+    "file_sha256": {
+      "metadata.json": "e9d9b1a7e348524337273240687332d549ce191bbe9b9321da032aed06f63df5",
+      "origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+      "input__history_values.npy": "9a477e06757ec244b102b36354815749fbe13a0109677332abaa489a51e3d4cd",
+      "input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+      "input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0"
+    },
+    "row": 72,
+    "origin_unix": 1641218400,
+    "availability_status": "archive_timestamp_proxies_only",
+    "strict_live_asof_verified": false,
+    "transform": "decode_price_frozen_train_zscore; demand_keeps_existing_train_zscore",
+    "new_fitting": false,
+    "future_labels_read": false
+  },
+  "model_calls": 4,
+  "elapsed_seconds": 45.66003206372261
+}
