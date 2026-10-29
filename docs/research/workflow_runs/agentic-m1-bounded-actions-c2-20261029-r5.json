@@ -1,0 +1,49 @@
+{
+  "provenance_schema_version": 1,
+  "provenance_path": "docs/research/workflow_runs/agentic-m1-bounded-actions-c2-20261029-r5.json",
+  "workflow_id": "afd80121-1803-4df5-858b-d01571795bdc",
+  "run_id": "dcd60610-3ddd-48e9-b2c8-5205f08f7d53",
+  "run_id_kind": "outer_ekko_workflow_run_id",
+  "controller_node_id": "hermes-controller",
+  "node_session_id": "5f9aa6dc-3a3f-47a4-97ae-61b396b12e30",
+  "run_id_resolution": "workflow API node_sessions session_id mapping",
+  "internal_cli_run_id_observed": "cli_run_mvtce2dt_lr98w2",
+  "internal_cli_run_id_used_as_workflow_run_id": false,
+  "base_branch": "research/agentic-asof-abs-predispatch-c2-20261029-r4",
+  "base_head": "e458016386311b277e193ec5a35b94aad1436c92",
+  "run_branch": "research/agentic-m1-bounded-actions-c2-20261029-r5",
+  "run_worktree": "/root/workspace/Code/DualTimesField-worktrees/agentic-m1-bounded-actions-c2-20261029-r5",
+  "mission_goal_id": "AGENTIC_ASOF_FORECASTING_RANK1_V1",
+  "goal_id": "AGENT_M1_FROZEN_CONTRACT_C2",
+  "mission_milestone": "M1 FROZEN_AGENT_CONTRACT",
+  "target_terminal_state": "ADVANCE_M1",
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "candidate_index": "2/3",
+  "goal_summary": "Freeze a complete machine-checkable A/B/C/D Agent contract covering sources, schemas, typed inputs, bounded actions, prompts/models, tools, budgets, deadlines, fallbacks, rejection rules, evidence publication, and falsifiable stop conditions before any performance evaluation.",
+  "bootstrap_scope": {
+    "performed": [
+      "create the dedicated run branch and worktree from the exact authorized base SHA",
+      "commit this workflow-run provenance as the only run-worktree file change"
+    ],
+    "not_performed": [
+      "M1 implementation",
+      "collection",
+      "training or fitting",
+      "price-label access or scoring",
+      "G1/G2 or D-C evaluation",
+      "leaderboard or final-test evaluation",
+      "experiment execution"
+    ]
+  },
+  "outer_workflow_started_at_utc": "2026-10-29T09:29:53.289Z",
+  "branch_preflight_utc": "2026-10-29T09:33:14Z",
+  "worktree_created_at_utc": "2026-10-29T09:33:38Z",
+  "authorization_snapshot_scope": "SHA-256 values captured before server bootstrap from the five orchestration files named by the controller task",
+  "authorization_files_sha256": {
+    "MISSION_GOAL.md": "a5023e6d2c9174e40d3a7964260fc6bdd27b336cae84fd2a3d4c0f05add8e672",
+    "MASTER_WORKFLOW.md": "cf579cafe59b655fdc00d91e5979f0b0b7add79a0f726e15f0a323e510449981",
+    "MASTER_RUN_STATE.md": "5f46851d057b36cbecf7d13f866dd4d8fea4430b32395f35c89edcfa16a04402",
+    "ACTIVE_ROUND.md": "11495165f2b928014fd1264b3c072927ffb9631a751898f552999cb201a1583b",
+    "APPROVALS.md": "32809393bef5e1e0d625f713fa3cf487ec9d28f4059bb1d565c6f081b67b4977"
+  }
+}
