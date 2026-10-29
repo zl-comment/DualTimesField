@@ -596,10 +596,12 @@ def verify_run_entry(repo_root: str | Path,
     Audit-3/H1: per-file pins alone are not a run identity.  The entry (a) runs
     at a resolvable git HEAD, optionally equal to an explicitly expected head
     (evidence replay binds the head its logs were produced at), (b) refuses any
-    modification, staged change or tracked-file drift — untracked files cannot
-    reach any pinned path — and (c) requires the frozen config file's working
-    bytes to equal its committed bytes, so the config that closes the execution
-    surface is itself closed by the commit it ships in.  Nothing is cached.
+    modification, staged change or tracked-file drift outside the append-only
+    evidence root (whose closure is verified by verify_m1_evidence instead) —
+    untracked files cannot reach any pinned path — and (c) requires the frozen
+    config file's working bytes to equal its committed bytes, so the config
+    that closes the execution surface is itself closed by the commit it ships
+    in.  Nothing is cached.
     """
     root = Path(repo_root)
     head = _git(root, "rev-parse", "HEAD")
@@ -614,8 +616,15 @@ def verify_run_entry(repo_root: str | Path,
     status = _git(root, "status", "--porcelain")
     if status.returncode != 0:
         raise M1IdentityDrift("run entry cannot read git status")
-    tracked_changes = [line for line in status.stdout.splitlines()
-                       if line and not line.startswith("??")]
+    evidence_prefix = f"{EVIDENCE_ROOT}/"
+    # the append-only evidence root is exempt from the clean check: the logged
+    # command pipeline writes its ledger/logs during the run BY DESIGN and its
+    # closure is verified separately (bidirectional manifest + ledger bijection
+    # in verify_m1_evidence).  Every OTHER tracked path must be clean.
+    tracked_changes = [
+        line for line in status.stdout.splitlines()
+        if line and not line.startswith("??")
+        and not line[3:].split(" -> ")[0].startswith(evidence_prefix)]
     if tracked_changes:
         raise M1IdentityDrift(
             "run entry tree is not clean over tracked files: "
