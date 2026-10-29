@@ -1,0 +1,156 @@
+M1 candidate 2 contract — frozen bounded Agent protocol (m1.agent_contract.c2.v1)
+Branch: research/agentic-m1-bounded-actions-c2-20261029-r5 (frozen before implementation)
+Date: 2026-10-29 (UTC)
+
+1. Scope and inherited base
+- candidate_id: predispatchis_absolute_totaldemand_future_v1; milestone M1 FROZEN_AGENT_CONTRACT.
+- This round freezes and enforces a complete machine-checkable A/B/C/D contract: sources,
+  schemas, typed inputs, bounded actions, prompts/model identity, tools, budgets, deadlines,
+  fallbacks, rejection rules, evidence publication and falsifiable stop conditions.
+- It executes bounded synthetic/protocol probes ONLY.  No labels, no scores, no accuracy,
+  no D-C evaluation, no fitting/calibration, no model download, no GPU, no collector, no
+  G1/G2, no live OpenAI call, no live source fetch, no push/merge/rebase.
+- Frozen base: e458016386311b277e193ec5a35b94aad1436c92 (branch
+  research/agentic-asof-abs-predispatch-c2-20261029-r4) with the five M0 file hashes, the
+  REGION_SOLUTION header-line hash 2f013ba4..., the Chronos-2 checkpoint identity
+  (revision 29ec3766...) and package set pinned in
+  configs/agent_forecasting/m1_agent_contract_c2_20261029.json.  Any drift is a run hard
+  stop (CONTRACT_IDENTITY_DRIFT) checked BEFORE any action.
+
+2. Source contract (inherited M0 semantics, unchanged)
+- URL https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/, table
+  PREDISPATCHREGIONSUM, CSV interface PREDISPATCH,REGION_SOLUTION,9, 131 header fields,
+  field TOTALDEMAND in MW, region NSW1, INTERVENTION=0, DATETIME = AEST (UTC+10, no DST)
+  half-hour period END.
+- Visibility clock is ONLY receipt_complete_unix_ceil <= origin_unix.  Filename timestamps,
+  HTTP Date/Last-Modified, LASTCHANGED and directory order are declared non-clocks.
+- Duplicate (seqno, runno, body_sha256) receipts fold to the EARLIEST receipt; same vintage
+  with two body hashes is a fork and fails closed; newest-visible-only selection; all 48
+  exact half-hour ends are required; hour h = mean of ends origin+(2h+1)*1800 and
+  origin+(2h+2)*1800; no fill/splice/older-longer fallback/archive proxy of any kind.
+- Withdrawal semantics: NOT_APPLICABLE — PREDISPATCHIS has no source-native withdrawal and
+  the absence of a later file never withdraws an immutable captured receipt.
+
+3. M1 as-of wrapper (new, mandatory)
+- load/selection never trusts a caller-supplied receipt iterable.  The wrapper (a) verifies
+  the append-only receipt-event hash chain and each event/body filename-hash binding,
+  (b) filters events by receipt_complete_unix_ceil <= origin BEFORE opening or parsing any
+  body, (c) materializes the visible prefix exactly once as an immutable tuple, and (d)
+  feeds the SAME tuple to fork detection, dedupe, selection and series construction.
+- Typed evidence identity (series_hash) binds origin, covariate name, the 24 values, the
+  selected vintage/body/header identity, the selected EARLIEST deduped receipt clock and
+  the visible-ledger hash over ALL visible events.  It is therefore independent of which
+  subset of refs an arm fetched and of any post-origin receipt.
+- A typed terminal additionally requires that the newest VISIBLE vintage's body was
+  actually fetched and byte-validated in-run; omission of the newest receipt can never
+  select an older vintage (that path rejects with ACTION_PRECONDITION, HTTP_TIMEOUT,
+  HTTP_STATUS, SCHEMA_DRIFT, INCOMPLETE_NEWEST_VINTAGE, FORK or NO_VISIBLE_RECEIPT and
+  publishes the exact A fallback).
+
+4. Arms and fairness
+- A: frozen base input -> frozen forecast tool -> atomic base publish.  A never touches the
+  external snapshot.
+- B: A + the maximal deterministic legal plan: one LIST, fetch the two canonical newest
+  VISIBLE refs (vintage key desc, canonical filename order tie-break), validate every
+  fetched body, derive typed evidence through the safety kernel, run the frozen typed
+  forecast if and only if ready, else publish byte-identical A output.
+- C: byte-identical B retrieval/validation FIRST, then exactly ONE frozen LLM decision
+  (USE_TYPED/USE_BASE) over the canonical digest; no adaptive follow-up of any kind.
+- D: A + at most four LLM action proposals restricted to the typed closed vocabulary
+  LIST / FETCH_REF / FINALIZE_TYPED / FINALIZE_BASE with opaque refs only; the
+  deterministic safety kernel performs every check, parse, derivation, forecast and publish.
+- B/C/D share source_snapshot_id, origin, cutoff, parser, base input identity, checkpoint
+  and forecast-tool pool, deadline and the full maximum envelope.  Declared leaf diffs:
+  B-A = typed pipeline + deterministic evidence rules; C-B = one-shot LLM decision
+  (prompt/parser/envelope); D-C = bounded action policy (order/subset/termination) with an
+  equal-total, smaller-per-call LLM envelope.  Every other leaf must be identical.
+
+5. Frozen LLM identity (no live call in M1)
+- OpenAI Responses API, model gpt-5.4-2026-03-05, response.model must equal it exactly;
+  reasoning effort "none"; store=false; truncation="disabled"; parallel_tool_calls=false.
+  No seed or temperature is synthesized; sampling determinism is NOT claimed.  Requests,
+  responses and provider usage are recorded verbatim as evidence.
+- Prompt/schema artifacts (byte-frozen in docs/research/agent_forecasting/m1_prompts/):
+  common system prompt, C template, D template, C decision schema, D action schema, each
+  pinned by SHA-256 in the config.
+- Digest renderer: only enum strings, opaque refs and booleans over the fixed fact space
+  (state, enabled actions/refs, budget-class availability, receipt cutoff relation,
+  coverage, schema validity, fork presence, typed readiness).  NO timestamps, counts,
+  numeric values, raw bytes, TOTALDEMAND values, prices, forecasts, labels, scores, URLs,
+  paths or free source text ever enter a digest.  The renderer module hash is bound in the
+  config at the implementation commit.
+- Strict parser: one JSON object or one strict function call, no prose; UTF-8 with a
+  4096-byte cap; duplicate keys, NaN/Infinity, unknown/missing keys, ANY JSON numeric
+  literal, schema mismatch, refusal, incomplete, timeout or oversize output => zero
+  retries, zero side effects, exact A fallback.  Refs are resolved against the enabled-ref
+  set and the action/ref pair is re-verified in the controller together with state, budget
+  and deadline preconditions.
+- Token envelopes: C = exactly 1 call with input<=16384/output<=1024; D <= 4 calls with
+  input<=4096/output<=256 each; cumulative caps 16384/1024 are IDENTICAL for C and D.
+  Frozen cost rates 2.5/15.0 USD per million tokens; worst case $0.05632, hard cap $0.06
+  (accounted in integer micro-USD).
+
+6. Budgets, retries, deadlines (per origin per arm; hash-chained append-only ledger)
+- logical source replay: 3 calls (1 LIST + <=2 FETCH_REF), 0 retries; 16 MiB total, 8 MiB
+  one body.  LLM token-count requests 4; generations A/B 0, C 1, D<=4.  Action proposals
+  C<=1, D<=4, invalid retries 0.  Local deterministic tool calls 8 (30 s each).  Frozen
+  forecast calls 2, unique-input-only, 300 s each, 2 CPU threads, 8 GiB RSS, GPU 0.
+- Wall clock: whole process 900 s; typed forecast reserve 300 s; publication reserve 30 s;
+  success must publish by origin+600 s.  Every class is reserve->effect->settle; a refused
+  reservation precedes any side effect; failures/timeouts/rejections are charged; no
+  refunds; an unsettled reserve is fully consumed; provider usage above reservation is
+  BUDGET_OVERRUN and forbids typed success; ledger folds must rederive result totals.
+- Reason vocabulary (frozen): NO_VISIBLE_RECEIPT, RECEIPT_AFTER_ORIGIN,
+  INCOMPLETE_NEWEST_VINTAGE, SCHEMA_DRIFT, BODY_HASH_MISMATCH, FORK, CLOCK_UNHEALTHY,
+  HTTP_TIMEOUT, HTTP_STATUS, LLM_TIMEOUT, LLM_REFUSAL, LLM_INCOMPLETE, LLM_MALFORMED,
+  ACTION_PRECONDITION, BUDGET_EXHAUSTED, BUDGET_OVERRUN, DEADLINE_MISSED,
+  FORECAST_TOOL_FAILURE, AGENT_ABSTAIN, CONTRACT_IDENTITY_DRIFT.  Arm A success records
+  AGENT_ABSTAIN (the typed mechanism is absent by definition).  Run-level hard stops:
+  CONTRACT_IDENTITY_DRIFT, LABEL_OR_SCORE_ACCESS, FORBIDDEN_SOURCE_TOOL_ACTION,
+  SOURCE_TERMS_CHANGE (403/429/source-terms change opens the circuit breaker: no further
+  source access, run hard stop, no success commit).
+
+7. Failure semantics
+- PUBLISHED_TYPED: every check passed; frozen tool bytes published unchanged.
+- PUBLISHED_BASE_FALLBACK: typed evidence, LLM, budget, deadline or typed forecast failed,
+  or C/D abstained; byte-identical A output plus the reason code.
+- SYSTEM_MISSING: A itself unavailable/invalid/late/failed; a missing record is published;
+  no origin is ever silently dropped or imputed.
+- Forecast output may not be clipped, sorted, calibrated, re-selected or edited by anyone;
+  the frozen tool is the single sink and each unique input is forecast at most once.
+
+8. Atomic evidence publication
+- Exclusive per-run lock; refuse an existing committed identity; same-filesystem O_EXCL
+  staging; write result, unchanged forecast bytes, the exact visible receipt-prefix
+  snapshot, action/budget/model ledgers and LLM request/response records; fsync every file;
+  manifest with SHA-256+size per payload; reverify hashes/folds/caps/identity/deadline;
+  atomic rename to the immutable final dir; COMMIT.json.tmp -> COMMIT.json is the LAST
+  evidence-root write; the closure checker runs outside the evidence root.  On-disk
+  inventory must equal manifest payloads plus exactly manifest.json and COMMIT.json;
+  command ids and log paths are globally injective and every log ends with its real
+  EXIT_CODE.  Any crash before COMMIT leaves no success; failures use a separate O_EXCL
+  failures directory; no success artifact is overwritten or amended.
+
+9. Reducibility gate (label-free, executable)
+- Exhaustive finite scenario reducer over the declared axes: listing EMPTY/ONE_REF/
+  TWO_REFS; per-ref fetch outcome COMPLETE_VALID/INCOMPLETE/SCHEMA_DRIFT/TIMEOUT/
+  NOT_FOUND; newest-receipt relation BEFORE/EQUAL/AFTER origin; two-body relation
+  DISTINCT_VINTAGES/DUPLICATE_SAME_BODY/FORK_SAME_VINTAGE; LLM result VALID_ENABLED_ACTION/
+  INVALID_ACTION/REFUSAL/INCOMPLETE/TIMEOUT.
+- For every scenario, enumerate EVERY legal D trace of at most four valid proposals under
+  the frozen state machine and envelope and compare its terminal
+  (verdict, input_hash, forecast-tool trace hash) with the maximal deterministic B plan,
+  the one-shot maximal C policy and the common A fallback on the SAME snapshot.
+- All useful D terminals reproduced by B/C => STOP / FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED.
+  A D advantage reachable only via extra sources/tools/budget, older-vintage fallback,
+  arbitrary numbers, free text, code execution, numeric edits or deliberately weakened
+  B/C => STOP / NO_FAIR_AGENT_MECHANISM.
+- Non-vacuity control: a seeded weak-B policy that spends its body GETs only on the
+  superseded ref must be classified NON-reducible in at least one scenario, else the
+  reducer itself is invalid.  Engineering GREEN never maps sufficiency to ADVANCE_M1.
+
+10. Verdict semantics for this round
+- Engineering acceptance = RED->GREEN enforcement of everything above with exact frozen
+  hashes and closed evidence.  Metrics stay NOT_EVALUATED; no accuracy, D-C, leaderboard
+  or mission-success claim is made.  The scientific terminal state is decided by the
+  executable reducer output in the gate file, not by engineering greenness.

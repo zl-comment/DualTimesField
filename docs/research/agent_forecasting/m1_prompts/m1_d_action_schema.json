@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "M1DAction",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["LIST", "FETCH_REF", "FINALIZE_TYPED", "FINALIZE_BASE"]
+    },
+    "ref": {
+      "type": "string",
+      "pattern": "^(NONE|snap_[0-9a-f]{16}|v_[0-9a-f]{16})$"
+    }
+  },
+  "required": ["action", "ref"],
+  "additionalProperties": false
+}

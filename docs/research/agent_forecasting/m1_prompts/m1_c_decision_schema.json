@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "M1CDecision",
+  "type": "object",
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["USE_TYPED", "USE_BASE"]
+    },
+    "evidence_ref": {
+      "type": "string",
+      "pattern": "^(NONE|ev_[0-9a-f]{16})$"
+    }
+  },
+  "required": ["decision", "evidence_ref"],
+  "additionalProperties": false
+}
