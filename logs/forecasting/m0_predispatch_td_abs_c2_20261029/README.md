@@ -91,9 +91,18 @@ Config: `configs/agent_forecasting/m0_predispatch_td_abs_c2_20261029.json`.
    HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE for child inheritance) after the GREEN
    commit; run `06_response_check` executed exactly this version (argv recorded
    in its log), and it is committed with this EVIDENCE commit.
-6. **Manifest snapshot boundary:** `artifact_manifest.json` (built by run 08b)
-   hashes every file present at build time; the only post-snapshot write is the
-   single `commands.jsonl` line appended by run 08b's own logger invocation.
+6. **Manifest closure (audit-1 evidence-only repair):** `artifact_manifest.json`
+   is the last write over the evidence root and excludes only itself (a file
+   cannot hold a stable hash of itself); it hashes every other file, including
+   the final `commands.jsonl` and the real `evidence/08b_manifest_final.txt`.
+   The original run-08b snapshot had hashed run 08b's in-flight `.raw.<pid>`
+   temp file and the pre-append ledger bytes instead - corrected by the
+   audit-1 repair commit (RED run 09, README repair run 10, then a direct
+   regeneration with no subsequent ledger append). The green closure record
+   lives outside the root at
+   `../m0_predispatch_td_abs_c2_20261029_audit1_green_closure.txt` so the
+   evidence tree stays closed. Read-only re-verification:
+   `/root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/check_m0_manifest_closure.py --root logs/forecasting/m0_predispatch_td_abs_c2_20261029`.
    Failed manifest attempt 07 (f-string syntax error) is preserved at its own
    unique log path alongside the successful 07b/08b rebuilds.
 

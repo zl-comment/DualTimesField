@@ -1,0 +1,23 @@
+=== run_logged id=09_audit1_red_manifest_closure ===
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/check_m0_manifest_closure.py --root logs/forecasting/m0_predispatch_td_abs_c2_20261029 --allow-raw-prefix evidence/09_audit1_red_manifest_closure.txt.raw
+git_head: eb733886a404b3b29f0b6ca25f62e26126faee31
+branch: research/agentic-asof-abs-predispatch-c2-20261029-r4
+start_utc: 2026-10-29T08:34:51.107251Z
+end_utc: 2026-10-29T08:34:51.224462Z
+--- output begin ---
+evidence_root_field: 'logs/forecasting/m0_predispatch_td_abs_c2_20261029'
+tree_total_files: 27 (ignored_transient: 1)
+manifest_entries: 27  excluded: []
+VIOLATIONS: 9
+  - manifest must exclude exactly one file - artifact_manifest.json - with a stated reason (self-hash closure is impossible); found: null
+  - manifest lists itself as a hashed payload; it must be self-excluded
+  - file in tree but not covered by manifest: evidence/08b_manifest_final.txt
+  - manifest entry does not exist in tree: evidence/08b_manifest_final.txt.raw.1483106
+  - size mismatch for artifact_manifest.json: manifest 4450 vs actual 4949
+  - sha256 mismatch for artifact_manifest.json: manifest 4ccd9de13c7f6f3a63a0c260075c6d9cf620287d3768572298b3028011a72cc6 vs actual 502440faadeb69e1d7d20d925f0a2434ae8a474e0102161be211df6619cacbe0
+  - size mismatch for commands.jsonl: manifest 4917 vs actual 5285
+  - sha256 mismatch for commands.jsonl: manifest f6401d770b07800a9091baaf583859a1b335d0064085c6880c9bb3e8c5d3a308 vs actual eab7c8d55d6ba376c338c97ab4309a719e3ba0fb16006e265cc58b2fe86c380c
+  - hashed_payload_count None != number of entries 27
+CLOSURE_FAILED
+--- output end ---
+EXIT_CODE=1

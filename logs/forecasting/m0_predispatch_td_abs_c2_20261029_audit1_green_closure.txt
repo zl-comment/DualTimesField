@@ -1,0 +1,13 @@
+=== audit1_green_closure direct check ===
+reason_direct: run_logged.sh would append to commands.jsonl and break the closure being verified; this record intentionally lives OUTSIDE the evidence root
+argv: env PYTHONDONTWRITEBYTECODE=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/check_m0_manifest_closure.py --root logs/forecasting/m0_predispatch_td_abs_c2_20261029
+git_head_at_check: eb733886a404b3b29f0b6ca25f62e26126faee31 (pre-repair-commit; the evidence-only repair commit follows)
+start_utc: 2026-10-29T08:35:18.843703Z
+--- output begin ---
+evidence_root_field: 'logs/forecasting/m0_predispatch_td_abs_c2_20261029'
+tree_total_files: 29 (ignored_transient: 0)
+manifest_entries: 28  excluded: ['artifact_manifest.json']
+CLOSURE_OK: manifest is an exact closure of the evidence root (sole exclusion: artifact_manifest.json)
+--- output end ---
+end_utc: 2026-10-29T08:35:18.899443Z
+EXIT_CODE=0
