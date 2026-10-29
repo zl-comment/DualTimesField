@@ -8,12 +8,13 @@ artifact was amended after COMMIT.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 from pathlib import Path
 
-from forecasting.agent_forecasting.m1_publication import verify_run_closure
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from forecasting.agent_forecasting.m1_publication import verify_run_closure  # noqa: E402
 
 
 def main() -> int:
@@ -22,6 +23,7 @@ def main() -> int:
         return 2
     root = Path(sys.argv[1])
     problems: list[str] = []
+    records = []
     ledger = root / "commands.jsonl"
     if not ledger.exists():
         problems.append("commands.jsonl missing")
@@ -59,11 +61,10 @@ def main() -> int:
         for problem in problems:
             print(f" - {problem}")
         return 1
-    print(f"CLOSURE OK: commands={len(ids) if ledger.exists() else 0} "
+    print(f"CLOSURE OK: commands={len(records)} "
           f"runs={len(list(runs.iterdir())) if runs.exists() else 0}")
     return 0
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     raise SystemExit(main())
