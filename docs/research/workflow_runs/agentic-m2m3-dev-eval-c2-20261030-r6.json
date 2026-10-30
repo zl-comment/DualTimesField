@@ -1,0 +1,84 @@
+{
+  "provenance_schema_version": 1,
+  "provenance_path": "docs/research/workflow_runs/agentic-m2m3-dev-eval-c2-20261030-r6.json",
+  "workflow_id": "bf8e0e7c-8ad4-402a-a162-277cd55d4d1d",
+  "run_id": "b2e9d4b5-fc08-4c57-9601-50e0628ec5d7",
+  "run_id_kind": "outer_ekko_workflow_run_id",
+  "controller_node_id": "bootstrap",
+  "node_session_id": "8c989cd7-e298-4d74-bfd3-320c18d750f2",
+  "run_id_resolution": "workflow API node_sessions session_id mapping",
+  "internal_cli_run_id_observed": "cli_run_mvuei5fx_zadyv8",
+  "internal_cli_run_id_used_as_workflow_run_id": false,
+  "base_branch": "research/agentic-m1-bounded-actions-c2-20261029-r5",
+  "base_head": "04f3ea72aba36c49a0b16fff2f6aef1c8e6db001",
+  "run_branch": "research/agentic-m2m3-dev-eval-c2-20261030-r6",
+  "run_worktree": "/root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-dev-eval-c2-20261030-r6",
+  "mission_goal_id": "AGENTIC_ASOF_FORECASTING_RANK1_V1",
+  "goal_id": "AGENTIC_M2M3_REAL_DEV_CAUSAL_EVAL_C2",
+  "mission_milestone": "M2M3_REAL_DEVELOPMENT_CAUSAL_EVALUATION",
+  "target_terminal_state": "DEV_RESULTS_READY",
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "candidate_index": "2/3",
+  "goal_summary": "Implement the minimum runnable A/B/C/D evaluation and measure real 2022 NSW1, QLD1 and TAS1 development results before deciding whether any optimization is justified.",
+  "user_authorization": {
+    "authorized": true,
+    "verbatim": "本轮以最小实现和真实 2022 三地区开发结果为主，跳过不影响结果的防御性审查；先测 MAE/QS/D-C/D-B，再根据结果决定优化。严格遵守 ACTIVE_ROUND，不触碰 2023-2024 最终测试。",
+    "implementation_first": true,
+    "measure_before_optimize": true,
+    "skip_non_result_affecting_defensive_review": true,
+    "development_year": 2022,
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "primary_metrics": [
+      "MAE",
+      "quantile_score",
+      "D-C",
+      "D-B"
+    ],
+    "final_test_2023_2024_forbidden": true
+  },
+  "bootstrap_scope": {
+    "performed": [
+      "map the current bootstrap node session to the outer Ekko workflow run ID",
+      "verify the exact authorized base branch ref and SHA",
+      "create the dedicated r6 branch and worktree from the exact authorized base SHA",
+      "commit this workflow-run provenance as the only run-worktree file change"
+    ],
+    "not_performed": [
+      "implementation",
+      "tests",
+      "collection",
+      "training or fitting",
+      "price-label access or scoring",
+      "G1/G2 or D-C/D-B evaluation",
+      "leaderboard or final-test evaluation",
+      "experiment execution",
+      "2023-2024 final-test access"
+    ]
+  },
+  "preflight_snapshot": {
+    "main_branch_observed": "research/predispatch-rrp-g0a-gate-repair-20261028",
+    "main_head_observed": "8ab3625fad218637e7de0f43a44d4ba997f81212",
+    "main_worktree_clean": true,
+    "main_checkout_identity_matches_active_round_base": false,
+    "main_checkout_identity_is_nonblocking_under_dedicated_worktree_rule": true,
+    "main_checkout_writer_count": 21,
+    "target_branch_absent": true,
+    "target_worktree_absent": true,
+    "target_worktree_writer_count": 0
+  },
+  "outer_workflow_started_at_utc": "2026-10-30T03:16:49.286000Z",
+  "branch_preflight_utc": "2026-10-30T03:20:43Z",
+  "worktree_created_at_utc": "2026-10-30T03:21:19.210824225Z",
+  "authorization_snapshot_scope": "SHA-256 values captured before server bootstrap from the five orchestration files named by the controller task",
+  "authorization_files_sha256": {
+    "MISSION_GOAL.md": "a5023e6d2c9174e40d3a7964260fc6bdd27b336cae84fd2a3d4c0f05add8e672",
+    "MASTER_WORKFLOW.md": "cf579cafe59b655fdc00d91e5979f0b0b7add79a0f726e15f0a323e510449981",
+    "MASTER_RUN_STATE.md": "233fa20aab11bbfc0ef2b083a444b54781ba30a25235fdf7bcaacc15dc3dadee",
+    "ACTIVE_ROUND.md": "13346376151a3d1afd39de2b4fd87d511f1ceddf7b03eabf1a4c7fea6ee560ea",
+    "APPROVALS.md": "32809393bef5e1e0d625f713fa3cf487ec9d28f4059bb1d565c6f081b67b4977"
+  }
+}
