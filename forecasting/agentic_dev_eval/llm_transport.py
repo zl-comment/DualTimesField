@@ -15,7 +15,7 @@ class TransportError(Exception):
 
 
 def chat(messages: list[dict], *, tools: list[dict] | None = None,
-         max_tokens: int, tag: str = "") -> dict:
+         response_format: dict | None = None, max_tokens: int, tag: str = "") -> dict:
     """One real HTTP call; returns content, tool_calls, usage and finish_reason."""
     payload = {
         "model": protocol.LLM_MODEL,
@@ -26,6 +26,8 @@ def chat(messages: list[dict], *, tools: list[dict] | None = None,
     }
     if tools:
         payload["tools"] = tools
+    if response_format:
+        payload["response_format"] = response_format
     request = urllib.request.Request(
         f"{protocol.LLM_BASE_URL}/chat/completions",
         data=json.dumps(payload).encode(),

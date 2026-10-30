@@ -159,13 +159,30 @@ def _tiny_frame():
     return frame
 
 
-def _agent_transport(script):
+def _agent_transport(script, capture=None):
     calls = {"i": 0}
-    def transport(messages, *, tools=None, max_tokens=0, tag=""):
+    def transport(messages, *, tools=None, response_format=None, max_tokens=0, tag=""):
+        if capture is not None:
+            capture.append({"roles": [m["role"] for m in messages], "tools": tools,
+                            "response_format": response_format,
+                            "max_tokens": max_tokens, "tag": tag})
         response = script[min(calls["i"], len(script) - 1)]
         calls["i"] += 1
         return response
     return transport
+
+
+def _tool_phase_response(names=("history_window",)):
+    return {"content": "",
+            "tool_calls": [{"id": f"t{i}", "name": name, "arguments": {"hours": 48}}
+                           for i, name in enumerate(names)],
+            "finish_reason": "tool_calls",
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5}}
+
+
+def _final_response(content='{"action": "NARROW", "reason": "calm"}'):
+    return {"content": content, "tool_calls": [], "finish_reason": "stop",
+            "usage": {"prompt_tokens": 300, "completion_tokens": 8}}
 
 
 def test_decide_d_tool_then_decision():
@@ -183,22 +200,85 @@ def test_decide_d_tool_then_decision():
     assert decision["tokens"] == {"prompt": 300, "completion": 19}
 
 
-def test_decide_d_budget_and_allowlist_guards():
+# ---------- r8 final decision-only turn ----------
+
+def test_decide_d_tool_quota_exhausted_enters_decision_only_turn():
+    """Tool-budget exhaustion must not block the final decision-only turn: the
+    phase burns the 4-call cap, then one extra no-tools schema-bound call
+    decides. The cap itself is never exceeded."""
     record = _record_dict()
     frame = _tiny_frame()
-    always_tools = [{"content": "", "tool_calls": [{"id": "t", "name": "history_window",
-                                                    "arguments": {"hours": 48}}],
-                     "finish_reason": "tool_calls", "usage": {"prompt_tokens": 10, "completion_tokens": 5}}]
-    decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(always_tools))
-    assert decision["exit_code"] == 1
-    assert decision["failure_reason"] in ("BUDGET_EXHAUSTED_NO_DECISION",
-                                          "BUDGET_EXHAUSTED_TOO_MANY_TOOL_CALLS")
+    capture = []
+    script = [_tool_phase_response(("history_window", "demand_window", "hourly_profile")),
+              _tool_phase_response(("base_quantiles", "history_window")),
+              _final_response()]
+    decision = arms.decide_d(record, _base_q(), frame,
+                             transport=_agent_transport(script, capture))
+    assert decision["action"] == "NARROW" and decision["exit_code"] == 0
+    assert decision["tool_calls"] == protocol.D_MAX_TOOL_CALLS  # cap respected
+    assert decision["llm_calls"] == 3  # 2 phase turns + 1 decision-only turn
+    assert len(capture) == 3
+    final = capture[-1]
+    assert final["tools"] is None  # no tools offered in the final turn
+    assert final["response_format"] == arms.FINAL_RESPONSE_FORMAT
+    schema = final["response_format"]["json_schema"]["schema"]
+    assert schema["properties"]["action"]["enum"] == list(protocol.ACTIONS)
+    assert final["max_tokens"] == protocol.D_MAX_TOKENS  # original token budget
+    assert final["roles"][-1] == "user"  # decision-only instruction, no new evidence
 
+
+@pytest.mark.parametrize("final_content,reason", [
+    ("I would widen the forecast", "INVALID_JSON"),
+    ("", "EMPTY_OUTPUT"),
+])
+def test_decide_d_final_turn_illegal_json_or_no_decision_fails_honestly(final_content, reason):
+    record = _record_dict()
+    frame = _tiny_frame()
+    script = [_tool_phase_response(), _tool_phase_response(), _tool_phase_response(),
+              _final_response(final_content)]
+    decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(script))
+    assert decision["exit_code"] == 1 and decision["action"] == ""
+    assert decision["failure_reason"] == reason
+    assert decision["llm_calls"] == protocol.D_MAX_TURNS + 1
+    assert "phase=BUDGET_EXHAUSTED_NO_DECISION" in decision["detail"]
+
+
+def test_decide_d_phase_parse_failure_enters_decision_only_turn():
+    """An in-phase prose reply (the r6 INVALID_JSON cells) still yields one
+    decision-only turn instead of an immediate failure."""
+    record = _record_dict()
+    frame = _tiny_frame()
+    script = [_final_response("volatility is high so I would widen"),
+              _final_response()]
+    decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(script))
+    assert decision["action"] == "NARROW" and decision["exit_code"] == 0
+    assert decision["llm_calls"] == 2 and decision["tool_calls"] == 0
+    assert decision["failure_reason"] == ""
+
+
+def test_decide_d_allowlist_violation_and_transport_error_paths():
+    record = _record_dict()
+    frame = _tiny_frame()
+    # Non-allowlisted tool ends the phase without a decision -> decision-only turn.
     forbidden = [{"content": "", "tool_calls": [{"id": "t", "name": "fetch_labels",
                                                  "arguments": {}}],
-                  "finish_reason": "tool_calls", "usage": {"prompt_tokens": 10, "completion_tokens": 5}}]
+                  "finish_reason": "tool_calls",
+                  "usage": {"prompt_tokens": 10, "completion_tokens": 5}},
+                 _final_response()]
     decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(forbidden))
-    assert decision["failure_reason"] == "TOOL_NOT_ALLOWLISTED"
+    assert decision["exit_code"] == 0 and decision["tool_calls"] == 0
+    assert decision["failure_reason"] == ""
+
+    # A transport (LLM call) failure still fails honestly with no extra call.
+    attempts = {"n": 0}
+    def broken(messages, *, tools=None, response_format=None, max_tokens=0, tag=""):
+        attempts["n"] += 1
+        raise arms.llm_transport.TransportError("CONNECTION_ERROR", "refused")
+
+    decision = arms.decide_d(record, _base_q(), frame, transport=broken)
+    assert decision["exit_code"] == 1
+    assert decision["failure_reason"] == "CONNECTION_ERROR"
+    assert attempts["n"] == 1  # no decision-only retry after an LLM call failure
 
 
 def test_tool_executor_only_returns_visible_rows():

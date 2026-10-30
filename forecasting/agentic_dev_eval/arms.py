@@ -38,6 +38,34 @@ TOOL_SCHEMAS = [
         "parameters": {"type": "object", "properties": {}}}},
 ]
 
+# r8 predeclared change: the existing final action JSON structure from the frozen
+# system prompt ({"action": <ACTIONS>, "reason": <one short sentence>}) bound to
+# the provider request as a structured-output constraint for the decision-only
+# turn. The action set itself is unchanged.
+FINAL_RESPONSE_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "final_decision",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": list(ACTIONS)},
+                "reason": {"type": "string"},
+            },
+            "required": ["action", "reason"],
+            "additionalProperties": False,
+        },
+    },
+}
+
+FINAL_TURN_INSTRUCTION = (
+    "Your investigation is over and no further tool calls are allowed. Reply now "
+    "with your final decision: exactly one JSON object "
+    '{"action": "<KEEP|SHIFT_UP|SHIFT_DOWN|WIDEN|NARROW>", '
+    '"reason": "<one short sentence>"} and nothing else.'
+)
+
 
 def _ok(action: str, latency_ms: float, llm_calls: int = 0, tool_calls: int = 0,
         tokens: dict | None = None, detail: str = "") -> Decision:
@@ -154,7 +182,13 @@ def _make_tool_executor(record: Mapping[str, Any], base_quantiles: np.ndarray,
 
 def decide_d(record: Mapping[str, Any], base_quantiles: np.ndarray, frame,
              transport: Callable = llm_transport.chat) -> Decision:
-    """Bounded agent: <=3 turns, <=4 allowlisted tool calls, then strict JSON."""
+    """Bounded agent: <=3 turns, <=4 allowlisted tool calls, then strict JSON.
+
+    r8 predeclared change: when the adaptive phase ends without a legal final
+    decision, exactly one decision-only LLM turn runs with all tool calls
+    forbidden and FINAL_RESPONSE_FORMAT bound to the request; an exhausted
+    tool budget does not block entry. The original per-call token limit, LLM
+    timeout and transport-failure semantics are retained."""
     executor, stats = _make_tool_executor(record, base_quantiles, frame)
     digest = protocol.evidence_digest(record, base_quantiles)
     messages = [{"role": "system", "content": _system_prompt(agent=True)},
@@ -162,6 +196,7 @@ def decide_d(record: Mapping[str, Any], base_quantiles: np.ndarray, frame,
     tokens = {"prompt": 0, "completion": 0}
     llm_calls = 0
     start = time.perf_counter()
+    phase_reason = ""
     for turn in range(1, protocol.D_MAX_TURNS + 1):
         try:
             response = transport(messages, tools=TOOL_SCHEMAS,
@@ -178,36 +213,65 @@ def decide_d(record: Mapping[str, Any], base_quantiles: np.ndarray, frame,
             try:
                 action = protocol.parse_decision(response["content"])
             except DecisionParseError as exc:
-                return _fail(exc.reason_code, (time.perf_counter() - start) * 1000.0,
-                             llm_calls=llm_calls, tool_calls=stats["tool_calls"],
-                             tokens=tokens, detail=f"raw={response['content'][:120]!r}")
+                phase_reason = exc.reason_code
+                break
             return _ok(action, (time.perf_counter() - start) * 1000.0,
                        llm_calls=llm_calls, tool_calls=stats["tool_calls"],
                        tokens=tokens, detail=response["content"][:200])
         if turn == protocol.D_MAX_TURNS:
-            return _fail("BUDGET_EXHAUSTED_NO_DECISION",
-                         (time.perf_counter() - start) * 1000.0,
-                         llm_calls=llm_calls, tool_calls=stats["tool_calls"], tokens=tokens)
+            phase_reason = "BUDGET_EXHAUSTED_NO_DECISION"
+            break
         messages.append({"role": "assistant", "content": response["content"] or None,
                          "tool_calls": [
                              {"id": c["id"], "type": "function",
                               "function": {"name": c["name"],
                                            "arguments": json.dumps(c["arguments"] or {})}}
                              for c in calls]})
+        phase_start = len(messages)
+        aborted = False
         for call in calls:
             if stats["tool_calls"] >= protocol.D_MAX_TOOL_CALLS:
-                return _fail("BUDGET_EXHAUSTED_TOO_MANY_TOOL_CALLS",
-                             (time.perf_counter() - start) * 1000.0,
-                             llm_calls=llm_calls, tool_calls=stats["tool_calls"], tokens=tokens)
+                phase_reason = "BUDGET_EXHAUSTED_TOO_MANY_TOOL_CALLS"
+                aborted = True
+                break
             if call["name"] not in ("history_window", "demand_window", "hourly_profile",
                                     "base_quantiles"):
-                return _fail("TOOL_NOT_ALLOWLISTED",
-                             (time.perf_counter() - start) * 1000.0,
-                             llm_calls=llm_calls, tool_calls=stats["tool_calls"], tokens=tokens,
-                             detail=f"tool={call['name']!r}")
+                phase_reason = "TOOL_NOT_ALLOWLISTED"
+                aborted = True
+                break
             result = executor(call["name"], call["arguments"])
             messages.append({"role": "tool", "tool_call_id": call["id"], "content": result})
-    raise AssertionError("unreachable")
+        if aborted:
+            del messages[phase_start - 1:]  # drop the assistant turn with unanswerable calls
+            break
+
+    # Final decision-only turn: no tools offered, final action JSON schema bound
+    # to the request; entry is not blocked by the exhausted tool budget.
+    messages.append({"role": "user", "content": FINAL_TURN_INSTRUCTION})
+    try:
+        response = transport(messages, response_format=FINAL_RESPONSE_FORMAT,
+                             max_tokens=protocol.D_MAX_TOKENS, tag="D-final")
+    except llm_transport.TransportError as exc:
+        return _fail(exc.reason_code, (time.perf_counter() - start) * 1000.0,
+                     llm_calls=llm_calls, tool_calls=stats["tool_calls"],
+                     tokens=tokens, detail=str(exc))
+    llm_calls += 1
+    tokens["prompt"] += response["usage"]["prompt_tokens"]
+    tokens["completion"] += response["usage"]["completion_tokens"]
+    elapsed = (time.perf_counter() - start) * 1000.0
+    if response["tool_calls"]:
+        return _fail("FINAL_TURN_TOOL_CALL", elapsed, llm_calls=llm_calls,
+                     tool_calls=stats["tool_calls"], tokens=tokens,
+                     detail=f"phase={phase_reason} "
+                            f"tools={[c['name'] for c in response['tool_calls']]}")
+    try:
+        action = protocol.parse_decision(response["content"])
+    except DecisionParseError as exc:
+        return _fail(exc.reason_code, elapsed, llm_calls=llm_calls,
+                     tool_calls=stats["tool_calls"], tokens=tokens,
+                     detail=f"phase={phase_reason} raw={response['content'][:100]!r}")
+    return _ok(action, elapsed, llm_calls=llm_calls, tool_calls=stats["tool_calls"],
+               tokens=tokens, detail=f"phase={phase_reason} -> {response['content'][:160]}")
 
 
 def allowed_actions() -> tuple[str, ...]:
