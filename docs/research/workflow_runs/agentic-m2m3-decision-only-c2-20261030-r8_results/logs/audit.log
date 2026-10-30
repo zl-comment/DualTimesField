@@ -1,0 +1,21 @@
+CMD: cd /root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-decision-only-c2-20261030-r8 && /root/workspace/Code/DualTimesField/.venv/bin/python outputs/forecasting/agentic_m2m3_decision_only_c2_20261030_r8/audit_r8.py --r8-root outputs/forecasting/agentic_m2m3_decision_only_c2_20261030_r8 --r6-root /root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-dev-eval-c2-20261030-r6/outputs/forecasting/agentic_m2m3_dev_c2_20261030_r6
+START_UTC: 2026-10-30T07:20:16Z
+{
+ "audit": "outputs/forecasting/agentic_m2m3_decision_only_c2_20261030_r8/results/audit_independent.json",
+ "max_abs_diff": 0.0,
+ "r6_vs_r8_totals": {
+  "r6_success": 62,
+  "r8_success": 159,
+  "both_success": 62,
+  "gained_success": 97,
+  "lost_success": 0,
+  "action_flips_on_both_success": 3,
+  "r6_failure_reasons": {
+   "BUDGET_EXHAUSTED_TOO_MANY_TOOL_CALLS": 62,
+   "INVALID_JSON": 24,
+   "BUDGET_EXHAUSTED_NO_DECISION": 11
+  },
+  "r8_failure_reasons": {}
+ }
+}
+EXIT_CODE: 0

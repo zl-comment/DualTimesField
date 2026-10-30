@@ -1,0 +1,9 @@
+== r8 real commands and exit codes ==
+1) FULL arm D (3 regions in parallel, each exit 0, see logs/<region>_D.log):
+   cd /root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-decision-only-c2-20261030-r8 && /root/workspace/Code/DualTimesField/.venv/bin/python -m forecasting.agentic_dev_eval.run_decide --region <NSW1|QLD1|TAS1> --arm D --output-dir outputs/forecasting/agentic_m2m3_decision_only_c2_20261030_r8
+2) score (exit 0, see logs/score.log):
+   cd <r8 worktree> && PYTHONPATH=$PWD /root/workspace/Code/DualTimesField/.venv/bin/python <r8out>/score_r8.py --output-dir <r8out> --regions NSW1,QLD1,TAS1
+3) independent audit (exit 0, see logs/audit.log):
+   cd <r8 worktree> && /root/workspace/Code/DualTimesField/.venv/bin/python <r8out>/audit_r8.py --r8-root <r8out> --r6-root <r6 output root>
+4) wiring smoke (exit 0, see smoke/logs/smoke_nsw1_d.log; 2-origin sliced-base, not part of formal artifacts):
+   ... run_decide --region NSW1 --arm D --output-dir <r8out>/smoke --limit 2
