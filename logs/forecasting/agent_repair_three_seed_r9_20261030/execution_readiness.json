@@ -1,0 +1,64 @@
+{
+  "status": "ENGINEERING_READY_FOR_FROZEN_2022_MATRIX",
+  "tested_implementation_commit": "83d5a4c9102a7390f876718e64ad1ea9990b509a",
+  "full_suite": {
+    "schema_version": 1,
+    "head_before": "83d5a4c9102a7390f876718e64ad1ea9990b509a",
+    "head_after": "83d5a4c9102a7390f876718e64ad1ea9990b509a",
+    "head_unchanged": true,
+    "cwd": "/root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9",
+    "command": "/root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest -q --tb=short tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py tests/test_agent_execution_r9.py tests/test_agent_m1_r9_contract_repairs.py tests/test_agentic_dev_eval.py tests/test_agentic_r9_decisions.py tests/test_agentic_r9_runner.py",
+    "argv": [
+      "/root/workspace/Code/DualTimesField/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "tests/test_agent_forecast_contract.py",
+      "tests/test_agent_frozen_chronos.py",
+      "tests/test_agent_evidence_g0.py",
+      "tests/test_agent_predispatch_td_v2.py",
+      "tests/test_agent_m1_contract.py",
+      "tests/test_agent_m1_reducer.py",
+      "tests/test_agent_execution_r9.py",
+      "tests/test_agent_m1_r9_contract_repairs.py",
+      "tests/test_agentic_dev_eval.py",
+      "tests/test_agentic_r9_decisions.py",
+      "tests/test_agentic_r9_runner.py"
+    ],
+    "test_files": [
+      "tests/test_agent_forecast_contract.py",
+      "tests/test_agent_frozen_chronos.py",
+      "tests/test_agent_evidence_g0.py",
+      "tests/test_agent_predispatch_td_v2.py",
+      "tests/test_agent_m1_contract.py",
+      "tests/test_agent_m1_reducer.py",
+      "tests/test_agent_execution_r9.py",
+      "tests/test_agent_m1_r9_contract_repairs.py",
+      "tests/test_agentic_dev_eval.py",
+      "tests/test_agentic_r9_decisions.py",
+      "tests/test_agentic_r9_runner.py"
+    ],
+    "all_test_files_existed_before_run": true,
+    "started_utc": "2026-10-30T13:15:37.188426+00:00",
+    "finished_utc": "2026-10-30T13:27:38.700417+00:00",
+    "wall_seconds": 721.5070865154266,
+    "exit_code": 0,
+    "log_path": "logs/forecasting/agent_repair_three_seed_r9_20261030/green_suite_01.txt",
+    "log_sha256": "5d63275f71cd89e1d6839cd43fb0cb4030d7a1d697be010da183395add21b03e",
+    "log_bytes": 1014
+  },
+  "review_files": [
+    "review_m1.txt",
+    "review_runner.txt"
+  ],
+  "auditor_unit_test": {
+    "result": "1 passed in 0.23s",
+    "source": "literature agent actual synthetic test run; separate from full suite",
+    "real_model_calls": 0
+  },
+  "config_sha256": "1875519a4cb4a112d8ef56b4e046dec08b733c54bfb37f7991f2d50ede301572",
+  "freeze_delta": "Adds independent offline result auditor to source inventory; prediction implementation remains tested commit bytes.",
+  "scientific_limit": "Engineering readiness is not ADVANCE_M1 or forecast advantage."
+}

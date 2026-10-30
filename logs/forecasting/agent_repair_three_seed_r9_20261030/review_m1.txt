@@ -1,0 +1,62 @@
+R9 M1 已确认缺陷的定点验收
+审查时间：2026-10-30T13:18:36.098496+00:00
+审查提交：83d5a4c9102a7390f876718e64ad1ea9990b509a
+分支：research/agent-repair-three-seed-20261030-r9
+结论：CODE_REVIEW_NO_BLOCKER；完整 suite 尚在运行，以其真实退出记录单独确认工程验收。
+范围仅为本轮授权修复；没有运行模型、网络、预测评分或额外测试，没有更改源码/HEAD。
+本 agent 编写了 schema/reducer 部分；本次对其他 agent 的 runtime/publication/execution 做独立只读验收，对本人代码复核并结合 literature agent 的独立交叉审查。不是外部人工审核。
+
+1. 实际请求携带完整 schema
+forecasting/agent_forecasting/m1_llm.py:159–192：构造给 transport 的实际 JSON bytes，text.format 包含 type=json_schema、name、strict=true 与冻结文件的完整 schema；原先仅文件名/hash 的 response_schema 已移除。
+模型、prompt 与每臂输出 token 上限保持原身份，返回后仍经过严格本地解析和 enabled-ref 检查。
+新回归比较实际请求内容与冻结 schema，而不是只看 hash 或文档。
+没有进行真实 provider 请求，因此本项证明请求构造与契约绑定，不能声称该端点已完成联调。
+
+2. 三镜像反例与停止语义
+forecasting/agent_forecasting/m1_reducer.py:44–79：原193场景外追加一个三镜像同体、同vintage、起报前已可见的合法例子；前两个规范镜像 TIMEOUT/NOT_FOUND，第三个 COMPLETE_VALID。
+B/C 的原两GET计划未变。D 的 LIST→FETCH第三→FINALIZE_TYPED 是合法且预算内的有用终态。
+默认 reducer 对194个有限场景枚举合法动作，报告 scope=bounded_synthetic_scenarios、global_sufficiency_proven=false、llm_advantage_demonstrated=false。
+forecasting/agent_forecasting/m1_contract.py:645–683：有useful PUBLISHED_TYPED witness且engineering_green才给 ENGINEERING_PASS_REDUCIBILITY_REFUTED；未满足则BLOCKED。有限无反例及旧“充分性”token仅映射 INCONCLUSIVE_REDUCIBILITY，不再自动全域STOP。
+scripts/build_m1_gate.py:32 与 scripts/verify_m1_evidence.py:159 传递完整report，保留witness，而不只传verdict。
+metrics_status=NOT_EVALUATED、mission_goal_achieved=false、advance_m1=false保持明确。
+该例只推翻当前B/C覆盖全部D合法终态的命题；不证明真实LLM能预知哪个未抓镜像可用，也不证明优于其他固定策略或具有预测收益。
+
+3. 真实effect截止控制
+forecasting/agent_forecasting/execution.py:21–57：用monotonic计时与Linux主线程SIGALRM中断callback，内层不得延长更早的外层截止，退出恢复原handler/timer；不是只在模拟返回值上检查超时。
+forecasting/agent_forecasting/m1_runtime.py:482–509：默认时钟是origin加真实elapsed；effect取单次上限与剩余发布时间预算的较小者。
+实际snapshot.fetch在521行、base/typed预测在677/704行、C/D transport.generate在781/841行均经过effect；预算仍在调用前预约，异常沿既有失败/回退路径。
+reducer明确注入synthetic clock和stub，不将合成探针误称真实历史时效证明。
+边界：这是一条Linux主线程执行路径，不是任意工作线程/子进程或远端服务端的强杀机制；本轮没有扩展到这些机制。
+
+4. 提交原子性与提交后异常
+forecasting/agent_forecasting/m1_publication.py:237–262：payload、manifest、COMMIT先在staging完成和核对，准备阶段受真实截止控制；随后调用共享目录发布函数。
+execution.py:74–111：在promote前同步/检查截止，以一次目录rename作为提交点；最终目录出现时已同时含COMMIT与全部payload。已有final拒绝覆盖。
+rename成功后的fsync或收尾异常不能再宣称没有提交；返回DirectoryCommit(durable=False)，M1在runtime:657–664记录published与publication_durable。发布前失败清理自己的staging。
+因此“可见且有COMMIT，同时返回FAILED_NO_COMMIT”的旧已确认缺口已修。durable=False是持久化未确认，不能解释为未提交、允许重试或保证掉电安全。
+实现确认的是原子可见性；没有声称覆盖全部文件系统故障模型。
+
+5. M0和身份来源核验
+只用stdlib逐文件SHA256与git show比对，没有加载权重或标签：
+- 16个execution pins均与当前工作树及83d5a4c提交对象一致，包含execution.py。
+- 26个source_files存在，新config/protocol均在清单中。
+- 5个M0文件均与原冻结hash及基点f62967c373d8ca210d39fd984a24b3831d957b44一致。
+- frozen_base全部字段（checkpoint标识、权重/config hash、packages、M0文件hash）与旧配置一致；未重新加载/重算模型权重。
+- prompt_artifacts与旧配置相同。旧20261029 config和protocol字节与基点完全一致。
+- 新配置：configs/agent_forecasting/m1_agent_contract_c2_20261030_r9.json。
+  SHA256=7409fcbceb20e064bc5d094cd05005ece511ef5c6f0392bfe62d056d4d41ad27。
+- provenance=555190a3a54c468697f2bf427601e0b028a9feab，明确是本轮归档RED记录；不是旧r5 bootstrap。
+- wire contract_id保留m1.agent_contract.c2.v1，因为digest/action schema未变；r9分支、新config/protocol、执行源码指纹区分本轮修订。
+
+6. 验证证据与剩余界限
+本agent此前观察新8项回归全过（35.33s）；随后三镜像正控显式synthetic clock的夹具适配补跑1项通过（2.77s），原行为断言未弱化。
+literature agent独立检查schema、reducer和gate三处未见阻断。
+新tests/test_agent_execution_r9.py含13项执行回归：真实sleep中断、已耗尽预算不进入callback、嵌套截止、原alarm恢复、阻塞预测、COMMIT先于可见rename、超时拒绝promote、提交后fsync失败、rename前阻塞、rename后异常及旧M1发布集成。history_audit报告其已通过；本轮没有重复执行。
+这些局部结果不能替代正在运行的冻结提交完整suite；完整GREEN后再用真实日志生成本轮reducer/gate和闭合记录。
+RED记录既有真实行为失败，也含当时尚缺的新API；三镜像正控在RED已通过，不能称全部RED失败都是旧实现同一种bug。
+没有把未找到的外层“七项终审”和“3/3”计数补造为本地证据。
+
+7. 与本轮三地区三seed实验的边界
+M1原机制是取得合法TOTALDEMAND证据后输入冻结预测模型；r8及本轮R9实际实验是历史信息下KEEP/SHIFT_UP/SHIFT_DOWN/WIDEN/NARROW有限预测调整。
+本轮数值实验由用户最新授权和独立r9_repair_and_three_seed_protocol_20261030.txt规定；不是从M1工程通过推出ADVANCE_M1，更不代表实时公告通路已经验证。
+M1科学机制、三镜像可达性、实际LLM选择能力、开发集概率预测效果四类结论必须分开。
+本报告没有读取或评价三地区实验结果，不追加来源、窗口、模型、训练或选择规则。

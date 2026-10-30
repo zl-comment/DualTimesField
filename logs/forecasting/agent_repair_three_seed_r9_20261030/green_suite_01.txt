@@ -1,0 +1,12 @@
+HEAD=83d5a4c9102a7390f876718e64ad1ea9990b509a
+CWD=/root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9
+COMMAND=/root/workspace/Code/DualTimesField/.venv/bin/python -B -m pytest -q --tb=short tests/test_agent_forecast_contract.py tests/test_agent_frozen_chronos.py tests/test_agent_evidence_g0.py tests/test_agent_predispatch_td_v2.py tests/test_agent_m1_contract.py tests/test_agent_m1_reducer.py tests/test_agent_execution_r9.py tests/test_agent_m1_r9_contract_repairs.py tests/test_agentic_dev_eval.py tests/test_agentic_r9_decisions.py tests/test_agentic_r9_runner.py
+STARTED_UTC=2026-10-30T13:15:37.188426+00:00
+
+....................................................... [ 20%]
+........................................................................ [ 48%]
+........................................................................ [ 75%]
+................................................................         [100%]
+263 passed, 89 subtests passed in 720.20s (0:12:00)
+
+EXIT_CODE=0

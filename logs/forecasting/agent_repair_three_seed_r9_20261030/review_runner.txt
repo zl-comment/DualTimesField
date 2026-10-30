@@ -1,0 +1,33 @@
+R9 执行路径交叉复核
+复核提交：83d5a4c9102a7390f876718e64ad1ea9990b509a
+方法：研究 agent 只读代码复核；合成数据测试。未访问模型端点或真实标签。
+范围：forecasting/agentic_dev_eval/r9.py、scripts/run_r9_three_seed.py、
+tests/test_agentic_r9_runner.py、configs/agent_forecasting/r9_development_20261030.json。
+
+最初发现的三项执行问题，现均已修复：
+1. 启动器不再将整个 53-origin 决策进程限为 1800 秒。
+   run_r9_three_seed.py:40-42 现在按 53×450+90 秒设置决策进程外层兜底，
+   A 为 600+60 秒；不会因原有任意 30 分钟整臂限制截断合法单点调用。
+2. r9.py:57-64 将写文件与清单准备纳入共享硬截止时间，随后由同一绝对
+   deadline 的 publish_directory 完成同步和 rename；没有在 rename 后用
+   额外外层 alarm 把已经可见的提交误作可重跑失败。
+3. r9.py:257 为 B/C/D 决策进程设置两核 affinity，run.json 记录实际 affinity。
+
+指定执行路径未发现其他本轮阻断：
+- 三个 seed 均传入 A 的 Python/NumPy/Torch 及 C/D 的每次请求；矩阵循环为
+  三地区×三个 seed×A/B/C/D，即 9 个 A 与 27 个 B/C/D stage。
+- prepare 将评分 actual 单独写入 labels；预测进程只加载 inputs 与共享 A。
+  tool_history 按 available_at<=origin 截取，LLM 不接收评分标签。
+- 决策失败保留 exit_code/failure_reason，预测逐字节回退同一 A，不冒充成功。
+  score 对完整预测网格计算损失并核对失败格与 A；没有只评分成功格。
+- C 单次 schema 请求，D 总调用最多三次且包含最终禁工具轮，最多执行四工具。
+- 原 qwen3-30b3a、127.0.0.1:18011、temperature=0、动作与数值幅度保持原样。
+
+验证记录：此前 runner 的三个合成测试通过；新增发布期限测试已由主代理纳入
+完整 suite，本次未重复执行该 suite。独立结果核验器的合成测试另为 1 passed，
+包含失败样本全量计分及篡改分数后重新封存也必须拒绝的检验。
+
+结论边界：以上是工程执行路径审查，不是实际实验结果或预测优势。
+响应 model 字段和 alias 只能按服务端原文归档，不能代替模型内部身份或预测
+成功证据；temperature=0 下三个 seed 不保证不同抽样，也不是三份独立数据。
+正式结果需在完整矩阵完成后运行 scripts/audit_r9_three_seed.py 独立复算。
