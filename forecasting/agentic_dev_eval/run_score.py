@@ -145,7 +145,7 @@ def write_report(summary: dict, path: Path) -> None:
     lines = [
         "# r6 真实 2022 三地区开发集评估（A/B/C/D）", "",
         f"- 轮次：`{summary['round_id']}`；分支：`{summary['branch']}`",
-        f"- 地区：NSW1 / QLD1 / TAS1；起报网格：2022 年每 7 天 00:00（当地时间），共 "
+        f"- 地区：NSW1 / QLD1 / TAS1；起报网格：2022 年每 7 天 00:00 AEST（UTC+10，与数据时间轴一致），共 "
         f"{summary['regions'][0]['identity']['n_origins']} 个起报/地区；72h 历史 → 24h 预测；"
         "分位数 0.05/0.10/0.50/0.90/0.95（q50 为点预测）；seed 2026。",
         "- A=冻结数值流（Chronos-2 zero-shot，CPU，离线，权重指纹固定）；B=固定规则；"
