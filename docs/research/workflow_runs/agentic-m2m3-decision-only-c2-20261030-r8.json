@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "round_id": "agentic-m2m3-decision-only-c2-20261030-r8",
+  "goal_id": "AGENT_D_DECISION_ONLY_COVERAGE_OPT_C2",
+  "mission_goal_id": "AGENTIC_ASOF_FORECASTING_RANK1_V1",
+  "workflow_id": "d8388220-ea00-4187-a6d1-56b37cf06850",
+  "run_id": "5eaa93ab-7fe1-41d0-9f49-90f76405d6fd",
+  "outer_run_id": "5eaa93ab-7fe1-41d0-9f49-90f76405d6fd",
+  "controller_node_id": "bootstrap",
+  "node_session_id": "c2273be0-3e9e-4745-a9c5-ea2e16238e6d",
+  "workflow_context": {
+    "workflow_id": "d8388220-ea00-4187-a6d1-56b37cf06850",
+    "run_id": "5eaa93ab-7fe1-41d0-9f49-90f76405d6fd",
+    "node_id": "bootstrap",
+    "node_session_id": "c2273be0-3e9e-4745-a9c5-ea2e16238e6d",
+    "node_execution_record_id": "845e3862-cdc8-44c3-93c1-70ddba1a0d36",
+    "run_id_resolution": "GET workflow runs: unique node_sessions.session_id mapping",
+    "mapping_endpoint": "/api/studio/workflows/d8388220-ea00-4187-a6d1-56b37cf06850/runs",
+    "outer_run_started_at_unix_ms": 1793342928076,
+    "internal_cli_run_id_observed": "coding_agent_mvum2ri1_ix9cm5",
+    "internal_cli_run_id_used_as_workflow_run_id": false
+  },
+  "host": "server89",
+  "base_branch": "research/agentic-m2m3-dev-eval-c2-20261030-r6",
+  "base_sha": "6c140210c90a7a74b948811d6c4f5615bf3aa25e",
+  "target_branch": "research/agentic-m2m3-decision-only-c2-20261030-r8",
+  "target_worktree": "/root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-decision-only-c2-20261030-r8",
+  "output_root": "outputs/forecasting/agentic_m2m3_decision_only_c2_20261030_r8/",
+  "authorization": {
+    "source_of_truth": "ACTIVE_ROUND.md",
+    "identity": "Explicit current user task for Codex bootstrap; ACTIVE_ROUND r8 run_authorized=true",
+    "round_authorization": "用户明确授权开始真实数据集预测实验，优先消除 D 的 62 个工具预算耗尽失败，同时减少无决策和非法 JSON。",
+    "current_node_scope": "Only fresh r8 worktree creation, guarded single-file provenance commit, and local MASTER_DECISION update; no implementation, tests, prediction, scoring or experiments.",
+    "current_node_user_instruction": "你是 r8 引导节点。r7 因 Ekko Hermes bridge 基础设施超时而烧毁：虽然控制器创建了 r7 provenance-only 分支，但没有实现、测试、预测或评分；不得复用或修改 r7。ACTIVE_ROUND 是唯一授权源。映射当前 node session 到新的外层 workflow/run ID。只在 server89 从 exact base SHA 6c140210c90a7a74b948811d6c4f5615bf3aa25e 创建分支 research/agentic-m2m3-decision-only-c2-20261030-r8 和 worktree /root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-decision-only-c2-20261030-r8；首写必须是 git worktree add -b。随后 guarded single-file provenance commit，绑定 outer IDs、base、目标、用户授权、r7 基础设施失败说明与授权文件 hashes，并更新 MASTER_DECISION。不得实现、测试或实验，不得触碰 r6/r7 或主 checkout。",
+    "authorization_snapshot_scope": "SHA-256 captured before server bootstrap; files remain unchanged in this node",
+    "snapshot_utc": "2026-10-30T06:51:36.233010+00:00",
+    "files_sha256": {
+      "MISSION_GOAL.md": "a5023e6d2c9174e40d3a7964260fc6bdd27b336cae84fd2a3d4c0f05add8e672",
+      "MASTER_WORKFLOW.md": "cf579cafe59b655fdc00d91e5979f0b0b7add79a0f726e15f0a323e510449981",
+      "MASTER_RUN_STATE.md": "55b3c71d0c1e6ec67a55ce15631259930a6a8681970b510ff5540e7bcebbf5d0",
+      "ACTIVE_ROUND.md": "9f82a282b979d9578aae720b4ea34d57365bfa9b514a46390121bb655597f87f",
+      "APPROVALS.md": "32809393bef5e1e0d625f713fa3cf487ec9d28f4059bb1d565c6f081b67b4977"
+    },
+    "active_round_outer_run_placeholder": "PENDING_LAUNCH",
+    "outer_run_resolution": "Bind actual outer run via current session mapping; do not alter hashed authorization files.",
+    "current_node_user_instruction_sha256": "5f0b928f8e558bdf1ad0eba2eda9c963bc9395cca414319a88ef6a2b927ceec5"
+  },
+  "authorization_files_sha256": {
+    "MISSION_GOAL.md": "a5023e6d2c9174e40d3a7964260fc6bdd27b336cae84fd2a3d4c0f05add8e672",
+    "MASTER_WORKFLOW.md": "cf579cafe59b655fdc00d91e5979f0b0b7add79a0f726e15f0a323e510449981",
+    "MASTER_RUN_STATE.md": "55b3c71d0c1e6ec67a55ce15631259930a6a8681970b510ff5540e7bcebbf5d0",
+    "ACTIVE_ROUND.md": "9f82a282b979d9578aae720b4ea34d57365bfa9b514a46390121bb655597f87f",
+    "APPROVALS.md": "32809393bef5e1e0d625f713fa3cf487ec9d28f4059bb1d565c6f081b67b4977"
+  },
+  "r7_infrastructure_failure": {
+    "workflow_id": "9ab03834-0bed-4da8-a408-234670fe7ddc",
+    "outer_run_id": "b2bd6f10-53f7-43cc-9961-cfe6febecc75",
+    "terminal": "FAILED_INFRASTRUCTURE_BOOTSTRAP",
+    "failure": "Ekko Hermes Agent bridge request timed out after 120000ms repeatedly",
+    "controller_created_provenance_only_commit": "6a3ca7a64de40b52a76d713066c127e3e9986539",
+    "implementation_started": false,
+    "tests_started": false,
+    "prediction_started": false,
+    "scoring_started": false,
+    "branch_burned": true,
+    "reuse_or_modification_forbidden": true,
+    "r8_inherits_r7": false,
+    "evidence_source": "ACTIVE_ROUND.md and current user task"
+  },
+  "single_predeclared_change": "If D lacks a legal final decision after adaptive phase, execute one tool-disabled final decision-only LLM turn bound to the existing final action JSON Schema; tool-budget exhaustion must not block entry; retain original LLM/token/deadline/global budgets.",
+  "frozen_protocol": {
+    "development_year": 2022,
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "origins_per_region": 53,
+    "total_origins": 159,
+    "label_cells": 3816,
+    "history_hours": 72,
+    "horizon_hours": 24,
+    "seed": 2026,
+    "abc": "Reuse and verify frozen r6 artifacts",
+    "final_test_years_forbidden": [
+      2023,
+      2024
+    ]
+  },
+  "node_outcome": {
+    "provenance_only": true,
+    "implementation_started": false,
+    "tests_run": false,
+    "experiments_run": false,
+    "prediction_started": false,
+    "scoring_started": false,
+    "development_metrics_evaluated": false,
+    "final_test_evaluated": false,
+    "mission_goal_achieved": false
+  },
+  "restrictions": [
+    "No write to r6, burned r7, or main checkout; shared Git metadata only as required to create r8.",
+    "No push, merge, rebase, reset, force-update, or branch deletion.",
+    "No implementation, tests or experiments in bootstrap.",
+    "No training, fitting, GPU, model download, final-test access or score-driven selection."
+  ],
+  "started_at_utc": "2026-10-30T06:53:32.790617+00:00",
+  "host_observed": "k8s-worker1",
+  "preflight": {
+    "target_branch_existed": false,
+    "target_worktree_existed": false,
+    "main_checkout": {
+      "branch": "research/predispatch-rrp-g0a-gate-repair-20261028",
+      "head": "8ab3625fad218637e7de0f43a44d4ba997f81212",
+      "status": "",
+      "index_sha256": "ff10b0b21409b0ae69df010f45cd92f75ad160bac7db131ba3b01b63fd4dbedc",
+      "head_file_sha256": "b6ba21b130ec40ff396a8b7d7ea32c6de54c16b117bd515aa5112b449435bea5"
+    },
+    "protected_branch_refs": {
+      "research/agentic-m2m3-dev-eval-c2-20261030-r6": "6c140210c90a7a74b948811d6c4f5615bf3aa25e",
+      "research/agentic-m2m3-decision-only-c2-20261030-r7": "6a3ca7a64de40b52a76d713066c127e3e9986539"
+    },
+    "target_process_cwd_scan": []
+  },
+  "first_server_write": {
+    "operation": "git worktree add -b",
+    "branch": "research/agentic-m2m3-decision-only-c2-20261030-r8",
+    "worktree": "/root/workspace/Code/DualTimesField-worktrees/agentic-m2m3-decision-only-c2-20261030-r8",
+    "start_point": "6c140210c90a7a74b948811d6c4f5615bf3aa25e",
+    "hooks_disabled": true
+  },
+  "commit_guards": {
+    "exact_parent": "6c140210c90a7a74b948811d6c4f5615bf3aa25e",
+    "allowed_changed_paths": [
+      "docs/research/workflow_runs/agentic-m2m3-decision-only-c2-20261030-r8.json"
+    ],
+    "exclusive_create": true,
+    "clean_before_write": true,
+    "target_process_cwd_check": true,
+    "hooks_disabled_to_avoid_tests": true,
+    "no_experiments": true
+  }
+}
