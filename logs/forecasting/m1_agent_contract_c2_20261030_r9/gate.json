@@ -1,0 +1,31 @@
+{
+  "advance_m1": false,
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "contract_id": "m1.agent_contract.c2.v1",
+  "engineering": {
+    "suite_exit_code": 0,
+    "suite_log": "/root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9/logs/forecasting/m1_agent_contract_c2_20261030_r9/source_logs/green_suite_01.txt",
+    "tests_passed": 263
+  },
+  "engineering_green": true,
+  "global_sufficiency_proven": false,
+  "llm_advantage_demonstrated": false,
+  "metrics_status": "NOT_EVALUATED",
+  "mission_goal_achieved": false,
+  "reducibility": {
+    "d_traces_enumerated": 1852,
+    "internal_consistency_ok": true,
+    "llm_failures_checked": 1746,
+    "non_vacuity_control": {
+      "detected": true,
+      "policy": "weak_B_fetches_only_the_superseded_ref",
+      "weak_b_diff_scenarios": 17
+    },
+    "scenarios_total": 194,
+    "uses_labels_or_scores": false,
+    "verdict": "REDUCIBILITY_REFUTED"
+  },
+  "reducibility_verdict": "REDUCIBILITY_REFUTED",
+  "scientific_decision": "ENGINEERING_PASS_REDUCIBILITY_REFUTED",
+  "stop_token": null
+}

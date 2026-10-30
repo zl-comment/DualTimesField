@@ -1,0 +1,381 @@
+FFFFFFFFFFFFFF.FFFFFFFF.FFFFFFFFFFFFFFFFFFF                              [100%]
+=================================== FAILURES ===================================
+_______ RealDeadlineTests.test_exhausted_budget_refuses_before_callback ________
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:55: in test_exhausted_budget_refuses_before_callback
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+_______ RealDeadlineTests.test_existing_alarm_and_handler_are_preserved ________
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:71: in test_existing_alarm_and_handler_are_preserved
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+______ RealDeadlineTests.test_inner_timeout_never_extends_outer_deadline _______
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:62: in test_inner_timeout_never_extends_outer_deadline
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+_ RealDeadlineTests.test_legacy_runtime_default_clock_times_out_blocking_forecast _
+tests/test_agent_execution_r9.py:101: in test_legacy_runtime_default_clock_times_out_blocking_forecast
+    self.assertLess(time.monotonic() - started, 0.095,
+E   AssertionError: 0.12233893945813179 not less than 0.095 : default M1 runtime must interrupt, not check a logical clock afterwards
+____ RealDeadlineTests.test_shared_timeout_interrupts_a_real_blocking_call _____
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:48: in test_shared_timeout_interrupts_a_real_blocking_call
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+_ SharedDirectoryCommitTests.test_commit_is_present_at_the_single_visible_rename _
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:118: in test_commit_is_present_at_the_single_visible_rename
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+______ SharedDirectoryCommitTests.test_deadline_expiry_refuses_promotion _______
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:137: in test_deadline_expiry_refuses_promotion
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+_ SharedDirectoryCommitTests.test_post_commit_fsync_error_reports_committed_not_failed _
+tests/test_agent_execution_r9.py:30: in execution
+    return importlib.import_module("forecasting.agent_forecasting.execution")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/anaconda3/envs/reranker/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1206: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1178: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1142: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'forecasting.agent_forecasting.execution'
+
+The above exception was the direct cause of the following exception:
+tests/test_agent_execution_r9.py:146: in test_post_commit_fsync_error_reports_committed_not_failed
+    module = execution()
+             ^^^^^^^^^^^
+tests/test_agent_execution_r9.py:32: in execution
+    raise AssertionError("shared r9 execution implementation is missing") from error
+E   AssertionError: shared r9 execution implementation is missing
+_ LegacyPublicationTests.test_legacy_commit_marker_is_staged_before_directory_visibility _
+tests/test_agent_execution_r9.py:176: in test_legacy_commit_marker_is_staged_before_directory_visibility
+    self.assertTrue(result.published)
+E   AssertionError: False is not true
+_ LegacyPublicationTests.test_legacy_post_commit_error_cannot_return_failed_with_valid_commit _
+tests/test_agent_execution_r9.py:190: in test_legacy_post_commit_error_cannot_return_failed_with_valid_commit
+    self.assertTrue(result.published,
+E   AssertionError: False is not true : a valid visible commit must not also return FAILED_NO_COMMIT
+_ LegacyPublicationTests.test_legacy_rechecks_clock_after_staging_before_publication _
+tests/test_agent_execution_r9.py:214: in test_legacy_rechecks_clock_after_staging_before_publication
+    m1_publication.publish_run(destination, "late_run", payloads,
+E   TypeError: publish_run() got an unexpected keyword argument 'clock'
+_______ StructuredRequestTests.test_c_request_carries_full_frozen_schema _______
+tests/test_agent_m1_r9_contract_repairs.py:60: in test_c_request_carries_full_frozen_schema
+    self._check_request("C", "m1_c_decision", "m1_c_decision_schema.json")
+tests/test_agent_m1_r9_contract_repairs.py:69: in _check_request
+    self.assertEqual(output_format.get("schema"), schema,
+E   AssertionError: None != {'$schema': 'https://json-schema.org/draf[286 chars]alse} : a filename/hash cannot constrain provider output structure
+_______ StructuredRequestTests.test_d_request_carries_full_frozen_schema _______
+tests/test_agent_m1_r9_contract_repairs.py:63: in test_d_request_carries_full_frozen_schema
+    self._check_request("D", "m1_d_action", "m1_d_action_schema.json")
+tests/test_agent_m1_r9_contract_repairs.py:69: in _check_request
+    self.assertEqual(output_format.get("schema"), schema,
+E   AssertionError: None != {'$schema': 'https://json-schema.org/draf[310 chars]alse} : a filename/hash cannot constrain provider output structure
+_ ThreeMirrorReductionTests.test_default_reducer_includes_the_legal_three_mirror_counterexample _
+tests/test_agent_m1_r9_contract_repairs.py:111: in test_default_reducer_includes_the_legal_three_mirror_counterexample
+    self.assertEqual(report["verdict"], "REDUCIBILITY_REFUTED",
+E   AssertionError: 'FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED' != 'REDUCIBILITY_REFUTED'
+E   - FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED
+E   + REDUCIBILITY_REFUTED
+E    : the default corpus omits a legal three-mirror witness
+_ ScopedGateTests.test_engineering_pass_with_witness_does_not_claim_llm_advantage _
+tests/test_agent_m1_r9_contract_repairs.py:129: in test_engineering_pass_with_witness_does_not_claim_llm_advantage
+    self.assertEqual(gate["scientific_decision"],
+E   AssertionError: 'PENDING_REVIEW' != 'ENGINEERING_PASS_REDUCIBILITY_REFUTED'
+E   - PENDING_REVIEW
+E   + ENGINEERING_PASS_REDUCIBILITY_REFUTED
+___ ScopedGateTests.test_no_witness_on_finite_subspace_is_not_a_global_stop ____
+tests/test_agent_m1_r9_contract_repairs.py:145: in test_no_witness_on_finite_subspace_is_not_a_global_stop
+    self.assertEqual(gate["scientific_decision"], "INCONCLUSIVE_REDUCIBILITY")
+E   AssertionError: 'STOP' != 'INCONCLUSIVE_REDUCIBILITY'
+E   - STOP
+E   + INCONCLUSIVE_REDUCIBILITY
+_____ ScopedGateTests.test_witness_does_not_replace_engineering_acceptance _____
+tests/test_agent_m1_r9_contract_repairs.py:138: in test_witness_does_not_replace_engineering_acceptance
+    self.assertEqual(gate["scientific_decision"], "BLOCKED")
+E   AssertionError: 'PENDING_REVIEW' != 'BLOCKED'
+E   - PENDING_REVIEW
+E   + BLOCKED
+_____ test_c_binds_existing_final_schema_without_changing_prompt_or_tokens _____
+tests/test_agentic_r9_decisions.py:51: in test_c_binds_existing_final_schema_without_changing_prompt_or_tokens
+    assert captured[0][1].get("response_format") == arms.FINAL_RESPONSE_FORMAT
+E   AssertionError: assert None == {'type': 'json_schema', 'json_schema': {'name': 'final_decision', 'strict': True, 'schema': {'type': 'object', 'proper... 'WIDEN', 'NARROW']}, 'reason': {'type': 'string'}}, 'required': ['action', 'reason'], 'additionalProperties': False}}}
+E    +  where None = <built-in method get of dict object at 0x7fa8ad8dc7c0>('response_format')
+E    +    where <built-in method get of dict object at 0x7fa8ad8dc7c0> = {'max_tokens': 600, 'tag': 'C'}.get
+E    +  and   {'type': 'json_schema', 'json_schema': {'name': 'final_decision', 'strict': True, 'schema': {'type': 'object', 'proper... 'WIDEN', 'NARROW']}, 'reason': {'type': 'string'}}, 'required': ['action', 'reason'], 'additionalProperties': False}}} = arms.FINAL_RESPONSE_FORMAT
+_____________ test_selected_seed_reaches_c_and_every_d_turn[2026] ______________
+tests/test_agentic_r9_decisions.py:67: in test_selected_seed_reaches_c_and_every_d_turn
+    c = arms.decide_c(record, base, transport=fake, seed=seed)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: decide_c() got an unexpected keyword argument 'seed'
+_____________ test_selected_seed_reaches_c_and_every_d_turn[2027] ______________
+tests/test_agentic_r9_decisions.py:67: in test_selected_seed_reaches_c_and_every_d_turn
+    c = arms.decide_c(record, base, transport=fake, seed=seed)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: decide_c() got an unexpected keyword argument 'seed'
+_____________ test_selected_seed_reaches_c_and_every_d_turn[2028] ______________
+tests/test_agentic_r9_decisions.py:67: in test_selected_seed_reaches_c_and_every_d_turn
+    c = arms.decide_c(record, base, transport=fake, seed=seed)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: decide_c() got an unexpected keyword argument 'seed'
+_______________ test_d_final_decision_is_inside_three_call_limit _______________
+tests/test_agentic_r9_decisions.py:86: in test_d_final_decision_is_inside_three_call_limit
+    assert result["llm_calls"] == len(captured) == 3
+E   AssertionError: assert 4 == 3
+E    +  where 4 = len([{'tools': [{'type': 'function', 'function': {'name': 'history_window', 'description': 'Last N visible hourly RRP pric...son': {...}}, 'required': ['action', 'reason'], 'additionalProperties': False}}}, 'max_tokens': 700, 'tag': 'D-final'}])
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","action":"WIDEN","reason":"duplicate"}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":"first","reason":"second"}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":"ok","price":123}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP"}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":null}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":7}] _
+tests/test_agentic_r9_decisions.py:120: in test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type
+    with pytest.raises(protocol.DecisionParseError):
+E   Failed: DID NOT RAISE DecisionParseError
+_ test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"KEEP","action":"WIDEN","reason":"duplicate"}] _
+tests/test_agentic_r9_decisions.py:139: in test_d_schema_violation_is_not_rescued_by_an_extra_final_reply
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+_ test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"KEEP","reason":"ok","price":123}] _
+tests/test_agentic_r9_decisions.py:139: in test_d_schema_violation_is_not_rescued_by_an_extra_final_reply
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+_ test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"UNKNOWN","reason":"outside action space"}] _
+tests/test_agentic_r9_decisions.py:139: in test_d_schema_violation_is_not_rescued_by_an_extra_final_reply
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+__________ test_d_failed_transport_attempt_counts_against_call_budget __________
+tests/test_agentic_r9_decisions.py:153: in test_d_failed_transport_attempt_counts_against_call_budget
+    assert result["llm_calls"] == len(attempts) == 1
+E   AssertionError: assert 0 == 1
+E    +  where 1 = len([{'tools': [{'type': 'function', 'function': {'name': 'history_window', 'description': 'Last N visible hourly RRP pric...recast the action applies to.', 'parameters': {'type': 'object', 'properties': {}}}}], 'max_tokens': 700, 'tag': 'D1'}])
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[base_quantiles-arguments0] _
+tests/test_agentic_r9_decisions.py:175: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[base_quantiles-arguments1] _
+tests/test_agentic_r9_decisions.py:175: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[history_window-arguments2] _
+tests/test_agentic_r9_decisions.py:175: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[history_window-arguments3] _
+tests/test_agentic_r9_decisions.py:174: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    result = arms.decide_d(record, base, None, transport=fake)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:242: in decide_d
+    result = executor(call["name"], call["arguments"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:179: in bounded
+    return run_tool(name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:153: in run_tool
+    prices, _, _ = eval_data.visible_slice(frame, record["origin_local"], hours)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/data.py:177: in visible_slice
+    mask = frame["available_at_aest"] <= origin_ts
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'NoneType' object is not subscriptable
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[hourly_profile-arguments4] _
+tests/test_agentic_r9_decisions.py:174: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    result = arms.decide_d(record, base, None, transport=fake)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:242: in decide_d
+    result = executor(call["name"], call["arguments"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:179: in bounded
+    return run_tool(name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+forecasting/agentic_dev_eval/arms.py:165: in run_tool
+    prices, _, hours_of_day = eval_data.visible_slice(
+forecasting/agentic_dev_eval/data.py:177: in visible_slice
+    mask = frame["available_at_aest"] <= origin_ts
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'NoneType' object is not subscriptable
+_ test_illegal_tool_request_fails_without_execution_or_final_rescue[fetch_labels-arguments5] _
+tests/test_agentic_r9_decisions.py:175: in test_illegal_tool_request_fails_without_execution_or_final_rescue
+    assert result["exit_code"] != 0 and result["action"] == ""
+E   assert (0 != 0)
+____ test_transport_records_actual_seed_request_response_identity_and_usage ____
+tests/test_agentic_r9_decisions.py:219: in test_transport_records_actual_seed_request_response_identity_and_usage
+    result = llm_transport.chat([{"role": "user", "content": "synthetic"}],
+E   TypeError: chat() got an unexpected keyword argument 'seed'
+_ test_failed_http_attempt_is_traced_with_seed_without_invented_response_model _
+tests/test_agentic_r9_decisions.py:240: in test_failed_http_attempt_is_traced_with_seed_without_invented_response_model
+    llm_transport.chat([], max_tokens=600, seed=2027, tag="C", trace=trace.append)
+E   TypeError: chat() got an unexpected keyword argument 'seed'
+________ test_duplicate_tool_argument_key_is_rejected_at_wire_boundary _________
+tests/test_agentic_r9_decisions.py:251: in test_duplicate_tool_argument_key_is_rejected_at_wire_boundary
+    with pytest.raises(llm_transport.TransportError):
+E   Failed: DID NOT RAISE TransportError
+=========================== short test summary info ============================
+FAILED tests/test_agent_execution_r9.py::RealDeadlineTests::test_exhausted_budget_refuses_before_callback
+FAILED tests/test_agent_execution_r9.py::RealDeadlineTests::test_existing_alarm_and_handler_are_preserved
+FAILED tests/test_agent_execution_r9.py::RealDeadlineTests::test_inner_timeout_never_extends_outer_deadline
+FAILED tests/test_agent_execution_r9.py::RealDeadlineTests::test_legacy_runtime_default_clock_times_out_blocking_forecast
+FAILED tests/test_agent_execution_r9.py::RealDeadlineTests::test_shared_timeout_interrupts_a_real_blocking_call
+FAILED tests/test_agent_execution_r9.py::SharedDirectoryCommitTests::test_commit_is_present_at_the_single_visible_rename
+FAILED tests/test_agent_execution_r9.py::SharedDirectoryCommitTests::test_deadline_expiry_refuses_promotion
+FAILED tests/test_agent_execution_r9.py::SharedDirectoryCommitTests::test_post_commit_fsync_error_reports_committed_not_failed
+FAILED tests/test_agent_execution_r9.py::LegacyPublicationTests::test_legacy_commit_marker_is_staged_before_directory_visibility
+FAILED tests/test_agent_execution_r9.py::LegacyPublicationTests::test_legacy_post_commit_error_cannot_return_failed_with_valid_commit
+FAILED tests/test_agent_execution_r9.py::LegacyPublicationTests::test_legacy_rechecks_clock_after_staging_before_publication
+FAILED tests/test_agent_m1_r9_contract_repairs.py::StructuredRequestTests::test_c_request_carries_full_frozen_schema
+FAILED tests/test_agent_m1_r9_contract_repairs.py::StructuredRequestTests::test_d_request_carries_full_frozen_schema
+FAILED tests/test_agent_m1_r9_contract_repairs.py::ThreeMirrorReductionTests::test_default_reducer_includes_the_legal_three_mirror_counterexample
+FAILED tests/test_agent_m1_r9_contract_repairs.py::ScopedGateTests::test_engineering_pass_with_witness_does_not_claim_llm_advantage
+FAILED tests/test_agent_m1_r9_contract_repairs.py::ScopedGateTests::test_no_witness_on_finite_subspace_is_not_a_global_stop
+FAILED tests/test_agent_m1_r9_contract_repairs.py::ScopedGateTests::test_witness_does_not_replace_engineering_acceptance
+FAILED tests/test_agentic_r9_decisions.py::test_c_binds_existing_final_schema_without_changing_prompt_or_tokens
+FAILED tests/test_agentic_r9_decisions.py::test_selected_seed_reaches_c_and_every_d_turn[2026]
+FAILED tests/test_agentic_r9_decisions.py::test_selected_seed_reaches_c_and_every_d_turn[2027]
+FAILED tests/test_agentic_r9_decisions.py::test_selected_seed_reaches_c_and_every_d_turn[2028]
+FAILED tests/test_agentic_r9_decisions.py::test_d_final_decision_is_inside_three_call_limit
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","action":"WIDEN","reason":"duplicate"}]
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":"first","reason":"second"}]
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":"ok","price":123}]
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP"}]
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":null}]
+FAILED tests/test_agentic_r9_decisions.py::test_decision_schema_rejects_duplicate_unknown_missing_or_wrong_type[{"action":"KEEP","reason":7}]
+FAILED tests/test_agentic_r9_decisions.py::test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"KEEP","action":"WIDEN","reason":"duplicate"}]
+FAILED tests/test_agentic_r9_decisions.py::test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"KEEP","reason":"ok","price":123}]
+FAILED tests/test_agentic_r9_decisions.py::test_d_schema_violation_is_not_rescued_by_an_extra_final_reply[{"action":"UNKNOWN","reason":"outside action space"}]
+FAILED tests/test_agentic_r9_decisions.py::test_d_failed_transport_attempt_counts_against_call_budget
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[base_quantiles-arguments0]
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[base_quantiles-arguments1]
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[history_window-arguments2]
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[history_window-arguments3]
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[hourly_profile-arguments4]
+FAILED tests/test_agentic_r9_decisions.py::test_illegal_tool_request_fails_without_execution_or_final_rescue[fetch_labels-arguments5]
+FAILED tests/test_agentic_r9_decisions.py::test_transport_records_actual_seed_request_response_identity_and_usage
+FAILED tests/test_agentic_r9_decisions.py::test_failed_http_attempt_is_traced_with_seed_without_invented_response_model
+FAILED tests/test_agentic_r9_decisions.py::test_duplicate_tool_argument_key_is_rejected_at_wire_boundary
+41 failed, 2 passed in 34.70s

@@ -1,0 +1,195 @@
+{
+  "contract": "m1.agent_contract.c2.v1",
+  "d_traces_enumerated": 1852,
+  "global_sufficiency_proven": false,
+  "internal_consistency_ok": true,
+  "llm_advantage_demonstrated": false,
+  "llm_failures_checked": 1746,
+  "non_vacuity_control": {
+    "detected": true,
+    "policy": "weak_B_fetches_only_the_superseded_ref",
+    "weak_b_diff_scenarios": 17
+  },
+  "scenarios_total": 194,
+  "scope": "bounded_synthetic_scenarios",
+  "uses_labels_or_scores": false,
+  "verdict": "REDUCIBILITY_REFUTED",
+  "witnesses": [
+    {
+      "scenario": {
+        "body_relation": "DUPLICATE_SAME_BODY",
+        "listing": "THREE_REFS",
+        "outcomes": [
+          "TIMEOUT",
+          "NOT_FOUND",
+          "COMPLETE_VALID"
+        ],
+        "relation": "BEFORE_ORIGIN"
+      },
+      "terminal": {
+        "input_hash": "a429bf773fa0ab0a4f8e4f87f3e0a30f2eabed058e86306e93d02216cb1f058c",
+        "reason_code": "PUBLISHED_TYPED",
+        "tool_trace_hash": "7ac5934d5bf1a00ec0434c2d926a31445df84ebfdd8a3e5610fcaa0546b4e988",
+        "verdict": "PUBLISHED_TYPED"
+      },
+      "trace": [
+        [
+          "LIST",
+          "NONE"
+        ],
+        [
+          "FETCH_REF",
+          "v_f9ff2be7410e01fd"
+        ],
+        [
+          "FETCH_REF",
+          "v_9ae9e0b21ea807aa"
+        ],
+        [
+          "FINALIZE_TYPED",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "scenario": {
+        "body_relation": "DUPLICATE_SAME_BODY",
+        "listing": "THREE_REFS",
+        "outcomes": [
+          "TIMEOUT",
+          "NOT_FOUND",
+          "COMPLETE_VALID"
+        ],
+        "relation": "BEFORE_ORIGIN"
+      },
+      "terminal": {
+        "input_hash": "a429bf773fa0ab0a4f8e4f87f3e0a30f2eabed058e86306e93d02216cb1f058c",
+        "reason_code": "PUBLISHED_TYPED",
+        "tool_trace_hash": "7ac5934d5bf1a00ec0434c2d926a31445df84ebfdd8a3e5610fcaa0546b4e988",
+        "verdict": "PUBLISHED_TYPED"
+      },
+      "trace": [
+        [
+          "LIST",
+          "NONE"
+        ],
+        [
+          "FETCH_REF",
+          "v_fe3a548d39b6bc9a"
+        ],
+        [
+          "FETCH_REF",
+          "v_9ae9e0b21ea807aa"
+        ],
+        [
+          "FINALIZE_TYPED",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "scenario": {
+        "body_relation": "DUPLICATE_SAME_BODY",
+        "listing": "THREE_REFS",
+        "outcomes": [
+          "TIMEOUT",
+          "NOT_FOUND",
+          "COMPLETE_VALID"
+        ],
+        "relation": "BEFORE_ORIGIN"
+      },
+      "terminal": {
+        "input_hash": "a429bf773fa0ab0a4f8e4f87f3e0a30f2eabed058e86306e93d02216cb1f058c",
+        "reason_code": "PUBLISHED_TYPED",
+        "tool_trace_hash": "7ac5934d5bf1a00ec0434c2d926a31445df84ebfdd8a3e5610fcaa0546b4e988",
+        "verdict": "PUBLISHED_TYPED"
+      },
+      "trace": [
+        [
+          "LIST",
+          "NONE"
+        ],
+        [
+          "FETCH_REF",
+          "v_9ae9e0b21ea807aa"
+        ],
+        [
+          "FETCH_REF",
+          "v_f9ff2be7410e01fd"
+        ],
+        [
+          "FINALIZE_TYPED",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "scenario": {
+        "body_relation": "DUPLICATE_SAME_BODY",
+        "listing": "THREE_REFS",
+        "outcomes": [
+          "TIMEOUT",
+          "NOT_FOUND",
+          "COMPLETE_VALID"
+        ],
+        "relation": "BEFORE_ORIGIN"
+      },
+      "terminal": {
+        "input_hash": "a429bf773fa0ab0a4f8e4f87f3e0a30f2eabed058e86306e93d02216cb1f058c",
+        "reason_code": "PUBLISHED_TYPED",
+        "tool_trace_hash": "7ac5934d5bf1a00ec0434c2d926a31445df84ebfdd8a3e5610fcaa0546b4e988",
+        "verdict": "PUBLISHED_TYPED"
+      },
+      "trace": [
+        [
+          "LIST",
+          "NONE"
+        ],
+        [
+          "FETCH_REF",
+          "v_9ae9e0b21ea807aa"
+        ],
+        [
+          "FETCH_REF",
+          "v_fe3a548d39b6bc9a"
+        ],
+        [
+          "FINALIZE_TYPED",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "scenario": {
+        "body_relation": "DUPLICATE_SAME_BODY",
+        "listing": "THREE_REFS",
+        "outcomes": [
+          "TIMEOUT",
+          "NOT_FOUND",
+          "COMPLETE_VALID"
+        ],
+        "relation": "BEFORE_ORIGIN"
+      },
+      "terminal": {
+        "input_hash": "a429bf773fa0ab0a4f8e4f87f3e0a30f2eabed058e86306e93d02216cb1f058c",
+        "reason_code": "PUBLISHED_TYPED",
+        "tool_trace_hash": "7ac5934d5bf1a00ec0434c2d926a31445df84ebfdd8a3e5610fcaa0546b4e988",
+        "verdict": "PUBLISHED_TYPED"
+      },
+      "trace": [
+        [
+          "LIST",
+          "NONE"
+        ],
+        [
+          "FETCH_REF",
+          "v_9ae9e0b21ea807aa"
+        ],
+        [
+          "FINALIZE_TYPED",
+          "NONE"
+        ]
+      ]
+    }
+  ]
+}

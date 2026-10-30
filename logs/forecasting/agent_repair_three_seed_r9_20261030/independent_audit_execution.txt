@@ -1,0 +1,11 @@
+Command: /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/audit_r9_three_seed.py --output outputs/forecasting/agent_repair_three_seed_r9_20261030/independent_audit.json
+CWD: /root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9
+HEAD: 04293abe114a8adee096910bb6ff82bf3f02a9db
+Exit: 0
+Wall seconds: 1.080129723995924
+Started UTC: 2026-10-30T13:51:30.731879+00:00
+Finished UTC: 2026-10-30T13:51:31.812047+00:00
+STDOUT:
+{"passed": true, "execution_commit": "04293abe114a8adee096910bb6ff82bf3f02a9db", "verified_stage_count": 36, "base_batches": 9, "origins_by_arm": {"A": 477, "B": 477, "C": 477, "D": 477}, "decision_failures_by_arm": {"A": 0, "B": 0, "C": 0, "D": 0}, "failure_reasons": {}, "successful_actions": {"B/SHIFT_UP": 90, "B/KEEP": 99, "B/SHIFT_DOWN": 69, "B/WIDEN": 219, "C/SHIFT_UP": 422, "C/SHIFT_DOWN": 52, "D/SHIFT_UP": 416, "D/WIDEN": 54, "C/KEEP": 3, "D/SHIFT_DOWN": 7}, "metric_comparisons": 166, "maximum_absolute_metric_error": 0.0, "metric_tolerance": {"atol": 1e-09, "rtol": 1e-10}, "llm_calls": 1832, "llm_calls_by_arm": {"B": 0, "C": 477, "D": 1355}, "transport_failures": {}, "response_models": {"qwen3-30b3a": 1832}, "response_model_missing_calls": 0, "wire_reported_tokens": {"prompt_tokens": 3505213, "completion_tokens": 103569}, "usage_missing_calls": 0, "decision_reported_tokens": {"prompt": 3505213, "completion": 103569}, "execution_counts_incomplete_cells": 0, "seed_limit": "temperature=0; repeats are not independent datasets or trained models", "resource_limit": "stage wall times overlap; their sum is not elapsed matrix wall time; server resources unknown", "model_limit": "response IDs/aliases are recorded claims, not proof of server internals or predictive success", "audit_scope": "artifact and full-grid metric consistency; passing does not establish forecast improvement", "metrics_verified": ["mae", "quantile_score"], "models_called_by_auditor": 0, "auditor_sha256": "d1104a43432ccb21ffadce4e780c492fae2658260ae9abc436e8c327162255f6", "config_sha256": "1875519a4cb4a112d8ef56b4e046dec08b733c54bfb37f7991f2d50ede301572", "checked_at_utc": "2026-10-30T13:51:31.779887+00:00"}
+
+STDERR:

@@ -1,0 +1,24 @@
+=== run_logged_m1 id=01_reducer_r9 ===
+argv: env PYTHONDONTWRITEBYTECODE=1 CUDA_VISIBLE_DEVICES= OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /root/workspace/Code/DualTimesField/.venv/bin/python -B scripts/run_m1_reducer.py /root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9/logs/forecasting/m1_agent_contract_c2_20261030_r9/reducibility/reducer_report.json
+git_head: 04293abe114a8adee096910bb6ff82bf3f02a9db
+branch: research/agent-repair-three-seed-20261030-r9
+start_utc: 2026-10-30T13:29:54.691537Z
+end_utc: 2026-10-30T13:35:19.752608Z
+--- output begin ---
+{
+  "d_traces_enumerated": 1852,
+  "internal_consistency_ok": true,
+  "llm_failures_checked": 1746,
+  "non_vacuity_control": {
+    "detected": true,
+    "policy": "weak_B_fetches_only_the_superseded_ref",
+    "weak_b_diff_scenarios": 17
+  },
+  "scenarios_total": 194,
+  "uses_labels_or_scores": false,
+  "verdict": "REDUCIBILITY_REFUTED",
+  "witness_count": 5
+}
+wrote /root/workspace/Code/DualTimesField-worktrees/agent-repair-three-seed-20261030-r9/logs/forecasting/m1_agent_contract_c2_20261030_r9/reducibility/reducer_report.json
+--- output end ---
+EXIT_CODE=0

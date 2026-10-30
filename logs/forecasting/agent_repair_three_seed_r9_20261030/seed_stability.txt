@@ -1,0 +1,55 @@
+三seed执行重复稳定性（只读预测/动作，无标签、无评分）
+execution_commit=04293abe114a8adee096910bb6ff82bf3f02a9db
+seeds=2026/2027/2028；每地区53个origin，3地区共159个；每次预测24x5。
+36阶段COMMIT齐全；本统计所用预测/决策/run文件哈希均与阶段COMMIT一致。
+
+预测数组跨三seed比较（bitwise为数组字节；maxabs为三对seed最大绝对差）：
+region arm changed_origins/53 all_bitwise_equal all_npz_equal max_abs_diff
+NSW1 A 0/53 True True 0
+NSW1 B 0/53 True True 0
+NSW1 C 0/53 True True 0
+NSW1 D 4/53 False False 421.842756072
+QLD1 A 0/53 True True 0
+QLD1 B 0/53 True True 0
+QLD1 C 0/53 True True 0
+QLD1 D 9/53 False False 1161.02505968
+TAS1 A 0/53 True True 0
+TAS1 B 0/53 True True 0
+TAS1 C 1/53 False False 11.2423700805
+TAS1 D 7/53 False False 214.308976875
+
+C/D成功动作变化与失败状态变化（同origin跨三seed任一对发生变化）：
+NSW1 C: action_changed=0/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={}
+  seed2026: {'SHIFT_DOWN': 8, 'SHIFT_UP': 45}
+  seed2027: {'SHIFT_DOWN': 8, 'SHIFT_UP': 45}
+  seed2028: {'SHIFT_DOWN': 8, 'SHIFT_UP': 45}
+NSW1 D: action_changed=4/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={'2022-02': 1, '2022-03': 1, '2022-06': 1, '2022-12': 1}
+  seed2026: {'SHIFT_UP': 48, 'WIDEN': 5}
+  seed2027: {'SHIFT_UP': 51, 'WIDEN': 2}
+  seed2028: {'SHIFT_UP': 48, 'WIDEN': 5}
+QLD1 C: action_changed=0/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={}
+  seed2026: {'KEEP': 1, 'SHIFT_DOWN': 5, 'SHIFT_UP': 47}
+  seed2027: {'KEEP': 1, 'SHIFT_DOWN': 5, 'SHIFT_UP': 47}
+  seed2028: {'KEEP': 1, 'SHIFT_DOWN': 5, 'SHIFT_UP': 47}
+QLD1 D: action_changed=9/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={'2022-02': 2, '2022-04': 3, '2022-05': 1, '2022-06': 1, '2022-10': 1, '2022-12': 1}
+  seed2026: {'SHIFT_DOWN': 1, 'SHIFT_UP': 41, 'WIDEN': 11}
+  seed2027: {'SHIFT_UP': 47, 'WIDEN': 6}
+  seed2028: {'SHIFT_UP': 47, 'WIDEN': 6}
+TAS1 C: action_changed=1/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={'2022-02': 1}
+  seed2026: {'SHIFT_DOWN': 5, 'SHIFT_UP': 48}
+  seed2027: {'SHIFT_DOWN': 4, 'SHIFT_UP': 49}
+  seed2028: {'SHIFT_DOWN': 4, 'SHIFT_UP': 49}
+TAS1 D: action_changed=7/53; failure_status_changed=0/53; failed_runs=[0, 0, 0]; months={'2022-01': 1, '2022-04': 1, '2022-05': 1, '2022-06': 2, '2022-07': 1, '2022-11': 1}
+  seed2026: {'SHIFT_DOWN': 3, 'SHIFT_UP': 43, 'WIDEN': 7}
+  seed2027: {'SHIFT_DOWN': 1, 'SHIFT_UP': 46, 'WIDEN': 6}
+  seed2028: {'SHIFT_DOWN': 2, 'SHIFT_UP': 45, 'WIDEN': 6}
+
+汇总（计数单位为地区-origin，不把3次重复当3份独立样本）：
+A: {"all_three_quantiles_bitwise_equal": true, "changed_prediction_region_origins": 0, "max_pairwise_abs_difference": 0.0, "n_region_origins": 159}
+B: {"all_three_quantiles_bitwise_equal": true, "changed_prediction_region_origins": 0, "max_pairwise_abs_difference": 0.0, "n_region_origins": 159}
+C: {"all_three_quantiles_bitwise_equal": false, "changed_prediction_region_origins": 1, "failure_status_changed_region_origins": 0, "max_pairwise_abs_difference": 11.242370080450371, "n_region_origins": 159, "successful_action_changed_region_origins": 1, "total_failed_origin_runs": 0}
+D: {"all_three_quantiles_bitwise_equal": false, "changed_prediction_region_origins": 20, "failure_status_changed_region_origins": 0, "max_pairwise_abs_difference": 1161.0250596837323, "n_region_origins": 159, "successful_action_changed_region_origins": 20, "total_failed_origin_runs": 0}
+
+model seed请求已由主checker核验；本统计不重复读wire，也不证明provider内部随机种子确实改变随机流。
+temperature=0的三次重复不能视为独立数据。相同输出不证明准确性，不同动作也不构成准确性改善。
+仅检查同一批固定输入上的执行稳定性；未读标签、未评分、未调用模型、未修改既有产物。详细变化日期/转移/来源哈希见同名JSON。
