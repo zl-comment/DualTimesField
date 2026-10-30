@@ -158,6 +158,34 @@ class SharedDirectoryCommitTests(unittest.TestCase):
             self.assertFalse(committed.durable)
             self.assertTrue((final / "COMMIT.json").is_file())
 
+    def test_blocking_rename_expires_before_commit(self):
+        module = execution()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            staging, final = self._staging(root), root / "final"
+            with mock.patch.object(module.os, "rename", side_effect=lambda *a: time.sleep(0.12)):
+                started = time.monotonic()
+                with self.assertRaises(module.DeadlineExceeded):
+                    module.publish_directory(staging, final, deadline=started + 0.025)
+                self.assertLess(time.monotonic() - started, 0.095)
+            self.assertFalse(final.exists())
+            self.assertTrue(staging.exists())
+
+    def test_rename_then_exception_preserves_committed_state(self):
+        module = execution()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            staging, final = self._staging(root), root / "final"
+            rename = os.rename
+            def renamed_then_error(source, destination):
+                rename(source, destination)
+                raise OSError("synthetic exception after rename committed")
+            with mock.patch.object(module.os, "rename", side_effect=renamed_then_error):
+                committed = module.publish_directory(staging, final)
+            self.assertEqual(committed.path, final)
+            self.assertFalse(committed.durable)
+            self.assertTrue((final / "COMMIT.json").is_file())
+
 
 class LegacyPublicationTests(unittest.TestCase):
     def test_legacy_commit_marker_is_staged_before_directory_visibility(self):
@@ -189,6 +217,7 @@ class LegacyPublicationTests(unittest.TestCase):
                 result = run_base(publish_root=root)
             self.assertTrue(result.published,
                             "a valid visible commit must not also return FAILED_NO_COMMIT")
+            self.assertFalse(result.publication_durable)
             self.assertNotEqual(result.verdict, "TERMINAL_FAILED_NO_COMMIT")
             self.assertEqual(m1_publication.verify_run_closure(result.publish_dir)["status"], "CLOSED")
             self.assertEqual(list((root / "failures").glob("*.json")), [])

@@ -26,6 +26,7 @@ LABEL_WINDOW_MAX_HOURS = 26       # DST fall-back makes one 24-row window span 2
 
 QUANTILE_LEVELS = (0.05, 0.10, 0.50, 0.90, 0.95)
 SEED = 2026
+SEEDS = (2026, 2027, 2028)        # request seeds; temperature=0 need not yield distinct samples
 
 ACTIONS = ("KEEP", "SHIFT_UP", "SHIFT_DOWN", "WIDEN", "NARROW")
 SHIFT_FRACTION = 0.25             # of std of the last 24 visible prices
@@ -58,6 +59,23 @@ class DecisionParseError(Exception):
     def __init__(self, reason_code: str, detail: str = ""):
         super().__init__(f"decision rejected: {reason_code} {detail}")
         self.reason_code = reason_code
+
+
+class DuplicateJSONKeyError(ValueError):
+    pass
+
+
+def json_loads_unique(raw_text: str):
+    """Reject duplicate JSON fields at the decision/tool-argument boundary."""
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise DuplicateJSONKeyError(f"duplicate field {key!r}")
+            result[key] = value
+        return result
+
+    return json.loads(raw_text, object_pairs_hook=unique_object)
 
 
 def apply_action(base_quantiles: np.ndarray, history_prices: np.ndarray, action: str) -> np.ndarray:
@@ -145,12 +163,18 @@ def parse_decision(raw_text: str) -> str:
     if not isinstance(raw_text, str) or not raw_text.strip():
         raise DecisionParseError("EMPTY_OUTPUT")
     try:
-        obj = json.loads(raw_text)
+        obj = json_loads_unique(raw_text)
+    except DuplicateJSONKeyError as exc:
+        raise DecisionParseError("DUPLICATE_JSON_KEY", str(exc)) from exc
     except ValueError as exc:
         raise DecisionParseError("INVALID_JSON", str(exc)[:120]) from exc
     if not isinstance(obj, dict):
         raise DecisionParseError("NOT_AN_OBJECT")
+    if set(obj) != {"action", "reason"}:
+        raise DecisionParseError("INVALID_FIELDS")
     action = obj.get("action")
     if action not in ACTIONS:
         raise DecisionParseError("INVALID_ACTION", repr(action)[:80])
+    if not isinstance(obj["reason"], str):
+        raise DecisionParseError("INVALID_REASON")
     return action

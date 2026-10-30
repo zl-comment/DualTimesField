@@ -141,16 +141,17 @@ class ReducerGateTests(unittest.TestCase):
     def test_full_reducer_proves_fixed_rule_sufficiency_or_reports_witness(self):
         report = m1_reducer.run_reducer()
         self.assertIn(report["verdict"],
-                      ("FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+                      ("NO_COUNTEREXAMPLE_IN_TESTED_SCENARIOS",
                        "REDUCIBILITY_REFUTED", "REDUCER_NON_VACUITY_FAILED"))
         # the exhaustive cross is the independently derived expectation set
         # (see test_scenario_space_equals_the_independently_derived_protocol_cross)
-        self.assertEqual(report["scenarios_total"], len(harness.scenario_space()))
+        self.assertEqual(report["scenarios_total"], len(harness.scenario_space()) + 1)
         self.assertGreater(report["d_traces_enumerated"], 1500)
         self.assertGreater(report["llm_failures_checked"], 1400)
         self.assertTrue(report["internal_consistency_ok"])
         self.assertFalse(report["uses_labels_or_scores"])
-        if report["verdict"] == "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED":
+        self.assertFalse(report["global_sufficiency_proven"])
+        if report["verdict"] == "NO_COUNTEREXAMPLE_IN_TESTED_SCENARIOS":
             self.assertEqual(report["witnesses"], [])
 
     def test_non_vacuity_control_detects_a_weak_b_policy(self):
@@ -165,7 +166,7 @@ class ReducerGateTests(unittest.TestCase):
         gate = m1_contract.map_gate(
             {"verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
              "engineering_green": True})
-        self.assertEqual(gate["scientific_decision"], "STOP")
+        self.assertEqual(gate["scientific_decision"], "INCONCLUSIVE_REDUCIBILITY")
         self.assertEqual(gate["metrics_status"], "NOT_EVALUATED")
         self.assertIn("advance_m1", gate)
         self.assertFalse(gate["advance_m1"])

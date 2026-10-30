@@ -125,7 +125,7 @@ def _record_dict():
     }
 
 
-def _fake_transport_ok(messages, *, tools=None, max_tokens=0, tag=""):
+def _fake_transport_ok(messages, *, tools=None, response_format=None, max_tokens=0, tag="", seed=2026):
     return {"content": '{"action": "WIDEN", "reason": "volatile"}', "tool_calls": [],
             "finish_reason": "stop", "usage": {"prompt_tokens": 11, "completion_tokens": 7}}
 
@@ -137,7 +137,7 @@ def test_decide_c_success_and_failure_paths():
     assert decision["action"] == "WIDEN" and decision["exit_code"] == 0
     assert decision["llm_calls"] == 1 and decision["tokens"] == {"prompt": 11, "completion": 7}
 
-    def bad(messages, *, tools=None, max_tokens=0, tag=""):
+    def bad(messages, *, tools=None, response_format=None, max_tokens=0, tag="", seed=2026):
         return {"content": "I think widening", "tool_calls": [], "finish_reason": "stop",
                 "usage": {"prompt_tokens": 5, "completion_tokens": 5}}
 
@@ -161,7 +161,7 @@ def _tiny_frame():
 
 def _agent_transport(script, capture=None):
     calls = {"i": 0}
-    def transport(messages, *, tools=None, response_format=None, max_tokens=0, tag=""):
+    def transport(messages, *, tools=None, response_format=None, max_tokens=0, tag="", seed=2026):
         if capture is not None:
             capture.append({"roles": [m["role"] for m in messages], "tools": tools,
                             "response_format": response_format,
@@ -174,7 +174,10 @@ def _agent_transport(script, capture=None):
 
 def _tool_phase_response(names=("history_window",)):
     return {"content": "",
-            "tool_calls": [{"id": f"t{i}", "name": name, "arguments": {"hours": 48}}
+            "tool_calls": [{"id": f"t{i}", "name": name,
+                            "arguments": ({} if name == "base_quantiles" else
+                                          {"days_back": 7} if name == "hourly_profile" else
+                                          {"hours": 48})}
                            for i, name in enumerate(names)],
             "finish_reason": "tool_calls",
             "usage": {"prompt_tokens": 10, "completion_tokens": 5}}
@@ -234,12 +237,14 @@ def test_decide_d_tool_quota_exhausted_enters_decision_only_turn():
 def test_decide_d_final_turn_illegal_json_or_no_decision_fails_honestly(final_content, reason):
     record = _record_dict()
     frame = _tiny_frame()
-    script = [_tool_phase_response(), _tool_phase_response(), _tool_phase_response(),
+    # r9 corrects r8's four-call expectation: the final turn is inside the
+    # existing, declared three-turn budget, not an additional fourth call.
+    script = [_tool_phase_response(), _tool_phase_response(),
               _final_response(final_content)]
     decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(script))
     assert decision["exit_code"] == 1 and decision["action"] == ""
     assert decision["failure_reason"] == reason
-    assert decision["llm_calls"] == protocol.D_MAX_TURNS + 1
+    assert decision["llm_calls"] == protocol.D_MAX_TURNS
     assert "phase=BUDGET_EXHAUSTED_NO_DECISION" in decision["detail"]
 
 
@@ -259,19 +264,21 @@ def test_decide_d_phase_parse_failure_enters_decision_only_turn():
 def test_decide_d_allowlist_violation_and_transport_error_paths():
     record = _record_dict()
     frame = _tiny_frame()
-    # Non-allowlisted tool ends the phase without a decision -> decision-only turn.
+    # r9: an allowlist violation fails the cell; a later legal decision cannot
+    # turn the invalid tool request into a successful experiment observation.
     forbidden = [{"content": "", "tool_calls": [{"id": "t", "name": "fetch_labels",
                                                  "arguments": {}}],
                   "finish_reason": "tool_calls",
                   "usage": {"prompt_tokens": 10, "completion_tokens": 5}},
                  _final_response()]
     decision = arms.decide_d(record, _base_q(), frame, transport=_agent_transport(forbidden))
-    assert decision["exit_code"] == 0 and decision["tool_calls"] == 0
-    assert decision["failure_reason"] == ""
+    assert decision["exit_code"] == 1 and decision["tool_calls"] == 0
+    assert decision["failure_reason"] == "TOOL_NOT_ALLOWLISTED"
+    assert decision["llm_calls"] == 1
 
     # A transport (LLM call) failure still fails honestly with no extra call.
     attempts = {"n": 0}
-    def broken(messages, *, tools=None, response_format=None, max_tokens=0, tag=""):
+    def broken(messages, *, tools=None, response_format=None, max_tokens=0, tag="", seed=2026):
         attempts["n"] += 1
         raise arms.llm_transport.TransportError("CONNECTION_ERROR", "refused")
 
@@ -292,9 +299,10 @@ def test_tool_executor_only_returns_visible_rows():
     visible = frame[frame["available_at_aest"] <= origin]
     expected = visible.tail(24)["rrp_aud_per_mwh"].round(2).tolist()
     assert result["prices"] == expected
-    bad = json.loads(executor("history_window", {"hours": 3}))
-    assert "error" in bad
-    assert stats["tool_calls"] == 2
+    # Invalid requests are rejected before tool execution in r9.
+    with pytest.raises(protocol.DecisionParseError):
+        executor("history_window", {"hours": 3})
+    assert stats["tool_calls"] == 1
 
 
 # ---------- real-CSV grid integration ----------

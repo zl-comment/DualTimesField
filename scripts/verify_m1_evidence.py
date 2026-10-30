@@ -157,7 +157,7 @@ def check_gate_and_reducer(root: Path, *, recompute: bool) -> list[str]:
                 f"{passed} passed" in line for line in lines):
             problems.append("gate tests_passed count not found in the suite log")
     expected = m1_contract.map_gate({
-        "verdict": report["verdict"],
+        **report,
         "engineering_green": engineering.get("suite_exit_code") == 0,
     })
     for key in ("scientific_decision", "stop_token", "metrics_status",

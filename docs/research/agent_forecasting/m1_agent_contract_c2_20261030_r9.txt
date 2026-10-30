@@ -1,0 +1,69 @@
+R9 revision of the M1 wire contract: m1.agent_contract.c2.v1
+Date: 2026-10-30 UTC
+Branch: research/agent-repair-three-seed-20261030-r9
+Base: f62967c373d8ca210d39fd984a24b3831d957b44
+RED tests: c54a9e8; archived RED evidence: 555190a3a54c468697f2bf427601e0b028a9feab.
+The provenance commit identifies this RED record, not the historical r5 bootstrap.
+The wire identifier remains unchanged because the digest/action schema is unchanged;
+the R9 branch, configuration, protocol and source fingerprints identify this revision.
+
+Scope
+Repair the previously identified engineering defects without running real models,
+source retrieval, LLM calls, fitting, price scoring or final-period evaluation in
+these M1 checks. The original r5 protocol/config/archive remain unchanged.
+The five inherited M0 source fingerprints, checkpoint and package identities,
+source semantics, input adapter, prompts, schemas and model snapshot remain pinned.
+The new config is configs/agent_forecasting/m1_agent_contract_c2_20261030_r9.json.
+The source identities are frozen after all R9 repair modules are complete.
+
+The historical protocol m1_agent_contract_c2_20261029.txt defines the unchanged
+TOTALDEMAND semantics, as-of prefix, typed actions, A/B/C/D arms, equal maximum
+budgets, strict output parsing and unchanged frozen-tool outputs. The corrections
+below supersede its reduction conclusion, request binding and runtime/publication
+enforcement claims. Actual blocking calls and atomic commit use the R9 shared
+deadline/publication helpers, with regressions for the previously observed gaps.
+Probe calls explicitly select a synthetic clock and deterministic forecast stub;
+their timings are not represented as evidence of historical real-time execution.
+
+Complete structured request
+Both C and D send the full frozen JSON schema in Responses text.format, with
+type=json_schema, strict=true, name=m1_c_decision or m1_d_action and schema equal
+to the corresponding committed schema file. Model, output-token envelope and
+all prompt bytes retain their original identities. A schema filename or SHA256
+alone is not a provider constraint; hashes remain provenance in the configuration.
+The strict local parser still validates the actual returned action and enabled ref.
+Official reference checked by the coordinator on 2026-10-30:
+https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses
+
+Bounded reduction and counterexample
+The historical 193-case corpus only has zero, one or two listed refs. The runtime
+contract accepts longer listings. Append a same-body, same-vintage three-mirror
+case with all three receipts before the origin: the first two canonical mirrors
+return TIMEOUT and NOT_FOUND, and the third returns COMPLETE_VALID.
+B/C keep their existing first-two-mirror plan and two-GET maximum; no comparator
+is changed after seeing this case. D can legally LIST, FETCH_REF(third), FINALIZE_TYPED
+within the same envelope. Enumerating this trace demonstrates reachability, not
+that a real LLM can infer which unseen mirror will succeed.
+The default 194-case corpus is explicitly finite and is not the entire input domain.
+Every legal D trace within each supplied case is still enumerated; the weak-B
+control still checks that the detector can find a useful difference.
+
+Verdicts
+A useful PUBLISHED_TYPED witness yields REDUCIBILITY_REFUTED. With engineering
+tests passing, the gate may report ENGINEERING_PASS_REDUCIBILITY_REFUTED; without
+engineering acceptance, or without a useful witness, it remains BLOCKED.
+No witness in the tested cases means NO_COUNTEREXAMPLE_IN_TESTED_SCENARIOS and
+INCONCLUSIVE_REDUCIBILITY, never global FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED.
+Legacy sufficiency report tokens also map to INCONCLUSIVE_REDUCIBILITY when read
+under this repaired contract. global_sufficiency_proven=false,
+llm_advantage_demonstrated=false, metrics_status=NOT_EVALUATED,
+mission_goal_achieved=false and advance_m1=false always remain explicit.
+Invalid reducer controls remain BLOCKED. Neither tests nor witnesses establish
+forecast accuracy, LLM superiority, live data availability or scientific novelty.
+
+Separate authorized experiment
+The R9 three-region/three-seed development experiment uses the separately frozen
+r9_repair_and_three_seed_protocol_20261030.txt. It evaluates the historical-data
+bounded forecast adjustments inherited from r8; it is not a validation of M1's
+TOTALDEMAND acquisition mechanism. Its authorization comes from the user's current
+instruction, not a fabricated ADVANCE_M1 or a rewritten historical gate.

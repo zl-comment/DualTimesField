@@ -1,4 +1,4 @@
-"""Label-free exhaustive reducibility gate for the M1 contract.
+"""Label-free bounded reducibility checks for the M1 contract.
 
 Enumerates the declared finite scenario axes, every legal D trace of at most four
 valid proposals under the frozen state machine and envelope, and the LLM failure
@@ -6,20 +6,24 @@ modes, then compares each terminal (verdict, input_hash, forecast-tool trace has
 with the maximal deterministic B plan, the one-shot maximal/abstaining C policies
 and the common A fallback on the SAME immutable snapshot.
 
-If every useful D terminal is reproduced by B/C the verdict is
-FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED.  A seeded weak-B control that wastes its
-body GET on a superseded ref must be classified non-reducible, otherwise the
-reducer itself is invalid (REDUCER_NON_VACUITY_FAILED).  No labels, no scores.
+The old two-ref corpus is supplemented by a legal three-mirror counterexample.
+No finite corpus here proves global sufficiency: a witness refutes the fixed
+B/C policy's coverage, while absence means only no witness in the tested cases.
+A weak-B control checks that the detector can detect a difference. No labels or
+scores are used, and no LLM ability or forecast accuracy is inferred.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 from pathlib import Path
 
-from . import m1_actions
+from . import m1_actions, m1_contract
 from .contracts import FrozenForecastInput
 from .m1_actions import M1ActionKind, M1State
-from .m1_runtime import M1SourceSnapshot, ScriptedTransport, run_arm
+from .m1_runtime import (DeterministicClock, DeterministicForecastStub,
+                         M1SourceSnapshot, ScriptedTransport, run_arm)
 
 # the synthetic scenario harness is test-fixture data shared with the suite
 _FIXTURES = str(Path(__file__).resolve().parents[2] / "tests" / "fixtures"
@@ -28,13 +32,51 @@ if _FIXTURES not in sys.path:  # pragma: no cover - idempotent path setup
     sys.path.insert(0, _FIXTURES)
 import m1_scenario_harness as harness  # type: ignore
 
-VERDICT_SUFFICIENT = "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED"
+VERDICT_SUFFICIENT = "NO_COUNTEREXAMPLE_IN_TESTED_SCENARIOS"
 VERDICT_REFUTED = "REDUCIBILITY_REFUTED"
 VERDICT_INVALID = "REDUCER_NON_VACUITY_FAILED"
 
 
 def _base_input() -> FrozenForecastInput:
     return FrozenForecastInput(**harness.synthetic_base_input_payload())
+
+
+def _run_probe(arm, snapshot, **kwargs):
+    """An explicitly synthetic clock/tool; never a real historical replay."""
+    return run_arm(arm, snapshot, clock=DeterministicClock(snapshot["origin_unix"]),
+                   tool=DeterministicForecastStub(), **kwargs)
+
+
+def _three_mirror_counterexample() -> dict:
+    snapshot = harness.build_snapshot(
+        listing="TWO_REFS", new_outcome="COMPLETE_VALID",
+        relation="BEFORE_ORIGIN", body_relation="DUPLICATE_SAME_BODY")
+    filename = "SYNTHETIC_M1_PUBLIC_PREDISPATCHIS_202201032350_20220103235500.zip"
+    ref = harness.opaque_ref(filename)
+    events = [{key: value for key, value in event.items()
+               if key not in ("chain_seq", "prev_sha256", "event_sha256")}
+              for event in snapshot["events"]]
+    events.append({**events[-1], "ref": ref, "filename": filename,
+                   "receipt_complete_unix_ceil": snapshot["origin_unix"] - 100})
+    snapshot["events"] = harness._chain(events)
+    snapshot["listing"] = (*snapshot["listing"], {"ref": ref, "filename": filename})
+    snapshot["fetch_behaviours"] = dict(zip(
+        (entry["ref"] for entry in snapshot["listing"]),
+        ("TIMEOUT", "NOT_FOUND", "COMPLETE_VALID")))
+    snapshot["scenario"] = {"listing": "THREE_REFS",
+                            "body_relation": "DUPLICATE_SAME_BODY",
+                            "outcomes": ["TIMEOUT", "NOT_FOUND", "COMPLETE_VALID"],
+                            "relation": "BEFORE_ORIGIN"}
+    identity = {key: snapshot[key] for key in
+                ("origin_unix", "listing", "events", "fetch_behaviours")}
+    snapshot["snapshot_id"] = "snap_" + hashlib.sha256(json.dumps(
+        identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:16]
+    return snapshot
+
+
+def reduction_scenarios() -> list[dict]:
+    """The 193 historical cases plus one counterexample; not a global domain."""
+    return [*harness.scenario_space(), _three_mirror_counterexample()]
 
 
 def _metric(result) -> dict:
@@ -106,7 +148,7 @@ def _canonical_d_trace(snapshot_data: dict) -> tuple[tuple[str, str], ...]:
     transport = ScriptedTransport([
         _llm_response(harness.llm_valid_d_action_bytes(action, ref))
         for action, ref in trace])
-    result = run_arm("D", snapshot_data, base_input=_base_input(),
+    result = _run_probe("D", snapshot_data, base_input=_base_input(),
                      transport=transport)
     if result.verdict == "PUBLISHED_TYPED":
         return tuple(trace)
@@ -115,13 +157,13 @@ def _canonical_d_trace(snapshot_data: dict) -> tuple[tuple[str, str], ...]:
 
 def terminals_for_scenario(snapshot_data: dict) -> dict:
     """Terminal metrics for A, maximal B, maximal C and the canonical maximal D."""
-    a = _metric(run_arm("A", snapshot_data, base_input=_base_input()))
-    b = _metric(run_arm("B", snapshot_data, base_input=_base_input()))
-    c = _metric(run_arm("C", snapshot_data, base_input=_base_input(),
+    a = _metric(_run_probe("A", snapshot_data, base_input=_base_input()))
+    b = _metric(_run_probe("B", snapshot_data, base_input=_base_input()))
+    c = _metric(_run_probe("C", snapshot_data, base_input=_base_input(),
                         transport=ScriptedTransport([
                             _llm_response(harness.llm_valid_c_decision_bytes(
                                 "USE_TYPED", "NONE"))])))
-    d = _metric(run_arm("D", snapshot_data, base_input=_base_input(),
+    d = _metric(_run_probe("D", snapshot_data, base_input=_base_input(),
                         transport=ScriptedTransport([
                             _llm_response(harness.llm_valid_d_action_bytes(action, ref))
                             for action, ref in _canonical_d_trace(snapshot_data)])))
@@ -145,7 +187,7 @@ def _weak_b_metric(snapshot_data: dict) -> dict:
     transport = ScriptedTransport([
         _llm_response(harness.llm_valid_d_action_bytes(action, ref))
         for action, ref in trace])
-    return _metric(run_arm("D", snapshot_data, base_input=_base_input(),
+    return _metric(_run_probe("D", snapshot_data, base_input=_base_input(),
                            transport=transport))
 
 
@@ -161,7 +203,7 @@ def _c_llm_failure_metric(snapshot_data: dict, kind: str) -> dict:
             status={"REFUSAL": "REFUSED", "INCOMPLETE": "INCOMPLETE",
                     "TIMEOUT": "TIMEOUT"}[kind],
             model=m1_contract.LLM_MODEL, output_raw=b"")
-    return _metric(run_arm("C", snapshot_data, base_input=_base_input(),
+    return _metric(_run_probe("C", snapshot_data, base_input=_base_input(),
                            transport=ScriptedTransport([response])))
 
 
@@ -178,13 +220,13 @@ def _d_failure_metric(snapshot_data: dict, kind: str) -> dict:
     # failure injected at the second proposal, after one valid action
     transport = ScriptedTransport([
         _llm_response(harness.llm_valid_d_action_bytes(*trace[0])), response])
-    return _metric(run_arm("D", snapshot_data, base_input=_base_input(),
+    return _metric(_run_probe("D", snapshot_data, base_input=_base_input(),
                            transport=transport))
 
 
 def run_reducer(repo_root=None, scenarios=None) -> dict:
     """Execute the full label-free reducibility gate over the declared axes."""
-    scenario_list = scenarios if scenarios is not None else harness.scenario_space()
+    scenario_list = scenarios if scenarios is not None else reduction_scenarios()
     witnesses: list[dict] = []
     consistency_ok = True
     weak_b_diff_scenarios = 0
@@ -192,14 +234,14 @@ def run_reducer(repo_root=None, scenarios=None) -> dict:
     llm_failures_checked = 0
     for snapshot in scenario_list:
         label = snapshot["scenario"]
-        a = _metric(run_arm("A", snapshot, base_input=_base_input()))
-        b = _metric(run_arm("B", snapshot, base_input=_base_input()))
-        c_typed = _metric(run_arm("C", snapshot, base_input=_base_input(),
+        a = _metric(_run_probe("A", snapshot, base_input=_base_input()))
+        b = _metric(_run_probe("B", snapshot, base_input=_base_input()))
+        c_typed = _metric(_run_probe("C", snapshot, base_input=_base_input(),
                                   transport=ScriptedTransport([
                                       _llm_response(
                                           harness.llm_valid_c_decision_bytes(
                                               "USE_TYPED", "NONE"))])))
-        c_base = _metric(run_arm("C", snapshot, base_input=_base_input(),
+        c_base = _metric(_run_probe("C", snapshot, base_input=_base_input(),
                                  transport=ScriptedTransport([
                                      _llm_response(
                                          harness.llm_valid_c_decision_bytes(
@@ -215,7 +257,7 @@ def run_reducer(repo_root=None, scenarios=None) -> dict:
         useful_d_keys = set()
         for trace in d_legal_traces(snapshot):
             d_traces_enumerated += 1
-            result = run_arm("D", snapshot, base_input=_base_input(),
+            result = _run_probe("D", snapshot, base_input=_base_input(),
                              transport=ScriptedTransport([
                                  _llm_response(
                                      harness.llm_valid_d_action_bytes(action, ref))
@@ -257,7 +299,10 @@ def run_reducer(repo_root=None, scenarios=None) -> dict:
     else:
         verdict = VERDICT_INVALID
     return {
-        "contract": "m1.agent_contract.c2.v1",
+        "contract": m1_contract.CONTRACT_ID,
+        "scope": "bounded_synthetic_scenarios",
+        "global_sufficiency_proven": False,
+        "llm_advantage_demonstrated": False,
         "verdict": verdict,
         "uses_labels_or_scores": False,
         "scenarios_total": len(scenario_list),

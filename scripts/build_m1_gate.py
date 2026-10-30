@@ -30,7 +30,7 @@ def main() -> int:
     passed = re.search(r"^(\d+) passed", log_text, flags=re.M)
     reducer = json.loads(reducer_path.read_text())
     gate = m1_contract.map_gate({
-        "verdict": reducer["verdict"],
+        **reducer,
         "engineering_green": exit_code == 0,
     })
     gate.update({

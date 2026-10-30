@@ -12,12 +12,14 @@ import base64
 import hashlib
 import json
 import math
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Mapping, Optional
 
 from . import m1_actions, m1_asof, m1_budget, m1_contract, m1_digest, m1_llm
 from .contracts import FrozenForecastInput
+from .execution import call_with_deadline
 from .frozen_chronos import build_model_input
 from .m1_actions import M1ActionKind, M1State
 from .m1_asof import M1FetchRecord
@@ -305,6 +307,7 @@ class M1RunResult:
     canonical_model_input_json: str
     typed_input_object: Optional[FrozenForecastInput] = None
     identity: dict = field(default_factory=dict)
+    publication_durable: Optional[bool] = None
 
     @property
     def forecast_sha256(self) -> str:
@@ -476,6 +479,7 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
             repo_root: Optional[str | Path] = None,
             budget: Optional[BudgetLedger] = None) -> M1RunResult:
     """Execute one arm over the shared snapshot; every origin lands in a verdict."""
+    started = time.monotonic()
     if arm not in ("A", "B", "C", "D"):
         raise ValueError("arm must be one of A/B/C/D")
     repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
@@ -484,8 +488,9 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
     origin = snapshot.origin_unix
     deadline = origin + DEADLINE_OFFSET
     budget = budget if budget is not None else BudgetLedger()
-    the_clock = clock if clock is not None else DeterministicClock(start=origin,
-                                                                   step=1.0)
+    # Historical replay timestamps advance by actual elapsed execution time.
+    # Synthetic probes may explicitly inject DeterministicClock.
+    the_clock = clock if clock is not None else lambda: origin + time.monotonic() - started
     sink = ForecastSink(tool if tool is not None else DeterministicForecastStub())
     if arm in ("C", "D") and transport is None:
         raise ValueError(f"arm {arm} requires an LLM transport")
@@ -499,6 +504,10 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
     fetched: dict[str, M1FetchRecord] = {}
     llm_wire: list[dict] = []
 
+    def effect(callback, limit):
+        remaining = deadline - the_clock() - PUBLICATION_RESERVE
+        return call_with_deadline(callback, min(limit, remaining))
+
     def _fetch(ref: str) -> None:
         # reserve BEFORE the replay read; the per-body byte cap is checked per
         # single body (standalone), never accumulated across bodies
@@ -509,7 +518,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
         seq_total = budget.reserve(BudgetClass.SOURCE_BYTES_TOTAL, expected_size,
                                    f"body:{ref}")
         seq_call = budget.reserve(BudgetClass.SOURCE_REPLAY_CALLS, 1, f"fetch:{ref}")
-        behaviour, body = snapshot.fetch(ref)  # the effect, after every reserve
+        behaviour, body = effect(lambda: snapshot.fetch(ref),
+                                 m1_contract.HTTP_TIMEOUT_SECONDS)
         actual = len(body) if body is not None else 0
         budget.settle(seq_body, actual, f"body:{ref}")
         budget.settle(seq_total, actual, f"body:{ref}")
@@ -534,6 +544,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
         deadline_ok = the_clock() <= deadline
         if not deadline_ok and verdict != "SYSTEM_MISSING":
             verdict, reason = "SYSTEM_MISSING", "DEADLINE_MISSED"
+            forecast_bytes, canonical_json, input_hash = b"", "", ""
+            series_hash, typed_values, typed_input = None, None, None
         try:
             budget.verify_chain()
             budget_chain_ok = True
@@ -642,12 +654,14 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
                     canonical_json.encode()).hexdigest(),
             }
             try:
-                final = publish_run(publish_root, run_id, payloads,
-                                    identity=result.identity, closure=closure)
+                committed = publish_run(publish_root, run_id, payloads,
+                                        identity=result.identity, closure=closure,
+                                        clock=the_clock, return_commit=True)
             except Exception:  # noqa: BLE001 - publication failure fails closed
                 return _failed("EVIDENCE_PUBLICATION_FAILED")
             result.published = True
-            result.publish_dir = str(final)
+            result.publish_dir = str(committed.path)
+            result.publication_durable = committed.durable
         return result
 
     # ---- phase 0: the deadline gate --------------------------------------------
@@ -660,7 +674,9 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
     base_canonical = canonical_model_input_json(base_model_input)
     base_hash = model_input_sha256(base_model_input)
     try:
-        base_bytes = sink.forecast_once(base_model_input, phase="base", budget=budget)
+        base_bytes = effect(lambda: sink.forecast_once(
+            base_model_input, phase="base", budget=budget),
+            m1_contract.FORECAST_CALL_WALL_SECONDS)
     except m1_budget.BudgetRefused:
         return finish("SYSTEM_MISSING", "BUDGET_EXHAUSTED", forecast_bytes=b"",
                       canonical_json=base_canonical, input_hash=base_hash)
@@ -685,8 +701,9 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
         typed_model_input = build_model_input(typed_request)
         typed_hash = model_input_sha256(typed_model_input)
         try:
-            typed_bytes = sink.forecast_once(typed_model_input, phase="typed",
-                                             budget=budget)
+            typed_bytes = effect(lambda: sink.forecast_once(
+                typed_model_input, phase="typed", budget=budget),
+                m1_contract.FORECAST_CALL_WALL_SECONDS)
         except m1_budget.BudgetRefused:
             return base_terminal("BUDGET_OVERRUN" if budget.overrun_classes
                                  else "BUDGET_EXHAUSTED")
@@ -732,6 +749,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
                                      "rejected": "BUDGET_EXHAUSTED"})
                 return base_terminal("BUDGET_OVERRUN" if budget.overrun_classes
                                      else "BUDGET_EXHAUSTED")
+            except TimeoutError:
+                return base_terminal("HTTP_TIMEOUT")
             action_trace.append({"arm": arm, "action": "FETCH_REF", "ref": ref,
                                  "mode": "fixed_plan"})
         evidence, rejection_reason = _derive_or_none(origin, snapshot, fetched)
@@ -759,7 +778,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
             return base_terminal("BUDGET_OVERRUN" if budget.overrun_classes
                                  else "BUDGET_EXHAUSTED")
         try:
-            response = transport.generate("C", 1, request)
+            response = effect(lambda: transport.generate("C", 1, request),
+                              m1_contract.LLM_TIMEOUT_SECONDS)
         except Exception:  # noqa: BLE001 - any transport failure (timeout or
             # adapter-internal crash) yields no endpoint response within the
             # frozen per-call window: the frozen no-response bucket is
@@ -818,7 +838,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
             return base_terminal("BUDGET_OVERRUN" if budget.overrun_classes
                                  else "BUDGET_EXHAUSTED")
         try:
-            response = transport.generate("D", turn, request)
+            response = effect(lambda: transport.generate("D", turn, request),
+                              m1_contract.LLM_TIMEOUT_SECONDS)
         except Exception:  # noqa: BLE001 - any transport failure (timeout or
             # adapter-internal crash) yields no endpoint response within the
             # frozen per-call window: the frozen no-response bucket is
@@ -868,6 +889,8 @@ def run_arm(arm: str, snapshot_data: Mapping, *, base_input: FrozenForecastInput
                                      "rejected": "BUDGET_EXHAUSTED"})
                 return base_terminal("BUDGET_OVERRUN" if budget.overrun_classes
                                      else "BUDGET_EXHAUSTED")
+            except TimeoutError:
+                return base_terminal("HTTP_TIMEOUT")
         elif kind is M1ActionKind.FINALIZE_TYPED:
             if evidence is None:
                 return base_terminal(rejection_reason or "ACTION_PRECONDITION")

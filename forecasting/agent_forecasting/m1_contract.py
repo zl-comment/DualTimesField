@@ -24,18 +24,18 @@ from pathlib import Path
 CONTRACT_ID = "m1.agent_contract.c2.v1"
 CANDIDATE_ID = "predispatchis_absolute_totaldemand_future_v1"
 WITHDRAWAL_SEMANTICS = "NOT_APPLICABLE"
-CONFIG_PATH = "configs/agent_forecasting/m1_agent_contract_c2_20261029.json"
-PROTOCOL_DOC = "docs/research/agent_forecasting/m1_agent_contract_c2_20261029.txt"
+CONFIG_PATH = "configs/agent_forecasting/m1_agent_contract_c2_20261030_r9.json"
+PROTOCOL_DOC = "docs/research/agent_forecasting/m1_agent_contract_c2_20261030_r9.txt"
 PROMPT_DIRECTORY = "docs/research/agent_forecasting/m1_prompts"
 RENDERER_PATH = "forecasting/agent_forecasting/m1_digest.py"
 
 # run ancestry and frozen surface identity (audit-3/H1: every scalar config
 # field is contract identity; drift in ANY of them refuses the run)
-BRANCH = "research/agentic-m1-bounded-actions-c2-20261029-r5"
-BASE_BRANCH = "research/agentic-asof-abs-predispatch-c2-20261029-r4"
-BASE_SHA = "e458016386311b277e193ec5a35b94aad1436c92"
-RUN_PROVENANCE_COMMIT = "9feb95fd41ee43b37cbb08b1d9ae3ef8428412f1"
-EVIDENCE_ROOT = "logs/forecasting/m1_agent_contract_c2_20261029"
+BRANCH = "research/agent-repair-three-seed-20261030-r9"
+BASE_BRANCH = "research/agentic-m2m3-decision-only-c2-20261030-r8"
+BASE_SHA = "f62967c373d8ca210d39fd984a24b3831d957b44"
+RUN_PROVENANCE_COMMIT = "555190a3a54c468697f2bf427601e0b028a9feab"
+EVIDENCE_ROOT = "logs/forecasting/m1_agent_contract_c2_20261030_r9"
 EXECUTION_SCOPE = "m1_contract_enforcement_only"
 INTERPRETER_PATH = "/root/workspace/Code/DualTimesField/.venv/bin/python"
 CONFIG_STATUS = "frozen_m1_contract"
@@ -122,6 +122,7 @@ SOURCE_FILE_LIST = (
     "forecasting/agent_forecasting/m1_actions.py",
     "forecasting/agent_forecasting/m1_llm.py",
     "forecasting/agent_forecasting/m1_asof.py",
+    "forecasting/agent_forecasting/execution.py",
     "forecasting/agent_forecasting/m1_runtime.py",
     "forecasting/agent_forecasting/m1_publication.py",
     "forecasting/agent_forecasting/m1_reducer.py",
@@ -133,6 +134,7 @@ SOURCE_FILE_LIST = (
     "tests/fixtures/agent_forecasting/m1_scenario_harness.py",
     "tests/test_agent_m1_contract.py",
     "tests/test_agent_m1_reducer.py",
+    "tests/test_agent_m1_r9_contract_repairs.py",
 )
 
 M0_PINNED_FILES = (
@@ -154,6 +156,7 @@ PROMPT_ARTIFACTS = (
 # reducibility cross (all hashed from config; the config's own fields are
 # cross-checked against these constants below)
 EXECUTION_PINNED_FILES = (
+    "forecasting/agent_forecasting/execution.py",
     "forecasting/agent_forecasting/m1_contract.py",
     "forecasting/agent_forecasting/m1_actions.py",
     "forecasting/agent_forecasting/m1_asof.py",
@@ -640,10 +643,11 @@ def verify_run_entry(repo_root: str | Path,
 
 
 def map_gate(reducer_report: dict) -> dict:
-    """Map the executable reducer verdict to the scientific decision.
+    """Separate engineering acceptance from the limited reduction experiment.
 
-    Engineering greenness NEVER converts sufficiency into ADVANCE_M1: a sufficiency
-    verdict is a scientific STOP with metrics explicitly not evaluated.
+    A useful witness refutes this B/C policy's universal terminal coverage.  It
+    does not establish that an LLM can choose the witnessing actions, nor that
+    their forecasts improve.  Finite absence of witnesses is inconclusive.
     """
     verdict = reducer_report.get("verdict")
     gate = {
@@ -654,12 +658,20 @@ def map_gate(reducer_report: dict) -> dict:
         "metrics_status": "NOT_EVALUATED",
         "mission_goal_achieved": False,
         "advance_m1": False,
+        "global_sufficiency_proven": False,
+        "llm_advantage_demonstrated": False,
     }
-    if verdict == "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED":
-        gate.update({"scientific_decision": "STOP",
-                     "stop_token": verdict})
+    if verdict in ("FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
+                   "NO_COUNTEREXAMPLE_IN_TESTED_SCENARIOS"):
+        gate.update({"scientific_decision": "INCONCLUSIVE_REDUCIBILITY",
+                     "stop_token": None})
     elif verdict == "REDUCIBILITY_REFUTED":
-        gate.update({"scientific_decision": "PENDING_REVIEW",
+        useful = any(witness.get("useful", True)
+                     and witness.get("terminal", {}).get("verdict") == "PUBLISHED_TYPED"
+                     for witness in reducer_report.get("witnesses", []))
+        gate.update({"scientific_decision": (
+                         "ENGINEERING_PASS_REDUCIBILITY_REFUTED"
+                         if gate["engineering_green"] and useful else "BLOCKED"),
                      "stop_token": None})
     elif verdict == "REDUCER_NON_VACUITY_FAILED":
         gate.update({"scientific_decision": "BLOCKED",

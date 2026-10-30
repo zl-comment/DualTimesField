@@ -506,15 +506,14 @@ class DigestAndPromptTests(unittest.TestCase):
         self.assertEqual(set(payload),
                          {"model", "instructions", "input", "reasoning", "store",
                           "truncation", "parallel_tool_calls", "max_output_tokens",
-                          "response_schema"})
+                          "text"})
         self.assertEqual(payload["max_output_tokens"],
                          m1_contract.PER_CALL_OUTPUT_TOKENS["C"])
-        schema = payload["response_schema"]
-        self.assertEqual(schema["artifact"], "m1_c_decision_schema.json")
-        self.assertEqual(schema["sha256"],
-                         config["prompt_artifacts"]["sha256"][
-                             "m1_c_decision_schema.json"])
-        self.assertEqual(schema["sha256"],
+        output_format = payload["text"]["format"]
+        self.assertEqual(output_format, {
+            "type": "json_schema", "name": "m1_c_decision", "strict": True,
+            "schema": json.loads((directory / "m1_c_decision_schema.json").read_text())})
+        self.assertEqual(config["prompt_artifacts"]["sha256"]["m1_c_decision_schema.json"],
                          m1_contract.sha256_file(directory / "m1_c_decision_schema.json"))
 
     def test_parser_rejects_the_full_forbidden_zoo(self):
@@ -1304,12 +1303,12 @@ class TrustBoundaryTests(unittest.TestCase):
                              m1_contract.PER_CALL_OUTPUT_TOKENS[arm], msg=arm)
             schema_name = ("m1_c_decision_schema.json" if arm == "C"
                            else "m1_d_action_schema.json")
-            schema = request["response_schema"]
-            self.assertEqual(schema["artifact"], schema_name, msg=arm)
-            self.assertEqual(schema["sha256"],
-                             config["prompt_artifacts"]["sha256"][schema_name],
-                             msg=arm)
-            self.assertEqual(schema["sha256"],
+            output_format = request["text"]["format"]
+            self.assertEqual(output_format["schema"],
+                             json.loads((directory / schema_name).read_text()), msg=arm)
+            self.assertTrue(output_format["strict"])
+            self.assertEqual(output_format["type"], "json_schema")
+            self.assertEqual(config["prompt_artifacts"]["sha256"][schema_name],
                              m1_contract.sha256_file(directory / schema_name),
                              msg=arm)
 
@@ -1595,20 +1594,22 @@ class GateMappingTests(unittest.TestCase):
     def setUp(self):
         _require_m1()
 
-    def test_sufficiency_maps_to_stop_with_metrics_not_evaluated(self):
+    def test_finite_sufficiency_is_inconclusive_with_metrics_not_evaluated(self):
         gate = m1_contract.map_gate(
             {"verdict": "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED",
              "engineering_green": True})
-        self.assertEqual(gate["scientific_decision"], "STOP")
-        self.assertEqual(gate["stop_token"], "FIXED_RULES_SUFFICIENT_AGENT_NOT_NEEDED")
+        self.assertEqual(gate["scientific_decision"], "INCONCLUSIVE_REDUCIBILITY")
+        self.assertIsNone(gate["stop_token"])
         self.assertEqual(gate["metrics_status"], "NOT_EVALUATED")
         self.assertFalse(gate["advance_m1"])
         self.assertFalse(gate["mission_goal_achieved"])
 
-    def test_only_a_real_witness_blocks_stop(self):
+    def test_useful_witness_and_green_mean_engineering_acceptance_only(self):
         gate = m1_contract.map_gate({"verdict": "REDUCIBILITY_REFUTED",
+                                     "witnesses": [{"terminal": {"verdict": "PUBLISHED_TYPED"}}],
                                      "engineering_green": True})
-        self.assertEqual(gate["scientific_decision"], "PENDING_REVIEW")
+        self.assertEqual(gate["scientific_decision"],
+                         "ENGINEERING_PASS_REDUCIBILITY_REFUTED")
         gate = m1_contract.map_gate({"verdict": "REDUCER_NON_VACUITY_FAILED",
                                      "engineering_green": True})
         self.assertEqual(gate["scientific_decision"], "BLOCKED")

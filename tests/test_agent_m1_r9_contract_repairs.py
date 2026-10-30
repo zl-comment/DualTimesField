@@ -8,9 +8,13 @@ execution, budgets, typed derivation and reducer comparisons are not mocked.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
+import io
 import json
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -89,14 +93,17 @@ class ThreeMirrorReductionTests(unittest.TestCase):
         snapshot = three_mirror_snapshot()
         base = FrozenForecastInput(**harness.synthetic_base_input_payload())
         successful_ref = snapshot["listing"][2]["ref"]
-        b = m1_runtime.run_arm("B", snapshot, base_input=base)
+        b = m1_runtime.run_arm("B", snapshot, base_input=base,
+            clock=m1_runtime.DeterministicClock(harness.ORIGIN_UNIX))
         c = m1_runtime.run_arm("C", snapshot, base_input=base,
+            clock=m1_runtime.DeterministicClock(harness.ORIGIN_UNIX),
             transport=m1_runtime.ScriptedTransport([
                 response(harness.llm_valid_c_decision_bytes("USE_TYPED", "NONE"))]))
         trace = (("LIST", "NONE"), ("FETCH_REF", successful_ref),
                  ("FINALIZE_TYPED", "NONE"))
         self.assertIn(trace, m1_reducer.d_legal_traces(snapshot))
         d = m1_runtime.run_arm("D", snapshot, base_input=base,
+            clock=m1_runtime.DeterministicClock(harness.ORIGIN_UNIX),
             transport=m1_runtime.ScriptedTransport([
                 response(harness.llm_valid_d_action_bytes(*action)) for action in trace]))
         self.assertEqual(b.verdict, "PUBLISHED_BASE_FALLBACK")
@@ -129,6 +136,7 @@ class ScopedGateTests(unittest.TestCase):
         self.assertEqual(gate["scientific_decision"],
                          "ENGINEERING_PASS_REDUCIBILITY_REFUTED")
         self.assertFalse(gate["advance_m1"])
+
         self.assertFalse(gate["mission_goal_achieved"])
         self.assertEqual(gate["metrics_status"], "NOT_EVALUATED")
         self.assertFalse(gate.get("llm_advantage_demonstrated", True))
@@ -145,6 +153,36 @@ class ScopedGateTests(unittest.TestCase):
         self.assertEqual(gate["scientific_decision"], "INCONCLUSIVE_REDUCIBILITY")
         self.assertIsNone(gate["stop_token"])
         self.assertFalse(gate["advance_m1"])
+
+
+class GateArtifactIntegrationTests(unittest.TestCase):
+    def test_builder_and_verifier_preserve_the_useful_witness(self):
+        def load_script(name):
+            spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+
+        builder = load_script("build_m1_gate")
+        verifier = load_script("verify_m1_evidence")
+        report = {**ScopedGateTests.witness_report(True),
+                  "scenarios_total": 1, "d_traces_enumerated": 1,
+                  "llm_failures_checked": 0, "internal_consistency_ok": True,
+                  "non_vacuity_control": {"detected": True}, "uses_labels_or_scores": False}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "reducibility").mkdir()
+            source = root / "reducibility" / "reducer_report.json"
+            source.write_text(json.dumps(report))
+            suite = root / "suite.txt"
+            suite.write_text("7 passed\nEXIT_CODE=0\n")
+            gate_path = root / "gate.json"
+            with patch.object(sys, "argv", ["build_m1_gate.py", str(suite),
+                                             str(source), str(gate_path)]), redirect_stdout(io.StringIO()):
+                self.assertEqual(builder.main(), 0)
+            self.assertEqual(json.loads(gate_path.read_text())["scientific_decision"],
+                             "ENGINEERING_PASS_REDUCIBILITY_REFUTED")
+            self.assertEqual(verifier.check_gate_and_reducer(root, recompute=False), [])
 
 
 if __name__ == "__main__":

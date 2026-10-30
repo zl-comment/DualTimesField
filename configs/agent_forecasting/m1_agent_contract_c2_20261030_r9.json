@@ -1,0 +1,268 @@
+{
+  "advance_to_g1_g2": false,
+  "arm_leaf_whitelist_diffs": {
+    "B_minus_A": [
+      "policy",
+      "typed_pipeline"
+    ],
+    "C_minus_B": [
+      "llm_decision",
+      "policy"
+    ],
+    "D_minus_C": [
+      "llm_envelope_shape",
+      "policy"
+    ]
+  },
+  "arms": {
+    "A": [
+      "RUN_BASE_FORECAST",
+      "ATOMIC_PUBLISH_BASE"
+    ],
+    "B": [
+      "RUN_BASE_FORECAST",
+      "LIST",
+      "FETCH_CANONICAL_NEWEST_VISIBLE_1",
+      "FETCH_CANONICAL_NEWEST_VISIBLE_2_IF_PRESENT",
+      "DETERMINISTIC_VALIDATE_DERIVE_ATTACH",
+      "RUN_TYPED_FORECAST_IF_READY",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ],
+    "C": [
+      "RUN_BASE_FORECAST",
+      "BYTE_IDENTICAL_B_RETRIEVAL_VALIDATION",
+      "ONE_FROZEN_LLM_DECISION",
+      "RUN_TYPED_FORECAST_IF_READY_AND_SELECTED",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ],
+    "D": [
+      "RUN_BASE_FORECAST",
+      "UP_TO_FOUR_TYPED_ACTION_PROPOSALS",
+      "CONTROLLER_EXECUTES_ONLY_PRECONDITION_VALID_ACTIONS",
+      "RUN_TYPED_FORECAST_AT_MOST_ONCE",
+      "ATOMIC_PUBLISH_TYPED_ELSE_EXACT_BASE"
+    ]
+  },
+  "base_branch": "research/agentic-m2m3-decision-only-c2-20261030-r8",
+  "base_sha": "f62967c373d8ca210d39fd984a24b3831d957b44",
+  "branch": "research/agent-repair-three-seed-20261030-r9",
+  "budgets": {
+    "agent_action_proposals": 4,
+    "evidence_ledger_bytes": 2097152,
+    "evidence_llm_bytes": 524288,
+    "evidence_source_bytes": 16777216,
+    "evidence_total_bytes": 19398656,
+    "forecast_calls": 2,
+    "llm_cost_micro_usd": 60000,
+    "llm_generation_calls": 4,
+    "llm_input_token_count_requests": 4,
+    "llm_input_tokens": 16384,
+    "llm_output_tokens": 1024,
+    "local_deterministic_tool_calls": 8,
+    "logical_source_bytes_one_body": 8388608,
+    "logical_source_bytes_total": 16777216,
+    "logical_source_replay_calls": 3,
+    "retries": 0
+  },
+  "candidate_id": "predispatchis_absolute_totaldemand_future_v1",
+  "contract_id": "m1.agent_contract.c2.v1",
+  "deadline": {
+    "forecast_call_wall_seconds": 300,
+    "http_timeout_seconds": 15,
+    "local_tool_timeout_seconds": 30,
+    "publication_reserve_seconds": 30,
+    "success_publish_by_offset_seconds": 600,
+    "typed_forecast_reserve_seconds": 300,
+    "whole_process_max_seconds": 900
+  },
+  "digest_renderer": {
+    "path": "forecasting/agent_forecasting/m1_digest.py",
+    "sha256": "c70fd1a36e92b2ac2a787c6e83d132a4dec314b9ed40fb96d80b895dd4233f87"
+  },
+  "evidence_root": "logs/forecasting/m1_agent_contract_c2_20261030_r9",
+  "execution_modules": {
+    "files_sha256": {
+      "docs/research/agent_forecasting/m1_agent_contract_c2_20261030_r9.txt": "f4a642fb2a032b22ef0636e7fe92f678feadc60cea237e459bab245a43493fac",
+      "forecasting/agent_forecasting/execution.py": "dfca4d7ba7734691a7c2f02fecb8b235ad8fb40e2998b2e48742581a331d2947",
+      "forecasting/agent_forecasting/m1_actions.py": "95ad846bc58ae3adafcfcfb5c8b57b167675710fbda466ed79a6a8a421ba15ff",
+      "forecasting/agent_forecasting/m1_asof.py": "f5970a6a162625fe9af93298a195ea8aacb2ce38d7e7e4c41d8c5b8e4edae571",
+      "forecasting/agent_forecasting/m1_budget.py": "af15e49720cecd3e9dcfe8c34ba5dc137a50e2883d1d67d859a06f1e8865f5af",
+      "forecasting/agent_forecasting/m1_contract.py": "ed6ab02335fd1ec856146e48e4844dbe1aa6b09369a5471ac3dc116ce24860e6",
+      "forecasting/agent_forecasting/m1_llm.py": "540cbcb1546f854e0d4371bab74355ecde6b7d4562310251e0b52976c514ac8f",
+      "forecasting/agent_forecasting/m1_publication.py": "34f0fc1241f877179720b9b0ffa724d2aa37047e368f4d49b209df0c4e892e56",
+      "forecasting/agent_forecasting/m1_reducer.py": "f4fd6c3c06a7aad38d8666350b1bc708749afe314b0125476ca193a982759704",
+      "forecasting/agent_forecasting/m1_runtime.py": "7a357512e25a44c13af48a1cdb32525528b61869828c72f962fbc9041bb2881f",
+      "scripts/build_m1_gate.py": "39b643c5c1ee773da5abe5c36c885d89bac12839de6fa948023dd42e4ed905ee",
+      "scripts/build_m1_manifest.py": "bf40a2fec33a16b4dde5ecb9958bcacad082380e1164a25d297c3fe0236f1dc4",
+      "scripts/run_logged_m1.sh": "8c1e0111d3b3561b836acfe7d061126494b86fdd7b0b6469a14751c80db110b5",
+      "scripts/run_m1_reducer.py": "cbbb5c2db92ee46b687ff53b744e4d95e2722b1491d93ec0bd42e09a3099f7b9",
+      "scripts/verify_m1_evidence.py": "2f76d77819a5ab9978292a0af22b2a4f40debcdcb6719c6dab049319a38a38ca",
+      "tests/fixtures/agent_forecasting/m1_scenario_harness.py": "0782092451dcea079af48e4a2e8cfb20da5f071a53b78b2cccebc021913750e1"
+    }
+  },
+  "execution_scope": "m1_contract_enforcement_only",
+  "forecast_tool": {
+    "binding": "identity-only; the frozen Chronos-2 CPU path from M0 is pinned via frozen_base checkpoint/packages and is NOT executed in M1 probes",
+    "calls_max": 2,
+    "output_rule": "published bytes are the frozen tool bytes; no clip/sort/calibration/edit",
+    "unique_input_only": true
+  },
+  "frozen_base": {
+    "checkpoint": {
+      "config_json_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "model_safetensors_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c"
+    },
+    "files_sha256": {
+      "configs/agent_forecasting/m0_predispatch_td_abs_c2_20261029.json": "3619dfbb8dfc6fc765ebfb61682933f0fa4469fb8e22c8fb648e76210d4a676e",
+      "docs/research/agent_forecasting/m0_predispatch_td_abs_protocol_20261029.txt": "e776e258726e1a92803a0dfe32101da299e8e07758a6556a0b4a8fd3cb1d5121",
+      "forecasting/agent_forecasting/contracts.py": "3b0a6975b799ead83f1f5ab12ef0c7341eb3056a492f974169d96c703503ef3d",
+      "forecasting/agent_forecasting/frozen_chronos.py": "c49ae8c42941a2e568e5d40daf6a2de8b2a21483cdda271e0d71daf23364e522",
+      "forecasting/agent_forecasting/predispatch_td_abs.py": "0f82c92e32a591e08b0bb3c45443c8bc27030feac743d1bb065511ad7d380808"
+    },
+    "header_line_sha256": "2f013ba453d6ef05959d74895fa6db6f9cd2522b6c0f7d4356af09fadaaa529a",
+    "packages": {
+      "chronos-forecasting": "2.3.2",
+      "numpy": "2.4.6",
+      "psutil": "7.2.2",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.20.2"
+    }
+  },
+  "interpreter": "/root/workspace/Code/DualTimesField/.venv/bin/python",
+  "llm": {
+    "endpoint": "POST https://api.openai.com/v1/responses",
+    "input_token_endpoint": "POST https://api.openai.com/v1/responses/input_tokens",
+    "model": "gpt-5.4-2026-03-05",
+    "parallel_tool_calls": false,
+    "provider": "OpenAI",
+    "raw_output_cap_bytes": 4096,
+    "reasoning": {
+      "effort": "none"
+    },
+    "response_model_must_equal": "gpt-5.4-2026-03-05",
+    "retries": 0,
+    "sampling_note": "No seed or determinism claim; unspecified sampling controls are not synthesized; raw request/response bytes and provider usage are the evidence.",
+    "store": false,
+    "timeout_seconds_each": 30,
+    "truncation": "disabled"
+  },
+  "llm_cost": {
+    "accounting_unit": "integer micro_usd",
+    "hard_cap_usd": 0.06,
+    "rate_input_usd_per_million": 2.5,
+    "rate_output_usd_per_million": 15.0,
+    "worst_case_usd_at_token_caps": 0.05632
+  },
+  "llm_envelopes": {
+    "C": {
+      "generation_calls": 1,
+      "input_tokens_max": 16384,
+      "output_tokens_max": 1024
+    },
+    "D": {
+      "generation_calls_max": 4,
+      "input_tokens_max_per_call": 4096,
+      "output_tokens_max_per_call": 256
+    },
+    "input_token_count_requests_max": 4,
+    "shared_generation_calls_max": 4,
+    "shared_input_tokens_max": 16384,
+    "shared_output_tokens_max": 1024
+  },
+  "metrics_status": "NOT_EVALUATED",
+  "prompt_artifacts": {
+    "directory": "docs/research/agent_forecasting/m1_prompts",
+    "sha256": {
+      "m1_c_decision_schema.json": "caf59c8837aa7e453a306f10eefacd3efe19871a4de0efe99eac500535a2fd7e",
+      "m1_c_prompt_template.txt": "5c2f48af93d24212462c8df35b87ff2d88b5b8ca5f5c9f2e013a0527e65bdaaa",
+      "m1_common_system_prompt.txt": "72196794c218643c3026b8b1d0e95f5e6acc943bd8ed4a96a228363cf5e0dd93",
+      "m1_d_action_schema.json": "1995e22f7f15ef7a3df4644e3a78fbcd3610427607c004388024cea0ecc150a6",
+      "m1_d_prompt_template.txt": "6bbb7a1651005f979e2e2801edc9bf40023073ea1f9f67c3da27d413b1f1f2a2"
+    }
+  },
+  "protocol_doc": "docs/research/agent_forecasting/m1_agent_contract_c2_20261030_r9.txt",
+  "reason_codes": [
+    "ACTION_PRECONDITION",
+    "AGENT_ABSTAIN",
+    "BODY_HASH_MISMATCH",
+    "BUDGET_EXHAUSTED",
+    "BUDGET_OVERRUN",
+    "CLOCK_UNHEALTHY",
+    "CONTRACT_IDENTITY_DRIFT",
+    "DEADLINE_MISSED",
+    "EVIDENCE_PUBLICATION_FAILED",
+    "FORECAST_TOOL_FAILURE",
+    "FORK",
+    "HTTP_STATUS",
+    "HTTP_TIMEOUT",
+    "INCOMPLETE_NEWEST_VINTAGE",
+    "LLM_INCOMPLETE",
+    "LLM_MALFORMED",
+    "LLM_REFUSAL",
+    "LLM_TIMEOUT",
+    "NO_VISIBLE_RECEIPT",
+    "RECEIPT_AFTER_ORIGIN",
+    "SCHEMA_DRIFT"
+  ],
+  "run_hard_stop_reasons": [
+    "CONTRACT_IDENTITY_DRIFT",
+    "LABEL_OR_SCORE_ACCESS",
+    "FORBIDDEN_SOURCE_TOOL_ACTION",
+    "SOURCE_TERMS_CHANGE"
+  ],
+  "run_provenance_commit": "555190a3a54c468697f2bf427601e0b028a9feab",
+  "source_contract": {
+    "csv_interface": "PREDISPATCH,REGION_SOLUTION,9",
+    "field": "TOTALDEMAND",
+    "header_field_count": 131,
+    "hour_mapping": "hour h is the mean of half-hour ends origin+(2h+1)*1800 and origin+(2h+2)*1800",
+    "intervention": 0,
+    "non_clocks": [
+      "filename timestamp",
+      "HTTP Date",
+      "HTTP Last-Modified",
+      "LASTCHANGED",
+      "directory order"
+    ],
+    "official_table": "PREDISPATCHREGIONSUM",
+    "region": "NSW1",
+    "unit": "MW",
+    "url": "https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/",
+    "vintage_key": [
+      "PREDISPATCHSEQNO",
+      "RUNNO"
+    ],
+    "visibility_rule": "receipt_complete_unix_ceil <= origin_unix",
+    "withdrawal_semantics": "NOT_APPLICABLE"
+  },
+  "source_files": [
+    "configs/agent_forecasting/m1_agent_contract_c2_20261030_r9.json",
+    "docs/research/agent_forecasting/m1_agent_contract_c2_20261030_r9.txt",
+    "docs/research/agent_forecasting/m1_prompts/m1_common_system_prompt.txt",
+    "docs/research/agent_forecasting/m1_prompts/m1_c_prompt_template.txt",
+    "docs/research/agent_forecasting/m1_prompts/m1_d_prompt_template.txt",
+    "docs/research/agent_forecasting/m1_prompts/m1_c_decision_schema.json",
+    "docs/research/agent_forecasting/m1_prompts/m1_d_action_schema.json",
+    "forecasting/agent_forecasting/m1_contract.py",
+    "forecasting/agent_forecasting/m1_digest.py",
+    "forecasting/agent_forecasting/m1_budget.py",
+    "forecasting/agent_forecasting/m1_actions.py",
+    "forecasting/agent_forecasting/m1_llm.py",
+    "forecasting/agent_forecasting/m1_asof.py",
+    "forecasting/agent_forecasting/execution.py",
+    "forecasting/agent_forecasting/m1_runtime.py",
+    "forecasting/agent_forecasting/m1_publication.py",
+    "forecasting/agent_forecasting/m1_reducer.py",
+    "scripts/run_logged_m1.sh",
+    "scripts/run_m1_reducer.py",
+    "scripts/build_m1_gate.py",
+    "scripts/build_m1_manifest.py",
+    "scripts/verify_m1_evidence.py",
+    "tests/fixtures/agent_forecasting/m1_scenario_harness.py",
+    "tests/test_agent_m1_contract.py",
+    "tests/test_agent_m1_reducer.py",
+    "tests/test_agent_m1_r9_contract_repairs.py"
+  ],
+  "status": "frozen_m1_contract"
+}

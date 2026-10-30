@@ -6,11 +6,10 @@ publisher: verifies the SEMANTIC closure (budget chain/fold/caps, deadline,
 as-of origin, input/tool identity) BEFORE writing anything; takes an exclusive
 per-run lock and refuses a committed identity; creates a same-filesystem O_EXCL
 staging directory; writes every payload and fsyncs it; generates a per-payload
-SHA-256/size manifest; re-verifies everything on disk; atomically renames
-staging to the final directory; and finally renames COMMIT.json.tmp ->
-COMMIT.json as the LAST evidence-root write.  Any crash before that point
-removes its own staging directory and lock and leaves no success.  Failure
-records use a separate O_EXCL directory.
+SHA-256/size manifest; re-verifies everything on disk; writes COMMIT.json in
+staging; then atomically renames the complete directory. Post-commit durability
+or lock-cleanup errors cannot turn an already visible commit into a failure.
+Failure records use a separate O_EXCL directory.
 """
 from __future__ import annotations
 
@@ -24,6 +23,7 @@ from pathlib import Path
 from typing import Mapping
 
 from . import m1_budget, m1_contract
+from .execution import DirectoryCommit, call_with_deadline, publish_directory
 
 _RUN_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 _HEX64_RE = re.compile(r"[0-9a-f]{64}\Z")
@@ -198,8 +198,12 @@ def _verify_publication_identities(closure: Mapping,
 
 
 def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
-                identity: Mapping, closure: Mapping) -> Path:
-    """Atomically publish one run; returns the immutable final directory."""
+                identity: Mapping, closure: Mapping, clock=None,
+                return_commit: bool = False) -> Path | DirectoryCommit:
+    """Publish once; optionally expose post-commit durability without retrying."""
+    started = time.monotonic()
+    if clock is None:
+        clock = lambda: closure["clock_final"] + time.monotonic() - started
     root = Path(root)
     if not _RUN_ID_RE.fullmatch(run_id or ""):
         raise PublicationError(f"run id {run_id!r} is not a bounded identifier")
@@ -225,52 +229,54 @@ def publish_run(root: Path | str, run_id: str, payloads: Mapping[str, bytes], *,
     lock = locks / f"{run_id}.lock"
     lock_handle = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
     staging: Path | None = None
+    committed: DirectoryCommit | None = None
     try:
         staging = staging_root / f"{run_id}.{os.getpid()}.{time.time_ns():x}"
         staging.mkdir(parents=True, exist_ok=False)
-        manifest_payloads = {}
-        for name, payload in sorted(payloads.items()):
-            target = staging / name
-            _write_exclusive(target, payload)
-            manifest_payloads[name] = {"sha256": _sha256_bytes(payload),
-                                       "size_bytes": len(payload)}
-        manifest = {"run_id": run_id, "identity": dict(identity),
-                    "payloads": manifest_payloads, **semantic}
-        _write_exclusive(staging / "manifest.json",
-                         json.dumps(manifest, sort_keys=True,
-                                    separators=(",", ":")).encode())
-        _fsync_dir(staging)
-        # re-verify every byte on disk against the manifest before promotion
-        for name, record in manifest_payloads.items():
-            on_disk = (staging / name).read_bytes()
-            if (len(on_disk) != record["size_bytes"]
-                    or _sha256_bytes(on_disk) != record["sha256"]):
-                raise PublicationError(f"staged payload {name} failed reverification")
-        os.rename(staging, final)
-        _fsync_dir(runs)
-        commit = {"run_id": run_id,
-                  "manifest_sha256": _sha256_bytes(
-                      (final / "manifest.json").read_bytes()),
-                  "committed_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
-                                                 time.gmtime())}
-        _write_exclusive(final / "COMMIT.json.tmp",
-                         json.dumps(commit, sort_keys=True,
-                                    separators=(",", ":")).encode())
-        os.rename(final / "COMMIT.json.tmp", final / "COMMIT.json")
-        _fsync_dir(final)
-        _fsync_dir(runs)
-        return final
+
+        def prepare():
+            manifest_payloads = {}
+            for name, payload in sorted(payloads.items()):
+                _write_exclusive(staging / name, payload)
+                manifest_payloads[name] = {"sha256": _sha256_bytes(payload),
+                                           "size_bytes": len(payload)}
+            manifest = {"run_id": run_id, "identity": dict(identity),
+                        "payloads": manifest_payloads, **semantic}
+            manifest_bytes = json.dumps(manifest, sort_keys=True,
+                                        separators=(",", ":")).encode()
+            _write_exclusive(staging / "manifest.json", manifest_bytes)
+            for name, record in manifest_payloads.items():
+                on_disk = (staging / name).read_bytes()
+                if (len(on_disk) != record["size_bytes"]
+                        or _sha256_bytes(on_disk) != record["sha256"]):
+                    raise PublicationError(f"staged payload {name} failed reverification")
+            commit = {"run_id": run_id,
+                      "manifest_sha256": _sha256_bytes(manifest_bytes),
+                      "committed_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                                     time.gmtime())}
+            _write_exclusive(staging / "COMMIT.json", json.dumps(
+                commit, sort_keys=True, separators=(",", ":")).encode())
+
+        call_with_deadline(prepare, closure["deadline_unix"] - clock())
+        committed = publish_directory(staging, final,
+                                      deadline=closure["deadline_unix"], clock=clock)
     except BaseException:
         # a crash anywhere inside the publisher removes its own staging tree
         if staging is not None and staging.exists():
             shutil.rmtree(staging, ignore_errors=True)
         raise
     finally:
-        os.close(lock_handle)
         try:
-            os.unlink(lock)
-        except FileNotFoundError:
-            pass
+            os.close(lock_handle)
+            try:
+                os.unlink(lock)
+            except FileNotFoundError:
+                pass
+        except BaseException:
+            if committed is None:
+                raise
+            committed = DirectoryCommit(final, False)
+    return committed if return_commit else committed.path
 
 
 def verify_run_closure(final_dir: Path | str) -> dict:

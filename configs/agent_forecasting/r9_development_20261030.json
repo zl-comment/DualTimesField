@@ -1,0 +1,43 @@
+{
+  "branch": "research/agent-repair-three-seed-20261030-r9",
+  "base_commit": "f62967c373d8ca210d39fd984a24b3831d957b44",
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "origins_per_region": 53,
+  "data_root": "/root/workspace/Code/DualTimesField/data/holdout",
+  "data_sha256": {
+    "NSW1": "bb11dfb7d33af1996fca13359f90d0231c4968f24a0e4b57dcb0560ffe50befb",
+    "QLD1": "66d4ada0d3fbb39d354e31762308633f8d0d1a623e6834317432148e75a5a96a",
+    "TAS1": "3e6a53a489c780251ae837896509b6c1e3a7b5f0a8915e3d45b685db878bf491"
+  },
+  "checkpoint": {
+    "config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+    "directory": "/root/workspace/Code/DualTimesField/weights/hf_home/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "weights_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+  },
+  "cpu_threads": 2,
+  "base_deadline_seconds": 600,
+  "decision_deadline_seconds": 450,
+  "publication_deadline_seconds": 30,
+  "output_root": "outputs/forecasting/agent_repair_three_seed_r9_20261030",
+  "source_files": [
+    "forecasting/agentic_dev_eval/r9.py",
+    "forecasting/agentic_dev_eval/arms.py",
+    "forecasting/agentic_dev_eval/data.py",
+    "forecasting/agentic_dev_eval/protocol.py",
+    "forecasting/agentic_dev_eval/metrics.py",
+    "forecasting/agentic_dev_eval/llm_transport.py",
+    "forecasting/agent_forecasting/execution.py",
+    "configs/agent_forecasting/r9_development_20261030.json",
+    "docs/research/agent_forecasting/r9_repair_and_three_seed_protocol_20261030.txt",
+    "scripts/run_r9_three_seed.py"
+  ]
+}

@@ -170,7 +170,7 @@ def build_request_bytes(arm: str, digest: str, repo_root: str | Path) -> bytes:
         raise ValueError(f"frozen {arm} template lost its digest placeholder")
     schema_name = ("m1_c_decision_schema.json" if arm == "C"
                    else "m1_d_action_schema.json")
-    schema_digest = m1_contract.sha256_file(directory / schema_name)
+    schema = json.loads((directory / schema_name).read_text())
     user_message = template.replace(placeholder, digest)
     request = {
         "model": m1_contract.LLM_MODEL,
@@ -181,11 +181,12 @@ def build_request_bytes(arm: str, digest: str, repo_root: str | Path) -> bytes:
         "truncation": m1_contract.LLM_TRUNCATION,
         "parallel_tool_calls": m1_contract.LLM_PARALLEL_TOOL_CALLS,
         "max_output_tokens": m1_contract.PER_CALL_OUTPUT_TOKENS[arm],
-        "response_schema": {
-            "function": (C_FUNCTION_NAME if arm == "C" else D_FUNCTION_NAME),
-            "artifact": schema_name,
-            "sha256": schema_digest,
-        },
+        "text": {"format": {
+            "type": "json_schema",
+            "name": (C_FUNCTION_NAME if arm == "C" else D_FUNCTION_NAME),
+            "strict": True,
+            "schema": schema,
+        }},
     }
     return json.dumps(request, sort_keys=True, separators=(",", ":"),
                       ensure_ascii=True).encode()
