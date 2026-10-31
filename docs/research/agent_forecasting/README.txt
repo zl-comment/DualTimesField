@@ -5,6 +5,10 @@ Agent 电价预测研究资料库
 持续查阅论文、已核实的开源框架和本项目的设计边界。本文档不是实验成功声明。
 
 最新计划（2026-10-31，Asia/Shanghai）
+r12_totaldemand_information_protocol_20261031.txt：用户已确认代理特征，2023三地区S1 A/B实施协议。
+当前分支research/agent-totaldemand-information-20261031-r12，基点9b4bc64；34项关键测试通过，冻结前独立审查通过。
+S1只运行数值seed2026；2024三地区三seed Agent实验仍以S1/S2通过为条件。
+
 historical_replay_protocol_20261031_r11.txt：用户确认历史回溯后提出的R11方案，2023信息筛选、2024 Agent历史评价。
 分支research/agent-historical-replay-20261031-r11以a568f7a为基点；原R10结论不改。
 已实现72/25/24小时历史输入、原生分位评分和S1配对评价；24项关键合成测试通过，记录在logs/forecasting/r11_*tests*。

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_totaldemand_information.py",
+    "tests/test_historical_replay.py",
+    "tests/test_historical_comparison.py",
+    "tests/test_totaldemand_proxy.py",
+    "tests/test_totaldemand_information_runner.py"
+  ],
+  "observed_exit_code": 0,
+  "observed_stdout": ".................................. [100%]\n34 passed in 3.33s\n",
+  "recording_basis": "Observed exec output before freezing; no inference or real scores in tests",
+  "source_sha256": {
+    "scripts/run_totaldemand_information.py": "7718ad6323490f6a25d052d83e0450a598bd28893eb0cd1218eff1519954d485",
+    "forecasting/agent_forecasting/totaldemand_proxy.py": "20e1f99f07396012013e5abc9704c8ff8527510aba2488789434adcb05fe06bb",
+    "tests/test_totaldemand_proxy.py": "44e1376427eee9b199cfee2a0cc5c80d32751366f68c769715ddfd12862c1d35",
+    "tests/test_totaldemand_information_runner.py": "fd221dfda9e0f526e101a5a3bd40f48b0be87e90062e206566b2b315c9e54e5c"
+  }
+}

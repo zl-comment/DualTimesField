@@ -1,0 +1,76 @@
+{
+  "branch": "research/agent-totaldemand-information-20261031-r12",
+  "base_commit": "9b4bc64f6ae4fc4c3d6e6f42ab74aa1ee533b91a",
+  "candidate_id": "aemo_totaldemand_hourly_proxy_future_v2",
+  "authorization": "User explicitly selected approved proxy feature historical exploration on 2026-10-31",
+  "first_date": "2023-01-01",
+  "last_date": "2023-12-31",
+  "history_first_date": "2022-12-28",
+  "label_end_exclusive": "2024-01-01",
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "seed": 2026,
+  "downstream_agent_seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "data_root": "/root/workspace/Code/DualTimesField/data/holdout",
+  "data_sha256": {
+    "NSW1": "bb11dfb7d33af1996fca13359f90d0231c4968f24a0e4b57dcb0560ffe50befb",
+    "QLD1": "66d4ada0d3fbb39d354e31762308633f8d0d1a623e6834317432148e75a5a96a",
+    "TAS1": "3e6a53a489c780251ae837896509b6c1e3a7b5f0a8915e3d45b685db878bf491"
+  },
+  "checkpoint": {
+    "config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+    "directory": "/root/workspace/Code/DualTimesField/weights/hf_home/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "weights_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+  },
+  "coverage_file": "logs/forecasting/agent_historical_source_r11_20261031/coverage_2023.csv",
+  "coverage_sha256": "7b64a8bdc2dd8be8f86e527cadd759c45d48fea25e2b6e959474caad53af410b",
+  "source_manifest": "logs/forecasting/agent_historical_source_r11_20261031/source_manifest.json",
+  "months": [
+    "202212",
+    "202301",
+    "202302",
+    "202303",
+    "202304",
+    "202305",
+    "202306",
+    "202307",
+    "202308",
+    "202309",
+    "202310",
+    "202311",
+    "202312"
+  ],
+  "cpu_threads": 2,
+  "origins_per_batch": 16,
+  "series_batch_size": 176,
+  "resources": {
+    "prepare_wall_seconds": 900,
+    "prediction_wall_seconds": 21600,
+    "score_wall_seconds": 300,
+    "max_unit_attempts": 2190,
+    "training": 0,
+    "gpu": 0,
+    "llm_calls": 0,
+    "downloads": 0
+  },
+  "output_root": "outputs/forecasting/agent_totaldemand_information_r12_20261031",
+  "archive_root": "logs/forecasting/agent_totaldemand_information_r12_20261031",
+  "source_files": [
+    "scripts/run_totaldemand_information.py",
+    "forecasting/agent_forecasting/totaldemand_proxy.py",
+    "forecasting/agent_forecasting/totaldemand_information.py",
+    "forecasting/agent_forecasting/historical_replay.py",
+    "forecasting/agent_forecasting/historical_comparison.py",
+    "forecasting/agentic_dev_eval/data.py",
+    "forecasting/agentic_dev_eval/protocol.py",
+    "configs/agent_forecasting/r12_totaldemand_information_20261031.json",
+    "docs/research/agent_forecasting/r12_totaldemand_information_protocol_20261031.txt"
+  ]
+}
