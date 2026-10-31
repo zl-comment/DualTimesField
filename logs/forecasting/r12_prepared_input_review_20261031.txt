@@ -1,0 +1,41 @@
+R12 S1真实准备输入独立复核
+复核日期UTC：2026-10-31T13:37:58.090402+00:00
+结论：PASS；全部检查成功。
+执行源码commit：f5a9541138bcc6f69269c552635ae9f87158b1fe
+
+范围：只读取prepared.json、inputs目录四份JSON、既有R11 coverage_2023.csv及九份冻结源码/配置的Git对象和当前文件。
+没有打开labels目录中的任何文件，包括没有为复核读取其字节计算hash；没有打开预测/评分产物，没有网络、模型调用或原始ZIP重扫。
+获准读取的历史价格只用于形状及finite检查，未计算误差或价格统计。仅新增本review文件。
+
+一、固定网格与输入
+日期轴精确为2023-01-01..2023-12-31的365个连续AEST日期，三区各365条，共1095个唯一region-origin输入，无缺失或额外日期。
+72条历史时间逐值为O+[-73..-2]小时；25个模型目标逐值为O+[-1..23]小时；24个评价目标逐值为O+[0..23]小时。
+cutoff均为O−600秒；model_start均为O−3600秒；输入记录不含actual/labels/future_price/target_values字段。
+每条history_prices/history_demand形状(72,)，history_calendar形状(72,9)，future_calendar形状(25,9)，全部finite。
+history_available_max_unix均为O−3600秒，距cutoff均3000秒；本次核对保存的最大可用时间字段，没有重新读取每一行原始历史可用时间。
+日历用标准库datetime固定UTC+10、实际年天数、math.sin/cos独立重建；预设容差2e-15，最大绝对差8.8817841970012523e-16。
+
+二、完整代理与版本
+proxies精确包含全部1095个预定region-origin键，无None；source_complete矩阵形状(365,3)，布尔值全部True。
+每条50个半小时末端逐值为O−30min至O+24h；25个小时起点逐值对应模型目标O−1h至O+23h。
+对每个相邻半小时数值用独立标量(a+b)/2重算，共27375个小时均值全部逐值相同，maxabsdiff=0.0。
+SEQNO独立解码schedule_label；全部SEQNO/RUNNO/label/LASTCHANGED最大值与既有R11覆盖记录一致。
+全部50槽LASTCHANGED<=cutoff；其最大值等于保存lastchanged_max；PERIODID与label+(PERIODID−1)×1800秒逐槽一致。
+cutoff−schedule_label范围1200..1200秒；cutoff−各槽LASTCHANGED范围2803..2904秒。
+保存的duplicate_rows合计0；没有在本次复核重新裁定底层重复行。
+每条代理保留archive_proxy、strict_asof_verified=false及获批小时代理映射名称；不把同通道近似改称严格物理量等价。
+
+三、冻结身份与文件hash
+九份source_sha256同时匹配执行commit Git blob和当前文件。
+四份inputs文件的SHA256全部匹配prepared.files；labels三份文件按本任务权限未打开，其hash未重新验证。
+prepared.json SHA256：baa8931d898bdcfcdd9fb0ef178c26dc6debe6b37145e0010f182ad7ed3c07ba
+R11 coverage_2023.csv SHA256：7b64a8bdc2dd8be8f86e527cadd759c45d48fea25e2b6e959474caad53af410b
+inputs/NSW1.json 53792f7fbae17abb865041cc5d0f0b69a6604782f8c3f3918a7f361c9d2a3609
+inputs/QLD1.json 2538a549a93b260a19bc90391364244e2febd81bec3ecc3039eff53c2c59aec2
+inputs/TAS1.json 42249eb4af1a17318e84b4adcd6a8f528530d005c155b477ace8d8dd8efeea71
+inputs/proxies.json 19994cf5b3cc4db33d1c231657a90c9ffec542198f55dfbc0a2bdd11b108cace
+
+四、解释限制
+这次PASS确认已保存准备输入内部对齐、数值有效性、已审计版本映射和输入文件身份；不代表价格标签质量、预测成功、准确率、信息增益或Agent效果通过。
+历史公开时点仍为archive_proxy，未验证first_seen或历史PRICE_AND_DEMAND与PREDISPATCH定义严格等价。
+原prepared摘要报告prepare wall 97.484798189s、CPU user 97.953715s/system 2.091780s、peak RSS 635031552 bytes，model_calls=0、price_scores=0；本复核没有重测原准备进程。

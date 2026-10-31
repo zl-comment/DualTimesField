@@ -1,0 +1,76 @@
+{
+  "execution_commit": "f5a9541138bcc6f69269c552635ae9f87158b1fe",
+  "host": "k8s-worker1",
+  "experiment": {
+    "wrapper_wall_seconds": 1444.5201173014939,
+    "total_reported_cpu_seconds": 2750.753636,
+    "maximum_peak_rss_bytes": 1406738432,
+    "stages": {
+      "prepare": {
+        "function_resources": {
+          "wall_seconds": 97.48479818925261,
+          "cpu_user_seconds": 97.953715,
+          "cpu_system_seconds": 2.09178,
+          "peak_rss_bytes": 635031552
+        },
+        "process_wall_seconds": 100.56525265425444,
+        "exit_code": 0
+      },
+      "predict": {
+        "function_resources": {
+          "wall_seconds": 1330.8920241706073,
+          "cpu_user_seconds": 2586.921636,
+          "cpu_system_seconds": 55.333848,
+          "peak_rss_bytes": 1406738432
+        },
+        "process_wall_seconds": 1334.6015778705478,
+        "exit_code": 0
+      },
+      "score": {
+        "function_resources": {
+          "wall_seconds": 5.72781690582633,
+          "cpu_user_seconds": 7.764604,
+          "cpu_system_seconds": 0.6880529999999999,
+          "peak_rss_bytes": 454983680
+        },
+        "process_wall_seconds": 9.35184084624052,
+        "exit_code": 0
+      }
+    }
+  },
+  "independent_result_review": {
+    "process_wall_seconds": 1.891869693994522,
+    "exit_code": 0,
+    "wall_seconds": 1.713061198592186,
+    "cpu_seconds": 4.3566823160000006,
+    "peak_rss_bytes": 102002688
+  },
+  "unit_attempts": {
+    "A": 1095,
+    "B": 1095
+  },
+  "pipeline_calls": {
+    "A": 72,
+    "B": 72
+  },
+  "ledger_status_counts": {
+    "A": {
+      "predicted": 1095
+    },
+    "B": {
+      "predicted": 1095
+    }
+  },
+  "cpu_threads": 2,
+  "affinity": [
+    0,
+    1
+  ],
+  "device": "cpu",
+  "training_calls": 0,
+  "experiment_llm_calls": 0,
+  "new_zip_downloads": 0,
+  "new_weight_downloads": 0,
+  "scope": "This R12 experiment and its separate result verifier only. No accounting for prior R10/R11 stages, implementation, tests, research assistant or multi-agent service usage.",
+  "timing_note": "Wrapper process wall includes startup/imports/writes; function timer is narrower. CPU is user plus system recorded by each child, not wall time."
+}

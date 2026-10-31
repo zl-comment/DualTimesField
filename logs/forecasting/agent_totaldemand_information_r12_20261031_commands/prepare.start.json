@@ -1,0 +1,14 @@
+{
+  "stage": "prepare",
+  "command": [
+    "timeout",
+    "900s",
+    "/root/workspace/Code/DualTimesField/.venv/bin/python",
+    "-u",
+    "scripts/run_totaldemand_information.py",
+    "prepare",
+    "--config",
+    "configs/agent_forecasting/r12_totaldemand_information_20261031.json"
+  ],
+  "started_unix": 1793453674.9040053
+}

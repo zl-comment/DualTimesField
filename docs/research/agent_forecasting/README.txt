@@ -4,17 +4,22 @@ Agent 电价预测研究资料库
 用途
 持续查阅论文、已核实的开源框架和本项目的设计边界。本文档不是实验成功声明。
 
-最新计划（2026-10-31，Asia/Shanghai）
-r12_totaldemand_information_protocol_20261031.txt：用户已确认代理特征，2023三地区S1 A/B实施协议。
-当前分支research/agent-totaldemand-information-20261031-r12，基点9b4bc64；34项关键测试通过，冻结前独立审查通过。
-S1只运行数值seed2026；2024三地区三seed Agent实验仍以S1/S2通过为条件。
+最新结果（2026-10-31，Asia/Shanghai）
+r12_totaldemand_information_protocol_20261031.txt：用户确认代理特征后的2023三地区S1 A/B冻结协议。
+分支research/agent-totaldemand-information-20261031-r12，基点9b4bc64；执行提交f5a9541138bcc6f69269c552635ae9f87158b1fe。
+2023三区各365日完整运行，A/B各1095单元、seed2026，无缺失/失败/回退；34项关键测试及独立实际结果复算通过。
+宏QS改善4.6008%（相对变化95%CI −6.5517%..−3.2941%），宏MAE改善4.3208%。
+宏/QLD1/TAS1的C80偏差恶化超过1个百分点；26/29条件通过，组合判定NO_USEFUL_GAIN，按冻结规则停止S2/S3。
+这表示损失改善但覆盖保护未通过，不表示完全没有预测收益；没有执行2024或三seed Agent实验，也没有推送。
+完整结果、实际资源与独立审查：../../../logs/forecasting/agent_totaldemand_information_r12_20261031/results_cn.txt。
 
 historical_replay_protocol_20261031_r11.txt：用户确认历史回溯后提出的R11方案，2023信息筛选、2024 Agent历史评价。
 分支research/agent-historical-replay-20261031-r11以a568f7a为基点；原R10结论不改。
 已实现72/25/24小时历史输入、原生分位评分和S1配对评价；24项关键合成测试通过，记录在logs/forecasting/r11_*tests*。
 2023三地区各365/365、2024各366/366，结构覆盖均100%；来源审计执行提交b3680d0。
 详细结果：../../../logs/forecasting/agent_historical_source_r11_20261031/results_cn.txt。
-新小时需求代理编码已列明近似与局限，尚待用户确认；未运行模型、真实评分或三seed实验，未推送。
+R11当时记录：新小时需求代理编码已列明近似与局限，尚待用户确认；当时未运行模型、真实评分或三seed实验，未推送。
+后续确认与实际模型结果见上方R12，旧协议和审计身份不回写。
 
 R10历史记录
 information_first_plan_20261031_r10.txt：r9 后的修改计划，先核实未来 TOTALDEMAND 的信息增益，

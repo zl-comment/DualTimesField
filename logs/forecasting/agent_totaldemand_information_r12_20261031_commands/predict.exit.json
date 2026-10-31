@@ -1,0 +1,16 @@
+{
+  "stage": "predict",
+  "command": [
+    "timeout",
+    "21600s",
+    "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python",
+    "-u",
+    "scripts/run_totaldemand_information.py",
+    "predict",
+    "--config",
+    "configs/agent_forecasting/r12_totaldemand_information_20261031.json"
+  ],
+  "started_unix": 1793453775.4696627,
+  "exit_code": 0,
+  "wall_seconds": 1334.6015778705478
+}

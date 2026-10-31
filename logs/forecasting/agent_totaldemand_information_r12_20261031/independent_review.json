@@ -1,0 +1,136 @@
+{
+  "passed": true,
+  "verdict": "PASS_EVIDENCE_MATCH",
+  "scope": "Stored evidence and independent calculations match; not a claim of information or Agent benefit.",
+  "execution_commit": "f5a9541138bcc6f69269c552635ae9f87158b1fe",
+  "scientific_decision": "NO_USEFUL_GAIN",
+  "planned_days": 365,
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "regional_scores_checked": 6,
+  "criteria_checked": 29,
+  "numeric_fields_checked": 227,
+  "max_absolute_numeric_difference": 3.552713678800501e-15,
+  "numeric_tolerance": 1e-10,
+  "exact_array_checks": 21,
+  "ledger_units": 1095,
+  "ledger_status_counts": {
+    "A": {
+      "predicted": 1095
+    },
+    "B": {
+      "predicted": 1095
+    }
+  },
+  "fallback_outputs_checked": 0,
+  "unit_attempts": {
+    "A": 1095,
+    "B": 1095
+  },
+  "pipeline_calls": {
+    "A": 72,
+    "B": 72
+  },
+  "bootstrap": {
+    "method": "synchronous_non_circular_moving_day_blocks",
+    "block_days": 7,
+    "replicates": 2000,
+    "seed": 20261031,
+    "date_axis_length": 365,
+    "valid_replicates": 2000,
+    "relative_qs_ci95": [
+      -0.06551689529887887,
+      -0.032941226463221195
+    ],
+    "status": "complete"
+  },
+  "macro": {
+    "A": {
+      "mae": 33.879705647804315,
+      "quantile_score": 20.554482887227817,
+      "coverage_80": 0.7588660578386607,
+      "coverage_90": 0.8823059360730593,
+      "width_80": 97.7639988863577,
+      "width_90": 156.34229148132798,
+      "pinball_by_quantile": {
+        "0.05": 4.441859908168854,
+        "0.1": 7.118454374509049,
+        "0.5": 16.939852823902157,
+        "0.9": 12.729570735989418,
+        "0.95": 10.156469375500057
+      },
+      "coverage_distance_80": 0.041133942161339476,
+      "coverage_distance_90": 0.01769406392694069
+    },
+    "B": {
+      "mae": 32.41583668131717,
+      "quantile_score": 19.60880618810182,
+      "coverage_80": 0.7458523592085236,
+      "coverage_90": 0.8754946727549467,
+      "width_80": 89.92196269431797,
+      "width_90": 143.173306322692,
+      "pinball_by_quantile": {
+        "0.05": 4.213384739486755,
+        "0.1": 6.769623330723145,
+        "0.5": 16.207918340658583,
+        "0.9": 12.09388216862952,
+        "0.95": 9.737206890756548
+      },
+      "coverage_distance_80": 0.05414764079147646,
+      "coverage_distance_90": 0.024505327245053277
+    },
+    "relative_qs_change": -0.04600829436159755,
+    "relative_mae_change": -0.04320784193654937,
+    "coverage_distance_increase": {
+      "80": 0.013013698630136981,
+      "90": 0.006811263318112586
+    }
+  },
+  "failed_criteria": [
+    "macro/coverage_80_protection",
+    "QLD1/coverage_80_protection",
+    "TAS1/coverage_80_protection"
+  ],
+  "files_hashed": 26,
+  "sha256": {
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/prepared.json": "baa8931d898bdcfcdd9fb0ef178c26dc6debe6b37145e0010f182ad7ed3c07ba",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/predicted.json": "ce5e89348635b37ff64d342e1b63275f3772d9e89ff5713112daee1878933c3f",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/logs/forecasting/agent_totaldemand_information_r12_20261031/metrics.json": "c413a96c46c184bca258b253f22e66e56a79922181d4c4da61cf88d07aabc497",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/logs/forecasting/agent_totaldemand_information_r12_20261031/prepared_manifest.json": "baa8931d898bdcfcdd9fb0ef178c26dc6debe6b37145e0010f182ad7ed3c07ba",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/inputs/NSW1.json": "53792f7fbae17abb865041cc5d0f0b69a6604782f8c3f3918a7f361c9d2a3609",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/inputs/QLD1.json": "2538a549a93b260a19bc90391364244e2febd81bec3ecc3039eff53c2c59aec2",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/inputs/TAS1.json": "42249eb4af1a17318e84b4adcd6a8f528530d005c155b477ace8d8dd8efeea71",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/inputs/proxies.json": "19994cf5b3cc4db33d1c231657a90c9ffec542198f55dfbc0a2bdd11b108cace",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/labels/NSW1.npz": "c6d3a65a82eb26865bfb9da9aea36d2859a3f1477653eba2975f7f99fc0de41b",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/labels/QLD1.npz": "101b3f17ea36180a20df2207f9d17e88fb3ff3a87c672960c587e4c81e442cea",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/labels/TAS1.npz": "16f7ca4a671e7d4c6c20d84ccaf9f1c1189fad9e29dd5ff7530cb51ff4a9e7bb",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/predictions/NSW1.npz": "44020b0938dd1c6b91838c33053c18adc2db59fd7d6114b5f8b840f18cdf70bf",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/predictions/QLD1.npz": "78cf62da429b03473a6c16ef8306d7cd85349208e87c2f035dfd9e0962a68cf0",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/predictions/TAS1.npz": "101033413268c3b55bcf21410bc7204f576b26ac66da54f7bc38bfa5eac1f05a",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/outputs/forecasting/agent_totaldemand_information_r12_20261031/predictions/ledger.jsonl": "1753d8744a450678b4ae9b980688db359ef1f01323697a4329a885c4f1d3f243",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/scripts/run_totaldemand_information.py": "7718ad6323490f6a25d052d83e0450a598bd28893eb0cd1218eff1519954d485",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agent_forecasting/totaldemand_proxy.py": "20e1f99f07396012013e5abc9704c8ff8527510aba2488789434adcb05fe06bb",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agent_forecasting/totaldemand_information.py": "0398d6430c0daeac1a4e1161acc57aba45ff1e4776a7252190680ac493a0d083",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agent_forecasting/historical_replay.py": "1152b770aa616d2a44c93c94e6c5fd90343dc7c8a4e764f30ce868cd662ad157",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agent_forecasting/historical_comparison.py": "2998021692f3d34ccf96c29954b00b4d8a905ca3ab62ba3f51a1794c7d776782",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agentic_dev_eval/data.py": "1f708297935d935baaca6c0ce8bfa49f0a45678a2a730594952c0ea3bebab745",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/forecasting/agentic_dev_eval/protocol.py": "b5653621c0f049ddd1ef833a35aa26057596e61c73df5216a05547eb9c5bd8a8",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/configs/agent_forecasting/r12_totaldemand_information_20261031.json": "c5d3f93d163a48617063769416d9418b4a74a416cdcd6452d490d9406f9bd77e",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/docs/research/agent_forecasting/r12_totaldemand_information_protocol_20261031.txt": "dbb450db4df61b68d6f4fbb95ecd923e8f43b38a08a0b0ec5f283274fe6fe871",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/logs/forecasting/agent_totaldemand_information_r12_20261031/paired_predictions.npz": "04cb2a16ae1afa58f15b91756eefb3c94e7ccb89dda03feeb4906bbabc1ae89c",
+    "/root/workspace/Code/DualTimesField-worktrees/agent-totaldemand-information-20261031-r12/logs/forecasting/agent_totaldemand_information_r12_20261031/regional_metrics.csv": "bee6f98f440c588c64c2e524062c6e36b6358ad03830c7a621775893347e80d0"
+  },
+  "limitations": [
+    "No model replay or raw source re-parsing; receipt-time and demand-semantics limitations remain.",
+    "Input file hashes and ledger hash presence are checked; model-input hashes are not reconstructed here."
+  ],
+  "verifier_sha256": "63e2e879c564479cafc7fe59c2934cf4cf7980cc726e991253ebbf539c8cfc9d",
+  "resources": {
+    "wall_seconds": 1.713061198592186,
+    "cpu_seconds": 4.3566823160000006,
+    "peak_rss_bytes": 102002688
+  }
+}

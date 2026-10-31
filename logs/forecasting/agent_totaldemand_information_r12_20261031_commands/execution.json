@@ -1,0 +1,53 @@
+{
+  "wall_seconds": 1444.5201173014939,
+  "stages": [
+    {
+      "stage": "prepare",
+      "command": [
+        "timeout",
+        "900s",
+        "/root/workspace/Code/DualTimesField/.venv/bin/python",
+        "-u",
+        "scripts/run_totaldemand_information.py",
+        "prepare",
+        "--config",
+        "configs/agent_forecasting/r12_totaldemand_information_20261031.json"
+      ],
+      "started_unix": 1793453674.9040053,
+      "exit_code": 0,
+      "wall_seconds": 100.56525265425444
+    },
+    {
+      "stage": "predict",
+      "command": [
+        "timeout",
+        "21600s",
+        "/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python",
+        "-u",
+        "scripts/run_totaldemand_information.py",
+        "predict",
+        "--config",
+        "configs/agent_forecasting/r12_totaldemand_information_20261031.json"
+      ],
+      "started_unix": 1793453775.4696627,
+      "exit_code": 0,
+      "wall_seconds": 1334.6015778705478
+    },
+    {
+      "stage": "score",
+      "command": [
+        "timeout",
+        "300s",
+        "/root/workspace/Code/DualTimesField/.venv/bin/python",
+        "-u",
+        "scripts/run_totaldemand_information.py",
+        "score",
+        "--config",
+        "configs/agent_forecasting/r12_totaldemand_information_20261031.json"
+      ],
+      "started_unix": 1793455110.0718584,
+      "exit_code": 0,
+      "wall_seconds": 9.35184084624052
+    }
+  ]
+}
