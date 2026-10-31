@@ -1,0 +1,143 @@
+R11 官方需求语义与小时代理编码审查
+日期：2026-10-31
+状态：研究审查；新编码仅为待用户确认的方法假设，尚未实施或验证收益。
+作者角色：独立研究代理 literature；不是 AEMO 官方解释或外部人工金标准。
+
+1. 决策边界
+
+原 R10 candidate aemo_totaldemand_same_quantity_future_v1 要求证明历史与未来
+是同一物理量且时间聚合定义一致。这一承诺目前仍未满足，原 R10 仍为 blocked；
+不得将本文件的新建议写成原候选通过，也不得据此启动预测实验。
+
+要求两种时间分辨率的统计量严格等价，作为所有预测研究的准入条件，属于过强约束。
+可以另行预注册一个预测工程假设：将两个半小时 TOTALDEMAND 功率样本的算术均值
+作为小时负荷水平代理，与既有历史需求列连接，检验信息是否对冻结预测器有用。
+该建议并不证明两端物理、统计或条件分布完全等价。
+
+截至本文件编写时，主线程已发送方法选择的异步问题，尚未收到用户回复。
+下述新 candidate 的编码、运行授权和比较设计均不得视为已获确认。
+主线程并行开展的 2023/2024 档案覆盖审查，不是对本方法假设的用户批准，
+也不是预测收益证据。
+
+2. 官方来源及已确认的语义
+
+[S1] AEMO, Demand Terms in EMMS Data Model, July 2025，尤其表 2、
+     第 2.1.2 节、表 4 与附录 A1。
+https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/dispatch/policy_and_process/demand-terms-in-emms-data-model.pdf
+
+该文档统一将 Total Demand 描述为区域参考节点 RRN 的需求预测，随后分别说明
+Dispatch、Pre-dispatch 与 5MPD 的计算过程。因此，Dispatch 与 Pre-dispatch
+TOTALDEMAND 存在共同的地区需求概念依据，并非仅因列名相同而推测相关。
+原文短摘：“forecast demand at the Regional Reference Node”。
+
+Dispatch TOTALDEMAND 使用 SCADA 生成量、联络线流量等输入，并包含需求变化预测
+DemandForecast 和调度误差 AggregateDispatchError。不能将其直接称为纯实测
+五分钟区间平均用电。Pre-dispatch TOTALDEMAND 从 50% POE 需求出发，扣除规定的
+分配联络线损耗。文档中的构成和计算方式说明，不是对所有同名外部产品逐值同源的认证。
+
+同文档附录 A1 将 50% POE 定义为被实际值达到或超过的概率为 50% 的预测。
+据此作出的数学判断：两个半小时边际 50% POE 预测的均值，一般不等于小时平均需求
+的 50% POE 预测；分位数通常不能线性相加。因此，即使使用均值构造协变量，也不能
+称其为已经校准的小时需求中位数预测。
+
+[S2] AEMO, Aggregated price and demand data，官方产品入口。
+https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem/aggregated-data
+该页面关联的官方应用：
+https://www.aemo.com.au/aemo/apps/visualisation/index.html
+
+已确认官方产品入口存在；本轮未取得足以认证 PRICE_AND_DEMAND.TOTALDEMAND
+底层表、计算式或干预运行选择的产品说明。应用页面正文未提供可核验映射；
+直接 HTML 读取尝试返回 HTTP 403。未因此尝试绕过访问控制。
+
+[S3] AEMO MMS Data Model, PREDISPATCHREGIONSUM 字段说明。
+https://visualisations.aemo.com.au/aemo/nemweb/MMSDataModelReport/Electricity/MMS%20Data%20Model%20Report_files/MMS_278.htm
+
+预调度表具有独立的 INTERVENTION 字段，用于区分定价运行和物理运行。
+PRICE_AND_DEMAND 的 PERIODTYPE=TRADE 不能据此直接解释为 INTERVENTION=0；
+本轮没有找到支持这一等价关系的官方说明。
+
+[S4] AEMO, Negative electricity demand in South Australia, 23 November 2021。
+https://aemo.com.au/newsroom/news-updates/negative-electricity-demand-in-south-australia
+
+官方实际案例分别报告 operational、scheduled 与 total demand，数值不同。
+该案例支持“需求名称及口径须区分”，不能证明本地 PRICE_AND_DEMAND 与指定
+MMS 字段的映射，更不能单独证明小时聚合相等。
+
+[S5] AEMO, SO_OP_3710 Load Forecasting, version 25, effective 30 May 2023。
+https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3710-load-forecasting.pdf
+
+[S6] AEMO, SO_OP_3704 Pre-dispatch procedure, version 19, effective 1 April 2026。
+https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3704-predispatch.pdf
+
+此前有界审查已读取 S5/S6：运行范围、预测过程与机组 MW 目标的时段末含义，
+不能单独替代 TOTALDEMAND 的区间积分平均定义。不同年份的文档版本也不能不加
+核查地视为 2022、2023、2024 各年全部字段语义完全一致。
+
+3. 本地溯源事实与仍未知事项
+
+并行历史溯源代理报告：既有小时 CSV 继承 PRICE_AND_DEMAND 的 TRADE 行；
+2022 年按 12 个五分钟 TOTALDEMAND 值取算术均值，available_at 使用人为小时末。
+这属于本地构造链证据，不是 AEMO 对小时统计量或实际收到时间的认证。
+本文件没有独立重算 CSV 或开展跨表数值对拍。
+
+仍未证实：
+- PRICE_AND_DEMAND.TOTALDEMAND 与 DISPATCHREGIONSUM.TOTALDEMAND 的官方精确映射。
+- PERIODTYPE=TRADE 与 INTERVENTION=0 的关系。
+- 两个产品是否在所选历史年份、所有场景中具有相同构成、修订规则及取值方式。
+- 历史 12 个五分钟值均值与未来两个半小时值均值具有严格相同时间统计定义。
+- 事后归档值是否就是每个历史起报时刻实际已经公开、已经完整收到的版本。
+
+这些未知项使原 R10 的严格承诺不能通过；它们不自动推出该来源没有预测价值。
+历史实验若采用近似编码，必须明确其假设与可见性代理，不能用名称相同替代论证。
+
+4. 最小新 candidate 建议：近似同通道
+
+建议名称：aemo_td_hourly_proxy_future_v2（仅建议，待用户确认）。
+研究问题：在既有历史输入和冻结预测器之上，加入合法历史 vintage 的小时负荷水平
+代理，是否改善未来价格分布预测？
+
+拟固定的编码：
+- 历史 PRICE_AND_DEMAND 的 12×5 分钟 MW 算术均值保持原样。
+- 未来使用同一合法 vintage 内、对应小时的两个半小时 TOTALDEMAND 样本均值，
+  单位保持 MW，定义为 hourly load-level proxy。
+- 两端同通道连接是测量方式、时间分辨率及条件信息不同情况下的迁移假设。
+- 分别记录 source_product、value_kind、aggregation_operator、vintage、
+  scenario 与 availability_basis；历史场景映射未知就保留 unknown。
+- 不声称未来值是真实需求、精确小时平均功率或小时平均需求的 50% POE。
+- 不把归档历史值称为未经修订的当时实测；时间可见性另按冻结历史回放协议处理。
+
+拟固定的比较：
+- A/B 共享全部历史、日期网格、预测器及数值参数，B 仅增加该未来代理。
+- 看分数前冻结编码，不训练价格修正器，不根据结果切换同通道/独立通道。
+- B−A 的收益归因限于“该预调度信息经此固定编码进入该模型后的增量”，不能单独
+  宣称精确物理映射、任意编码下的信息价值或 Agent 收益。
+- 数据时间泄漏约束、同 vintage 完整性与缺失回退仍然有效；语义近似不是放宽
+  截止时刻、使用未来修订或跨版本补齐的理由。
+
+作为最小研究版本，倾向先考虑此方案：保留原历史关系，改变项少，可以直接检验
+用户关心的增量。预测器面对的输入分布不匹配是实际风险，是否有用应由预注册实验
+回答；没有免训练提升保证。
+
+5. 独立“同产品历史预报”通道：合理，但不是最小替换
+
+另一个可提出的候选，是保留原历史需求列，另加来自同一预调度产品的历史及未来
+预报通道。它能减少跨产品与聚合口径混用，但不是自动满足统计同分布：
+- 每个历史目标的 vintage 和提前量规则必须预先固定，且仅使用在相应当时截止前
+  可用的记录，不能事后选择最新修订。
+- 历史与未来的提前量、发布条件及误差分布仍可能不同。
+- 为隔离未来信息增量，A/B 都必须具有相同的过去预报通道，仅 B 增加未来值。
+  否则 B−A 同时包含新增历史预报信息，不能全部归因于未来需求预报。
+- 它需要额外历史预报构造和覆盖审查，不能在上述近似同通道成绩不好后临时切换，
+  更不能比较若干编码后只报告最优者。
+
+此方案仅供用户选择后的独立协议讨论，本文件不批准任一方案实施。
+
+6. 本轮工作与资源记录
+
+本轮采用有界检索，计 19 项搜索/页面请求尝试（包括失败请求）；这是研究请求的
+计数口径，不是声称测得底层服务实际 HTTP 重试次数。已在此上限内停止搜索。
+只采用官方来源形成事实判断；搜索结果中的非官方解释不作为字段映射证明。
+未下载数据 ZIP，未运行模型、训练、价格评分或跨表数值实验。
+写入本文件时未新增网络查询，未修改其他共享文件，未提交或推送。
+
+截至本文件：原 R10 仍 blocked；新 proxy 编码待用户确认；没有已验证预测收益。

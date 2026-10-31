@@ -1,0 +1,57 @@
+R11 历史来源覆盖产物独立轻量复核
+复核日期（UTC）：2026-10-31T12:43:09.348957+00:00
+结论：PASS。未发现小型产物内部不一致、遗漏网格、选中版本超出记录cutoff或源码身份不符。
+执行源码commit：b3680d086237c036996f469ecad44430e34f3632
+
+范围：仅读取coverage_2023.csv、coverage_2024.csv、source_manifest.json、summary.json、四份源码/配置及其Git对象。
+没有重读或解压原始ZIP，没有读取价格CSV/预测/标签，没有网络请求、模型调用或价格评分。
+本复核只新增review.txt，不修改任何原有产物或源码。
+
+一、独立网格与覆盖复算
+用标准库datetime固定UTC+10构造完整年度每日00:00网格，逐项比较(region,origin_unix)，没有导入生产coverage函数。
+year region planned covered25 target24 bridge_only_missing
+2023 NSW1 365 365 365 0
+2023 QLD1 365 365 365 0
+2023 TAS1 365 365 365 0
+2024 NSW1 366 366 366 0
+2024 QLD1 366 366 366 0
+2024 TAS1 366 366 366 0
+总计2193个唯一地区—起报单元；2023为1095，2024为1098；无重复、遗漏或额外单元。
+2024网格包含02-29。各地区完整率均为1.0，缺日列表均为空，与summary逐项一致；均超过固定0.95门槛。
+
+二、时间/版本记录的一致性
+全部origin_aest均为UTC+10的00:00，且与origin_unix精确对应；全部cutoff=origin−600秒。
+独立从SEQNO前8位日期及末2位PP重算label=该日04:00 AEST+PP×30分钟，与全部selected_schedule_label_unix一致。
+全部选中label及LASTCHANGED最大值不晚于cutoff；run_age_seconds=origin−label；RUNNO为正整数。
+全部target24选中SEQNO/RUNNO与25小时选中版本相同。
+cutoff−selected_label范围：1200..1200秒。
+cutoff−lastchanged_max范围：2803..2904秒。
+run_age_seconds范围：1800..1800秒。
+2023首日选中版本：{"NSW1": "2022123139/1", "QLD1": "2022123139/1", "TAS1": "2022123139/1"}
+2024首日选中版本：{"NSW1": "2023123139/1", "QLD1": "2023123139/1", "TAS1": "2023123139/1"}
+CSV候选诊断列求和（同候选可能跨起报被计数，不代表独立事件数）：{"candidate_conflict_count": 0, "candidate_nonfinite_count": 0, "newer_incomplete_candidates": 0}
+
+三、清单数字及源码身份
+清单恰为202212..202412共25个唯一月包，全部status=read；月份、路径文件名及64位SHA256格式一致。
+清单总压缩字节：993078433，与summary.source_bytes一致；总retained_rows：6088998。
+202312只列一次；两年跨年起点实际引用202212/202312版本，未缺上一年12月。
+未重新计算25个原始ZIP的hash；这里核对的是清单内部一致性，不伪称再次验证原文件内容。
+以下四份文件SHA256同时匹配当前文件、执行commit的Git blob与summary：
+forecasting/agent_forecasting/totaldemand_information.py 0398d6430c0daeac1a4e1161acc57aba45ff1e4776a7252190680ac493a0d083
+scripts/audit_totaldemand_history.py 85a1389ee78aaed9fdcf9763ed5a8488c247eedf42c6adce282d29325fb0ff9f
+configs/agent_forecasting/r11_historical_source_audit_20261031.json 645c6f71111843321f51c98154a1e76b6234e57e2d00500a415a8fe7406e684b
+docs/research/agent_forecasting/historical_replay_protocol_20261031_r11.txt 2f642e0b6e0b45765ca1ec6d3e12ecd824bfc7b6afc30af1bf2cbc46360a9dcf
+
+四、资源记录与解释边界
+原扫描摘要报告wall=228.978711683s，CPU user=235.675179s，CPU system=4.118937s，peak RSS=1538195456 bytes；wall低于900s。
+资源数字为原扫描进程记录，本复核未独立重测原扫描耗时，也不把这组数字当所有研究活动总资源。
+原摘要model_calls=0、price_scores=0、network_requests=0，与此前源码审查及本次复核范围一致。
+全部记录维持archive_proxy、strict_asof_verified=false；summary也保留quantity_equivalence_verified=false、candidate_eligibility_assessed=false。
+PASS仅表示固定2023/2024网格的已存覆盖产物自洽、源码身份匹配；不证明历史首次公开时点、两种需求产品严格等价、价格信息增益或Agent价值。
+没有重新读取底层50行逐槽验证，因此不将本次复核描述为对原始ZIP计算的独立全量重跑。
+
+五、被复核小型产物SHA256
+coverage_2023.csv 7b64a8bdc2dd8be8f86e527cadd759c45d48fea25e2b6e959474caad53af410b
+coverage_2024.csv a2ce0512679e6ac9067a1ebe8f81c6e9f05db164cf9729263a4c00b1cc7d808c
+source_manifest.json abf67f8472f692c58cc3ac76ee341e2fb62663813ef314ad79e2b5be6847ec7d
+summary.json ff5e1232525862c74430cb03d999ad4990c3ac3ccdad6f4c6f9e8131fedef6e7

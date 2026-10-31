@@ -1,0 +1,164 @@
+R11 历史归档恢复调查与来源覆盖实现复核
+日期：2026-10-31
+调查人：history_audit 子代理；父任务要求最多20次请求、只查目录/元数据/少量样本。
+R11分支：research/agent-historical-replay-20261031-r11
+基点：a568f7a4a4c59f86d3bd8cd32977e8a63e848fc7
+
+一、结论与证据边界
+
+2022-10完整PREDISPATCHREGIONSUM未能从本轮查到的公开入口恢复。
+已确认这不只是展开网页目录遗漏：官方整月7,367,051,838字节总ZIP内部的完整中央目录
+同样没有该全量表。其DATA目录只含第一步裁剪表，不能拼成起报前可得的25小时预测。
+未发现说明该月为何缺少全量表的官方公告；不能推断原始数据永久丢失。
+
+可立即执行的历史路线：本地已有2023、2024各12个月全量地区预调度包及2022-12桥接包。
+先冻结2023/2024完整年度网格，再用已有需求/版本模块计算覆盖，不必等待未来112天。
+本次只确认包存在、表头和少量记录，不声称两个年份逐日25小时覆盖已经通过。
+这两个年份已被既有研究查看，不能称为新盲测；历史归档仍采用archive_proxy，不能称first_seen。
+候选编码、统计等价和价格信息增益另行判定，不能由包存在推导通过。
+
+二、2022-10公开入口核查
+
+1. 已有S0原始目录证据
+URL：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+S0已存HTML仅列PUBLIC_DVD_PREDISPATCHCONSTRAINT1_202210010000.zip。
+本轮复用本地HTML，不为该目录再发相同请求。
+本地证据：logs/forecasting/agent_totaldemand_s0_20261031/october_directory.html。
+
+直接HEAD预期未列出的完整地区包：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/PUBLIC_DVD_PREDISPATCHREGIONSUM_202210010000.zip
+结果：HTTP 404。
+
+2. 同月DATA裁剪表：可下载，但不能作为全量vintage替代
+目录：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/DATA/
+文件：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/DATA/PUBLIC_DVD_PREDISPATCHREGIONSUM_D_202210010000.zip
+HTTP正文：820,433字节；仅在内存打开，未写共享目录。
+CSV表头：I,PREDISPATCH,REGION_SOLUTION,5；含118个CSV字段（包括前四个接口字段）。
+八个核查字段均存在：PREDISPATCHSEQNO、RUNNO、REGIONID、PERIODID、INTERVENTION、
+DATETIME、TOTALDEMAND、LASTCHANGED。
+数据行数7,440 = 31天 × 48次 × 5地区。
+不同PREDISPATCHSEQNO共1,488个，从2022100101至2022103148。
+PERIODID集合严格为{"01"}；同(region,target,intervention)最多1行。
+首条需求记录：NSW1、seqno=2022100101、runno=1、periodid=01、intervention=0，
+DATETIME=2022/10/01 04:30:00，LASTCHANGED=2022/10/01 04:02:01。
+末条记录的目标为2022/11/01 04:00:00，seqno=2022103148，periodid=01。
+因此该包保留每次运行的第一步；把不同SEQNO的第一步合成一个25小时向量会使用未来运行，
+不满足本轮同版本、起报前可得的规则。它不补R10缺失的31个每日起报单元。
+
+3. 整月总ZIP：中央目录直接排除隐藏的全量地区包
+目录所列大小：7,367,051,838字节。
+URL：
+https://www.nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10.zip
+不带www的同路径使用Range: bytes=-131072时超时，未取得正文。
+www路径使用Range: bytes=7366920766-7367051837成功返回HTTP 206：
+Content-Range: bytes 7366920766-7367051837/7367051838。
+每次只读取131,072字节，未下载完整大ZIP。
+第一次扫描PK中央目录签名时会同时看到靠近文件尾部的内嵌ZIP目录，不能直接用签名计数。
+第二次按外层ZIP64 End of Central Directory给出的偏移/数量精确解析并核对目录终点：
+  外层条目总数：476；中央目录偏移：7,366,984,846；中央目录长度：66,894字节。
+  PREDISP_ALL_DATA成员只有目录项本身和：
+  MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/PUBLIC_DVD_PREDISPATCHCONSTRAINT1_202210010000.zip
+  全部含PREDISPATCHREGIONSUM的成员只有：
+  MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/BCP_FMT/PUBLIC_DVD_PREDISPATCHREGIONSUM_D_202210.fmt
+  MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/CTL/PUBLIC_DVD_PREDISPATCHREGIONSUM_D_202210.ctl
+  MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/DATA/PUBLIC_DVD_PREDISPATCHREGIONSUM_D_202210010000.zip
+此检查支持“展开目录与整月总包均缺该完整表”；不支持“其他未查系统也必定没有”。
+
+4. 其他官方入口
+BCP_DATA目录HTTP 200，无PREDISPATCH匹配条目：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/BCP_DATA/
+
+PredispatchIS_Reports滚动归档：
+https://www.nemweb.com.au/REPORTS/ARCHIVE/PredispatchIS_Reports/
+本轮网页工具返回目录最早周包为PUBLIC_PREDISPATCHIS_20250928_20251004.zip，
+未列2022年。该网页工具结果注明其抓取时间早于调查日，不能据此精确界定实时保留起点。
+另对未列出的PUBLIC_PREDISPATCHIS_20221002_20221008.zip作直接HEAD，返回404：
+https://www.nemweb.com.au/REPORTS/ARCHIVE/PredispatchIS_Reports/PUBLIC_PREDISPATCHIS_20221002_20221008.zip
+未逐一试探2022所有周包，不将这一个404泛化为所有可能旧文件均不存在。
+
+官方Data_Archive根目录只列Wholesale_Electricity；后者列FCAS_Causer_Pays、MMSDM、NEMDE。
+https://nemweb.com.au/Data_Archive/
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/
+最后请求以下备用路径时发生TLS EOF错误，未取得可判读目录，保留为未核实：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/NEMDE/2022/
+本轮请求预算到此耗尽，未继续抓取NEMDE或请求AEMO工作人员。
+
+三、2023/2024可复用资产及版本变化
+
+本地目录：/root/workspace/Code/DualTimesField/data/aemo_exogenous/raw/predispatch/
+2023每月PREDISPATCHREGIONSUM_YYYYMM.zip均在；2024每月同名缓存均在。
+24个月包总压缩大小956,552,575字节。仅读取每包首个I表头，八个必需字段均存在。
+版本及列宽（列宽含四个接口字段）：
+  2023-01..2023-06：REGION_SOLUTION v5，118列。
+  2023-07..2024-04：REGION_SOLUTION v5，124列。
+  2024-05..2024-12：REGION_SOLUTION v8，129列。
+不得按列号或单一列宽复用M0 v9解析器；已有按字段名投影的read_month可覆盖这些表头。
+只抽看2023/2024首尾月的首条D记录，没有扫描全年内容或计算预测/需求误差。
+
+官方年份目录均列12个月目录及总ZIP：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2023/
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2024/
+
+本轮另直接核对两个末月PREDISP_ALL_DATA目录：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2023/MMSDM_2023_12/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+列PUBLIC_DVD_PREDISPATCHREGIONSUM_202312010000.zip，39,934,600字节，与本地大小一致。
+完整文件URL：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2023/MMSDM_2023_12/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/PUBLIC_DVD_PREDISPATCHREGIONSUM_202312010000.zip
+
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2024/MMSDM_2024_12/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+列PUBLIC_ARCHIVE#PREDISPATCHREGIONSUM#ALL#FILE01#202412010000.zip，49,769,920字节，
+与本地大小一致。文件URL中的#必须编码为%23：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2024/MMSDM_2024_12/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/PUBLIC_ARCHIVE%23PREDISPATCHREGIONSUM%23ALL%23FILE01%23202412010000.zip
+2024-08..12本地成员也采用PUBLIC_ARCHIVE#...#ALL#...命名；官方目录显示2026-05重归档时间。
+该重归档时间不是2024预测当时的发布时间，字段LASTCHANGED也不升级为首次公开收据。
+本轮没有逐个请求24个月官方目录，也没有重新计算24包SHA256；后续冻结扫描负责记录实际输入hash。
+
+四、网络请求账本
+
+共20次显式请求/网页操作，包含失败与一次对既有页面的find。采用保守计数，不把工具内部缓存
+命中当成额外预算。只读调查之后的R11脚本复核没有新增网络请求。
+
+01 web open：2022-10 SQLLoader/DATA目录；成功。
+02 web open：REPORTS/ARCHIVE/PredispatchIS_Reports目录；成功，工具注明较早抓取。
+03 web open：MMSDM/2023年份目录；成功。
+04 web open：MMSDM/2024年份目录；成功。
+05 urllib GET：2022-10 SQLLoader父目录；HTTP 200。
+06 urllib GET：2023-12 PREDISP_ALL_DATA目录；HTTP 200。
+07 urllib GET：2024-12 PREDISP_ALL_DATA目录；HTTP 200。
+08 urllib GET：MMSDM/2022年份目录；HTTP 200，取得总ZIP大小。
+09 web find：第01页搜索PREDISPATCHREGIONSUM；工具报告抓取超时。
+10 urllib Range GET：无www的2022-10总ZIP尾部；超时，未取得正文。
+11 urllib GET：2022-10 DATA目录；HTTP 200，取得_D包确切文件名及大小。
+12 urllib GET：2022-10 BCP_DATA目录；HTTP 200，无匹配条目。
+13 urllib HEAD：2022-10预期完整地区包；HTTP 404。
+14 urllib GET：2022-10地区_D小包；820,433字节，内存解析。
+15 urllib Range GET：www域名总ZIP尾部；HTTP 206，131,072字节。
+16 urllib GET：Data_Archive/Wholesale_Electricity目录；HTTP 200。
+17 urllib GET：Data_Archive根目录；HTTP 200。
+18 urllib HEAD：2022-10-02..08 PredispatchIS周包；HTTP 404。
+19 urllib Range GET：同第15项；HTTP 206，131,072字节，按ZIP64精确复核外层目录。
+20 urllib GET：Data_Archive/Wholesale_Electricity/NEMDE/2022/；TLS EOF错误。
+
+成功取得的ZIP正文合计1,082,577字节（820,433 + 2×131,072），不含目录HTML。
+没有整月大ZIP下载、模型调用、训练、价格数组/评分读取或共享数据覆盖。
+本文件汇总当轮工具返回证据；本轮HTTP原始响应正文/尾部字节未另存为本地证据文件，
+因此未给它们伪造SHA256。上列准确URL、范围、目录偏移和计数可供后续按需重验。
+
+五、R11来源覆盖脚本冻结前只读复核
+
+审查文件：scripts/audit_totaldemand_history.py、
+configs/agent_forecasting/r11_historical_source_audit_20261031.json。
+结论：没有发现影响当前来源覆盖检查的实质问题。
+配置固定years=[2023,2024]、regions=[NSW1,QLD1,TAS1]、minimum_coverage=0.95。
+脚本为每年读取上一年12月和当年12个月；仅读文件存在性实查：202212..202412共25个唯一包齐全，
+202212与202312两个跨年桥接包均在。202312缓存复用，不重复加入单个年份的行。
+每日起点由固定AEST时区date_range生成，2023为365日，2024闰年为366日，不用价格挑日。
+直接复用未改的totaldemand_information.read_month/coverage：cutoff=O−600秒、50个半小时末端、
+同(region,SEQNO,RUNNO)选择最新完整版本、先过滤晚到行再判断冲突，不跨版本拼接或填尾。
+本脚本不读历史价格CSV、不导入模型/评分器、不发网络请求；下游seeds未在来源扫描执行。
+summary保留strict_asof_verified=false、quantity_equivalence_verified=false、
+candidate_eligibility_assessed=false，不把结构覆盖通过包装成候选或信息增益通过。
+审查仅源码与文件存在性，没有代替主线程执行覆盖扫描；产物和运行源码commit由主线程归档。

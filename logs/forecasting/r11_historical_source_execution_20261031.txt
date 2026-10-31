@@ -1,0 +1,31 @@
+COMMAND: ["timeout", "900s", "/root/workspace/Code/DualTimesField/.venv/bin/python", "-u", "scripts/audit_totaldemand_history.py", "--config", "configs/agent_forecasting/r11_historical_source_audit_20261031.json"]
+202212: 247752 demand rows
+202301: 247752 demand rows
+202302: 223776 demand rows
+202303: 247752 demand rows
+202304: 239760 demand rows
+202305: 247752 demand rows
+202306: 239760 demand rows
+202307: 247752 demand rows
+202308: 247752 demand rows
+202309: 239760 demand rows
+202310: 247752 demand rows
+202311: 239760 demand rows
+202312: 247536 demand rows
+{"year": 2023, "regions": {"NSW1": {"planned": 365, "covered25": 365, "coverage25": 1.0, "target24_covered": 365, "missing_dates": []}, "QLD1": {"planned": 365, "covered25": 365, "coverage25": 1.0, "target24_covered": 365, "missing_dates": []}, "TAS1": {"planned": 365, "covered25": 365, "coverage25": 1.0, "target24_covered": 365, "missing_dates": []}}, "structural_pass": true}
+202401: 247752 demand rows
+202402: 231768 demand rows
+202403: 247752 demand rows
+202404: 239760 demand rows
+202405: 247752 demand rows
+202406: 239760 demand rows
+202407: 247752 demand rows
+202408: 247752 demand rows
+202409: 239301 demand rows
+202410: 247752 demand rows
+202411: 239529 demand rows
+202412: 247752 demand rows
+{"year": 2024, "regions": {"NSW1": {"planned": 366, "covered25": 366, "coverage25": 1.0, "target24_covered": 366, "missing_dates": []}, "QLD1": {"planned": 366, "covered25": 366, "coverage25": 1.0, "target24_covered": 366, "missing_dates": []}, "TAS1": {"planned": 366, "covered25": 366, "coverage25": 1.0, "target24_covered": 366, "missing_dates": []}}, "structural_pass": true}
+{"resources": {"wall_seconds": 228.97871168330312, "cpu_user_seconds": 235.675179, "cpu_system_seconds": 4.118937, "peak_rss_bytes": 1538195456, "source_bytes": 993078433, "scope": "this source-audit process only"}}
+EXIT_CODE: 0
+WRAPPER_WALL_SECONDS: 232.321908
