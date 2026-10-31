@@ -1,0 +1,62 @@
+R10 S0 来源审计实施协议
+日期：2026-10-31（Asia/Shanghai）
+基点：a403f2a9997928234d359fe75a65813feb0a3645
+当前分支：research/agent-information-first-plan-20261031-r10
+
+执行范围
+按用户最新要求在当前分支实现；本阶段只有来源/元数据审计，不运行预测或价格评分。
+新增预测批次仍先创建独立分支。先提交本协议、配置、实现及必要测试，再运行全年来源扫描。
+本协议不放宽 R10 的同物理需求语义要求、95%完整率或后续统计门槛。
+
+已知事实和审计目标
+本地存在2021-12及2022除10月外的11个 PREDISPATCHREGIONSUM 原始全量ZIP。
+已只读少量表头/首行确认2022产品为REGION_SOLUTION v5；不会调用锁定v9的旧M0解析器。
+官方2022-10 PREDISP_ALL_DATA目录的网页只列CONSTRAINT1；本次运行将保存一次原始目录HTML。
+旧已填充NPZ不参与；不读PREDISPATCHPRICE、不联价格表、不读取RRP列、不运行LLM或Chronos。
+
+必需输入
+月表字段：PREDISPATCHSEQNO、RUNNO、REGIONID、PERIODID、INTERVENTION、TOTALDEMAND、LASTCHANGED、DATETIME。
+逐块读取三地区NSW1/QLD1/TAS1及INTERVENTION=0，保留RUNNO，不对不相关表头顺序做硬锁。
+历史CSV仅投影时间、地区、需求、源间隔、split；核2022的8760小时和生成器来源。
+现有原始ZIP只读；记录实际路径、大小、SHA256，原文件不复制或覆盖。
+
+时间代理
+vintage_schedule_label = seqno日期的04:00 AEST + PP×30分钟，PP=01对应04:30。
+这是计划运行对应的首个时段结束标签，不声称是实际计算开始或公开时刻。
+scheduled_start_proxy = label−30分钟；available_proxy = label。
+一个候选还须所需行LASTCHANGED<=cutoff；LASTCHANGED只作额外保守限制，不升级成first_seen。
+所有RUNNO保留，候选按(seqno,runno)排序；重运行实际发布时刻和回填修订仍未获证明。
+因此全年输出只描述 archive_proxy 下的结构覆盖，不能把该扫描判为严格在线可用。
+
+固定网格和选择
+2022-01-01至12-31，每日O=00:00 AEST；cutoff=O−10分钟，三地区共1095单元。
+25步所需50个半小时末端为O−30分钟、O、O+30分钟……O+24小时。
+同时单列目标24小时48末端O+30分钟……O+24小时，区分桥接小时和目标小时缺失。
+先按可见代理和LASTCHANGED过滤，再检查同一(seqno,runno,region)是否完整。
+重复同值行可合并；同一末端不同值计冲突，不凭归档顺序选赢家。
+缺槽、不有限或冲突的版本不完整；在剩余完整候选中选最新，不跨版本拼、不填尾值。
+12个预定细查单元为03-31、06-30、09-30、12-31各三个地区，不按结果换日。
+源码只计算源覆盖和需求摘要，不将需求向量送入模型。
+
+语义判定单列
+历史实际生成链为PRICE_AND_DEMAND、PERIODTYPE=TRADE；2022为12个五分钟值的均值。
+候选为REGION_SOLUTION、INTERVENTION=0；拟用两个半小时TOTALDEMAND均值。
+官方文档说明需求包含预测/估计成分，不能将本地历史直接称纯实测。
+目前尚无证据证明产品映射、干预口径和小时聚合一致；QuantityContract须逐项保留为未证实。
+结构覆盖好不能覆盖这些未解决项。任一项未解决，S0结论DATA_SEMANTICS_BLOCKED，S1/S2/S3均不启动。
+P路线也需要相同语义契约；收取未来数据不会自行修复统计定义差异，不为绕过语义失败启动采集。
+用户要求的三地区/三个seed仍是后续目标，本次不能伪装已完成或用旧r9结果代替。
+
+实现与验证
+一个来源模块，一个执行脚本，一份小配置。必要测试只验证时钟/跨日、同版本完整性、缺槽、
+重运行/晚到过滤和重复冲突；不增加通用安全框架、反复哈希、自动修复、无限重试或策略回退链。
+测试使用合成ZIP，不把合成数据当真实源证据。相关测试通过后冻结提交，扫描使用该HEAD。
+
+资源和产物
+仅使用现存12个本地月包；新增原始ZIP GET=0。官方目录HTML GET最多1，timeout=30秒、重试=0。
+本地结构扫描墙钟上限900秒，不下载模型、不安装包，模型调用/训练/GPU=0。
+产物写入全新logs/forecasting/agent_totaldemand_s0_20261031：运行摘要、全年coverage.csv、
+12单元timing_audit.json、quantity_contract.json、源manifest、目录HTML、中文结论和真实运行日志。
+保留不可用单元；报告365天分母、每地区覆盖和缺失月份，禁止把完整子集包装为全网格通过。
+资源记录wall/CPU/峰值RSS、正文GET/字节；执行退出0表示审计完成，不表示候选通过。
+结束后提交实现及审计结果，不推送。

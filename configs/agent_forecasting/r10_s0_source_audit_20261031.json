@@ -1,0 +1,42 @@
+{
+  "stage": "S0_source_audit_only",
+  "base_commit": "a403f2a9997928234d359fe75a65813feb0a3645",
+  "branch": "research/agent-information-first-plan-20261031-r10",
+  "candidate_id": "aemo_totaldemand_same_quantity_future_v1",
+  "regions": ["NSW1", "QLD1", "TAS1"],
+  "downstream_requested_seeds": [2026, 2027, 2028],
+  "year": 2022,
+  "audit_dates": ["2022-03-31", "2022-06-30", "2022-09-30", "2022-12-31"],
+  "raw_root": "/root/workspace/Code/DualTimesField/data/aemo_exogenous/raw/predispatch",
+  "months": ["202112", "202201", "202202", "202203", "202204", "202205", "202206", "202207", "202208", "202209", "202210", "202211", "202212"],
+  "historical_root": "/root/workspace/Code/DualTimesField/data/holdout",
+  "collector_source": "/root/workspace/Code/electricity-price-forecasting-research/scripts/collect_multi_market_resources.py",
+  "october_listing_url": "https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/",
+  "publication_basis": "archive_proxy",
+  "availability_rule": "schedule_label_at_or_before_cutoff_and_required_row_lastchanged_at_or_before_cutoff",
+  "minimum_coverage": 0.95,
+  "quantity_review": {
+    "history_product": "PRICE_AND_DEMAND.TOTALDEMAND",
+    "history_periodtype": "TRADE",
+    "history_value_kind": "archived_product_value_not_proven_pure_measurement",
+    "history_aggregation": "mean_of_12_five_minute_values",
+    "candidate_product": "PREDISPATCH.REGION_SOLUTION.TOTALDEMAND",
+    "candidate_intervention": 0,
+    "candidate_aggregation": "mean_of_2_half_hour_values",
+    "unresolved": ["PRICE_AND_DEMAND_to_REGION_SOLUTION_quantity_mapping", "TRADE_to_INTERVENTION_0_equivalence", "hourly_temporal_aggregation_equivalence", "2022_version_specific_official_semantics"],
+    "official_sources": [
+      "https://www.aemo.com.au/-/media/Files/Electricity/NEM/Security_and_Reliability/Dispatch/Policy_and_Process/%E2%80%8CDemand-terms-in-EMMS-Data-Model.pdf",
+      "https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3704-predispatch.pdf",
+      "https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3710-load-forecasting.pdf"
+    ]
+  },
+  "output_root": "logs/forecasting/agent_totaldemand_s0_20261031",
+  "resources": {"wall_seconds": 900, "listing_gets": 1, "listing_timeout_seconds": 30, "zip_gets": 0, "model_calls": 0, "training": 0},
+  "source_files": [
+    "forecasting/agent_forecasting/totaldemand_information.py",
+    "scripts/audit_totaldemand_source.py",
+    "tests/test_totaldemand_information.py",
+    "configs/agent_forecasting/r10_s0_source_audit_20261031.json",
+    "docs/research/agent_forecasting/r10_s0_source_audit_protocol_20261031.txt"
+  ]
+}
