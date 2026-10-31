@@ -1,0 +1,18 @@
+{
+  "stage": "historical_source_coverage_only",
+  "base_commit": "a568f7a4a4c59f86d3bd8cd32977e8a63e848fc7",
+  "branch": "research/agent-historical-replay-20261031-r11",
+  "years": [2023, 2024],
+  "regions": ["NSW1", "QLD1", "TAS1"],
+  "downstream_seeds": [2026, 2027, 2028],
+  "minimum_coverage": 0.95,
+  "raw_root": "/root/workspace/Code/DualTimesField/data/aemo_exogenous/raw/predispatch",
+  "output_root": "logs/forecasting/agent_historical_source_r11_20261031",
+  "resources": {"wall_seconds": 900, "new_downloads": 0, "model_calls": 0, "price_scores": 0},
+  "source_files": [
+    "forecasting/agent_forecasting/totaldemand_information.py",
+    "scripts/audit_totaldemand_history.py",
+    "configs/agent_forecasting/r11_historical_source_audit_20261031.json",
+    "docs/research/agent_forecasting/historical_replay_protocol_20261031_r11.txt"
+  ]
+}
