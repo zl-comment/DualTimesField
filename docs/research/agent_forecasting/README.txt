@@ -4,6 +4,13 @@ Agent 电价预测研究资料库
 用途
 持续查阅论文、已核实的开源框架和本项目的设计边界。本文档不是实验成功声明。
 
+最新计划（2026-10-31，Asia/Shanghai）
+information_first_plan_20261031_r10.txt：r9 后的修改计划，先核实未来 TOTALDEMAND 的信息增益，
+再检验 Agent 的独立贡献；四个设计差距、A/B/C/D、时点、停止规则、预算与实现顺序均在其中。
+information_first_review_20261031_r10.txt：三路独立审查意见、官方来源和未解决的证据边界。
+计划分支 research/agent-information-first-plan-20261031-r10，基点 9a1cd340c1c02fda5dba6b11bc270e69355390d2。
+当前仅完成计划；下一项为独立分支上的 S0 来源/语义审查，尚未执行。本段之后是原资料库历史记录。
+
 入口
 1. papers/RE-Price/RE-Price.pdf：用户提供的13页原论文，原样保存。
 2. papers/RE-Price/RE-Price.fulltext.txt：pdftotext -layout 提取全文，可全文搜索；图表以PDF为准。

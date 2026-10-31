@@ -1,0 +1,129 @@
+R10 计划审查记录与官方来源索引
+日期：2026-10-31（Asia/Shanghai）
+计划：information_first_plan_20261031_r10.txt
+状态：计划资料；不是模型实验、真人标注或来源完整性验收报告。
+
+一、多 Agent 分工与采纳意见
+
+history_audit：独立审查 G0/G0a/M0/M1/r9 协议和结果。
+- TOTALDEMAND 的真实价格信息增益尚未检验；M0 真实收取与合成模型响应是两类证据。
+- G0a 负结果属于预调度 RRP 缓存，不能直接迁移为 TOTALDEMAND 的负结果。
+- M0 只在 NSW1 单点验证真实 48 半小时覆盖；不能声称已验证三地区整年或新的 25 小时输入。
+- 原 README 中 10.9917 的单位应为 AUD/MWh；本轮记录引用纠正，不改旧冻结结果。
+- TOTALDEMAND 不具备原生公告撤销语义，本轮不编造撤销任务；公告另需数值通路和时点证明。
+- 旧 M1 反例是有限策略反例，不能再把有限场景结果写成固定规则的全域充分性证明。
+
+gate_audit：独立审查识别策略、四个差距和统计口径。
+- 先 A/B 信息比较，再 B/C/D；强固定 B 不故意遗漏来源，D−C 与 D−B 均要通过。
+- 首轮唯一映射为同物理需求的过去观测/未来预报；定义无法对齐就停，不按分数切换编码。
+- H/P 在看分数前按来源可得性决定，历史失败后不能换前推窗口寻求翻盘。
+- seed 先平均同 origin 的损失，再按共同日期块推断，不能先平均分位数构造未声明集成。
+- 1% 点效应和区间排除零是两项条件，不表示至少 1% 改善有区间保证。
+- 成熟误差先只进监控；后续反馈研究向各对照开放相同信息，独立估计反馈作用。
+- 固定输入截止、发布时间和目标区间；真实在线需要为计算与输入到达留出时间。
+
+literature：核验 AEMO/NEMWeb 官方说明、数据模型与历史目录。
+- 2022–2025 每年目录均列有十二个月；具体核到的表包为 2022/2023/2024/2025 的一月及 2025 十二月。
+- PREDISP_ALL_DATA 是历史全量版本候选通路，普通 DATA 中的缩减表不能直接替代。
+- 当前滚动周档缺旧年不等于月度全量档案不存在；目录存在也不证明文件内部 vintage 完整。
+- TOTALDEMAND 与 DEMANDFORECAST 不同；未来需求预报与历史需求须核对物理定义和聚合语义。
+- 风光要分开：集中式机组预测涉及权限与 DUID 汇总；屋顶光伏已有地区级公开版本，不笼统说都不可得。
+
+主 agent 整合：采用单一来源和新候选，安排 S0→S1→S2→S3；反馈因素单列。
+对已有 M0 时钟与 r9 输入的差异显式提出新公共时间约定：目标前十分钟截止，发布在目标前，
+历史结束在目标前一小时，数值预测 25 步后丢掉第一步。S0 检查该 horizon 可得性，不能假定已支持。
+文件级最终审查中发现的问题和处理另记于本文末尾；审查本身不替代 S0/S1 证据。
+
+二、官方来源：核实了什么与还没核实什么
+
+[S1] AEMO Operational forecasting
+https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/nem-forecasting-and-planning/operational-forecasting
+已核：运营预测覆盖负荷及风光，进入预调度/短期充裕度评估。
+未核：本项目所需每个历史 origin、字段版本、完整收取时间和信息收益。
+
+[S2] AEMO Pre-dispatch
+https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem/market-management-system-mms-data/pre-dispatch
+已核：地区级半小时预调度、每半小时更新，范围到下一市场日结束。
+限制：不能据此假设任意起报时刻都有完整未来 24 或 25 小时；S0 必须检查具体 run。
+
+[S3] NEMWeb 当前发布目录
+https://www.nemweb.com.au/REPORTS/CURRENT/PredispatchIS_Reports/
+已有本地 M0 字节证据，详见旧 capture/verify；这不证明 2022 历史版本可得。
+
+[S4] 2022 一月 PREDISP_ALL_DATA
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_01/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+目录列 PUBLIC_DVD_PREDISPATCHREGIONSUM_202201010000.zip，39,049,185 bytes。
+这是约 39 MB 的候选文件；本次未下载 ZIP，未核包内主键、全部运行或三个地区的完整覆盖。
+
+[S5] 2023 一月 PREDISP_ALL_DATA
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2023/MMSDM_2023_01/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+HTTP 200，目录列对应地区预调度包；网页工具读取失败后仅用 urllib 读取目录 HTML。
+
+[S6] 2024 一月 PREDISP_ALL_DATA
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2024/MMSDM_2024_01/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+目录列对应地区预调度包，约 40 MB；未下载 ZIP。
+
+[S7] 2025 一月及十二月 PREDISP_ALL_DATA
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2025/MMSDM_2025_01/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2025/MMSDM_2025_12/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+目录列 PUBLIC_ARCHIVE#PREDISPATCHREGIONSUM#ALL#FILE01#YYYYMM010000.zip 形式的文件；
+实际文件链接的 # 要编码为 %23。十二月目录同样仅在网页工具失败后读取 HTML。
+部分目录显示 2026 年重新归档时间，不能拿它作为原预测公布时间。
+本次没有核完 48 个月表包，也没有核 ZIP 内运行完整性。
+
+[S8] AEMO Electricity Data Model Package Summary v5.4
+https://visualisations.aemo.com.au/aemo/di-help/Content/Data_Model/Electricity_Data_Model_Package_Summary_54.pdf
+官方存储选项说明存在按地区/目标时段覆盖旧记录与保留运行批次的区别。
+因此源审查须直接验证同 target 多个 PREDISPATCHSEQNO/RUNNO，不能只看表名含 predispatch。
+
+[S9] PREDISPATCHREGIONSUM 字段说明
+https://visualisations.aemo.com.au/aemo/nemweb/MMSDataModelReport/Electricity/MMS%20Data%20Model%20Report_files/MMS_278.htm
+已核：DATETIME 是目标时段；PERIODID 为每次运行自 1 开始的期数；PREDISPATCHSEQNO 编码
+YYYYMMDDPP，01 对应 04:30；RUNNO 标识重运行；TOTALDEMAND 单位 MW，DEMANDFORECAST 是增量。
+映射时仍需核该说明对应的实际文件版本，不能将它套给名称相近但 schema 不同的文件。
+
+[S10] 旧表 LASTCHANGED 说明与加载审计字段
+https://visualisations.aemo.com.au/aemo/nemweb/MMSDataModelReport/Electricity/MMS%20Data%20Model%20Report_files/MMS_278_1.htm
+https://di-help.docs.public.aemo.com.au/Content/pdrLoader/Database_Tables.htm
+旧字段注释仅为 Period date and time；不能仅据名字认定它是发布时间。
+官方加载审计分别记录 FILE_GENERATE_TIME、FILE_RECEIVE_TIME 和处理时间，说明这些时点不可混用。
+
+[S11] AEMO 时间/端点规范参考（Project EDGE 数据规范）
+https://www.aemo.com.au/-/media/files/initiatives/der/2023/project-edge---data-specification-part-a.pdf?la=en
+用于核对固定 AEST 与半小时结束边界表达。具体 PredispatchIS 仍以该产品字段定义和真实文件为准。
+两个半小时值取均值是本项目预先声明的小时特征映射，不自动等于官方定义的小时平均需求。
+
+[S12] AEMO Demand terms in EMMS Data Model
+https://www.aemo.com.au/-/media/Files/Electricity/NEM/Security_and_Reliability/Dispatch/Policy_and_Process/%E2%80%8CDemand-terms-in-EMMS-Data-Model.pdf
+需求定义及版本记录涉及 IESS 等调整；TOTALDEMAND 不能与任意“用电需求”或 CLEAREDSUPPLY 混用。
+需核历史 CSV 和候选预调度两端的定义与版本。若不一致，本轮唯一候选停止，不用模型分数掩盖差异。
+
+[S13] 后续风光候选的权限/版本边界（本轮不接入）
+https://tech-specs.docs.public.aemo.com.au/Content/TSP_EMMSDM56_Nov2025/Electricity_Data_Model_v.htm
+集中式机组预测涉及 Private/Public Next-Day；事后公开不等于起报前公开。DUID 到地区还需时点映射。
+https://visualisations.aemo.com.au/aemo/nemweb/MMSDataModelReport/Electricity/MMS%20Data%20Model%20Report_files/MMS_112.htm
+ROOFTOP_PV_FORECAST 已有地区级公开预测及 VERSION_DATETIME，不把所有光伏来源笼统列为不可用。
+https://tech-specs.docs.public.aemo.com.au/Content/TSP_EMMSDM55_Apr2025/EMMS_DMv5.5_Apr25_1.htm
+新旧表迁移和 POE 字段更正需要单独核验。未来另立候选时才开展审查，不作为 TOTALDEMAND 失败后的补救。
+
+三、本轮执行边界
+
+只读本地源码、协议和结果，查看上述官方说明与少量目录 HTML；未运行预测器、实验 LLM、训练或批量数据下载。
+没有安装依赖、下载模型、启动定时器或采集服务，也没有更改旧实验输出。
+代码基点工作区干净；新建独立 worktree/分支后仅编辑计划文件和资料入口。
+没有把研究 Agent 的执行费用或网页工具内部消耗记成模型实验用量；本轮没有测量这些工具的 CPU/GPU/金额。
+
+四、文件级最终审查与修改闭合
+
+gate_audit 和 literature 对初稿再次只读审查，提出的实质问题已纳入计划：
+1. S2 停止条件改为“全 case 与同一个固定臂相同”，修正逐 case 的 B/C 析取歧义。
+2. 前推标签固定每目标小时结束+7天封存；全臂共用完整24小时标签和A可用的评分掩码，
+   每地区共同可评分率也须达到95%；缺失保留在计划分母，不伪造分数。
+3. H/P 路由补足“部分历史可恢复但不足完整率”的情况，统一按 H→P→阻断顺序在评分前决定。
+4. S2 增加正确有效输入、已核验错误、回退/失败、unknown 的具体计数规则，unknown 不计成功。
+5. A 只有25步日历；B/C/D才需要未来需求。明确桥接步缺失诊断、完整vintage年龄及50个末端覆盖。
+6. QuantityContract 增加历史 value_kind 与时间聚合算子核查，不默认两种小时均值完全等价。
+7. 前推S0还需核基础价格/历史需求和标签的实时来源；不能只核新增预报便声称整个链路在线。
+
+尚待实施验证：历史包内完整运行、三地区覆盖、需求语义/聚合一致性、25小时输入可得性、
+前推输入实际到达与截止内完成能力，以及全部价格收益。这些没有被文档审查标为通过。
