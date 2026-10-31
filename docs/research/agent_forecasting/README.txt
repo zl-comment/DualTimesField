@@ -9,7 +9,11 @@ information_first_plan_20261031_r10.txt：r9 后的修改计划，先核实未�
 再检验 Agent 的独立贡献；四个设计差距、A/B/C/D、时点、停止规则、预算与实现顺序均在其中。
 information_first_review_20261031_r10.txt：三路独立审查意见、官方来源和未解决的证据边界。
 计划分支 research/agent-information-first-plan-20261031-r10，基点 9a1cd340c1c02fda5dba6b11bc270e69355390d2。
-当前仅完成计划；下一项为独立分支上的 S0 来源/语义审查，尚未执行。本段之后是原资料库历史记录。
+实施进度：遵从用户最新指令，已在此分支完成S0最小读取/时间覆盖审计实现，先提交协议/测试后执行。
+r10_s0_source_audit_protocol_20261031.txt为实施协议，执行提交d91d60c02533d93bc120e12ae7cc9c807f087f30。
+结果见../../../logs/forecasting/agent_totaldemand_s0_20261031/results_cn.txt及review.txt。
+7项相关测试通过；三地区各334/365=91.51%结构覆盖，需求定义仍未证实一致，S0未放行。
+S1/S2/S3和三地区三seed预测实验尚未执行；没有推送。本段之后是原资料库历史记录。
 
 入口
 1. papers/RE-Price/RE-Price.pdf：用户提供的13页原论文，原样保存。

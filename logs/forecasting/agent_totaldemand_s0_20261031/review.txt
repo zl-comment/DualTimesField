@@ -1,0 +1,44 @@
+R10 S0 独立复核记录
+日期：2026-10-31（Asia/Shanghai）
+执行提交：d91d60c02533d93bc120e12ae7cc9c807f087f30
+复核方式：history_audit 独立读取源码与小型归档产物；未重跑原始月包扫描。
+
+复核结论：工程与本次归档一致性通过；不表示需求语义通过或预测收益成立。
+
+已核对
+- coverage.csv 有1095个唯一地区/起报单元，三个地区各365个。
+- 三地区各334个完整25步输入，334/365=91.506849315%；低于冻结95%。
+- 三地区均缺2022-10-02至2022-11-01共31日；目标24小时覆盖同为334，仅桥接缺失为0。
+- 12条timing_audit记录与coverage.csv所有字段逐项一致。
+- 所有选中版本的schedule label及所需行LASTCHANGED均不晚于cutoff。
+- summary内5个源码SHA256同时匹配当前文件与d91d60c Git对象。
+- source_manifest合计12个已有包、202210缺失，2916852条需求元数据、474956532字节。
+- 历史CSV投影不包含RRP，程序没有预测器/LLM/评分调用。整文件SHA256读取字节，不构造价格数组。
+- coverage按region、SEQNO、RUNNO分组；晚到行先过滤，不跨版本拼接或填充。
+- 语义UNVERIFIED来自冻结的quantity_review人工证据审查；覆盖率由数据计算，两者分别保存。
+- archive_proxy、strict_asof_verified=false、BLOCKED_BEFORE_H_OR_P与协议一致。
+- 原始目录HTML保留服务端CRLF及尾空格，不为通过空白检查而改写证据；其余提交内容通过git diff --check。
+
+来源审查说明
+历史血缘在electricity-price-forecasting-research/scripts/collect_multi_market_resources.py中：
+1342–1359解析PRICE_AND_DEMAND的TRADE行，1382–1395构造小时均值和人工hour_end可用时间。
+只投影需求/时间字段复核，holdout三地区前87672行与原2015–2024数据相同，需求最大差为0；
+2022每地区8760小时均为12个五分钟值。完整旧生成链保存在Git对象
+4913b994c0f87adb0b2ca9632106c0b38f05d330:forecasting/build_price_demand.py。
+
+官方Demand Terms及SO_OP_3710表明调度需求含预测/估计成分，不能直接称为纯实测小时用电。
+目前尚未证明PRICE_AND_DEMAND→REGION_SOLUTION产品映射、TRADE→INTERVENTION=0、
+十二个五分钟值与两个半小时值的时间聚合相容性，亦未逐项核清2022对应版本定义。
+这些是未证实项，不是“任何负荷预报都不能预测价格”的结论。
+公开需求图表采用CLEAREDSUPPLY的说明也不能直接证明旧PRICE_AND_DEMAND月CSV的字段血缘：
+https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem/data-dashboard-nem
+官方2022-10全量目录本次正文已保留在october_directory.html，未列REGIONSUM包：
+https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/2022/MMSDM_2022_10/MMSDM_Historical_Data_SQLLoader/PREDISP_ALL_DATA/
+
+执行范围与尚未完成部分
+相关7项合成测试通过；真实来源审计进程exit0、wall115.913秒，CPU user117.163/system2.875秒，
+峰值RSS1426169856字节；读取已有ZIP，不新增ZIP下载；脚本仅1次目录GET、5054字节。
+资源口径为审计子进程，不包含研究Agent、浏览器工具或测试；没有推断服务端费用。
+没有运行S1价格信息实验、S2 Agent案例实验或S3三地区三seed前推。后续Agent/反馈实施也未宣称完成。
+当前候选按R10第5/6节在语义和数据覆盖不足处停止；没有删除10月、填充缺日、切换编码或改门槛。
+没有启动未来采集来绕过语义缺口。三地区、三个seed仍是未完成目标，不能以本次审计代替。

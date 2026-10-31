@@ -1,0 +1,17 @@
+R10 S0 来源审计结果
+执行提交：d91d60c02533d93bc120e12ae7cc9c807f087f30
+分支：research/agent-information-first-plan-20261031-r10
+结论：DATA_SEMANTICS_BLOCKED；路线：BLOCKED_BEFORE_H_OR_P；S1来源准备成立：False。
+未计算价格误差，未调用预测模型或实验LLM；不是新的价格预测负结果。
+历史是 PRICE_AND_DEMAND/TRADE 的12个五分钟值均值；候选是 REGION_SOLUTION/INTERVENTION=0 的两个半小时值均值。
+语义未解决项：PRICE_AND_DEMAND_to_REGION_SOLUTION_quantity_mapping, TRADE_to_INTERVENTION_0_equivalence, hourly_temporal_aggregation_equivalence, 2022_version_specific_official_semantics
+未来收取不能自动修复已有的定义差异。结构覆盖和语义审查分别报告。
+
+三地区全年结构覆盖（archive_proxy，不是first_seen）：
+NSW1: 334/365 = 91.51%; 目标24h完整=334; 仅桥接缺失=0
+QLD1: 334/365 = 91.51%; 目标24h完整=334; 仅桥接缺失=0
+TAS1: 334/365 = 91.51%; 目标24h完整=334; 仅桥接缺失=0
+官方2022-10目录列有REGIONSUM包：False
+要求的三地区、三个seed实验尚未执行，不能把已有r9结果或本次来源扫描算作完成。
+S0本身不启动预测；后续受上述来源判定约束，不自动填充、改编码、改日期或换来源。
+资源：wall=115.913s，CPU(user/system)=117.163/2.875s，峰值RSS=1426169856bytes；新增ZIP下载=0，目录GET=1/5054bytes。

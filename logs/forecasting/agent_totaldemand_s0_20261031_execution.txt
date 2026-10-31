@@ -1,0 +1,18 @@
+COMMAND: ["timeout", "900s", "/root/workspace/Code/DualTimesField/.venv/bin/python", "-u", "scripts/audit_totaldemand_source.py", "--config", "configs/agent_forecasting/r10_s0_source_audit_20261031.json"]
+START_UTC: 2026-10-31T12:19:20.311381+00:00
+202112: 247752 demand metadata rows
+202201: 247524 demand metadata rows
+202202: 223776 demand metadata rows
+202203: 247752 demand metadata rows
+202204: 239760 demand metadata rows
+202205: 247752 demand metadata rows
+202206: 239760 demand metadata rows
+202207: 247752 demand metadata rows
+202208: 247752 demand metadata rows
+202209: 239760 demand metadata rows
+202210: missing source package
+202211: 239760 demand metadata rows
+202212: 247752 demand metadata rows
+{"verdict": "DATA_SEMANTICS_BLOCKED", "regions": {"NSW1": {"planned": 365, "covered25": 334, "coverage25": 0.915068493150685, "target24_covered": 334, "bridge_only_missing": 0, "missing_dates": ["2022-10-02", "2022-10-03", "2022-10-04", "2022-10-05", "2022-10-06", "2022-10-07", "2022-10-08", "2022-10-09", "2022-10-10", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-14", "2022-10-15", "2022-10-16", "2022-10-17", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-21", "2022-10-22", "2022-10-23", "2022-10-24", "2022-10-25", "2022-10-26", "2022-10-27", "2022-10-28", "2022-10-29", "2022-10-30", "2022-10-31", "2022-11-01"]}, "QLD1": {"planned": 365, "covered25": 334, "coverage25": 0.915068493150685, "target24_covered": 334, "bridge_only_missing": 0, "missing_dates": ["2022-10-02", "2022-10-03", "2022-10-04", "2022-10-05", "2022-10-06", "2022-10-07", "2022-10-08", "2022-10-09", "2022-10-10", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-14", "2022-10-15", "2022-10-16", "2022-10-17", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-21", "2022-10-22", "2022-10-23", "2022-10-24", "2022-10-25", "2022-10-26", "2022-10-27", "2022-10-28", "2022-10-29", "2022-10-30", "2022-10-31", "2022-11-01"]}, "TAS1": {"planned": 365, "covered25": 334, "coverage25": 0.915068493150685, "target24_covered": 334, "bridge_only_missing": 0, "missing_dates": ["2022-10-02", "2022-10-03", "2022-10-04", "2022-10-05", "2022-10-06", "2022-10-07", "2022-10-08", "2022-10-09", "2022-10-10", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-14", "2022-10-15", "2022-10-16", "2022-10-17", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-21", "2022-10-22", "2022-10-23", "2022-10-24", "2022-10-25", "2022-10-26", "2022-10-27", "2022-10-28", "2022-10-29", "2022-10-30", "2022-10-31", "2022-11-01"]}}, "resources": {"wall_seconds": 115.9132358841598, "cpu_user_seconds": 117.162889, "cpu_system_seconds": 2.875285, "peak_rss_bytes": 1426169856, "local_archive_bytes": 474956532, "archive_gets": 0, "listing_gets": 1, "listing_bytes": 5054, "scope": "this source-audit process only; excludes research-agent and browser tools"}}
+EXIT_CODE: 0
+WALL_SECONDS: 119.247132

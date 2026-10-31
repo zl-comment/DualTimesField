@@ -1,0 +1,100 @@
+{
+  "history_product": "PRICE_AND_DEMAND.TOTALDEMAND",
+  "history_periodtype": "TRADE",
+  "history_value_kind": "archived_product_value_not_proven_pure_measurement",
+  "history_aggregation": "mean_of_12_five_minute_values",
+  "candidate_product": "PREDISPATCH.REGION_SOLUTION.TOTALDEMAND",
+  "candidate_intervention": 0,
+  "candidate_aggregation": "mean_of_2_half_hour_values",
+  "unresolved": [
+    "PRICE_AND_DEMAND_to_REGION_SOLUTION_quantity_mapping",
+    "TRADE_to_INTERVENTION_0_equivalence",
+    "hourly_temporal_aggregation_equivalence",
+    "2022_version_specific_official_semantics"
+  ],
+  "official_sources": [
+    "https://www.aemo.com.au/-/media/Files/Electricity/NEM/Security_and_Reliability/Dispatch/Policy_and_Process/%E2%80%8CDemand-terms-in-EMMS-Data-Model.pdf",
+    "https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3704-predispatch.pdf",
+    "https://www.aemo.com.au/-/media/files/electricity/nem/security_and_reliability/power_system_ops/procedures/so_op_3710-load-forecasting.pdf"
+  ],
+  "review_status": "UNVERIFIED",
+  "historical_inventory": {
+    "NSW1": {
+      "path": "/root/workspace/Code/DualTimesField/data/holdout/nsw1_hourly.csv",
+      "sha256": "bb11dfb7d33af1996fca13359f90d0231c4968f24a0e4b57dcb0560ffe50befb",
+      "rows": 102264,
+      "year_rows": 8760,
+      "source_intervals": [
+        {
+          "minutes": 5,
+          "count": 12,
+          "hours": 8760
+        }
+      ],
+      "availability_equals_hour_end": true,
+      "columns_projected": [
+        "delivery_start_aest",
+        "available_at_aest",
+        "region",
+        "total_demand_mw",
+        "source_interval_minutes",
+        "source_interval_count",
+        "split"
+      ],
+      "price_columns_materialized": false
+    },
+    "QLD1": {
+      "path": "/root/workspace/Code/DualTimesField/data/holdout/qld1_hourly.csv",
+      "sha256": "66d4ada0d3fbb39d354e31762308633f8d0d1a623e6834317432148e75a5a96a",
+      "rows": 102264,
+      "year_rows": 8760,
+      "source_intervals": [
+        {
+          "minutes": 5,
+          "count": 12,
+          "hours": 8760
+        }
+      ],
+      "availability_equals_hour_end": true,
+      "columns_projected": [
+        "delivery_start_aest",
+        "available_at_aest",
+        "region",
+        "total_demand_mw",
+        "source_interval_minutes",
+        "source_interval_count",
+        "split"
+      ],
+      "price_columns_materialized": false
+    },
+    "TAS1": {
+      "path": "/root/workspace/Code/DualTimesField/data/holdout/tas1_hourly.csv",
+      "sha256": "3e6a53a489c780251ae837896509b6c1e3a7b5f0a8915e3d45b685db878bf491",
+      "rows": 102264,
+      "year_rows": 8760,
+      "source_intervals": [
+        {
+          "minutes": 5,
+          "count": 12,
+          "hours": 8760
+        }
+      ],
+      "availability_equals_hour_end": true,
+      "columns_projected": [
+        "delivery_start_aest",
+        "available_at_aest",
+        "region",
+        "total_demand_mw",
+        "source_interval_minutes",
+        "source_interval_count",
+        "split"
+      ],
+      "price_columns_materialized": false
+    }
+  },
+  "collector_source": {
+    "path": "/root/workspace/Code/electricity-price-forecasting-research/scripts/collect_multi_market_resources.py",
+    "sha256": "0bd12dd9da23ad64e37c7d4e3eca2acd65c5da50ece241fb9a219b393392321b"
+  },
+  "review_basis": "source code lineage plus official definitions; equivalence remains unproven"
+}
