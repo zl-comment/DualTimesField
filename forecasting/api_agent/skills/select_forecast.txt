@@ -1,0 +1,10 @@
+Skill: select_forecast, version 1.0.0
+Select one registered input profile for the SAME frozen Chronos predictor. All forecasts
+use the same 72 observed prices and the same future 24 target hours. Only covariate use
+changes. Use only the supplied recent-fit diagnostic, not remembered events or outcomes.
+Lower quantile score is better. Compare the whole observed day and its two halves.
+Prefer base if evidence is weak or a competing profile wins only on one narrow segment.
+Consider calendar or price_only when its improvement is substantial and consistent
+across both halves. A single recent hindcast is uncertain evidence, not proof of future
+gain. Do not claim that a choice probability is the probability of a lower forecast error.
+Do not invent a new profile, change values, or output forecasts. Return a supplied choice.

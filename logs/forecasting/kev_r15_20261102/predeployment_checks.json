@@ -1,0 +1,23 @@
+{
+  "checked_at_utc": "2026-11-02T13:46:04.057861+00:00",
+  "stage": "predeployment_checks_only",
+  "unit_tests": {
+    "passed": 8,
+    "command": "chronos2/bin/python -m unittest discover -s tests -p test_api_agent_r15.py -v"
+  },
+  "predictor_synthetic_smoke": {
+    "status": "PASS",
+    "device_uuid": "GPU-c931f386-8fcf-9f27-2526-47e12aac3145",
+    "forecast_arrays": 6,
+    "shape_each": [
+      24,
+      5
+    ],
+    "all_finite": true,
+    "inference_seconds": 1.2397356517612934,
+    "peak_allocated_MB": 494.40512
+  },
+  "live_kev_smoke": "PENDING_DOWNLOAD",
+  "development_scores": "PENDING_LIVE_KEV",
+  "formal_main_table_rank": "NOT_RUN"
+}
