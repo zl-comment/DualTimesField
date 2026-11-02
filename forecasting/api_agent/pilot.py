@@ -81,18 +81,31 @@ def main():
             raise ValueError('Kev weight checksum mismatch: ' + filename)
     client = KevClient()
     identity = client.identity()
+    from ..chronos2_zeroshot.model import package_versions
     source_paths = sorted((ROOT / 'forecasting/api_agent').glob('*.py')) + sorted(
         (ROOT / 'forecasting/api_agent/skills').glob('*.txt'))
     source_paths += [ROOT / 'forecasting/aligned_scoring.py',
                      ROOT / 'forecasting/chronos2_zeroshot/model.py',
                      ROOT / 'configs/agent_forecasting/r15_kev_runtime.json']
     source_hashes = {str(p.relative_to(ROOT)): sha_file(p) for p in source_paths}
+    input_sources = {}
+    for region in ('NSW1', 'QLD1', 'TAS1'):
+        for filename in ('metadata.json', 'origin_unix.npy', 'target_time_unix.npy',
+                         'input__history_values.npy', 'input__history_calendar.npy',
+                         'input__future_calendar.npy'):
+            path = CACHE / region / 'selection' / filename
+            input_sources[str(path)] = sha_file(path)
     manifest = {
         'release': 'r15-pilot-v1', 'base_commit': '46e92fd9053a8c5e63619435e599496e023c669c',
         'git_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
         'source_hashes': source_hashes, 'source_fingerprint': digest(source_hashes),
+        'input_source_hashes': input_sources,
         'kev_identity': identity, 'kev_weights': model_files, 'predictor_weights': CHECKPOINT_SHA,
+        'predictor_packages': package_versions(),
+        'kev_runtime_packages': (runtime_root / 'requirements.freeze.txt').read_text(),
+        'kev_source_commit': subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'], cwd=runtime_root / 'runtime-src', text=True).strip(),
         'development_only': True, 'regions': ['NSW1', 'QLD1', 'TAS1'],
         'origins_per_region': args.origins_per_region, 'sampling': 'uniform linspace over selection cache',
         'training_calls': 0, 'max_kev_calls_per_origin': 2,
@@ -172,6 +185,9 @@ def main():
     for relative_path, expected in source_hashes.items():
         if sha_file(ROOT / relative_path) != expected:
             raise RuntimeError('Source changed during frozen pilot: ' + relative_path)
+    for filename, expected in input_sources.items():
+        if sha_file(filename) != expected:
+            raise RuntimeError('Input cache changed during frozen pilot: ' + filename)
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2), flush=True)
 
