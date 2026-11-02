@@ -4,15 +4,16 @@ Agent 电价预测研究资料库
 用途
 持续查阅论文、已核实的开源框架和本项目的设计边界。本文档不是实验成功声明。
 
-最新设计（2026-11-02，Asia/Shanghai）
-r14_frozen_api_agent_alignment_20261102.txt：冻结Chronos-2＋API LLM＋可版本化流程/skills的基线对齐设计。
-分支research/frozen-api-agent-alignment-20261102-r14，基准752a871（R13）。状态DESIGN_ONLY。
-统一O-10min截止、72小时历史、25步桥接/24小时评分、九项日历和原始需求单位。
-分开同数值输入模型表与A0/B1/B2/C/D贡献表，LLM与Agent不训练权重；监督基线另记训练预算。
-2023开发、2024回顾评价的拟定新协议；2024已暴露，不声称盲测。API、skills和I2接口尚未实现。
+最新计划（2026-11-02，Asia/Shanghai，v0.2.0重订）
+r14_frozen_api_agent_alignment_20261102.txt：开发冻结Chronos-2＋API LLM＋版本化流程/skills，接入已有主表。
+分支research/frozen-api-agent-alignment-20261102-r14，基准752a871（R13）。状态PLAN_ONLY。
+按用户纠正撤回v0.1的基线重训、新矩阵和时间规则；以现有2023–2024每小时主表为准。
+沿用原72→24、十项日历、原预处理及cutoff=O。25行/225格结果复用，基线无需重训或重跑。
+BASE复用已有Chronos，只新增同来源FIXED和AGENT；固定LLM流程消融以后按需开展。
+先在既有2022开发范围调试，再冻结版本并评估原完整网格；历史已暴露，不声称盲测。
 机器可读设计：../../../configs/agent_forecasting/r14_alignment_design_20261102.json（run_ready=false）。
 skill契约：r14_skill_contracts_20261102.txt；对齐矩阵：r14_baseline_alignment_matrix_20261102.csv。
-本轮只提交设计，无训练、预测或API调用；R12停止判定及旧主表不变。
+本轮只重订计划，无训练、预测或API调用；R12停止判定及旧主表不变。
 
 最新参考排名（2026-11-02）
 R13对225份主表预测按2023相同每日目标重新评分，R12 B的MAE第9/21、QS第10/19。
