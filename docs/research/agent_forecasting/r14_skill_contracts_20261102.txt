@@ -1,0 +1,59 @@
+R14项目Agent skill契约（设计0.1.0，未实现/未安装）
+
+这些skill属于目标电价预测Agent，不是给当前Codex助手安装的全局技能。
+API服务提供LLM推理能力；本地编排器加载相同版本的skill指令、schema和允许工具。
+单有SKILL文本不构成可执行能力；工具服务执行时间、权限、引用、单位和输出身份检查。
+
+1. evidence_retrieval
+输入：不可变snapshot_id、region、目标24小时、基础输入清单、已获证据IDs。
+输出：从同一快照中检索到的相关文档IDs，说明缺失字段及下一步查询理由。
+允许工具：search_snapshot、read_snapshot_document。
+限制：无实时互联网、任意文件路径或可由LLM改写的cutoff；所有搜索先按快照权限过滤。
+普通结构化字段的排序/去重由工具执行，不把这些确定性工作包装为LLM独有能力。
+
+2. event_extraction
+输入：工具返回的原始正文和带版本元数据的文档。
+输出：event_type、region、valid_from/to、status、source_id/version、quote_span、
+      正文明示的quantity/value/unit（可为空）、related_notice_ids。
+限制：缺失值写unknown；禁止用模型记忆填事实，不输出price_shift、risk_multiplier或价格数组。
+同一来源多篇转述不自动变成多条独立证据；事实与意见分开记录。
+引用/数字/时间存在性由确定性验证器复核；需要语义判断时保存歧义，不保证字符串匹配等于事实正确。
+
+3. version_resolution
+输入：结构化事实、原文引用及同快照内相关公告。
+输出：有效、撤销、被替代、冲突未解四类状态，及支持关系的引用。
+允许工具：read_related_versions、validate_fact_packet。
+限制：只使用截止时点前已可见关系；无权在相互冲突版本之间凭价格效果挑选。
+固定B2拥有同样的公开版本字段与确定性规则，C/D不享有隐藏的额外来源。
+
+4. forecast_request
+输入：通过验证的事实包、批准的input_profile_id、公共历史与协变量指纹。
+输出：固定adapter生成的input_hash、forecast_frozen返回的forecast_id及引用解释。
+限制：字段映射由程序注册表固定，LLM不生成任意Python或新变量、不自由改分位、不选择测试赢家。
+未经验证的新事件类型只作为解释，不进入数值输入；没有合法数值影响则如实保留底座预测。
+
+C/D共享约束
+C按冻结的检索、抽取、核验顺序执行；D可在相同总预算内决定补查、跳过或停止。
+两个臂用同一API模型、system prompt、四个skill版本、输出schema及工具实现。
+工作流控制prompt允许因固定/自适应编排而不同，但必须单独存hash，不能混入额外金融/历史事实。
+每次调用记录snapshot_id、skill_id/version/hash、API请求/响应身份、工具输入输出、真实用量和状态。
+最终有效输入相同必须输出相同数值；不能让自由解释文本成为隐藏数值输入。
+
+建议的实现布局（本次未创建运行代码）
+forecasting/api_agent/workflow.py：固定C和自适应D编排。
+forecasting/api_agent/transport.py：API传输、计数、截止与响应身份记录。
+forecasting/api_agent/tools.py：快照绑定的工具服务。
+forecasting/api_agent/skills/<skill_id>/instructions.txt：可版本化指令。
+forecasting/api_agent/skills/<skill_id>/schema.json：结构化输入输出。
+forecasting/api_agent/releases/<release_id>.json：冻结的整套版本manifest。
+forecasting/api_agent/predictor.py：共享冻结Chronos-2接口，不能导入标签或训练器。
+与旧agent_forecasting/m1_*、agentic_dev_eval/r9.py隔离，保留旧实验可解释性。
+
+发布manifest的必需字段
+release_id、parent_release、git_commit、workflow_hash、orchestration_prompt_hash、
+system_prompt_hash、tool_schema_hash、skill_versions_and_hashes、input_contract_hash、
+approved_mapping_hash、scoring_contract_hash、predictor_config/weights_sha256、
+api_requested_model、api_version_or_immutability_limitation、sampling_parameters、budget_hash。
+开发版本可以变更；评价时锁定manifest。更改任一skill/工具/映射/模型版本就产生新的release_id。
+历史评价标签、未来公告和当前网页不能通过记忆、示例库或skill构建过程注入评价运行。
+本文件只定义契约；真实指令、schema、测试和发布指纹需随实现提交，当前不填伪造hash。

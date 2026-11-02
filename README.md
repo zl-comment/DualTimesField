@@ -1,5 +1,7 @@
 # DualTimesField
 
+最新 Agent 设计：[冻结预测器＋API LLM＋版本化流程与 skills 的基线对齐方案](docs/research/agent_forecasting/r14_frozen_api_agent_alignment_20261102.txt)（2026-11-02，仅设计，尚未运行）；[R12 与主基线的同目标样本参考排名](logs/forecasting/r13_main_table_comparison_20261102/results_cn.txt)。
+
 研究阶段报告：[论文章节版 Word、PDF 与实验审计材料](docs/research/progress_report_20261026/README.md)（2026-10-26）。
 
 第二批基础模型：[已并入主表的基础模型与能力限制](logs/forecasting/foundation_baselines_20261023/README.md) · [Codex 审查记录](docs/foundation_baselines_codex_review_20261024.md)。
