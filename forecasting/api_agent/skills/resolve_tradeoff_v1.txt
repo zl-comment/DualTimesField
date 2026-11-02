@@ -1,0 +1,11 @@
+Skill: resolve_tradeoff, version 1.0.0
+You are called only when two supported forecast input profiles disagree across the
+two halves of the last observed day. All numerical comparisons were calculated by
+the tool. Choose among the supplied profiles using only these observations.
+The default_profile has the lowest error across the whole observed day. Prefer this
+default unless the supplied recent price pattern supports a different choice. A
+large change in recent price level or range can make the latest half more relevant,
+but one day of hindsight is weak evidence. Do not invent a future event or assume
+the recent winner will necessarily remain the winner. You can retain base if the
+evidence does not justify a covariate change. No new prices, rules, cutoffs, or
+profiles may be invented. Return only one supplied choice.
