@@ -1,0 +1,67 @@
+{
+  "status": "DEPLOYED_AND_TWO_DEVELOPMENT_PILOTS_COMPLETE",
+  "timestamp_utc": "2026-11-02T14:21:27.075822+00:00",
+  "service": {
+    "endpoint": "http://127.0.0.1:8009/v1/systemone",
+    "tmux_session": "kev-4b",
+    "gpu_index": 6,
+    "gpu_uuid": "GPU-d38f792e-b077-9b2f-c8c9-e2c692cc6001",
+    "model_process_memory_MiB": 9328,
+    "predictor_gpu_index": 7
+  },
+  "same_numerical_forecasts_verified": {
+    "NSW1": {
+      "origin_unix": true,
+      "target_time_unix": true,
+      "BASE": true,
+      "FIXED": true
+    },
+    "QLD1": {
+      "origin_unix": true,
+      "target_time_unix": true,
+      "BASE": true,
+      "FIXED": true
+    },
+    "TAS1": {
+      "origin_unix": true,
+      "target_time_unix": true,
+      "BASE": true,
+      "FIXED": true
+    }
+  },
+  "costs": {
+    "r15": {
+      "origins": 72,
+      "api_calls": 144,
+      "api_input_tokens": 96585,
+      "fallbacks": 0,
+      "api_latency_median_seconds": 0.3607501741498709,
+      "pilot_elapsed_seconds": 60.89217111468315,
+      "changed_from_fixed": 3
+    },
+    "r16": {
+      "origins": 72,
+      "api_calls": 1,
+      "api_input_tokens": 1020,
+      "fallbacks": 0,
+      "api_latency_median_seconds": 0.43297596648335457,
+      "pilot_elapsed_seconds": 10.19626734405756,
+      "changed_from_fixed": 0
+    }
+  },
+  "qs_gain_vs_base_percent": 2.931643044104305,
+  "coverage_90_change_percentage_points": -0.63657407407407,
+  "api_call_reduction_percent": 99.30555555555556,
+  "llm_increment_demonstrated": false,
+  "main_table_rank": null,
+  "unit_tests_passed": 11,
+  "training_calls": 0,
+  "limitations": [
+    "72 reused 2022 H1 development origins; not independent confirmation",
+    "No 2023-2024 evaluation run or main-table rank",
+    "R16 exactly matches the strong deterministic control",
+    "Coverage decreases slightly relative to BASE",
+    "Historical pretraining overlap cannot be ruled out",
+    "Numerical candidates eagerly computed; no adaptive GPU compute-saving claim"
+  ]
+}

@@ -97,6 +97,12 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   -m forecasting.api_agent.pilot --origins-per-region 24 --out <new-output-directory>
 ```
 
-Current verification: eight boundary/decision/fallback unit tests passed; a real
+Predeployment verification: eight boundary/decision/fallback unit tests passed; a real
 GPU 7 synthetic check produced all six profile/hindcast arrays of shape `[24,5]`
-with finite values. Live Kev and development scores remain pending deployment.
+with finite values. Deployment and the R15 pilot subsequently completed; see
+`logs/forecasting/kev_r15_20261102/service_smoke.json` and `pilot_report.json`.
+The R16 follow-up records the paired workflow optimization and its limitations.
+
+The adapter was downloaded from the publisher's ModelScope mirror at revision
+`54ac5810dae3e2d8a7fac8c963a7cc9b475ccfac`; its SHA-256 matches the pinned HF
+adapter (`90e817356246e7f18bfa7ca3d31794cd4fbeb3332a66a84cb51d9ceae925f2b2`).

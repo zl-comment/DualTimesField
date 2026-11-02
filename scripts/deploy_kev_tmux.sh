@@ -29,4 +29,7 @@ exec /root/workspace/services/kev/venv/bin/python -u -m kev.serve \
 SH
 chmod +x "$service_root/serve.sh"
 tmux new-session -d -s "$session" "/bin/bash -c '$service_root/serve.sh; exec /bin/bash'"
+tmux rename-window -t "$session:0" server
+tmux new-window -d -t "$session" -n logs "tail -n 50 -F $service_root/logs/server.log"
+tmux select-window -t "$session:logs"
 echo "Started tmux session $session; readiness requires GET /v1/models and a decision smoke test."

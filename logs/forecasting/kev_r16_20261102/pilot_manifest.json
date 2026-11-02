@@ -1,0 +1,274 @@
+{
+  "release": "r16-pilot-v1",
+  "base_commit": "0ae728e7e8eb478a7dc463c8b87dfbb0890660ad",
+  "git_commit": "a25c7ff6ebb1d967961bfc2d8c40f5c4ca6552b0",
+  "branch": "research/kev-agent-gated-routing-20261102-r16",
+  "source_hashes": {
+    "forecasting/api_agent/__init__.py": "0036272a94b8f28f0520cb90b288b0e006e34857c374c2f9742b2aec1f37de8f",
+    "forecasting/api_agent/pilot.py": "deec85ebd51beea5d584935620dacc4e1c58d8037b8daf1e138dfd15f58c0317",
+    "forecasting/api_agent/transport.py": "1509872788ff273c24be333353019fb578d9cd6bacb36832c0973d103157a0bf",
+    "forecasting/api_agent/workflow.py": "02d07bc07794fd1e3e0894cf773213965faac7c8f25ab53a5604880d08d71009",
+    "forecasting/api_agent/workflow_r16.py": "5aa21984bf4011a6b3c1859717ea6ffbdd5ec5e894a416ef51b477adc415cc7a",
+    "forecasting/api_agent/skills/resolve_tradeoff_v1.txt": "66172d6a98047afd31a8f46f88db9c171a6d3d8fbecfc4ca55d1ee1cdbabfe85",
+    "forecasting/api_agent/skills/select_forecast.txt": "ae15e79eef2396991aacc29b801c322d56dd286b6b7e44edadcbe57b19ca64f0",
+    "forecasting/api_agent/skills/triage.txt": "45eb92b869d7fba0130df1ec956b5e6494da2b36deb3ce47ea420e7c3fbe76ba",
+    "forecasting/aligned_scoring.py": "c214770fda62181c7e845535acbf962596656fca5284b705e3320315905bcb81",
+    "forecasting/chronos2_zeroshot/model.py": "b8bc3ca8941892460025b8bf01706188b7bff85dab389786a44bd6fc3691e3ec",
+    "configs/agent_forecasting/r15_kev_runtime.json": "0d2794e1c2cd024652f20938e18a6add56317f1c26bc3b48f6a0c71b7c02fdb6"
+  },
+  "source_fingerprint": "4232a12462ae749b18d563abe848ef862adbd182d653da22edffde61bd30c699",
+  "input_source_hashes": {
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/metadata.json": "e9d9b1a7e348524337273240687332d549ce191bbe9b9321da032aed06f63df5",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/target_time_unix.npy": "b8309dbb28a7a0feae1c090c95d45823744f802c1001532af11298c126762dcc",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__history_values.npy": "9a477e06757ec244b102b36354815749fbe13a0109677332abaa489a51e3d4cd",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/selection/input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/metadata.json": "4f07a1ff34bbd08927f46d20aab95109512419598ec6ee8398021c494af47468",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/target_time_unix.npy": "b8309dbb28a7a0feae1c090c95d45823744f802c1001532af11298c126762dcc",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/input__history_values.npy": "e2f95cd42b9efc845f1e1e0ee76f0399c5680d93a509e5eeafc6da4f1db9acd1",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/QLD1/selection/input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/metadata.json": "145fc8e81efd42c3c6ce3a3d98313c09568cdf43035f08a11b0807d771f0094d",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/origin_unix.npy": "a2bbea276714ae64fd12f625a437aed4fe2bae02275c3767b8ad0ca2748241da",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/target_time_unix.npy": "b8309dbb28a7a0feae1c090c95d45823744f802c1001532af11298c126762dcc",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/input__history_values.npy": "a654f86ba00d79c7abd0db07144bae26285ee7193e3685c0b1625930f2074521",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/input__history_calendar.npy": "a2fcc841a3a28050ac421856ccee6b5f49ae899e4420224fd283cf5ed9d54639",
+    "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/TAS1/selection/input__future_calendar.npy": "915fca255b7356be9f08c7bdb54a2c843c761e5ca6938a01277d17025b18aad0"
+  },
+  "kev_identity": {
+    "models": [
+      {
+        "name": "kev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 145,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 146,
+          "requests": 146,
+          "queued": 0
+        }
+      },
+      {
+        "name": "jev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 145,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 146,
+          "requests": 146,
+          "queued": 0
+        }
+      }
+    ]
+  },
+  "kev_weights": {
+    "/root/workspace/services/kev/models/kev-4b/adapter_config.json": {
+      "sha256": "8a05dfd6c5e7f61a62e6db5d8de8093a8dbbd105aa7ee7b5e7b73f6249f45617",
+      "size": 1271,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/adapter_model.safetensors": {
+      "sha256": "90e817356246e7f18bfa7ca3d31794cd4fbeb3332a66a84cb51d9ceae925f2b2",
+      "size": 129924032,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/kev-4b/added_tokens.json": {
+      "sha256": "c0284b582e14987fbd3d5a2cb2bd139084371ed9acbae488829a1c900833c680",
+      "size": 707,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/head.pt": {
+      "sha256": "dd633435998ecc751ac538717a3742e32149500fabf7d7276287dbf0693f347c",
+      "size": 5249791,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/kev-4b/merges.txt": {
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "size": 1671853,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/provenance.json": {
+      "sha256": "7aa999a629f25d93713950d6fb39d0b4c37fe8a9f43d2673a79c4c455d42b26a",
+      "size": 4265,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/result.json": {
+      "sha256": "c28c365684ebc739d93c51d7ee881e3c589e2633deb3b42f4818b149b4c43ab2",
+      "size": 80553,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/special_tokens_map.json": {
+      "sha256": "6676f091c8bc4d1b50146427cfde92073402866b87b6e39223227931b70083e9",
+      "size": 616,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/tokenizer.json": {
+      "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523",
+      "size": 19989325,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/kev-4b/tokenizer_config.json": {
+      "sha256": "8671bed7c852ce9e661be94f179a7b4ffd091c2a65aea0363e5501c20318ee45",
+      "size": 1128,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/training_config.json": {
+      "sha256": "005f939bef00274f49f15282dfa60543f5f82e781268f3c12d8ceeacb9f61f30",
+      "size": 1845,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/kev-4b/vocab.json": {
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "size": 2776833,
+      "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/LICENSE": {
+      "sha256": "50cbab8a892c5f2993b8c7351a99182507472def3b1374558308605d99b86b32",
+      "size": 11343,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/config.json": {
+      "sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+      "size": 3161,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/merges.txt": {
+      "sha256": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+      "size": 3353259,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/model.safetensors-00001-of-00002.safetensors": {
+      "sha256": "df547074dce70532a0493e5433152bd17a65efb89088cfabc2e7e2371a93d712",
+      "size": 5329398712,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/model.safetensors-00002-of-00002.safetensors": {
+      "sha256": "590fbaac095dd31db886c322d9d2f7df47777966391acf306ddddc3e4e3a15ef",
+      "size": 3990429344,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/model.safetensors.index.json": {
+      "sha256": "eae340074abb0a5f31a6621f7ae8e8248a7c1790df04a722c4e4b70c2a6d1dbb",
+      "size": 76196,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/preprocessor_config.json": {
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size": 390,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/tokenizer.json": {
+      "sha256": "fe000e3ed39ed12b8d2481d527d44f93c65d37e87645d2dcc80d1bf9d50d2927",
+      "size": 12807196,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": true
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/tokenizer_config.json": {
+      "sha256": "3891e840d7dc5fca0af33d3a25083a735e36fe06214e3f707024820cb6b9f89c",
+      "size": 16713,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/video_preprocessor_config.json": {
+      "sha256": "d039cd7d88b3502a99edd455496b75b44ecf7dd3b3669748bafac37e6cecc085",
+      "size": 386,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    },
+    "/root/workspace/services/kev/models/Qwen3.5-4B-Base/vocab.json": {
+      "sha256": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003",
+      "size": 6722759,
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "upstream_lfs_verified": false
+    }
+  },
+  "predictor_weights": {
+    "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+    "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+  },
+  "predictor_packages": {
+    "chronos-forecasting": "2.3.2",
+    "torch": "2.14.1+cu126",
+    "numpy": "2.4.6",
+    "pandas": "3.1.0"
+  },
+  "kev_runtime_packages": "accelerate==1.15.0\naiohappyeyeballs==2.7.1\naiohttp==3.14.3\naiosignal==1.4.0\nannotated-doc==0.0.5\nannotated-types==0.8.0\nanyio==4.15.1\nattrs==26.1.0\ncertifi==2026.7.22\ncharset-normalizer==3.5.1\nclick==8.5.0\ncloudpickle==3.1.2\ndatasets==5.0.1\ndill==0.4.1\nfastapi==0.141.1\nfilelock==4.0.0\nfrozenlist==1.8.0\nfsspec==2026.6.0\nh11==0.16.0\nhf-xet==1.6.0\nhttpcore==1.0.9\nhttpcore2==2.13.0\nhttpx==0.28.1\nhttpx2==2.13.0\nhuggingface-hub==1.32.0\nidna==3.20\njinja2==3.1.6\njoblib==1.6.0\nkev @ file:///root/workspace/services/kev/runtime-src\nmarkdown-it-py==4.2.0\nmarkupsafe==3.0.3\nmdurl==0.1.2\nmpmath==1.3.0\nmsgspec==0.21.1\nmultidict==6.8.0\nmultiprocess==0.70.19\nnarwhals==2.26.0\nnetworkx==3.6.1\nnumpy==2.5.3\nnvidia-cublas-cu12==12.6.4.1\nnvidia-cuda-cupti-cu12==12.6.80\nnvidia-cuda-nvrtc-cu12==12.6.77\nnvidia-cuda-runtime-cu12==12.6.77\nnvidia-cudnn-cu12==9.10.2.21\nnvidia-cufft-cu12==11.3.0.4\nnvidia-cufile-cu12==1.11.1.6\nnvidia-curand-cu12==10.3.7.77\nnvidia-cusolver-cu12==11.7.1.2\nnvidia-cusparse-cu12==12.5.4.2\nnvidia-cusparselt-cu12==0.7.1\nnvidia-nccl-cu12 @ file:///root/workspace/services/kev/wheels/nvidia_nccl_cu12-2.27.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl\nnvidia-nvjitlink-cu12==12.6.85\nnvidia-nvtx-cu12==12.6.77\npackaging==26.3\npandas==3.0.5\npeft==0.21.0\npropcache==0.5.4\npsutil==7.2.2\npyarrow==25.0.1\npydantic==2.13.5\npydantic-core==2.46.5\npygments==2.21.0\npython-dateutil==2.9.0.post0\npyyaml==6.0.3\nregex==2026.9.10\nrequests==2.34.2\nrich==15.0.0\nsafetensors==0.8.0\nscikit-learn==1.9.1\nscipy==1.18.1\nsetuptools==84.0.0\nshellingham==1.5.4\nsix==1.17.0\nstarlette==1.6.0\nsympy==1.14.0\ntenacity==9.1.4\nthreadpoolctl==3.7.0\ntokenizers==0.23.2\ntorch @ file:///root/workspace/services/kev/wheels/torch-2.8.0+cu126-cp313-cp313-manylinux_2_28_x86_64.whl\ntqdm==4.70.1\ntransformers==5.17.0\ntriton @ file:///root/workspace/services/kev/wheels/triton-3.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl\ntruststore==0.10.4\ntyper==0.27.2\ntypesafe-sdk==0.6.0\ntyping-extensions==4.16.0\ntyping-inspection==0.4.4\nurllib3==2.8.0\nuvicorn==0.53.0\nxxhash==4.0.1\nyarl==1.25.1\n",
+  "kev_source_commit": "6b719c3c3f367295f6ef336f4f751cf5ff970abc",
+  "development_only": true,
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "origins_per_region": 24,
+  "sampling": "uniform linspace over selection cache",
+  "training_calls": 0,
+  "max_kev_calls_per_origin": 1,
+  "profiles": [
+    "base",
+    "calendar",
+    "price_only"
+  ],
+  "fixed_policy": "lowest visible-day QS; change only for >2% reduction",
+  "agent_guard": "route conflicting eligible profiles only; probability <.55 falls back to FIXED",
+  "interpretation": "development subset, not main-table rank; no pretraining-contamination exclusion",
+  "input_scope": "same 72-hour common input pool; effective covariate profiles may differ",
+  "historical_fit": "48-to-24 hindcast wholly inside each origin history; no parameter fitting"
+}
