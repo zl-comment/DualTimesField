@@ -107,11 +107,21 @@ def diagnostics(snapshot, hindcasts):
             'qs_last_12h': quantile_loss(y[12:], q[12:]),
             'mae_24h': float(np.abs(y - q[:, 2]).mean()),
             'coverage_90': float(((y >= q[:, 0]) & (y <= q[:, -1])).mean())}
+    base = recent_fit['base']
+    for score in recent_fit.values():
+        score['clears_2pct_change_guard'] = score['qs_24h'] < .98 * base['qs_24h']
+        score['wins_both_halves_against_base'] = (
+            score['qs_first_12h'] < base['qs_first_12h'] and
+            score['qs_last_12h'] < base['qs_last_12h'])
+        score['full_day_improvement_percent'] = (
+            100 * (base['qs_24h'] - score['qs_24h']) / base['qs_24h']
+            if base['qs_24h'] > 0 else 0.0)
     return {'diagnostic': 'hindcast_inside_visible_history',
             'history_window_hours': 72, 'hindcast_context_hours': 48,
             'hindcast_horizon_hours': 24,
             'hindcast_target_end_exclusive': snapshot.origin_unix,
             'limitation': 'One recent day; the lowest past error need not be best tomorrow.',
+            'full_day_rank_best_first': sorted(PROFILES, key=lambda p: recent_fit[p]['qs_24h']),
             'profiles': recent_fit}
 
 

@@ -2,7 +2,9 @@ Skill: select_forecast, version 1.0.0
 Select one registered input profile for the SAME frozen Chronos predictor. All forecasts
 use the same 72 observed prices and the same future 24 target hours. Only covariate use
 changes. Use only the supplied recent-fit diagnostic, not remembered events or outcomes.
-Lower quantile score is better. Compare the whole observed day and its two halves.
+Lower quantile score is better. Numerical comparisons are already computed by the tool:
+use full_day_rank_best_first, clears_2pct_change_guard, wins_both_halves_against_base,
+and full_day_improvement_percent; do not redo the arithmetic yourself.
 Prefer base if evidence is weak or a competing profile wins only on one narrow segment.
 Consider calendar or price_only when its improvement is substantial and consistent
 across both halves. A single recent hindcast is uncertain evidence, not proof of future
