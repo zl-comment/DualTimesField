@@ -1,0 +1,359 @@
+{
+  "kind": "synthetic_live_api_behavior_check",
+  "cases": [
+    {
+      "support": 8,
+      "synthetic_better_candidate": "lightgbm:full:72",
+      "selected": "commit:lightgbm:full:72",
+      "responds_to_supplied_evidence": true,
+      "record": {
+        "request": {
+          "model": "kev-latest",
+          "state": {
+            "fixture": "SYNTHETIC ONLY; these are not measured experimental results.",
+            "phase": "final_selection",
+            "default_candidate_id": "lightgbm:full:72",
+            "candidate_ids": [
+              "lightgbm:full:72",
+              "chronos:price_only:24"
+            ],
+            "future_actuals_available": false,
+            "paired_diagnostic": {
+              "diagnostic_kind": "retrospective_frozen_recompute",
+              "same_episodes_for_both_candidates": true,
+              "horizon_hours": 24,
+              "support_count": 8,
+              "candidates": {
+                "lightgbm:full:72": {
+                  "sample_count": 8,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 10,
+                    "mae": 20,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                },
+                "chronos:price_only:24": {
+                  "sample_count": 8,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 50,
+                    "mae": 90,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                }
+              }
+            },
+            "other_evidence": "No conflicting numerical evidence or failures; both forecasts valid."
+          },
+          "questions": {
+            "action": {
+              "type": "choice",
+              "instructions": "compare_candidates v2.0.0\nMake the final forecast choice using only the supplied evidence. Matched retrospective diagnostics compare the default and the proposed alternative on the SAME mature episodes, with the SAME24-hour horizon and score. Quantile score (qs) is the primary loss: smaller is better. Check sample count, missing/failure count, data roles, MAE, interval coverage and width. Training/selection-exposed and tiny samples are limited evidence, not unbiased guarantees. Missing metrics are unknown, never zero. Forecast disagreement and narrow intervals alone do not establish accuracy. Retain the default when its matched evidence is stronger or the alternative is unsupported; select the alternative when its evidence is more convincing for the current regime. There is no compulsory numerical winner or minimum percentage improvement gate. A pool is defensible only as a deliberate compromise under complementary or uncertain evidence; pooling does not automatically improve loss or calibration. Each recipe's coefficient applies to the first named candidate. Never infer pool losses from component means: a pool not retrospectively scored must be identified as unscored.\n",
+              "criteria": {
+                "commit:lightgbm:full:72": "Submit the existing frozen LightGBM prediction.",
+                "commit:chronos:price_only:24": "Submit the existing frozen Chronos prediction."
+              }
+            }
+          }
+        },
+        "response": {
+          "model": "kev-latest",
+          "answers": {
+            "action": {
+              "type": "choice",
+              "choice": "commit:lightgbm:full:72",
+              "confidence": 0.9607,
+              "probabilities": {
+                "commit:lightgbm:full:72": 0.9804,
+                "commit:chronos:price_only:24": 0.0196
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 541,
+            "output_tokens": 79
+          },
+          "latency_ms": 341.7
+        },
+        "elapsed_seconds": 0.36315808817744255,
+        "selected_probability": 0.9804
+      }
+    },
+    {
+      "support": 8,
+      "synthetic_better_candidate": "chronos:price_only:24",
+      "selected": "commit:chronos:price_only:24",
+      "responds_to_supplied_evidence": true,
+      "record": {
+        "request": {
+          "model": "kev-latest",
+          "state": {
+            "fixture": "SYNTHETIC ONLY; these are not measured experimental results.",
+            "phase": "final_selection",
+            "default_candidate_id": "lightgbm:full:72",
+            "candidate_ids": [
+              "lightgbm:full:72",
+              "chronos:price_only:24"
+            ],
+            "future_actuals_available": false,
+            "paired_diagnostic": {
+              "diagnostic_kind": "retrospective_frozen_recompute",
+              "same_episodes_for_both_candidates": true,
+              "horizon_hours": 24,
+              "support_count": 8,
+              "candidates": {
+                "lightgbm:full:72": {
+                  "sample_count": 8,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 50,
+                    "mae": 90,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                },
+                "chronos:price_only:24": {
+                  "sample_count": 8,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 10,
+                    "mae": 20,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                }
+              }
+            },
+            "other_evidence": "No conflicting numerical evidence or failures; both forecasts valid."
+          },
+          "questions": {
+            "action": {
+              "type": "choice",
+              "instructions": "compare_candidates v2.0.0\nMake the final forecast choice using only the supplied evidence. Matched retrospective diagnostics compare the default and the proposed alternative on the SAME mature episodes, with the SAME24-hour horizon and score. Quantile score (qs) is the primary loss: smaller is better. Check sample count, missing/failure count, data roles, MAE, interval coverage and width. Training/selection-exposed and tiny samples are limited evidence, not unbiased guarantees. Missing metrics are unknown, never zero. Forecast disagreement and narrow intervals alone do not establish accuracy. Retain the default when its matched evidence is stronger or the alternative is unsupported; select the alternative when its evidence is more convincing for the current regime. There is no compulsory numerical winner or minimum percentage improvement gate. A pool is defensible only as a deliberate compromise under complementary or uncertain evidence; pooling does not automatically improve loss or calibration. Each recipe's coefficient applies to the first named candidate. Never infer pool losses from component means: a pool not retrospectively scored must be identified as unscored.\n",
+              "criteria": {
+                "commit:lightgbm:full:72": "Submit the existing frozen LightGBM prediction.",
+                "commit:chronos:price_only:24": "Submit the existing frozen Chronos prediction."
+              }
+            }
+          }
+        },
+        "response": {
+          "model": "kev-latest",
+          "answers": {
+            "action": {
+              "type": "choice",
+              "choice": "commit:chronos:price_only:24",
+              "confidence": 0.9626,
+              "probabilities": {
+                "commit:lightgbm:full:72": 0.0187,
+                "commit:chronos:price_only:24": 0.9813
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 541,
+            "output_tokens": 79
+          },
+          "latency_ms": 336.0
+        },
+        "elapsed_seconds": 0.34590139240026474,
+        "selected_probability": 0.9813
+      }
+    },
+    {
+      "support": 4,
+      "synthetic_better_candidate": "lightgbm:full:72",
+      "selected": "commit:lightgbm:full:72",
+      "responds_to_supplied_evidence": true,
+      "record": {
+        "request": {
+          "model": "kev-latest",
+          "state": {
+            "fixture": "SYNTHETIC ONLY; these are not measured experimental results.",
+            "phase": "final_selection",
+            "default_candidate_id": "lightgbm:full:72",
+            "candidate_ids": [
+              "lightgbm:full:72",
+              "chronos:price_only:24"
+            ],
+            "future_actuals_available": false,
+            "paired_diagnostic": {
+              "diagnostic_kind": "retrospective_frozen_recompute",
+              "same_episodes_for_both_candidates": true,
+              "horizon_hours": 24,
+              "support_count": 4,
+              "candidates": {
+                "lightgbm:full:72": {
+                  "sample_count": 4,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 10,
+                    "mae": 20,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                },
+                "chronos:price_only:24": {
+                  "sample_count": 4,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 50,
+                    "mae": 90,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                }
+              }
+            },
+            "other_evidence": "No conflicting numerical evidence or failures; both forecasts valid."
+          },
+          "questions": {
+            "action": {
+              "type": "choice",
+              "instructions": "compare_candidates v2.0.0\nMake the final forecast choice using only the supplied evidence. Matched retrospective diagnostics compare the default and the proposed alternative on the SAME mature episodes, with the SAME24-hour horizon and score. Quantile score (qs) is the primary loss: smaller is better. Check sample count, missing/failure count, data roles, MAE, interval coverage and width. Training/selection-exposed and tiny samples are limited evidence, not unbiased guarantees. Missing metrics are unknown, never zero. Forecast disagreement and narrow intervals alone do not establish accuracy. Retain the default when its matched evidence is stronger or the alternative is unsupported; select the alternative when its evidence is more convincing for the current regime. There is no compulsory numerical winner or minimum percentage improvement gate. A pool is defensible only as a deliberate compromise under complementary or uncertain evidence; pooling does not automatically improve loss or calibration. Each recipe's coefficient applies to the first named candidate. Never infer pool losses from component means: a pool not retrospectively scored must be identified as unscored.\n",
+              "criteria": {
+                "commit:lightgbm:full:72": "Submit the existing frozen LightGBM prediction.",
+                "commit:chronos:price_only:24": "Submit the existing frozen Chronos prediction."
+              }
+            }
+          }
+        },
+        "response": {
+          "model": "kev-latest",
+          "answers": {
+            "action": {
+              "type": "choice",
+              "choice": "commit:lightgbm:full:72",
+              "confidence": 0.9572,
+              "probabilities": {
+                "commit:lightgbm:full:72": 0.9786,
+                "commit:chronos:price_only:24": 0.0214
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 541,
+            "output_tokens": 79
+          },
+          "latency_ms": 335.2
+        },
+        "elapsed_seconds": 0.3433137722313404,
+        "selected_probability": 0.9786
+      }
+    },
+    {
+      "support": 4,
+      "synthetic_better_candidate": "chronos:price_only:24",
+      "selected": "commit:chronos:price_only:24",
+      "responds_to_supplied_evidence": true,
+      "record": {
+        "request": {
+          "model": "kev-latest",
+          "state": {
+            "fixture": "SYNTHETIC ONLY; these are not measured experimental results.",
+            "phase": "final_selection",
+            "default_candidate_id": "lightgbm:full:72",
+            "candidate_ids": [
+              "lightgbm:full:72",
+              "chronos:price_only:24"
+            ],
+            "future_actuals_available": false,
+            "paired_diagnostic": {
+              "diagnostic_kind": "retrospective_frozen_recompute",
+              "same_episodes_for_both_candidates": true,
+              "horizon_hours": 24,
+              "support_count": 4,
+              "candidates": {
+                "lightgbm:full:72": {
+                  "sample_count": 4,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 50,
+                    "mae": 90,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                },
+                "chronos:price_only:24": {
+                  "sample_count": 4,
+                  "missing_count": 0,
+                  "data_roles": [
+                    "post_selection_holdout"
+                  ],
+                  "metrics": {
+                    "qs": 10,
+                    "mae": 20,
+                    "coverage90": 0.9,
+                    "width90": 100
+                  }
+                }
+              }
+            },
+            "other_evidence": "No conflicting numerical evidence or failures; both forecasts valid."
+          },
+          "questions": {
+            "action": {
+              "type": "choice",
+              "instructions": "compare_candidates v2.0.0\nMake the final forecast choice using only the supplied evidence. Matched retrospective diagnostics compare the default and the proposed alternative on the SAME mature episodes, with the SAME24-hour horizon and score. Quantile score (qs) is the primary loss: smaller is better. Check sample count, missing/failure count, data roles, MAE, interval coverage and width. Training/selection-exposed and tiny samples are limited evidence, not unbiased guarantees. Missing metrics are unknown, never zero. Forecast disagreement and narrow intervals alone do not establish accuracy. Retain the default when its matched evidence is stronger or the alternative is unsupported; select the alternative when its evidence is more convincing for the current regime. There is no compulsory numerical winner or minimum percentage improvement gate. A pool is defensible only as a deliberate compromise under complementary or uncertain evidence; pooling does not automatically improve loss or calibration. Each recipe's coefficient applies to the first named candidate. Never infer pool losses from component means: a pool not retrospectively scored must be identified as unscored.\n",
+              "criteria": {
+                "commit:lightgbm:full:72": "Submit the existing frozen LightGBM prediction.",
+                "commit:chronos:price_only:24": "Submit the existing frozen Chronos prediction."
+              }
+            }
+          }
+        },
+        "response": {
+          "model": "kev-latest",
+          "answers": {
+            "action": {
+              "type": "choice",
+              "choice": "commit:chronos:price_only:24",
+              "confidence": 0.9641,
+              "probabilities": {
+                "commit:lightgbm:full:72": 0.0179,
+                "commit:chronos:price_only:24": 0.9821
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 541,
+            "output_tokens": 79
+          },
+          "latency_ms": 332.5
+        },
+        "elapsed_seconds": 0.3395657613873482,
+        "selected_probability": 0.9821
+      }
+    }
+  ],
+  "responds_in_all_cases": true,
+  "real_forecasting_gain_tested": false,
+  "skill_sha256": "36528365a720d3c6b514241b6e44019dca8293528e38683da5e82b619ca24c79",
+  "script_sha256": "e97d05eb6014d542001c3bcf23b685d501f4f0679934088b439e05b3a9fbf6b0",
+  "branch": "research/r19-kev-evidence-policy-20261103",
+  "base_commit": "0291158b50e6876089bcd0121daaa7aec2d570f0"
+}

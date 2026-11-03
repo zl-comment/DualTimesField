@@ -11,6 +11,7 @@ import argparse
 from dataclasses import asdict
 import hashlib
 import importlib.metadata
+import importlib
 import json
 import os
 from pathlib import Path
@@ -57,9 +58,17 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    paths += sorted(p for p in (root / 'forecasting/adaptive_agent/skills').rglob('*') if p.is_file())
+    for directory in ('skills', 'skills_r19'):
+        paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
+
+
+def policy_module(policy):
+    modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy'}
+    if policy not in modules:
+        raise ValueError('Unregistered replay policy')
+    return importlib.import_module(modules[policy], package=__package__)
 
 
 def select_indices(length, count):
@@ -195,10 +204,11 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                *, information_scope='full_evidence', agent_runner=None, host_factory=None):
     """Dependency-injected core shared by real replay and fault/resume tests."""
     from .analogs import AnalogStore
-    from .controller import run
     from .memory import FeedbackLedger
     from .runtime import ToolHost
-    agent_runner, host_factory = agent_runner or run, host_factory or ToolHost
+    if agent_runner is None:
+        agent_runner = policy_module(manifest['configuration'].get('policy', 'r18')).run
+    host_factory = host_factory or ToolHost
     output = Path(output)
     schedule = build_schedule(repositories, manifest['configuration']['origins_per_region'])
     manifest_id = digest(manifest)
@@ -299,6 +309,8 @@ def _score_completed(output, manifest, repositories, registries, evidence,
                'fallback_count': sum(bool(t.get('fallback')) for t in traces),
                'api_calls': sum(t.get('costs', {}).get('api_calls', 0) for t in traces),
                'tools': {}, 'selected_candidates': {},
+               'llm_selected_tools': 0, 'protocol_required_tools': 0,
+               'unclassified_tools': 0,
                'selection_equals_default': sum(r['agent'].candidate_id == r['base'].candidate_id for r in finished),
                'prediction_differs_from_base': sum(not np.array_equal(r['agent'].quantiles, r['base'].quantiles) for r in finished),
                'failed_origins': 0,
@@ -334,6 +346,16 @@ def _score_completed(output, manifest, repositories, registries, evidence,
         for tool in trace.get('tools', []):
             key = tool.get('action', tool.get('action_id', 'unknown'))
             summary['tools'][key] = summary['tools'].get(key, 0) + 1
+            mode = tool.get('execution_mode')
+            if mode is None and manifest['configuration'].get('policy', 'r18') == 'r18':
+                # Legacy R18 tools were all selected by the LLM; its trace
+                # predates the explicit protocol-vs-LLM attribution field.
+                mode = 'llm_selected'
+            field = {'llm_selected': 'llm_selected_tools',
+                     'protocol_required': 'protocol_required_tools'}.get(mode, 'unclassified_tools')
+            summary[field] += 1
+    summary['tool_count_semantics'] = 'Counts trace tool attempts, including recorded errors; protocol-required coverage is not evidence of LLM benefit.'
+    summary['policy'] = manifest['configuration'].get('policy', 'r18')
     write_json(output / 'report.json', summary)
     write_json(output / 'progress.json', {'status': 'COMPLETE', 'completed': len(finished), 'total': len(schedule)})
     return summary
@@ -404,6 +426,7 @@ def main(argv=None):
     parser.add_argument('--origins-per-region', '--origins', default='24', help='Positive count or all; evenly spaced existing origins')
     parser.add_argument('--regions', nargs='+', choices=('NSW1', 'QLD1', 'TAS1'), default=['NSW1', 'QLD1', 'TAS1'])
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
+    parser.add_argument('--policy', choices=('r18', 'r19_evidence_first'), default='r18')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
     parser.add_argument('--evidence', help='Frozen evidence JSONL; absent means real_data_unavailable')
     parser.add_argument('--api-calls', type=int, default=8)
@@ -413,6 +436,7 @@ def main(argv=None):
     if len(set(args.regions)) != len(args.regions):
         parser.error('Duplicate regions')
     configuration = {'split': args.split, 'origins_per_region': args.origins_per_region,
+                     'policy': args.policy,
                      'regions': sorted(args.regions), 'seed': args.seed,
                      'information_scope': args.information_scope,
                      'api_calls': args.api_calls, 'origin_deadline_seconds': args.origin_deadline_seconds,
@@ -426,7 +450,8 @@ def main(argv=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = GPU_UUID
     from .contracts import BudgetLimits
     from .context import ContextRepository
-    from .controller import RELEASE, load_skills
+    selected_policy = policy_module(args.policy)
+    release, load_skills = selected_policy.RELEASE, selected_policy.load_skills
     from .evidence import EvidenceStore
     from .registry import ForecastRegistry
     from .predictors.chronos import FrozenChronosAdapter
@@ -454,7 +479,7 @@ def main(argv=None):
     for region in repositories:
         adapters[region] = FrozenLightGBMAdapter(base_root / 'runs/lightgbm' / f'seed{args.seed}' / region,
                                                 region=region, seed=args.seed, threads=4)
-    manifest = {'schema': 'r18-sequential-replay-v1', 'release': RELEASE,
+    manifest = {'schema': 'r18-sequential-replay-v1', 'release': release,
                 'configuration': configuration, 'budgets': asdict(limits), 'source': source_identity(),
                 'inputs': inputs, 'models': {'chronos': chronos_identity, 'kev': kev_identity,
                 'lightgbm': {region: adapter.identity for region, adapter in adapters.items()}},
@@ -491,10 +516,10 @@ def main(argv=None):
         pipeline = Chronos2Pipeline.from_pretrained(str(CHRONOS_SNAPSHOT), device_map='cuda:0', local_files_only=True)
         chronos = FrozenChronosAdapter(pipeline, chronos_identity)
         registries = {region: ForecastRegistry({'lightgbm': adapter, 'chronos': chronos},
-                                               RELEASE, max_current_candidates=limits.candidates)
+                                               release, max_current_candidates=limits.candidates)
                       for region, adapter in adapters.items()}
         report = run_replay(output, manifest, repositories, registries, client, evidence, limits,
-                            information_scope=args.information_scope)
+                            information_scope=args.information_scope, agent_runner=selected_policy.run)
         if source_identity() != manifest['source']:
             write_json(output / 'source_changed.json', {'status': 'INVALIDATED', 'reason': 'Source changed during replay'})
             report['status'] = 'INVALIDATED'

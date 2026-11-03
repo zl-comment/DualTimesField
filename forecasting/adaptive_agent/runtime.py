@@ -41,10 +41,43 @@ class ToolHost:
 
     def initial_observation(self, context):
         self._check(context)
-        summary = summarize_state(context)
+        external_enabled = self.information_scope == 'full_evidence'
+        feedback = self.feedback.snapshot(context) if external_enabled else []
+        recent_feedback = feedback[-8:]
+        summary = summarize_state(context, recent_feedback)
+        evidence = self.evidence.search(context, limit=1) if external_enabled else None
+        default_id = self.registry.default_id
+        default_metrics = summary['mature_feedback'].get(default_id)
+        # This ledger contains forecasts actually selected by this arm. Candidate
+        # groups may cover different origins, so their averages are not paired
+        # comparative model scores and missing candidates have no implied error.
+        default_feedback = {
+            'candidate_id': default_id,
+            'status': ('disabled_common_input' if not external_enabled else
+                       'available' if default_metrics else 'no_mature_selected_forecasts_in_recent_window'),
+            'sample_count': default_metrics['sample_count'] if default_metrics else 0,
+            'metrics': {k: v for k, v in (default_metrics or {}).items() if k != 'sample_count'},
+            'observation_policy': 'selected_forecasts_only',
+            'independent_model_comparison': False,
+        }
+        summary['feedback_scope'] = {
+            'observation_policy': 'selected_forecasts_only',
+            'mature_selected_forecast_count': len(recent_feedback),
+            'total_mature_selected_forecast_count': len(feedback),
+            'summary_window': 'latest_8_mature_selected_forecasts',
+            'memory_watermark': min(context.cutoff, context.memory_watermark),
+            'independent_model_comparison': False,
+            'limitation': 'Sparse selected-only feedback; unselected candidates have no counterfactual error. '
+                          'Candidate means can cover different origins and are not paired comparisons.',
+        }
+        summary['default_mature_feedback'] = default_feedback
         return {'numerical_state': summary, 'information_scope': self.information_scope,
-                'evidence_status': self.evidence.search(context, limit=1)['status']
-                    if self.information_scope == 'full_evidence' else 'disabled_common_input',
+                'evidence_status': evidence['status'] if evidence else 'disabled_common_input',
+                'available_evidence_count': evidence['visible_count'] if evidence else 0,
+                'available_evidence_count_basis': 'verified_cutoff_visible_source_versions; '
+                                                  'may include superseded versions or duplicate reposts',
+                'eligible_analog_count': self.analogs.eligible_count(context) if external_enabled else 0,
+                'historical_information_status': 'enabled' if external_enabled else 'disabled_common_input',
                 'registered_models': list(self.registry.adapters),
                 'forecast_semantics': 'all values are frozen predictions, not future observations',
                 'default_summary': compare_candidates(self.artifacts)}

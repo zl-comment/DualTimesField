@@ -59,6 +59,10 @@ class AnalogStore:
         return [r for r in self._episodes.values() if r['region'] == context.region
                 and r['origin_unix'] < context.origin_unix and r['outcome_available_at'] <= cutoff]
 
+    def eligible_count(self, context):
+        """Count mature same-region records without retrieving targets or ranking."""
+        return len(self._visible(context))
+
     def get_episode(self, context, episode_id):
         row = next((r for r in self._visible(context) if r['episode_id'] == episode_id), None)
         if row is None:

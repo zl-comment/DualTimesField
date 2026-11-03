@@ -1,5 +1,8 @@
 """No-network replay persistence, maturity, integrity, and failure tests."""
 import json
+import io
+from contextlib import redirect_stdout
+from types import SimpleNamespace
 from pathlib import Path
 import tempfile
 import unittest
@@ -12,7 +15,8 @@ from forecasting.adaptive_agent.contracts import ForecastContext, BudgetLimits
 from forecasting.adaptive_agent.registry import ForecastRegistry
 from forecasting.adaptive_agent.evidence import EvidenceStore
 from forecasting.adaptive_agent.replay import (validate_manifest, run_replay, stable_service_identity,
-                                               aggregate_scores, main, preserve_run_git_provenance)
+                                               aggregate_scores, main, preserve_run_git_provenance,
+                                               source_identity, policy_module)
 
 
 class Repository:
@@ -183,6 +187,65 @@ class ReplayTests(unittest.TestCase):
     def test_cli_without_execute_is_plan_only(self):
         self.assertEqual(main(['--output', str(self.output)]), 0)
         self.assertFalse(self.output.exists())
+
+    def test_cli_policy_default_and_r19_are_recorded_without_loading_models(self):
+        for supplied, expected in (([], 'r18'), (['--policy', 'r19_evidence_first'], 'r19_evidence_first')):
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                self.assertEqual(main(['--output', str(self.output), *supplied]), 0)
+            self.assertEqual(json.loads(stream.getvalue())['configuration']['policy'], expected)
+            self.assertFalse(self.output.exists())
+
+    def test_policy_resolver_routes_registered_modules_only(self):
+        sentinel = object()
+        with patch('forecasting.adaptive_agent.replay.importlib.import_module', return_value=sentinel) as load:
+            self.assertIs(policy_module('r19_evidence_first'), sentinel)
+            load.assert_called_with('.evidence_policy', package='forecasting.adaptive_agent')
+            self.assertIs(policy_module('r18'), sentinel)
+            load.assert_called_with('.controller', package='forecasting.adaptive_agent')
+        with self.assertRaises(ValueError):
+            policy_module('arbitrary_module')
+
+    def test_policy_change_cannot_resume_even_with_same_source(self):
+        original = {**self.manifest, 'configuration': {'origins_per_region': '3', 'policy': 'r18'}}
+        validate_manifest(self.output, original)
+        changed = {**original, 'configuration': {**original['configuration'], 'policy': 'r19_evidence_first'}}
+        with self.assertRaises(ValueError):
+            validate_manifest(self.output, changed, resume=True)
+        with self.assertRaises(ValueError):
+            preserve_run_git_provenance(self.output, changed)
+
+    def test_source_identity_covers_r19_non_python_skill_payloads(self):
+        root = Path(self.temp.name) / 'source'
+        directory = root / 'forecasting/adaptive_agent/skills_r19/plan_forecast'
+        directory.mkdir(parents=True)
+        skill = directory / 'instructions.txt'
+        skill.write_text('frozen instructions')
+        before = source_identity(root)
+        self.assertIn('forecasting/adaptive_agent/skills_r19/plan_forecast/instructions.txt', before['files'])
+        skill.write_text('changed instructions')
+        self.assertNotEqual(before['sha256'], source_identity(root)['sha256'])
+
+    def test_report_separates_llm_choices_and_protocol_tools(self):
+        self.manifest['configuration']['policy'] = 'r19_evidence_first'
+        validate_manifest(self.output, self.manifest)
+        def classified(context, host, client, limits):
+            artifact, trace = runner(context, host, client, limits)
+            trace['tools'] = [
+                {'action': 'forecast:alternative', 'execution_mode': 'llm_selected'},
+                {'action': 'diagnose:pair', 'execution_mode': 'protocol_required'},
+                {'action': 'unclassified', 'execution_mode': 'unrecognized_mode'}]
+            return artifact, trace
+        # With no injected runner, route through the selected policy's run.
+        with patch('forecasting.adaptive_agent.replay.policy_module', return_value=SimpleNamespace(run=classified)) as resolve:
+            report = run_replay(self.output, self.manifest, {'NSW1': self.repo}, self.registries,
+                                None, EvidenceStore(), BudgetLimits(), host_factory=Host)
+        resolve.assert_called_once_with('r19_evidence_first')
+        self.assertEqual(report['llm_selected_tools'], 3)
+        self.assertEqual(report['protocol_required_tools'], 3)
+        self.assertEqual(report['unclassified_tools'], 3)
+        self.assertEqual(sum(report['tools'].values()), 9)
+        self.assertEqual(report['policy'], 'r19_evidence_first')
 
     def test_scoring_uses_five_quantiles_and_explicit_axes(self):
         result = aggregate_scores(np.zeros((2, 24)), np.zeros((2, 24, 5)))
