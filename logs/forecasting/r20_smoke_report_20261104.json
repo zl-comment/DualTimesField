@@ -1,0 +1,1430 @@
+{
+  "abstention_count": 0,
+  "api_calls": 216,
+  "api_failure_count": 0,
+  "api_latency_seconds": {
+    "count": 216,
+    "p50": 0.7905782144516706,
+    "p95": 1.1818301137536764,
+    "p99": 1.211613979563117
+  },
+  "capabilities": {
+    "external_evidence": "real_data_unavailable",
+    "frozen_chronos": true,
+    "frozen_lightgbm": true,
+    "historical_analogs": true,
+    "mature_feedback": true,
+    "notice": "Enabled capability does not imply selected at every origin; see tool counts."
+  },
+  "coverage_fraction": 1.0,
+  "estimate_limit": "Serial origin latency only; excludes startup, file hashing, and environment changes. Not an accuracy estimate.",
+  "evidence_fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "expected_origins": 72,
+  "failed_origins": 0,
+  "fallback_count": 0,
+  "information_scope": "full_evidence",
+  "iteration_count": 69,
+  "iteration_semantics": "Candidate comparison rounds and optional LLM revisions are counted from explicit trace lists; missing legacy fields count as zero.",
+  "ledger_fingerprint": "30cc66149a96e6c9968b8c0306e35027a3215b767a8a9109d3b6c8d686728026",
+  "llm_selected_tools": 141,
+  "manifest_id": "9fa81888dc694b3e8d2a87994b6ee096065814c0fdf522003df451e26eb52507",
+  "optional_evidence_action_count": 0,
+  "origin_latency_seconds": {
+    "count": 72,
+    "p50": 4.217747865244746,
+    "p95": 4.303937674313784,
+    "p99": 4.348767123520375
+  },
+  "origin_trace_costs": [
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 0,
+        "historical_evaluations": 3,
+        "tool_calls": 2
+      },
+      "elapsed_seconds": 3.756981447339058,
+      "fallback": null,
+      "iteration_count": 0,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1640959200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "04d82d80f87f911998d6502a86e798b54cd6773d4d93473207cbc0a6da27c299",
+      "trace_path": "origins/001640959200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 0,
+        "historical_evaluations": 3,
+        "tool_calls": 2
+      },
+      "elapsed_seconds": 2.600511770695448,
+      "fallback": null,
+      "iteration_count": 0,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1640959200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "6b767065325f2541132ce83f66cd2e97bd3061f1d3ddd75b25bddf7cf5c7d49d",
+      "trace_path": "origins/001640959200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 0,
+        "historical_evaluations": 3,
+        "tool_calls": 2
+      },
+      "elapsed_seconds": 2.6923476979136467,
+      "fallback": null,
+      "iteration_count": 0,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1640959200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "b0fdff974b066e0d7cb5386ecfacb640b15d0a5f3d553a635f3729c8fea8f9d0",
+      "trace_path": "origins/001640959200_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 7,
+        "historical_evaluations": 14,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 3.91534810513258,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1641632400,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "86cfb0d4a151b3d5dbd14d7e4f1a152ad7bd5b08f640cfd7f556166b60485784",
+      "trace_path": "origins/001641632400_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 7,
+        "historical_evaluations": 14,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 3.862971715629101,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1641632400,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "b1140e4adaddc422f9d43d5f7a23208ac0b6f2716289ef291b7097510f7cffef",
+      "trace_path": "origins/001641632400_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 7,
+        "historical_evaluations": 14,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.094308249652386,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1641632400,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "437d5e5f26a364f0e681ddd6b11a85e44c13ebc27c583a37a185b8e68ff40f6c",
+      "trace_path": "origins/001641632400_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.15834679082036,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642309200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "80fd0962de5c5d94a1f9cb562e538bf3e69ced57f8ec8abe32bf976cf05d22f5",
+      "trace_path": "origins/001642309200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.161933220922947,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642309200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "a618075181508182707d1b31a29e5ef7661ab31fbbd9a459b4ba18ae08cd0816",
+      "trace_path": "origins/001642309200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.183995325118303,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642309200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "a60e8f828948173b71b9189ff45268ed433ea912fab68e056f2948772968a5ab",
+      "trace_path": "origins/001642309200_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.136349622160196,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642986000,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "af19dc28f06cff22828e650dc7ce44a196a353d689df9f97f1559d0154eb3dee",
+      "trace_path": "origins/001642986000_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.150734290480614,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642986000,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "ad618c89e5615e06708bb4706dc862f04f54d14b9b6dd2e3a5aff8aadb3b453a",
+      "trace_path": "origins/001642986000_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.236133426427841,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1642986000,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "e9230243f2162e7eb26c6ee261e95fc244786e72c56985b778937f14543a70c9",
+      "trace_path": "origins/001642986000_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.1464829333126545,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1643662800,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "54747a9dd481baa9f01a1ebcbf2a3fa2c8e74015d50bf9721e7661ccc655afd5",
+      "trace_path": "origins/001643662800_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.136469475924969,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1643662800,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "fe88b91c994833ebee2acf7068e55d50bcaa92683c2495eb755ebca746438bc3",
+      "trace_path": "origins/001643662800_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.204184327274561,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1643662800,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "d85b033ee743e452aa17666ddeeb2888d04b575e8bfde441fc5ed71bb9acdc46",
+      "trace_path": "origins/001643662800_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.221738841384649,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1644339600,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "c4b043fbb1f981cb059b9bdae32032a6cff422bbfe7264efe268c52cbb3ef75e",
+      "trace_path": "origins/001644339600_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.177300605922937,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1644339600,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "21da5f9c57e836a218ccc6f90b4192467384e812cbdc095f56b9aec075fa10db",
+      "trace_path": "origins/001644339600_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.340807873755693,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1644339600,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "8ee01aa7a3b4d9f786e7451d3c160e049e8c717b58be61664b2d76be2b8e1417",
+      "trace_path": "origins/001644339600_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.178640902042389,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645012800,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "cba202f683c45bc75c58f2c753f2c65450c6d849ecd80da277a66e1c0a9b7a8a",
+      "trace_path": "origins/001645012800_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.149153180420399,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645012800,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "9d0fa1131e91cab22ab91b3a0157802875aa41f83a99cfcd4b78301ed0bb1db2",
+      "trace_path": "origins/001645012800_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.21462208032608,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645012800,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "0538b849d9be1f70aa0f5f6fabb1d71d107bba0e3e92e1690261802a3a4fff5d",
+      "trace_path": "origins/001645012800_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.242580372840166,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645689600,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "ae4003d2ee9eaa91219a3c6deade02f25eb07d59ef2c9842710ba1f89e5df1d4",
+      "trace_path": "origins/001645689600_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.249521218240261,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645689600,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "0d7d49ff806c1f6acbcdb6992a958f2690683c30f69d9ea8e2f00cfa1b52bed8",
+      "trace_path": "origins/001645689600_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.247665870934725,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1645689600,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "a537604c90006d48e14ca2d5909ff51c0cfb18615aaa64f9cdb182c5528d8cbc",
+      "trace_path": "origins/001645689600_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.2332484275102615,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1646366400,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "c4b2e2297e5d64dc98dd3f10d92312148afe8aabf67d397f190e2cd4b9ca1f6f",
+      "trace_path": "origins/001646366400_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.177109215408564,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1646366400,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "79fe863ac06884843b44d43187e07512c82814a7536961839932375d6be524d1",
+      "trace_path": "origins/001646366400_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.266044542193413,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1646366400,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "e6a7c76536baf1719ded77608c25a1c16e14b9794a115eaa1acbed61609ce92f",
+      "trace_path": "origins/001646366400_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.21837804839015,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647043200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "7acd001c346649b565bc9fd64624df00de0ab6271c86e7069b4996bfcee12c73",
+      "trace_path": "origins/001647043200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.231289349496365,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647043200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "dfc5c8fc46f884dc550929fd22eafa56e31131a41c21baaf919d71da11f6326c",
+      "trace_path": "origins/001647043200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.291992262005806,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647043200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "b8ded2f1a45a84128fd095dea46fbefe099728878a2a103c03cb41b2d44c9384",
+      "trace_path": "origins/001647043200_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.188596278429031,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647720000,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "e5b0265bda67d7c76d94461f9cd1fa82d9a180ba06b03385fb3f867fe0beebce",
+      "trace_path": "origins/001647720000_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.259538732469082,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647720000,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "f5dc5c0617e6590d9a22c4870a48a27e982a147d0850c47c1a0e37b7d8e2fec2",
+      "trace_path": "origins/001647720000_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.231627315282822,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1647720000,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "e854ca04f19c779fded0b40e0efb9d69ceeb524e9cbfab8fe4a113839794c16f",
+      "trace_path": "origins/001647720000_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.200230672955513,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1648396800,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "cf00a9cbccb2417d31c582bbb0a5ec9d563c1ee0b0110e0413867d9b7ad75def",
+      "trace_path": "origins/001648396800_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.198142230510712,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1648396800,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "573f712ff3516b0d889de4fc952137d8b6f4f098da397190f9adf3a4272c61eb",
+      "trace_path": "origins/001648396800_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.303516071289778,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1648396800,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "e4cd0562995561360ec99300bbc89deec8c8603dc9ba5fbc2d3643892012b265",
+      "trace_path": "origins/001648396800_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.206795118749142,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649070000,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "de7aeefb3bf101e2e29a60469b28c8ce6b9d9964039f23cdc80c43a1cd3c2b74",
+      "trace_path": "origins/001649070000_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.196535594761372,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649070000,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "e5dcd50b262ea4d5455ba03c020b1c078df11d2e307fd7e8907d5ee83bbd244b",
+      "trace_path": "origins/001649070000_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.269917208701372,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649070000,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "4b67183fb819e953c5abf5057674fa1b53fd8485576b4657f38f3a3348675405",
+      "trace_path": "origins/001649070000_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.181425221264362,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649746800,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "243a5b785009a83466ac42981635b029f08a6e010ec136784d84ce7f5afa84be",
+      "trace_path": "origins/001649746800_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.223986864089966,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649746800,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "178d9c7441cbc3ca8adbeb1177b9e7894f0dc002b4a5bdbe6b608fde6b8142a8",
+      "trace_path": "origins/001649746800_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.3682535625994205,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1649746800,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "57e32697f6fa03ff554a6dc9e65afcfc6ab32c8ed3580693d66def43280421d2",
+      "trace_path": "origins/001649746800_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.30445296689868,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1650423600,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "84441365c489c1392fd98c77626adb76028389cda69e40a8989c54cf64e33685",
+      "trace_path": "origins/001650423600_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.251158870756626,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1650423600,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "e5cbd9b71363c2538a57be738e08bcf94a3583924971487e0a522c7682936731",
+      "trace_path": "origins/001650423600_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.2745218724012375,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1650423600,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "1e865403db2b987edc137e58771810c4ee64bebdc640c7064898da1bd16eaeea",
+      "trace_path": "origins/001650423600_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.2321597300469875,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651100400,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "2f89396c73c4ab93ec07e16fde29094dae0950d498866143dea4c6000dc06e67",
+      "trace_path": "origins/001651100400_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.217117682099342,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651100400,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "ba115c14e076995c57cc17ba0007dacccda6ad0e11fb49753e37746bb0ff4c8d",
+      "trace_path": "origins/001651100400_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.269217640161514,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651100400,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "ae945c037f5ca4c6d2b9d624566b36eb336165575cb5202c613b35eee7362064",
+      "trace_path": "origins/001651100400_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.1791862063109875,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651777200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "e8ceb05e18ca3977b52857e802d0be6153a0f51d2ecc8731dd39643ade49fba4",
+      "trace_path": "origins/001651777200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.213417302817106,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651777200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "fd1c51f66b7995bc938ffe34988d68573dfc668448b5ed9863917111d1230056",
+      "trace_path": "origins/001651777200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.277630217373371,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1651777200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "431a72103faec3b0dcb6f9d903416f63a0ccda5ccbd1c24bd3dfd1ebf953d193",
+      "trace_path": "origins/001651777200_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.197070613503456,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1652454000,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "c3775877d7b2dfb94342ffa753ece8c415fd0b369332bcbd8654ac08845d0ae7",
+      "trace_path": "origins/001652454000_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.221741359680891,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1652454000,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "fb37a77f29b494ab0df4d48f9e9a111820e88c77998c993bdbd7ced9bd196161",
+      "trace_path": "origins/001652454000_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.268643453717232,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1652454000,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "68c6489dd1a24fceee453d684cbd7cc30991067aa809adf2dc280811fb171e43",
+      "trace_path": "origins/001652454000_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.29538893699646,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653127200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "e41f4b433f2a9765419983bd8c0c5438d1645925d5b6848bf4e1c7281957d90e",
+      "trace_path": "origins/001653127200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.224749982357025,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653127200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "b452dea5709d5f7a6b428f6103c0a5a67076b21721c070a99c3ac4a5d1160c1a",
+      "trace_path": "origins/001653127200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.252323996275663,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653127200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "6d635d88f7e5304956b89cb801269fa4207603e09787489d846caf695cdccd54",
+      "trace_path": "origins/001653127200_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.253882300108671,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653804000,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "361ae5ff4e39f68c04885efb220bd21d15fe3f4b85847d7aeb6aa90011d4cd9c",
+      "trace_path": "origins/001653804000_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.178645350039005,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653804000,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "04fa03de9c754cc18df0a78a9d1f87b89d92c7e63ae98ddb0f59b837e49413ad",
+      "trace_path": "origins/001653804000_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.209389571100473,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1653804000,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "33d1a36fb9e048ae20176fe4e22971514eca7e05b210432673fbe1093e70a0b8",
+      "trace_path": "origins/001653804000_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.209901615977287,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1654480800,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "bd01ae6657ba68fa5fe6d94da1639d87de183c0098089f8c5a060d36d6e09a0b",
+      "trace_path": "origins/001654480800_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.144047018140554,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1654480800,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "45a5de00318bb4fe230910ff5452c0833f406438be17f45316ed31228054eb3f",
+      "trace_path": "origins/001654480800_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.2397545129060745,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1654480800,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "c27a1b622689a941139064da4ca28143d4c7e401ab6d1643e9e286650b8503e1",
+      "trace_path": "origins/001654480800_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.234366226941347,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655157600,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "0b92feb46f3a0b029954ab4e4a3036e90f41f0a3d592957ae4f983af9a6eff34",
+      "trace_path": "origins/001655157600_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.219671584665775,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655157600,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "0c3136769b8d17080263b193f1ba3b61824439700ee2a187c077e7e0c6482d40",
+      "trace_path": "origins/001655157600_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.301862351596355,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655157600,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "1cfdd921b87a9c593372c49b8d07fe2cd51d7e67b614f0bd1c8e287330f6f997",
+      "trace_path": "origins/001655157600_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.2340653501451015,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655834400,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "3c193ebfa344d325b2b7537102bb4e449f06133cd6b91a136c9737806bfce5bf",
+      "trace_path": "origins/001655834400_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.1548424400389194,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655834400,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "6ae185b48a29e29acaa8b9f560f954a3e110102d196a3f72dd2e6bb9d5acf55e",
+      "trace_path": "origins/001655834400_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.258874230086803,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1655834400,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "56006da3505d115bc224dd4e6cfc24398e7859e9bc74c3aa3f7f95a8a7201fdd",
+      "trace_path": "origins/001655834400_TAS1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.196999467909336,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1656511200,
+      "region": "NSW1",
+      "revision_count": 0,
+      "selected_forecast_id": "ed6571dcb67d12d772ea05d65b1a5716535f6bf66a795f5ea98f05dc0e6b7c3a",
+      "trace_path": "origins/001656511200_NSW1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.1835558377206326,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1656511200,
+      "region": "QLD1",
+      "revision_count": 0,
+      "selected_forecast_id": "49b01232b823781b0ff4212614d9e1bf9a0569118b29f3a5462b542d281c83f2",
+      "trace_path": "origins/001656511200_QLD1/trace.json"
+    },
+    {
+      "costs": {
+        "api_calls": 3,
+        "candidates": 2,
+        "episodes": 8,
+        "historical_evaluations": 16,
+        "tool_calls": 3
+      },
+      "elapsed_seconds": 4.3141794092953205,
+      "fallback": null,
+      "iteration_count": 1,
+      "optional_evidence_action_count": 0,
+      "origin_unix": 1656511200,
+      "region": "TAS1",
+      "revision_count": 0,
+      "selected_forecast_id": "d26c0900459c38c066f3fb8a5f4077d3800d211f7c773ce4516c70fa71a85c24",
+      "trace_path": "origins/001656511200_TAS1/trace.json"
+    }
+  ],
+  "origins": 72,
+  "origins_with_revision": 0,
+  "policy": "r20_iterative_input",
+  "prediction_differs_from_base": 16,
+  "protocol_required_tools": 72,
+  "region_equal_mean": {
+    "AGENT": {
+      "coverage90": 0.8524305555555555,
+      "mae": 81.56642423990003,
+      "qs": 58.37109137906656,
+      "rmse": 453.71859157681905,
+      "width90": 293.49600579581175
+    },
+    "BASE": {
+      "coverage90": 0.875,
+      "mae": 89.40539355017087,
+      "qs": 63.13235920396651,
+      "rmse": 458.384397921375,
+      "width90": 406.5201084669941
+    }
+  },
+  "regions": {
+    "NSW1": {
+      "AGENT": {
+        "coverage90": 0.828125,
+        "mae": 40.439097466277055,
+        "qs": 27.90088020852496,
+        "rmse": 78.84919882880186,
+        "width90": 264.81734152455596
+      },
+      "BASE": {
+        "coverage90": 0.8524305555555556,
+        "mae": 49.88180334882851,
+        "qs": 33.81738546225022,
+        "rmse": 89.29234406024979,
+        "width90": 378.5174217133239
+      },
+      "count": 24
+    },
+    "QLD1": {
+      "AGENT": {
+        "coverage90": 0.8975694444444444,
+        "mae": 139.69972116257966,
+        "qs": 100.70113428301103,
+        "rmse": 924.6703565569511,
+        "width90": 486.55355144187274
+      },
+      "BASE": {
+        "coverage90": 0.9288194444444444,
+        "mae": 152.80406578948498,
+        "qs": 110.28846970653127,
+        "rmse": 927.8305735669865,
+        "width90": 703.8582394447427
+      },
+      "count": 24
+    },
+    "TAS1": {
+      "AGENT": {
+        "coverage90": 0.8315972222222222,
+        "mae": 64.56045409084336,
+        "qs": 46.51125964566369,
+        "rmse": 357.6362193447041,
+        "width90": 129.11712442100648
+      },
+      "BASE": {
+        "coverage90": 0.84375,
+        "mae": 65.53031151219916,
+        "qs": 45.29122244311806,
+        "rmse": 358.0302761368888,
+        "width90": 137.18466424291574
+      },
+      "count": 24
+    }
+  },
+  "revision_count": 0,
+  "selected_candidates": {
+    "chronos:base:72": 5,
+    "chronos:price_only:72": 11,
+    "lightgbm:full:72": 56
+  },
+  "selection_equals_default": 56,
+  "serial_full_grid_hours_estimate": 182.33920617490153,
+  "status": "COMPLETE",
+  "tool_count_semantics": "Counts trace tool attempts, including recorded errors; protocol-required coverage is not evidence of LLM benefit.",
+  "tools": {
+    "diagnose:lightgbm:full:72|chronos:base:72": 38,
+    "diagnose:lightgbm:full:72|chronos:price_only:72": 31,
+    "forecast:chronos:base:72": 39,
+    "forecast:chronos:price_only:72": 33,
+    "inspect_recent_fit": 3,
+    "retrieve_analogs:recent": 49,
+    "retrieve_analogs:state": 20
+  },
+  "unclassified_tools": 0
+}

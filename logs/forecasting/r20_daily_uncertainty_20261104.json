@@ -1,0 +1,81 @@
+{
+  "status": "COMPLETE_DESCRIPTIVE_PAIRED_UNCERTAINTY",
+  "preregistered_parameters": {
+    "analysis_id": "r20-r19-paired-daily-circular-block-v1",
+    "input_status": "COMPLETE_PAIRED_DEVELOPMENT_COMPARISON",
+    "split": "selection",
+    "experiment_seed": 2026,
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "origins_per_region": 181,
+    "total_region_origins": 543,
+    "origin_interval_seconds": 86400,
+    "aggregation_order": "First equal-weight the three regions at each shared origin; then average the 181 days.",
+    "estimand": "mean QS delta = R20 minus R19; negative favors R20",
+    "relative_improvement_percent": "-100 * mean paired QS delta / mean R19 QS",
+    "bootstrap_method": "circular moving-block bootstrap",
+    "block_days": 7,
+    "bootstrap_replicates": 2000,
+    "rng_seed": 2026,
+    "rng_algorithm": "numpy.random.Generator(PCG64)",
+    "blocks_per_replicate": 26,
+    "sample_construction": "Uniform block starts on the 181-day grid; wrap modulo 181; concatenate blocks and truncate to 181 days.",
+    "paired_resampling": "Identical day indices for R19 and R20; no separate region or arm resampling.",
+    "interval": "two-sided 95% percentile",
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "percentile_interpolation": "linear",
+    "relative_denominator": "Recompute the R19 mean within each bootstrap replicate; reject zero denominators rather than dropping replicates.",
+    "result_dependent_parameter_selection": false,
+    "preregister_mode_reads_comparison": false
+  },
+  "grid": {
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "days": 181,
+    "region_origins": 543,
+    "first_origin_unix": 1640959200,
+    "last_origin_unix": 1656511200,
+    "origin_interval_seconds": 86400
+  },
+  "mean_qs": {
+    "R19": 42.95508126866027,
+    "R20": 42.265243030381285
+  },
+  "mean_qs_delta_r20_minus_r19": -0.6898382382789688,
+  "mean_qs_delta_percentile_95_interval": [
+    -3.903557114100701,
+    1.6304713844701588
+  ],
+  "relative_improvement_percent": 1.6059525855961307,
+  "relative_improvement_percentile_95_interval": [
+    -3.7903030553184887,
+    9.153570163998513
+  ],
+  "bootstrap_replicates_completed": 2000,
+  "bootstrap_indices_sha256": "4f86b18697800a225057af86eb2180f655fca1443c89ace063c397115dd38ef2",
+  "numpy_version": "2.4.6",
+  "input_manifest_ids": {
+    "R19": "08aba7ee2c42ea3afa25580d43516b3ec33b5dc40fe943c325223f8ce1319e10",
+    "R20": "4bf3cee9325a7d6f3d789ea2a2317f7cf0fcab30d567b00bc92a0561f4dbbce7"
+  },
+  "labels_read": false,
+  "limitations": [
+    "This describes the completed development comparison, not an independent blind-test result or a causal effect of the LLM.",
+    "Seven-day blocks preserve local serial dependence and shared-day dependence between regions; longer dependence and nonstationarity may remain.",
+    "Circular wrapping joins the end of the development interval to its beginning as a resampling approximation.",
+    "A percentile interval excluding zero does not establish an independently validated gain after development or model/skill selection.",
+    "No block-length search, one-sided test, or outcome-dependent stopping is performed."
+  ],
+  "input_comparison": "/root/workspace/Code/DualTimesField-worktrees/frozen-api-agent-alignment-20261102-r14/logs/forecasting/r20_daily_comparison_20261104.json",
+  "input_comparison_sha256": "c38d91d9457fa2e714fb8f8dcdfe5c454b0152272cee1f5fbea24a598a098f84",
+  "script_sha256": "b62b75f3a3a8bd4e92b1713c2d10f2ebb4b53a98346678d295dd4dcc5dc4e355"
+}
