@@ -58,17 +58,26 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    for directory in ('skills', 'skills_r19'):
+    for directory in ('skills', 'skills_r19', 'skills_r20'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
 
 
 def policy_module(policy):
-    modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy'}
+    modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy',
+               'r20_iterative_input': '.iterative_policy'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
+
+
+def policy_host_factory(policy):
+    if policy == 'r20_iterative_input':
+        return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
+    if policy in ('r18', 'r19_evidence_first'):
+        return importlib.import_module('.runtime', package=__package__).ToolHost
+    raise ValueError('Unregistered replay host policy')
 
 
 def select_indices(length, count):
@@ -129,7 +138,7 @@ def _artifact_record(artifact):
             'provenance': plain(artifact.provenance), 'identity': artifact.identity()}
 
 
-def save_bundle(output, context, index, base, agent, trace, audit, manifest_id):
+def save_bundle(output, context, index, base, agent, trace, audit, manifest_id, *, materialized=None):
     from .contracts import plain
     destination = Path(output) / 'origins' / bundle_name(context.region, context.origin_unix)
     if destination.exists():
@@ -144,12 +153,26 @@ def save_bundle(output, context, index, base, agent, trace, audit, manifest_id):
             os.fsync(stream.fileno())
         write_json(temporary / 'trace.json', plain(trace))
         write_json(temporary / 'audit.json', plain(audit))
+        names = ['predictions.npz', 'trace.json', 'audit.json']
+        if materialized is not None:
+            from .review import validate_artifact
+            candidates = [validate_artifact(context, artifact) for artifact in materialized.values()]
+            if not candidates or len({item.candidate_id for item in candidates}) != len(candidates):
+                raise ValueError('Materialized candidate archive must be nonempty and unique')
+            with (temporary / 'materialized_candidates.npz').open('xb') as stream:
+                np.savez_compressed(stream,
+                    candidate_ids=np.asarray([item.candidate_id for item in candidates]),
+                    forecast_ids=np.asarray([item.identity() for item in candidates]),
+                    quantiles=np.stack([item.quantiles for item in candidates]),
+                    target_time_unix=context.snapshot.target_time_unix)
+                stream.flush()
+                os.fsync(stream.fileno())
+            names.append('materialized_candidates.npz')
         record = {'manifest_id': manifest_id, 'region': context.region,
                   'origin_unix': context.origin_unix, 'index': int(index),
                   'context_id': context.identity(), 'base': _artifact_record(base),
                   'agent': _artifact_record(agent),
-                  'files': {name: sha_file(temporary / name) for name in
-                            ('predictions.npz', 'trace.json', 'audit.json')}}
+                  'files': {name: sha_file(temporary / name) for name in names}}
         write_json(temporary / 'record.json', record)
         os.rename(temporary, destination)
     except BaseException:
@@ -168,7 +191,8 @@ def load_bundle(directory, context, index, manifest_id):
             or record['region'] != context.region or record['origin_unix'] != context.origin_unix
             or record['index'] != index):
         raise ValueError('Saved origin does not match this run/context')
-    if set(record['files']) != {'predictions.npz', 'trace.json', 'audit.json'}:
+    required = {'predictions.npz', 'trace.json', 'audit.json'}
+    if set(record['files']) not in (required, required | {'materialized_candidates.npz'}):
         raise ValueError('Invalid committed bundle file manifest')
     for name, expected in record['files'].items():
         if sha_file(directory / name) != expected:
@@ -205,10 +229,10 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
     """Dependency-injected core shared by real replay and fault/resume tests."""
     from .analogs import AnalogStore
     from .memory import FeedbackLedger
-    from .runtime import ToolHost
+    policy = manifest['configuration'].get('policy', 'r18')
     if agent_runner is None:
-        agent_runner = policy_module(manifest['configuration'].get('policy', 'r18')).run
-    host_factory = host_factory or ToolHost
+        agent_runner = policy_module(policy).run
+    host_factory = host_factory or policy_host_factory(policy)
     output = Path(output)
     schedule = build_schedule(repositories, manifest['configuration']['origins_per_region'])
     manifest_id = digest(manifest)
@@ -253,7 +277,9 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                          'registry_stats': dict(registry.stats),
                          'feedback_before_publish': ledger.fingerprint}
                 initial_reads[region] = len(repo.outcome_reads)
-                save_bundle(output, context, index, base, agent, trace, audit, manifest_id)
+                materialized = getattr(host, 'artifacts', None) if policy == 'r20_iterative_input' else None
+                save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
+                            materialized=materialized)
             key = ledger.append_forecast(context, agent)
             pending.append({'region': region, 'index': index, 'forecast_id': key,
                             'available_at': origin + 86400})
@@ -356,6 +382,22 @@ def _score_completed(output, manifest, repositories, registries, evidence,
             summary[field] += 1
     summary['tool_count_semantics'] = 'Counts trace tool attempts, including recorded errors; protocol-required coverage is not evidence of LLM benefit.'
     summary['policy'] = manifest['configuration'].get('policy', 'r18')
+    summary['iteration_count'] = sum(len(trace.get('iterations', [])) for trace in traces)
+    summary['revision_count'] = sum(len(trace.get('revisions', [])) for trace in traces)
+    summary['origins_with_revision'] = sum(bool(trace.get('revisions')) for trace in traces)
+    summary['optional_evidence_action_count'] = sum(len(trace.get('optional_evidence_actions', [])) for trace in traces)
+    summary['iteration_semantics'] = 'Candidate comparison rounds and optional LLM revisions are counted from explicit trace lists; missing legacy fields count as zero.'
+    summary['origin_trace_costs'] = [{
+        'region': row['region'], 'origin_unix': row['origin_unix'],
+        'trace_path': 'origins/' + bundle_name(row['region'], row['origin_unix']) + '/trace.json',
+        'costs': trace.get('costs', {}),
+        'iteration_count': len(trace.get('iterations', [])),
+        'revision_count': len(trace.get('revisions', [])),
+        'optional_evidence_action_count': len(trace.get('optional_evidence_actions', [])),
+        'elapsed_seconds': trace.get('elapsed_seconds'),
+        'selected_forecast_id': row['agent'].identity(),
+        'fallback': trace.get('fallback')}
+        for row, trace in zip(finished, traces)]
     write_json(output / 'report.json', summary)
     write_json(output / 'progress.json', {'status': 'COMPLETE', 'completed': len(finished), 'total': len(schedule)})
     return summary
@@ -426,7 +468,7 @@ def main(argv=None):
     parser.add_argument('--origins-per-region', '--origins', default='24', help='Positive count or all; evenly spaced existing origins')
     parser.add_argument('--regions', nargs='+', choices=('NSW1', 'QLD1', 'TAS1'), default=['NSW1', 'QLD1', 'TAS1'])
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
-    parser.add_argument('--policy', choices=('r18', 'r19_evidence_first'), default='r18')
+    parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input'), default='r18')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
     parser.add_argument('--evidence', help='Frozen evidence JSONL; absent means real_data_unavailable')
     parser.add_argument('--api-calls', type=int, default=8)
