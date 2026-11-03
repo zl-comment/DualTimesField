@@ -1,0 +1,112 @@
+{
+  "abstention_count": 0,
+  "api_calls": 543,
+  "api_failure_count": 0,
+  "api_latency_seconds": {
+    "count": 543,
+    "p50": 0.610943865031004,
+    "p95": 0.631684460490942,
+    "p99": 0.6404518843442202
+  },
+  "capabilities": {
+    "external_evidence": "real_data_unavailable",
+    "frozen_chronos": true,
+    "frozen_lightgbm": true,
+    "historical_analogs": true,
+    "mature_feedback": true,
+    "notice": "Enabled capability does not imply selected at every origin; see tool counts."
+  },
+  "coverage_fraction": 1.0,
+  "estimate_limit": "Serial origin latency only; excludes startup, file hashing, and environment changes. Not an accuracy estimate.",
+  "evidence_fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "expected_origins": 543,
+  "failed_origins": 0,
+  "fallback_count": 0,
+  "information_scope": "full_evidence",
+  "ledger_fingerprint": "809ddf63cde13fd333547ba8edbaf8fc26f65f7818f63d1d98b18b3e136d15c7",
+  "manifest_id": "ee46c700d9afc6e347ef68a675a026b2027adbc5eca9a780e9c5bffcc1587899",
+  "origin_latency_seconds": {
+    "count": 543,
+    "p50": 0.6607723720371723,
+    "p95": 0.6894945472478866,
+    "p99": 0.7188515581935644
+  },
+  "origins": 543,
+  "prediction_differs_from_base": 0,
+  "region_equal_mean": {
+    "AGENT": {
+      "coverage90": 0.8821362799263351,
+      "mae": 70.72187490406914,
+      "qs": 45.754747883650715,
+      "rmse": 368.44129820675084,
+      "width90": 337.5698457206214
+    },
+    "BASE": {
+      "coverage90": 0.8821362799263351,
+      "mae": 70.72187490406914,
+      "qs": 45.754747883650715,
+      "rmse": 368.44129820675084,
+      "width90": 337.5698457206214
+    }
+  },
+  "regions": {
+    "NSW1": {
+      "AGENT": {
+        "coverage90": 0.8832872928176796,
+        "mae": 58.82959046288766,
+        "qs": 36.28980815160697,
+        "rmse": 241.08606302048025,
+        "width90": 307.5789540300458
+      },
+      "BASE": {
+        "coverage90": 0.8832872928176796,
+        "mae": 58.82959046288766,
+        "qs": 36.28980815160697,
+        "rmse": 241.08606302048025,
+        "width90": 307.5789540300458
+      },
+      "count": 181
+    },
+    "QLD1": {
+      "AGENT": {
+        "coverage90": 0.9339318600368324,
+        "mae": 103.07529281201792,
+        "qs": 70.24481609283367,
+        "rmse": 562.9438371653803,
+        "width90": 582.4133598991801
+      },
+      "BASE": {
+        "coverage90": 0.9339318600368324,
+        "mae": 103.07529281201792,
+        "qs": 70.24481609283367,
+        "rmse": 562.9438371653803,
+        "width90": 582.4133598991801
+      },
+      "count": 181
+    },
+    "TAS1": {
+      "AGENT": {
+        "coverage90": 0.8291896869244936,
+        "mae": 50.26074143730184,
+        "qs": 30.729619406511503,
+        "rmse": 301.29399443439206,
+        "width90": 122.71722323263828
+      },
+      "BASE": {
+        "coverage90": 0.8291896869244936,
+        "mae": 50.26074143730184,
+        "qs": 30.729619406511503,
+        "rmse": 301.29399443439206,
+        "width90": 122.71722323263828
+      },
+      "count": 181
+    }
+  },
+  "selected_candidates": {
+    "lightgbm:full:72": 543
+  },
+  "selection_equals_default": 543,
+  "serial_full_grid_hours_estimate": 29.09958390900651,
+  "status": "COMPLETE",
+  "tools": {}
+}

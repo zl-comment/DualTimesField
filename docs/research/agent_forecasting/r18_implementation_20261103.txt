@@ -88,3 +88,14 @@ common_input模式关闭外部证据、历史库和私有反馈，仅保留共�
 三地区×九种Chronos配置均输出合法24×5；live Kev在合成引用中选择outage，保留原文和300 MW。
 逐项状态见 r18_implementation_test_evidence_20261103.csv；未运行和数据不可用项保持明确标记。
 开发回放结果、工具实际调用情况、成本和覆盖以各运行 report.json 为准。
+
+本轮最终验收
+实现提交 ce717de；独立smoke分支 research/r18-agent-development-smoke-20261103；
+当前daily分支 research/r18-agent-development-daily-20261103。两批源码一致，各自manifest记录基点和分支。
+最终工程测试118项及18个子测试通过。真实72起点和543起点开发回放均完成。
+72起点恢复验证289文件逐字节不变，无重复预测发布；崩溃恢复另有故障注入测试。
+543起点 BASE/AGENT 等权QS分别为 45.7547478837 / 45.7547478837。
+API故障0，回退0，与默认不同的预测0。
+Kev真实选择直接提交默认，工具没有被代码屏蔽；合成链路可改变预测不能冒充真实决策收益。
+下一步研究重点是取证与决策流程/skill；正式2023–2024三地区三seed测试尚未启动。
+结果总览 logs/forecasting/r18_implementation_status_20261103.json；全部逐起点产物在对应outputs目录。
