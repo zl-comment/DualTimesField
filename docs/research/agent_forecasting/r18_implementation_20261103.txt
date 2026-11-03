@@ -1,0 +1,90 @@
+R18 完整 Agent 实现与验收记录
+日期：2026-11-03
+实现分支：research/complete-adaptive-agent-20261103-r18
+基准提交：3aabed79cbc73122c0f846769a2dd44aa30868a9
+运行源码指纹：每个 replay 的 run_manifest.json.source。+
+目标与当前实现
+冻结预测器 + API Kev + 可版本化 Agent 流程和 skills，不新增训练、微调或残差拟合。
+本实现承接 r18_complete_agent_design_20261103.txt；该设计文件及 PLAN_ONLY 配置保留为历史设计快照。
+可执行入口是 forecasting.adaptive_agent.replay，不是历史设计 JSON。
+
+实际流程
+1. ContextRepository 按预测起点提供固定 72 小时历史、已知日历及原基线七块输入。
+2. 冻结 LightGBM 按原 schema 产生默认预测，保证后续工具/API失败时有合法回退。
+3. ToolHost 向 Kev 提供数值摘要、可调用工具、已生成候选及剩余预算。
+4. Kev 每次只选择一个注册动作。动作结果进入下一轮状态，可以继续取证或直接提交。
+5. 可用动作包括状态/成熟反馈、证据搜索与引用读取、事件分类、五种历史检索、
+   冻结候选生成、近期历史诊断、成熟样本诊断、候选比较、分位数池化及复核。
+6. 预测数组经 context/目标轴/有限值/分位数规则检查后原子保存；已发布预测不可改写。
+7. 相应 24 小时结果完整成熟后才写入该实验臂反馈台账；后续起点可读取成熟指标。
+8. 所有请求起点完成后，独立评分阶段读取评估标签，统一评价 BASE 与 AGENT。
+
+Kev 的实际作用
+Kev 是本机 http://127.0.0.1:8009 的 typed-choice API；不假设其支持自由文本生成。
+它可决定取什么证据、检索什么样本、运行哪个预测器、采用哪种 Chronos 输入窗口，
+以及提交哪个候选或组合。它不生成价格数组，不执行任意代码，不训练模型。
+不再使用 R17 的 recent-QS 强制赢家或 0.55 决策门槛覆盖合法选择。
+允许直接提交默认值；工程测试不强制每次调用所有模块，也不把收益作为模块上线门槛。
+
+冻结预测器与输入变化
+LightGBM：加载既有 seed/地区 checkpoint，原七块输入不删列、不补零；此前已在任务训练集训练。
+Chronos-2：固定 revision 29ec3766d36d6f73f0696f85560a422f50e8498c，
+profile={base,calendar,price_only} × window={24,48,72}，共九种实际输入配置。
+所有输出均为 24 小时 × [0.05,0.1,0.5,0.9,0.95] 五分位。
+候选池化只允许两个已生成模型预测按 0.25/0.5/0.75 加权同一分位数；不是精确混合分布分位数。
+历史相似片段用于比较候选误差，不拼成假连续序列，不重训 LightGBM。
+
+Skills
+forecasting/adaptive_agent/skills 下七个目录：plan_forecast、assess_state、
+interpret_evidence、retrieve_analogs、compose_forecast_request、compare_candidates、review_and_commit。
+每个目录含 instructions.txt、schema.json、examples.jsonl、version。
+运行保存版本及内容 SHA256；修改流程/skill产生新的源码身份，旧产物不能用新版本恢复。
+这些是项目运行时技能，不是 Codex 插件或训练权重。
+
+时间隔离与恢复
+预测上下文不含未来 actual/target 标签。只有 mature_actual 的完整成熟检查通过后才打开标签。
+数值缓存回放采用区间结束即可获得历史价格的约定；这不是对实时数据发布延迟的核验。
+文档需有核验发布时间，先过滤时点和地区，再做排序与版本关系处理。
+first_seen_role 默认 availability；archive_fetch 必须显式标记且已有独立核验发布时间。
+归档代理时间不会自动升级为真实发布时间，未来生效但过去已发布的计划事件可以使用。
+LLM可见指纹只基于可见结果；全仓库及完整台账指纹留在宿主审计，避免未来数据改变请求。
+时间规则约束输入和工具访问；不声称能消除基础模型预训练中未知的数据重合。
+历史检索仓最多32个成熟日窗：近16日 + 较早历史均匀16日；当前只覆盖所选split。
+每次最多返回8个非重叠片段；不足如实报告。没有自动跨split扩充、没有真实历史事件标签补造。
+顺序回放使用每个origin固定watermark；恢复必须匹配源码、配置、模型、输入、依赖和skills。
+逐起点预测/trace/audit有校验和和原子目录提交；台账append-only、hash链、幂等恢复。
+
+预算
+默认每起点 API 8次、工具12次、当前候选5个（含默认）、历史样本8个、
+历史候选×样本推理40次、请求24000字节、API30秒、origin180秒。
+真实截止时间通过 Linux 主线程 SIGALRM 实施；运行器不在工作线程内调用控制器。
+预算或API异常后保留有效默认预测；默认模型本身失败会中止并报告未覆盖起点，不静默剔除。
+
+数据能力边界
+盘点详见 logs/forecasting/r18_source_inventory_20261103.json。
+现有127条公告都是2026年且时钟语义未核验，不能用于2022–2024历史评估。
+预调度归档存在，但仍是archive_proxy；没有接入为verified证据。
+未提供合格 evidence JSONL 时，文档/真实事件能力标为 real_data_unavailable。
+合成引用场景用于验证工程链路，不能声称已覆盖真实历史新闻。
+
+如何执行
+环境：/root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python
+在本worktree执行：
+  python -m forecasting.adaptive_agent.replay --output /绝对路径/新的运行目录
+上式只显示配置。真实开发回放：
+  python -m forecasting.adaptive_agent.replay --execute --split selection \
+    --origins-per-region 24 --seed 2026 --output /绝对路径/新的运行目录
+默认三地区 NSW1 QLD1 TAS1；181个起点在现有selection轴上等距取样，恰为每日一步。
+中断后相同参数加 --resume，源码/模型/输入变化则拒绝。
+正式test必须显式指定 --split test --origins-per-region all，不能将开发回放用于主表排名。
+正式比较复用现有基线、相同目标轴/分位数/评分/地区等权聚合；额外证据范围另行披露。
+common_input模式关闭外部证据、历史库和私有反馈，仅保留共同72小时输入内可得的诊断。
+其余逐模块消融开关和三seed实验属于后续研究阶段，本版不冒充已经完成。
+
+验收证据
+单元及集成测试：tests/test_adaptive_agent_*.py。
+真实模型/API检查：scripts/verify_r18_live.py；结果 logs/forecasting/r18_live_integration_20261103.json。
+三地区LightGBM按主表公共排序复现差异0；原始未排序输出存在交叉，因此不称原始数组逐位相同。
+三地区×九种Chronos配置均输出合法24×5；live Kev在合成引用中选择outage，保留原文和300 MW。
+逐项状态见 r18_implementation_test_evidence_20261103.csv；未运行和数据不可用项保持明确标记。
+开发回放结果、工具实际调用情况、成本和覆盖以各运行 report.json 为准。

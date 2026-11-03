@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "skill_id": "compose_forecast_request",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "action"
+  ],
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "Must be one of the runtime registered typed-choice IDs."
+    }
+  },
+  "additionalProperties": false,
+  "transport": "Kev questions.action choice; runtime criteria supplies the permitted enum"
+}

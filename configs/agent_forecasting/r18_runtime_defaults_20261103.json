@@ -1,0 +1,64 @@
+{
+  "kind": "release_defaults_not_cli_configuration",
+  "release": "r18-complete-agent-v1",
+  "implementation_status": "IMPLEMENTED",
+  "entrypoint": "python -m forecasting.adaptive_agent.replay",
+  "base_commit": "3aabed79cbc73122c0f846769a2dd44aa30868a9",
+  "branch": "research/complete-adaptive-agent-20261103-r18",
+  "training_calls": 0,
+  "default_replay": {
+    "split": "selection",
+    "regions": [
+      "NSW1",
+      "QLD1",
+      "TAS1"
+    ],
+    "origins_per_region": 24,
+    "seed": 2026,
+    "information_scope": "full_evidence"
+  },
+  "budgets": {
+    "api_calls": 8,
+    "tool_calls": 12,
+    "candidates": 5,
+    "episodes": 8,
+    "historical_evaluations": 40,
+    "api_timeout_seconds": 30,
+    "origin_deadline_seconds": 180
+  },
+  "skills": {
+    "plan_forecast": {
+      "version": "1.0.0",
+      "sha256": "44863cc746ff7ac6865286dcb3a63cab8779d424d6f1b518a0bebfeb3d6cf3a7"
+    },
+    "assess_state": {
+      "version": "1.0.0",
+      "sha256": "b6884824172503b6ec1477bf15344ed25b97dad44bb59f4f1ab288ace0f04968"
+    },
+    "interpret_evidence": {
+      "version": "1.0.0",
+      "sha256": "0dc0bbe93c08fc7e7c1c8ab0b8b25bd445c82336c04630e94eac9e08e3b95b54"
+    },
+    "retrieve_analogs": {
+      "version": "1.0.0",
+      "sha256": "6f2a773e5f3a4802e7954b30093c20c01ebeb1d0052e187cd481897ff6107536"
+    },
+    "compose_forecast_request": {
+      "version": "1.0.0",
+      "sha256": "01659eb6cdb01c92f5948d1832bc1cb9717a84a5e3b74ee3b18baf18cf98ac27"
+    },
+    "compare_candidates": {
+      "version": "1.0.0",
+      "sha256": "e6c9d5e038da132e5d365462c60486a65a1ac0957b15cb753052a9a109f83ee3"
+    },
+    "review_and_commit": {
+      "version": "1.0.0",
+      "sha256": "673638cfbabdab363524611cad4981886ecec535fb4e9a78a9a34ebde845eb2b"
+    }
+  },
+  "real_historical_document_evidence": "UNAVAILABLE",
+  "formal_test_completed": false,
+  "implementation_document": "docs/research/agent_forecasting/r18_implementation_20261103.txt",
+  "test_evidence": "docs/research/agent_forecasting/r18_implementation_test_evidence_20261103.csv",
+  "runtime_configuration_authority": "CLI arguments and immutable per-run run_manifest.json"
+}

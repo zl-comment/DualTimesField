@@ -1,0 +1,481 @@
+{
+  "branch": "research/complete-adaptive-agent-20261103-r18",
+  "base_commit": "3aabed79cbc73122c0f846769a2dd44aa30868a9",
+  "source_files": {
+    "forecasting/adaptive_agent/__init__.py": "4b965542d74f519ac10a7b64ea2a976ed4647767d868091e73be051aaf9c21cc",
+    "forecasting/adaptive_agent/analogs.py": "fd1079bb936fe37f84e869126cb28e538cf127e02dfb66571e772b988e57c102",
+    "forecasting/adaptive_agent/context.py": "53b0344f2dcfb27ee1dcf1f81fb7611bbe581a9440a0227cb694f6fe22ae62e9",
+    "forecasting/adaptive_agent/contracts.py": "3831390dba8c4422b63463fac34cb025ef1fe95f2f4924e02dde7832f6d2af58",
+    "forecasting/adaptive_agent/controller.py": "3d9cfd919529fb885933658a4258272b7c99a65f7d990909dca5d2535796f126",
+    "forecasting/adaptive_agent/diagnostics.py": "f4387b9994db5b322b140294d574d6c0da2ced5853ceb60848fa5e154640b37d",
+    "forecasting/adaptive_agent/events.py": "e918b6f055a9a2bdd20508014bcce20fdcbbb5473dc861cca59bf687930681fd",
+    "forecasting/adaptive_agent/evidence.py": "23c81196ea28d4daa15acebafd3b84d0b1d5575871cf6f29f448bd125cf4d899",
+    "forecasting/adaptive_agent/memory.py": "83de45be4efbe57d234e531068e10d2aa3266cc1d097af8bf91285e9f8c9917c",
+    "forecasting/adaptive_agent/pooling.py": "a1f537d4ee4a82a3d2e5d34d9ddf1d6bb6ad4f61e25a906f66bb2a8951878098",
+    "forecasting/adaptive_agent/predictors/__init__.py": "db8b7633e8868bb03c3ac1870a12e8ccc723943323d5b85c4d85c88453b9fe4b",
+    "forecasting/adaptive_agent/predictors/chronos.py": "0d50f8b2c84a9bc678abda5f90360104407041e3a5fcc1ac83289aebe1be7b57",
+    "forecasting/adaptive_agent/predictors/lightgbm.py": "7d3ded7d7464c98ceb4ce54796d6fce17609f94ab79619108275a952a9fe7610",
+    "forecasting/adaptive_agent/registry.py": "a9f783d9e3d4cfbbc6f337b6e2baf3546464bf9ebe58de56ac5c62fb56329927",
+    "forecasting/adaptive_agent/review.py": "ce9d9a4e09b844c083317ee51da560d7625d7a37a7b7bfb7dd6085aeb31be808",
+    "forecasting/adaptive_agent/runtime.py": "95a3d7e1a903859a9e9410fd6c58b9e2340971fe47bbaa8324a322bb387980ec",
+    "forecasting/adaptive_agent/skills/assess_state/examples.jsonl": "afb21caf741af9d0d6104a0f4b6aa75524a86f671332ce021885d808dd6b4101",
+    "forecasting/adaptive_agent/skills/assess_state/instructions.txt": "9627cfe5c2553408968fc87a05ec39ec2c5dcba257d676b65fe089e27d02e23e",
+    "forecasting/adaptive_agent/skills/assess_state/schema.json": "9b7bc784282043c11b5ef407da1ae6accd2c83df34177b95a4dd3f040e9154a7",
+    "forecasting/adaptive_agent/skills/assess_state/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/compare_candidates/examples.jsonl": "6d2508f2d21f0707552100a334c2fd7a6227edcd232d943fcd1347f9af615a8e",
+    "forecasting/adaptive_agent/skills/compare_candidates/instructions.txt": "1251ee81e66d43dc8d427478de2b9de9fb100c96690f3ec90284d4a68e099294",
+    "forecasting/adaptive_agent/skills/compare_candidates/schema.json": "018a1d4dac0e782d502784642a4761f3f0bac52419604e88b56320bf20f599df",
+    "forecasting/adaptive_agent/skills/compare_candidates/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/compose_forecast_request/examples.jsonl": "c1583e06d2d1ab81b9253bc8bfe62d0bd521db81641fefaec75af6c1cd41467a",
+    "forecasting/adaptive_agent/skills/compose_forecast_request/instructions.txt": "741c9dc142cec79835f9cd46a8447c9f4c8b0b9ab5f64ee9804e34875b607535",
+    "forecasting/adaptive_agent/skills/compose_forecast_request/schema.json": "18fff6023f5972ebf9e1f4466b946bf7056c31838e4e89aadd6afbf3488e11ff",
+    "forecasting/adaptive_agent/skills/compose_forecast_request/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/interpret_evidence/examples.jsonl": "a281ea3ad9211162c1216200173b5dcdb81e46df775e533ebd7716465f0b859a",
+    "forecasting/adaptive_agent/skills/interpret_evidence/instructions.txt": "b1f9bf7d8aed9ef383d90e5c03c893ebcff10b6de8902f502cab0277544b9189",
+    "forecasting/adaptive_agent/skills/interpret_evidence/schema.json": "f4741b928e8ae9e2f8bc9d39a2ce136ece15809ae30248543ef1ee8ab28441b9",
+    "forecasting/adaptive_agent/skills/interpret_evidence/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/plan_forecast/examples.jsonl": "a6ca8da02d751a9001b7a091c93387c2f5fdbb77e7dbc5baf1783ab63b14fc21",
+    "forecasting/adaptive_agent/skills/plan_forecast/instructions.txt": "248a7d78c6f182a68e2f7f21477dec65189963c29a7bf37cd890955962b0a976",
+    "forecasting/adaptive_agent/skills/plan_forecast/schema.json": "a26f0152b640fedc89a41875a3880f0439ed64cf4ad1464edceb39a2665643da",
+    "forecasting/adaptive_agent/skills/plan_forecast/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/retrieve_analogs/examples.jsonl": "33edc681d30c72abdf345527b207df63d4a781aed5aeda4130ad3ad7efdd1b37",
+    "forecasting/adaptive_agent/skills/retrieve_analogs/instructions.txt": "1f57cd82c922cfbc8220ba1e3b2f3437d8ac3d719d8e0968c71c32753908059a",
+    "forecasting/adaptive_agent/skills/retrieve_analogs/schema.json": "ae481926f70694365c3da4a9589dd2a627539ddc8c78547608def2231c7984be",
+    "forecasting/adaptive_agent/skills/retrieve_analogs/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/skills/review_and_commit/examples.jsonl": "7af4fbe400fa3f7f6f16b11c73219e25b3bb2a713caf71f2916ec7f4f58aae52",
+    "forecasting/adaptive_agent/skills/review_and_commit/instructions.txt": "2f876eed3e0d7905076bbd16c6ec486b897ba9691c76279ebd0b1a8be4f18919",
+    "forecasting/adaptive_agent/skills/review_and_commit/schema.json": "497e3b1f68228542dc6df890b9d3a0fa1f249e3fd9c8bc0987eaa64e2a2d6136",
+    "forecasting/adaptive_agent/skills/review_and_commit/version": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+    "forecasting/adaptive_agent/state.py": "894b78dfc6fccf9033bc94938b23bcb0bb3c00457f1b8f2ffe169742705561f2"
+  },
+  "chronos_files": {
+    "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+    "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031"
+  },
+  "kev_identity": {
+    "models": [
+      {
+        "name": "kev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 102241,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 102242,
+          "requests": 102242,
+          "queued": 0
+        }
+      },
+      {
+        "name": "jev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 102241,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 102242,
+          "requests": 102242,
+          "queued": 0
+        }
+      }
+    ]
+  },
+  "regions": {
+    "NSW1": {
+      "lightgbm_max_abs_difference": 0.0,
+      "reference_rule": "sort existing saved quantiles exactly as shared scoring",
+      "native_unsorted_max_abs_difference": 7.214532793617707,
+      "lightgbm_manifest": {
+        "manifest_sha256": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d",
+        "model_directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models",
+        "seed": 2026,
+        "region": "NSW1",
+        "package_version": "4.7.0",
+        "files_verified": 120,
+        "selected_rounds": [
+          203,
+          257,
+          119,
+          490,
+          188,
+          202,
+          198,
+          241,
+          406,
+          370,
+          231,
+          311,
+          334,
+          304,
+          239,
+          315,
+          346,
+          280,
+          282,
+          253,
+          428,
+          183,
+          309,
+          376
+        ],
+        "target_mean": 70.45967659583641,
+        "target_std": 164.87342388310856,
+        "preprocessing_hash": "162027604e12313120d0bf62b4d98b7a36fce07065bbba3054f7aaca3c6e6423",
+        "model_sha256": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d",
+        "train_end_unix": null,
+        "selection_end_unix": null,
+        "frozen_in_memory": true
+      },
+      "chronos_profiles": {
+        "base:24": {
+          "sha256": "bee7cc438f254c195b8c8304eaee588ac05fbb581dd35f91582b4b85facf1bb6",
+          "mean_median": 86.85358301798503
+        },
+        "base:48": {
+          "sha256": "f872d0bb5ed32a826ed3470a5075c6a1a01f9a4d30fc5a724024ab41d3626ebf",
+          "mean_median": 81.53702211380005
+        },
+        "base:72": {
+          "sha256": "eebeedb9ed681aabfed77aaaefcd37cf015b4e0c88596874ba8faa3c783686bf",
+          "mean_median": 80.93259048461914
+        },
+        "calendar:24": {
+          "sha256": "eaf79e26bcfaeb9ba40582ecd793482346fbbd5b2d4801de075c478f82343fc0",
+          "mean_median": 92.10686747233073
+        },
+        "calendar:48": {
+          "sha256": "56e9ee35368c50ee98cea6f8507ee0ca96891301f4b22f2b3e33016864d76fba",
+          "mean_median": 81.02057409286499
+        },
+        "calendar:72": {
+          "sha256": "975ba083ad38f47840d7457043a31f836918a89989a0194d5d7475b3862ffa4d",
+          "mean_median": 81.11596822738647
+        },
+        "price_only:24": {
+          "sha256": "96282fdf138e77c7f49458ff2d1e6ce0457f66cfed9c8d0515304aea2252861f",
+          "mean_median": 84.28098376592
+        },
+        "price_only:48": {
+          "sha256": "90a1e27a52976ea72bfef604129d40a77922ca4c5abfe40bdd53423369b5ce16",
+          "mean_median": 81.18530925114949
+        },
+        "price_only:72": {
+          "sha256": "74162eb1f476bbc453a063ae6a97541e6a52296e812c06d0c54488a20b5191a3",
+          "mean_median": 78.92340882619222
+        }
+      }
+    },
+    "QLD1": {
+      "lightgbm_max_abs_difference": 0.0,
+      "reference_rule": "sort existing saved quantiles exactly as shared scoring",
+      "native_unsorted_max_abs_difference": 96.30913460414098,
+      "lightgbm_manifest": {
+        "manifest_sha256": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c",
+        "model_directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/models",
+        "seed": 2026,
+        "region": "QLD1",
+        "package_version": "4.7.0",
+        "files_verified": 120,
+        "selected_rounds": [
+          264,
+          182,
+          204,
+          169,
+          179,
+          221,
+          330,
+          260,
+          256,
+          237,
+          230,
+          173,
+          318,
+          325,
+          207,
+          161,
+          282,
+          329,
+          168,
+          305,
+          253,
+          227,
+          352,
+          222
+        ],
+        "target_mean": 70.93837860665722,
+        "target_std": 202.46565255218724,
+        "preprocessing_hash": "c5a763905bae57d5fc00ccb3e97a46456384795606df74a27821cd4304847183",
+        "model_sha256": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c",
+        "train_end_unix": null,
+        "selection_end_unix": null,
+        "frozen_in_memory": true
+      },
+      "chronos_profiles": {
+        "base:24": {
+          "sha256": "03c49b13f3a3f335f8413c211c7dca0bfbc432a4e85a5a7486fb9ca2dc029776",
+          "mean_median": 73.80791473388672
+        },
+        "base:48": {
+          "sha256": "079e44e0dfdc342713ba11caede4b43c2beab5fbc8c102d593de6cbc04d0e31d",
+          "mean_median": 74.14962005615234
+        },
+        "base:72": {
+          "sha256": "89685acef9fe727715f686736811b080cd473968ca2b9c8bf88209b2166ead98",
+          "mean_median": 74.92395702997844
+        },
+        "calendar:24": {
+          "sha256": "c7a98fed9f83bdc3efda6d0e82d09a7891dc87ade1719c7879c3b9944a4ac70f",
+          "mean_median": 76.15145715077718
+        },
+        "calendar:48": {
+          "sha256": "bf43eb1fc30fd62207246bf600e62c313af50065983911751fb1eab82683cb03",
+          "mean_median": 74.3906044960022
+        },
+        "calendar:72": {
+          "sha256": "98290e0aa1d2964c3105f0ca1b635e66e555023ec7f2b9cbb9031b4dad33d3dc",
+          "mean_median": 74.08316644032796
+        },
+        "price_only:24": {
+          "sha256": "a2715ed189a4ac56c2f9c04688777f80d440a27c4df7de448a366f6e194b20a5",
+          "mean_median": 74.37833484013875
+        },
+        "price_only:48": {
+          "sha256": "bdd1aebf6fe44add8418fe302be054abac68db0c11fc6e195e74ae8038f47563",
+          "mean_median": 74.50199222564697
+        },
+        "price_only:72": {
+          "sha256": "f160501389e2b689a20c6f64f9b23f5f704fe96a1b35da14848af160e314dec9",
+          "mean_median": 72.45580991109212
+        }
+      }
+    },
+    "TAS1": {
+      "lightgbm_max_abs_difference": 0.0,
+      "reference_rule": "sort existing saved quantiles exactly as shared scoring",
+      "native_unsorted_max_abs_difference": 4.992217949067509,
+      "lightgbm_manifest": {
+        "manifest_sha256": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9",
+        "model_directory": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/TAS1/models",
+        "seed": 2026,
+        "region": "TAS1",
+        "package_version": "4.7.0",
+        "files_verified": 120,
+        "selected_rounds": [
+          998,
+          347,
+          463,
+          368,
+          509,
+          561,
+          856,
+          894,
+          431,
+          491,
+          631,
+          599,
+          378,
+          609,
+          574,
+          334,
+          532,
+          338,
+          313,
+          356,
+          253,
+          416,
+          245,
+          295
+        ],
+        "target_mean": 69.42184532926912,
+        "target_std": 68.73603436930588,
+        "preprocessing_hash": "21f221ccba9b2f2c903ec0272da2333e431a88b10ee51c6db408a815a22cbad0",
+        "model_sha256": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9",
+        "train_end_unix": null,
+        "selection_end_unix": null,
+        "frozen_in_memory": true
+      },
+      "chronos_profiles": {
+        "base:24": {
+          "sha256": "4f02b1cd59a4aee0dca7017ed7cbccefac629cbb4685cf8c7613b9e7a07e71f9",
+          "mean_median": 73.1223996480306
+        },
+        "base:48": {
+          "sha256": "b4ab4b0d46abf1704412777b8fd41857c57bf29a443ecaaf068126262c5b93e8",
+          "mean_median": 68.72207911809285
+        },
+        "base:72": {
+          "sha256": "a1db6e1a967241d1ed03d094fed8f4dfc158310d0f2201454022f555d84ed833",
+          "mean_median": 73.8129547437032
+        },
+        "calendar:24": {
+          "sha256": "2881bf55bdb902431b17bde8f9593e8a7723b5b50c411879181022513e996ddd",
+          "mean_median": 74.72255166371663
+        },
+        "calendar:48": {
+          "sha256": "41e4352f45e281332fdedfe9ef6a904d044296acb7923c6af90ca50c13c3081b",
+          "mean_median": 69.80743265151978
+        },
+        "calendar:72": {
+          "sha256": "8d22143d59fc044e8cd8bc0e41b0e451240e1e9389f65cc4c33c2b6e495fe8c4",
+          "mean_median": 74.57031599680583
+        },
+        "price_only:24": {
+          "sha256": "f66099455d954f29e842aa95a02232c0d2d68543d0a14c0daaef017cc56b5269",
+          "mean_median": 72.83327992757161
+        },
+        "price_only:48": {
+          "sha256": "08afe958184a3a6f7fbc3bc8d79e68d71d8caa3cca17f3b2bfeddb2a62c856e4",
+          "mean_median": 72.17061233520508
+        },
+        "price_only:72": {
+          "sha256": "270b930bfab4325ee00dddd82695cd02a1a5e8c0a4fedb6834995093d36738d2",
+          "mean_median": 72.53769016265869
+        }
+      }
+    }
+  },
+  "training_calls": 0,
+  "actual_labels_read": 0,
+  "event_live_api": {
+    "synthetic_evidence": true,
+    "result": {
+      "status": "interpreted",
+      "choices": {
+        "outage": "Select quoted outage interpretation",
+        "unknown": "Abstain: text does not support a reliable interpretation"
+      },
+      "facts": [
+        {
+          "event_type": "outage",
+          "status": "planned",
+          "region": "NSW1",
+          "evidence_id": "synthetic-live-api-only",
+          "quote_span": {
+            "start": 0,
+            "end": 32,
+            "text": "A planned outage affects 300 MW."
+          },
+          "related_versions": [],
+          "explicit_quantities": [
+            {
+              "value_literal": "300",
+              "unit": "MW",
+              "quote_start": 25,
+              "quote_end": 31
+            }
+          ],
+          "valid_from": null,
+          "valid_to": null,
+          "validation_status": "quoted_llm_selected",
+          "version_status": "unknown",
+          "conflicting_evidence_ids": [],
+          "numerical_price_effect": null
+        }
+      ],
+      "evidence_id": "synthetic-live-api-only",
+      "selected_choice": "outage"
+    },
+    "trace": {
+      "request": {
+        "model": "kev-latest",
+        "state": {
+          "fixture": "synthetic; not historical coverage",
+          "quoted_candidates": [
+            {
+              "event_type": "outage",
+              "status": "planned",
+              "region": "NSW1",
+              "evidence_id": "synthetic-live-api-only",
+              "quote_span": {
+                "start": 0,
+                "end": 32,
+                "text": "A planned outage affects 300 MW."
+              },
+              "related_versions": [],
+              "explicit_quantities": [
+                {
+                  "value_literal": "300",
+                  "unit": "MW",
+                  "quote_start": 25,
+                  "quote_end": 31
+                }
+              ],
+              "valid_from": null,
+              "valid_to": null,
+              "validation_status": "quoted_candidate_requires_semantic_review",
+              "version_status": "unknown",
+              "conflicting_evidence_ids": [],
+              "numerical_price_effect": null
+            }
+          ]
+        },
+        "questions": {
+          "action": {
+            "type": "choice",
+            "instructions": "Select the interpretation directly supported by the quotation. Do not infer price changes.",
+            "criteria": {
+              "outage": "Select quoted outage interpretation",
+              "unknown": "Abstain: text does not support a reliable interpretation"
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "kev-latest",
+        "answers": {
+          "action": {
+            "type": "choice",
+            "choice": "outage",
+            "confidence": 0.6035,
+            "probabilities": {
+              "outage": 0.8018,
+              "unknown": 0.1982
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 194,
+          "output_tokens": 54
+        },
+        "latency_ms": 270.1
+      },
+      "elapsed_seconds": 0.28158727660775185,
+      "selected_probability": 0.8018
+    }
+  },
+  "elapsed_seconds": 11.532885443419218
+}
