@@ -1,0 +1,305 @@
+{
+  "status": "SEED2026_INTERIM_REVIEW_COMPLETE",
+  "scope": "Full 2023-2024 grid, 3 regions, seed2026 only, 52563 origins; NOT a completed three-seed experiment.",
+  "authorization": "User requested early seed2026 scoring to decide whether to stop later seeds.",
+  "source_fingerprint": "6d4769de59edd1b17897e7104dbdf02b07d39db74a9350f7a50d13c0bab905ec",
+  "analysis_script_sha256": "f68c874cef795a56304923e1fe70b7bc8b9899c48144924305ae29c0f4b1205a",
+  "summary": {
+    "BASE": {
+      "quantile_score_proxy": 32.49517369330291,
+      "mae": 48.52692593037411,
+      "rmse_pooled": 352.0328627664741,
+      "coverage_90": 0.871633404993373,
+      "interval_width_90": 249.67339660701853
+    },
+    "FIXED": {
+      "quantile_score_proxy": 31.83830250867779,
+      "mae": 47.922595828502445,
+      "rmse_pooled": 352.45923821378875,
+      "coverage_90": 0.8722953091211182,
+      "interval_width_90": 234.76824074786313
+    },
+    "AGENT": {
+      "quantile_score_proxy": 31.83830250867779,
+      "mae": 47.922595828502445,
+      "rmse_pooled": 352.45923821378875,
+      "coverage_90": 0.8722953091211182,
+      "interval_width_90": 234.76824074786313
+    }
+  },
+  "regions": {
+    "NSW1": {
+      "scores": {
+        "BASE": {
+          "mae": 59.533495999108275,
+          "rmse_pooled": 475.87665002975336,
+          "quantile_score_proxy": 42.504621718316045,
+          "coverage_90": 0.8708930236097635,
+          "interval_width_90": 316.6188103062757
+        },
+        "FIXED": {
+          "mae": 59.16174803195295,
+          "rmse_pooled": 477.9308078098468,
+          "quantile_score_proxy": 41.96155964182219,
+          "coverage_90": 0.8752401879649183,
+          "interval_width_90": 304.5093387019164
+        },
+        "AGENT": {
+          "mae": 59.16174803195295,
+          "rmse_pooled": 477.9308078098468,
+          "quantile_score_proxy": 41.96155964182219,
+          "coverage_90": 0.8752401879649183,
+          "interval_width_90": 304.5093387019164
+        }
+      },
+      "paired_uncertainty": {
+        "mean_agent_minus_fixed_qs": 0.0,
+        "percentile_95_interval": [
+          0.0,
+          0.0
+        ],
+        "block_hours": 168,
+        "draws": 2000,
+        "interpretation": "Paired circular weekly-block bootstrap; negative favors Agent. Descriptive given prior test exposure."
+      },
+      "agent_vs_fixed": {
+        "wins": 0,
+        "ties": 17521,
+        "losses": 0
+      },
+      "profile_counts": {
+        "BASE": {
+          "base": 17521
+        },
+        "FIXED": {
+          "price_only": 8046,
+          "calendar": 1659,
+          "base": 7816
+        },
+        "AGENT": {
+          "price_only": 8046,
+          "calendar": 1659,
+          "base": 7816
+        }
+      },
+      "label_sha256": "17120b8b0eaff36d90265d97e3acbb89e2973ee025c822df03e715d8c9737c6d"
+    },
+    "QLD1": {
+      "scores": {
+        "BASE": {
+          "mae": 50.22754186636158,
+          "rmse_pooled": 399.1304997754783,
+          "quantile_score_proxy": 33.830165954762066,
+          "coverage_90": 0.8654471776725072,
+          "interval_width_90": 255.2021078870029
+        },
+        "FIXED": {
+          "mae": 49.91535384495127,
+          "rmse_pooled": 399.54686187070365,
+          "quantile_score_proxy": 33.585944835417,
+          "coverage_90": 0.8725600707722162,
+          "interval_width_90": 247.48775361339844
+        },
+        "AGENT": {
+          "mae": 49.91535384495127,
+          "rmse_pooled": 399.54686187070365,
+          "quantile_score_proxy": 33.585944835417,
+          "coverage_90": 0.8725600707722162,
+          "interval_width_90": 247.48775361339844
+        }
+      },
+      "paired_uncertainty": {
+        "mean_agent_minus_fixed_qs": 0.0,
+        "percentile_95_interval": [
+          0.0,
+          0.0
+        ],
+        "block_hours": 168,
+        "draws": 2000,
+        "interpretation": "Paired circular weekly-block bootstrap; negative favors Agent. Descriptive given prior test exposure."
+      },
+      "agent_vs_fixed": {
+        "wins": 0,
+        "ties": 17521,
+        "losses": 0
+      },
+      "profile_counts": {
+        "BASE": {
+          "base": 17521
+        },
+        "FIXED": {
+          "base": 8723,
+          "calendar": 1647,
+          "price_only": 7151
+        },
+        "AGENT": {
+          "base": 8723,
+          "calendar": 1647,
+          "price_only": 7151
+        }
+      },
+      "label_sha256": "e49416acb06f5c8751482835752e615d482a4a4f60f73e1ed801d117ce534b0f"
+    },
+    "TAS1": {
+      "scores": {
+        "BASE": {
+          "mae": 35.819739925652485,
+          "rmse_pooled": 181.09143849419075,
+          "quantile_score_proxy": 21.150733406830614,
+          "coverage_90": 0.8785600136978483,
+          "interval_width_90": 177.19927162777697
+        },
+        "FIXED": {
+          "mae": 34.69068560860312,
+          "rmse_pooled": 179.900044960816,
+          "quantile_score_proxy": 19.96740304879419,
+          "coverage_90": 0.8690856686262199,
+          "interval_width_90": 152.3076299282745
+        },
+        "AGENT": {
+          "mae": 34.69068560860312,
+          "rmse_pooled": 179.900044960816,
+          "quantile_score_proxy": 19.96740304879419,
+          "coverage_90": 0.8690856686262199,
+          "interval_width_90": 152.3076299282745
+        }
+      },
+      "paired_uncertainty": {
+        "mean_agent_minus_fixed_qs": 0.0,
+        "percentile_95_interval": [
+          0.0,
+          0.0
+        ],
+        "block_hours": 168,
+        "draws": 2000,
+        "interpretation": "Paired circular weekly-block bootstrap; negative favors Agent. Descriptive given prior test exposure."
+      },
+      "agent_vs_fixed": {
+        "wins": 0,
+        "ties": 17521,
+        "losses": 0
+      },
+      "profile_counts": {
+        "BASE": {
+          "base": 17521
+        },
+        "FIXED": {
+          "price_only": 11206,
+          "base": 5195,
+          "calendar": 1120
+        },
+        "AGENT": {
+          "price_only": 11206,
+          "base": 5195,
+          "calendar": 1120
+        }
+      },
+      "label_sha256": "507b7588c274bc68adb7a5ab73c35c18be12c839a08e35ddec0cec7ecf91a89c"
+    }
+  },
+  "behavior": [
+    {
+      "region": "NSW1",
+      "api_calls": 27226,
+      "fallbacks": 0,
+      "changed_from_fixed": 0,
+      "input_tokens": 18213086,
+      "tools": {
+        "inspect_recent_fit": 9705
+      },
+      "stops": {
+        "agent_commit": 8808,
+        "uncertain_commit": 8713
+      },
+      "last_actions": {
+        "finish_price_only": 8048,
+        "finish_calendar": 1649,
+        "finish_base": 7816,
+        "finish_fixed": 8
+      }
+    },
+    {
+      "region": "QLD1",
+      "api_calls": 26316,
+      "fallbacks": 0,
+      "changed_from_fixed": 0,
+      "input_tokens": 17232065,
+      "tools": {
+        "inspect_recent_fit": 8795
+      },
+      "stops": {
+        "uncertain_commit": 9549,
+        "agent_commit": 7972
+      },
+      "last_actions": {
+        "finish_base": 8726,
+        "finish_calendar": 1627,
+        "finish_price_only": 7162,
+        "finish_fixed": 6
+      }
+    },
+    {
+      "region": "TAS1",
+      "api_calls": 29845,
+      "fallbacks": 0,
+      "changed_from_fixed": 0,
+      "input_tokens": 21011778,
+      "tools": {
+        "inspect_recent_fit": 12324
+      },
+      "stops": {
+        "agent_commit": 11314,
+        "uncertain_commit": 6207
+      },
+      "last_actions": {
+        "finish_price_only": 11201,
+        "finish_base": 5197,
+        "finish_calendar": 1118,
+        "finish_fixed": 5
+      }
+    }
+  ],
+  "qs_gain_vs_base_percent": 2.0214422942459884,
+  "qs_gain_vs_fixed_percent": 0.0,
+  "paired_uncertainty": {
+    "mean_agent_minus_fixed_qs": 0.0,
+    "percentile_95_interval": [
+      0.0,
+      0.0
+    ],
+    "block_hours": 168,
+    "draws": 2000,
+    "interpretation": "Paired circular weekly-block bootstrap; negative favors Agent. Descriptive given prior test exposure."
+  },
+  "partial_seed2027_prediction_agreement": {
+    "NSW1": {
+      "origins": 11968,
+      "equal_prediction_origins": {
+        "BASE": 11968,
+        "FIXED": 11968,
+        "AGENT": 11968
+      }
+    },
+    "QLD1": {
+      "origins": 0,
+      "equal_prediction_origins": {
+        "BASE": 0,
+        "FIXED": 0,
+        "AGENT": 0
+      }
+    },
+    "TAS1": {
+      "origins": 0,
+      "equal_prediction_origins": {
+        "BASE": 0,
+        "FIXED": 0,
+        "AGENT": 0
+      }
+    }
+  },
+  "limitations": [
+    "User-requested early look; no three-seed claim.",
+    "Any subsequent tuning uses an already exposed historical test set.",
+    "Kev argmax has no sampling seed; repeated runs are not independent trained models."
+  ]
+}
