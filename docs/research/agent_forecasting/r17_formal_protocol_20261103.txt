@@ -1,0 +1,72 @@
+R17 full formal evaluation: numerical-evidence tool Agent
+
+User instruction: execute three regions and three seeds on the current R17 branch.
+The user explicitly selected the FULL 2023-2024 test grid, not the 181-origin
+development proposal. Current-branch authorization supersedes the AGENTS.md
+default of creating another research branch for each new batch.
+Branch: research/kev-tool-agent-20261103-r17
+Base: caddb08ef9f749c6a2e029d83538d8b1a3015506
+Config: configs/agent_forecasting/r17_formal_20261103.json
+
+Frozen scientific scope
+NSW1, QLD1, TAS1; seeds 2026, 2027, 2028; 17,521 origins in every cell.
+157,689 origin/repeat decisions; at most 630,756 API requests.
+72 observed hours -> 24 future hours; native five common quantiles.
+R17 skill, tools, >2% recent-fit guard, .55 final-action threshold, four-call budget
+remain as implemented before the formal run. No task weight updates or skill
+changes based on outcomes during this evaluation.
+Kev returns argmax; its API has no sampling-seed argument. Seeds initialize Python,
+NumPy and torch inference. Repeats measure stability, not independent training or
+independent model draws. Do not manufacture diversity by reordering actions.
+
+Controls and alignment
+BASE reuses the nine existing Chronos-2 main-table artifacts exactly. Only the
+quantiles, axes and metadata are extracted during inference, never their actual
+arrays. Original artifacts and main.csv are hash checked and not overwritten.
+FIXED uses the original recent-fit policy. AGENT uses the exact same available
+numeric input pool and candidate forecasts; different selected profiles are logged.
+The frozen predictor generates the two alternative future forecasts and all three
+48-to-24 historical diagnostics. Batched inference keeps cross_learning=False.
+Native quantile crossings exist in the original BASE. Agent tools receive sorted
+quantiles, matching the established shared scoring rearrangement. Selected native
+arrays are preserved; sorting is not a learned calibration or forecast correction.
+
+Execution and resilience
+GPU 6 retains the existing Kev service; GPU 7 runs frozen Chronos-2.
+tmux session: kev-r17-formal
+Launcher: bash scripts/run_r17_formal.sh
+Runner: python -m forecasting.api_agent.formal_r17 --out OUTPUT_DIRECTORY
+64-origin atomic shards; two in-flight independent Agent loops; no cross-origin
+state. Each completed shard hashes its predictions and gzip-compressed full API
+trace. Resume skips only hash-verified completed shards under the identical source,
+config, inputs and model fingerprints. Partial shards are recomputed.
+Prediction/source errors stop visibly. Agent/API failures follow the frozen FIXED
+fallback, with the failed origin retained in metrics and audit logs.
+No runtime kernel or serving-model change is part of this experiment.
+
+Evaluation after all nine cells
+The scorer rejects missing or corrupt shards before extracting any actual labels.
+Report QS (primary), MAE, pooled RMSE, coverage90, width90 per cell, equal-region
+mean per seed, then mean and population standard deviation across repeats.
+Report calls, tokens, tools, final stops, fallback counts and deviation from FIXED.
+Check BASE scores reproduce the existing main-table Chronos-2 row.
+Report FIXED and AGENT reference ranks against existing original rows by QS/MAE,
+with task input/training-scope qualifications; do not overwrite the original table.
+For paired Agent-minus-FIXED QS, average repeat and region losses at each origin,
+then apply a circular 168-hour block bootstrap with 2000 draws (seed2026), resampling
+common temporal blocks across regions. This avoids treating repeated seeds and
+overlapping 24-hour targets as independent observations.
+
+Interpretation
+Negative paired QS difference favors Agent. Improvement over BASE alone does not
+establish LLM value: the main comparison is Agent versus same-information FIXED.
+Wider/narrower intervals and coverage changes must accompany accuracy conclusions.
+Repeated deterministic predictions do not create extra statistical evidence.
+This historical test period was used in earlier project versions; it is not a
+pristine never-seen holdout. Pretrained-model historical overlap remains possible.
+This R17 tests numerical evidence only, without news or event retrieval.
+
+Preflight
+23 API-Agent and formal-runner unit tests passed. Separate real-GPU development
+preflight compares batch versus single-origin predictions without loading labels.
+The runner freezes its complete source fingerprint in manifest.json at startup.

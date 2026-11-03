@@ -1,0 +1,23 @@
+{
+  "release": "r17-formal-numeric-evidence-v1",
+  "branch": "research/kev-tool-agent-20261103-r17",
+  "base_commit": "caddb08ef9f749c6a2e029d83538d8b1a3015506",
+  "branch_authorization": "User explicitly requested this experiment on the current branch, overriding AGENTS.md new-branch default.",
+  "regions": ["NSW1", "QLD1", "TAS1"],
+  "seeds": [2026, 2027, 2028],
+  "split": "test",
+  "origins_per_region": 17521,
+  "start_unix": 1672495200,
+  "target_end_exclusive_unix": 1735653600,
+  "shard_size": 64,
+  "predictor_batch_size": 32,
+  "api_workers": 2,
+  "max_calls_per_origin": 4,
+  "seed_scope": "Python, NumPy and torch inference seeds; Kev uses argmax and has no request sampling seed. These are repeatability runs, not independently trained models.",
+  "baseline_policy": "Reuse exact saved Chronos-2 main-table forecasts per region/seed; never retrain or overwrite original baseline outputs.",
+  "quantile_policy": "Sort native quantiles for diagnostics and Agent tools, identical to the shared scoring rearrangement; preserve native selected predictions in artifacts.",
+  "test_exposure": "This test period was used in earlier project versions; R17 is frozen before this run and will not be tuned on its outcomes.",
+  "score_policy": "Read labels only after all nine cells finish; shared aligned scorer; equal-region mean then seed mean and population std; paired circular 168-hour-block bootstrap, 2000 draws, averaging repeated seeds before resampling.",
+  "main_table_sha256": "a3015b93983a0d445083168fa056e70f60de316aad72514d6d6aaa1629db22e1",
+  "verification_sha256": "8f05d47c63292ec1c52635bc6333ef04570bfe93945caa57ef3032c48588afa1"
+}

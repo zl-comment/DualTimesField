@@ -1,0 +1,91 @@
+{
+  "release": "r17-tool-agent-v1",
+  "scope": "one development-origin integration check; no accuracy evaluation",
+  "base_commit": "caddb08ef9f749c6a2e029d83538d8b1a3015506",
+  "branch": "research/kev-tool-agent-20261103-r17",
+  "git_commit": "caddb08ef9f749c6a2e029d83538d8b1a3015506",
+  "source_hashes": {
+    "forecasting/api_agent/__init__.py": "0036272a94b8f28f0520cb90b288b0e006e34857c374c2f9742b2aec1f37de8f",
+    "forecasting/api_agent/pilot.py": "a358f276c7f1291cf56cbabba16deaee7063790889c757d2924a36db65f26aae",
+    "forecasting/api_agent/smoke_r17.py": "4879579f64215892c33e297b939f152f21ae7c34d6c8bc3377c59ed1eb250d96",
+    "forecasting/api_agent/transport.py": "1509872788ff273c24be333353019fb578d9cd6bacb36832c0973d103157a0bf",
+    "forecasting/api_agent/workflow.py": "02d07bc07794fd1e3e0894cf773213965faac7c8f25ab53a5604880d08d71009",
+    "forecasting/api_agent/workflow_r16.py": "5aa21984bf4011a6b3c1859717ea6ffbdd5ec5e894a416ef51b477adc415cc7a",
+    "forecasting/api_agent/workflow_r17.py": "d4e2932ae5fd59c5736a8e74bfec366d46463fd0f07302395f53475d8d2f23da",
+    "forecasting/api_agent/skills/resolve_tradeoff_v1.txt": "66172d6a98047afd31a8f46f88db9c171a6d3d8fbecfc4ca55d1ee1cdbabfe85",
+    "forecasting/api_agent/skills/select_forecast.txt": "ae15e79eef2396991aacc29b801c322d56dd286b6b7e44edadcbe57b19ca64f0",
+    "forecasting/api_agent/skills/tool_agent_v1.txt": "43f6b70effb7beba745f293d07ff05a76797a8b8eba65f7ed836b40848dd3281",
+    "forecasting/api_agent/skills/triage.txt": "45eb92b869d7fba0130df1ec956b5e6494da2b36deb3ce47ea420e7c3fbe76ba",
+    "forecasting/chronos2_zeroshot/model.py": "b8bc3ca8941892460025b8bf01706188b7bff85dab389786a44bd6fc3691e3ec"
+  },
+  "source_fingerprint": "41fcb2f870f33cc7a185e94633e1f069639f1b3e6eb1786c17efc51616bbe541",
+  "snapshot_id": "adc6cdb289a5aa370ed7fd1703ceab0d0c2dafbc2e0a6ea324525c24d5b35a86",
+  "kev_identity": {
+    "models": [
+      {
+        "name": "kev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 146,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 147,
+          "requests": 147,
+          "queued": 0
+        }
+      },
+      {
+        "name": "jev-latest",
+        "description": "Kev pointer head on Qwen/Qwen3.5-4B-Base, serving /root/workspace/services/kev/models/kev-4b at temperature 2.41",
+        "release_date": "2026-11-02",
+        "run": "/root/workspace/services/kev/models/kev-4b",
+        "base": "Qwen/Qwen3.5-4B-Base",
+        "lora": 16,
+        "device": "cuda",
+        "backend": "torch",
+        "dtype": "bfloat16",
+        "temperature": 2.406050072164233,
+        "max_state_tokens": 65536,
+        "truncate_states": false,
+        "cuda_graphs": null,
+        "prefix_cache": {
+          "size": 2,
+          "min_state_tokens": 0,
+          "max_tokens": 16384,
+          "hits": 1,
+          "misses": 146,
+          "cached_states": 2,
+          "oom_retries": 0
+        },
+        "batches": {
+          "count": 147,
+          "requests": 147,
+          "queued": 0
+        }
+      }
+    ]
+  },
+  "predictor_weights": {
+    "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+    "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+  },
+  "training_calls": 0,
+  "evaluation_labels_opened": false
+}

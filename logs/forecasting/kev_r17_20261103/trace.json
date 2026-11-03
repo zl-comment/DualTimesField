@@ -1,0 +1,213 @@
+{
+  "release": "r17-tool-agent-v1",
+  "snapshot_id": "adc6cdb289a5aa370ed7fd1703ceab0d0c2dafbc2e0a6ea324525c24d5b35a86",
+  "fixed_choice": "price_only",
+  "calls": [
+    {
+      "request": {
+        "model": "kev-latest",
+        "state": {
+          "task": "Choose tools, inspect evidence, then commit a frozen forecast profile.",
+          "visible_history_hours": 72,
+          "horizon_hours": 24,
+          "history_end_exclusive_unix": 1640959200,
+          "default_profile": "price_only",
+          "evidence": {},
+          "no_future_outcomes_available": true,
+          "remaining_decisions": 4
+        },
+        "questions": {
+          "action": {
+            "type": "choice",
+            "instructions": "Skill: forecast_tool_agent, version 1.0.0\nYou control a bounded tool-use loop for a frozen electricity-price predictor.\nSelect one of the offered actions. Tool results arrive in the next state.\nYou may inspect observed history, inspect recent hindcast errors, compare frozen\ncandidate forecasts, or commit a profile. Ask only for evidence that can change\nyour decision. Tools cannot be repeated. The last decision must commit.\n\ninspect_recent_fit evaluates an already observed day. It is required before\ncommitting an alternative profile yourself. Its best full-day score defines\ndefault_profile; finish_fixed accepts that deterministic policy without further\ninspection. Recent-fit support is necessary but does not guarantee future gain.\ninspect_history describes price and demand changes; it cannot identify unobserved\noutages, news, or causal events. inspect_forecast_disagreement shows predictions,\nnever realized future prices. Narrower intervals do not imply better forecasts.\n\nUse the default unless the inspected evidence supports a different available\nprofile. finish_base retains the original covariate setup. You cannot invent\nprices, tools, profiles, events, rules, or thresholds. Do not use memorized\nhistorical events to infer a future outcome. No online learning or skill editing.\nYour action probability is not a calibrated probability of forecasting improvement.\n",
+            "criteria": {
+              "finish_fixed": "Commit the fixed recent-fit rule and stop.",
+              "finish_base": "Commit the original price + past demand + calendar profile and stop.",
+              "inspect_recent_fit": "Compare all profiles on the last 24 already observed hours.",
+              "inspect_history": "Inspect changes in observed price and standardized demand over three days.",
+              "inspect_forecast_disagreement": "Inspect candidate forecast medians and interval widths; these are predictions, not outcomes."
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "kev-latest",
+        "answers": {
+          "action": {
+            "type": "choice",
+            "choice": "inspect_recent_fit",
+            "confidence": 0.1659,
+            "probabilities": {
+              "finish_fixed": 0.1477,
+              "finish_base": 0.2556,
+              "inspect_recent_fit": 0.3327,
+              "inspect_history": 0.1815,
+              "inspect_forecast_disagreement": 0.0824
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 443,
+          "output_tokens": 97
+        },
+        "latency_ms": 321.1
+      },
+      "elapsed_seconds": 0.33566781505942345,
+      "selected_probability": 0.3327
+    },
+    {
+      "request": {
+        "model": "kev-latest",
+        "state": {
+          "task": "Choose tools, inspect evidence, then commit a frozen forecast profile.",
+          "visible_history_hours": 72,
+          "horizon_hours": 24,
+          "history_end_exclusive_unix": 1640959200,
+          "default_profile": "price_only",
+          "evidence": {
+            "inspect_recent_fit": {
+              "diagnostic": "hindcast_inside_visible_history",
+              "history_window_hours": 72,
+              "hindcast_context_hours": 48,
+              "hindcast_horizon_hours": 24,
+              "hindcast_target_end_exclusive": 1640959200,
+              "limitation": "One recent day; the lowest past error need not be best tomorrow.",
+              "full_day_rank_best_first": [
+                "price_only",
+                "base",
+                "calendar"
+              ],
+              "profiles": {
+                "base": {
+                  "qs_24h": 16.161828539178615,
+                  "qs_first_12h": 11.300305110327479,
+                  "qs_last_12h": 21.02335196802975,
+                  "mae_24h": 28.02560835672141,
+                  "coverage_90": 1.0,
+                  "clears_2pct_change_guard": false,
+                  "wins_both_halves_against_base": false,
+                  "full_day_improvement_percent": 0.0
+                },
+                "calendar": {
+                  "qs_24h": 16.738300526434774,
+                  "qs_first_12h": 11.39013462611991,
+                  "qs_last_12h": 22.08646642674964,
+                  "mae_24h": 29.396998590599466,
+                  "coverage_90": 1.0,
+                  "clears_2pct_change_guard": false,
+                  "wins_both_halves_against_base": false,
+                  "full_day_improvement_percent": -3.5668735493555546
+                },
+                "price_only": {
+                  "qs_24h": 14.550568088583386,
+                  "qs_first_12h": 10.343076344941483,
+                  "qs_last_12h": 18.758059832225282,
+                  "mae_24h": 26.1014627859594,
+                  "coverage_90": 0.9583333333333334,
+                  "clears_2pct_change_guard": true,
+                  "wins_both_halves_against_base": true,
+                  "full_day_improvement_percent": 9.96954302967204
+                }
+              }
+            }
+          },
+          "no_future_outcomes_available": true,
+          "remaining_decisions": 3
+        },
+        "questions": {
+          "action": {
+            "type": "choice",
+            "instructions": "Skill: forecast_tool_agent, version 1.0.0\nYou control a bounded tool-use loop for a frozen electricity-price predictor.\nSelect one of the offered actions. Tool results arrive in the next state.\nYou may inspect observed history, inspect recent hindcast errors, compare frozen\ncandidate forecasts, or commit a profile. Ask only for evidence that can change\nyour decision. Tools cannot be repeated. The last decision must commit.\n\ninspect_recent_fit evaluates an already observed day. It is required before\ncommitting an alternative profile yourself. Its best full-day score defines\ndefault_profile; finish_fixed accepts that deterministic policy without further\ninspection. Recent-fit support is necessary but does not guarantee future gain.\ninspect_history describes price and demand changes; it cannot identify unobserved\noutages, news, or causal events. inspect_forecast_disagreement shows predictions,\nnever realized future prices. Narrower intervals do not imply better forecasts.\n\nUse the default unless the inspected evidence supports a different available\nprofile. finish_base retains the original covariate setup. You cannot invent\nprices, tools, profiles, events, rules, or thresholds. Do not use memorized\nhistorical events to infer a future outcome. No online learning or skill editing.\nYour action probability is not a calibrated probability of forecasting improvement.\n",
+            "criteria": {
+              "finish_fixed": "Commit the fixed recent-fit rule and stop.",
+              "finish_base": "Commit the original price + past demand + calendar profile and stop.",
+              "finish_price_only": "Commit the supported price_only profile and stop.",
+              "inspect_history": "Inspect changes in observed price and standardized demand over three days.",
+              "inspect_forecast_disagreement": "Inspect candidate forecast medians and interval widths; these are predictions, not outcomes."
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "kev-latest",
+        "answers": {
+          "action": {
+            "type": "choice",
+            "choice": "finish_price_only",
+            "confidence": 0.6419,
+            "probabilities": {
+              "finish_fixed": 0.1549,
+              "finish_base": 0.0664,
+              "finish_price_only": 0.7135,
+              "inspect_history": 0.0277,
+              "inspect_forecast_disagreement": 0.0375
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 1068,
+          "output_tokens": 97
+        },
+        "latency_ms": 408.7
+      },
+      "elapsed_seconds": 0.418334424495697,
+      "selected_probability": 0.7135
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "inspect_recent_fit",
+      "version": "1.0.0",
+      "result": {
+        "diagnostic": "hindcast_inside_visible_history",
+        "history_window_hours": 72,
+        "hindcast_context_hours": 48,
+        "hindcast_horizon_hours": 24,
+        "hindcast_target_end_exclusive": 1640959200,
+        "limitation": "One recent day; the lowest past error need not be best tomorrow.",
+        "full_day_rank_best_first": [
+          "price_only",
+          "base",
+          "calendar"
+        ],
+        "profiles": {
+          "base": {
+            "qs_24h": 16.161828539178615,
+            "qs_first_12h": 11.300305110327479,
+            "qs_last_12h": 21.02335196802975,
+            "mae_24h": 28.02560835672141,
+            "coverage_90": 1.0,
+            "clears_2pct_change_guard": false,
+            "wins_both_halves_against_base": false,
+            "full_day_improvement_percent": 0.0
+          },
+          "calendar": {
+            "qs_24h": 16.738300526434774,
+            "qs_first_12h": 11.39013462611991,
+            "qs_last_12h": 22.08646642674964,
+            "mae_24h": 29.396998590599466,
+            "coverage_90": 1.0,
+            "clears_2pct_change_guard": false,
+            "wins_both_halves_against_base": false,
+            "full_day_improvement_percent": -3.5668735493555546
+          },
+          "price_only": {
+            "qs_24h": 14.550568088583386,
+            "qs_first_12h": 10.343076344941483,
+            "qs_last_12h": 18.758059832225282,
+            "mae_24h": 26.1014627859594,
+            "coverage_90": 0.9583333333333334,
+            "clears_2pct_change_guard": true,
+            "wins_both_halves_against_base": true,
+            "full_day_improvement_percent": 9.96954302967204
+          }
+        }
+      }
+    }
+  ],
+  "fallback": null,
+  "skill_sha256": "43f6b70effb7beba745f293d07ff05a76797a8b8eba65f7ed836b40848dd3281",
+  "forecast_fingerprint": "c248638cb2cdd13bb050592ae30b39850b930beccc89ad12ba84e3eb409ac8c6",
+  "selected_profile": "price_only",
+  "stop_reason": "agent_commit"
+}

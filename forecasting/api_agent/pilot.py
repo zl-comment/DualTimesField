@@ -61,12 +61,14 @@ def load_snapshots(region, count):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--origins-per-region', type=int, default=24)
-    parser.add_argument('--workflow', choices=('r15', 'r16'), default='r15')
+    parser.add_argument('--workflow', choices=('r15', 'r16', 'r17'), default='r15')
     parser.add_argument('--out', required=True)
     args = parser.parse_args()
     decision_function = decide
     if args.workflow == 'r16':
         from .workflow_r16 import decide as decision_function
+    elif args.workflow == 'r17':
+        from .workflow_r17 import decide as decision_function
     if not 1 <= args.origins_per_region <= 24:
         raise ValueError('This preregistered pilot is capped at 24 origins per region')
     out = Path(args.out).resolve()
@@ -101,8 +103,11 @@ def main():
             input_sources[str(path)] = sha_file(path)
     manifest = {
         'release': args.workflow + '-pilot-v1',
-        'base_commit': ('0ae728e7e8eb478a7dc463c8b87dfbb0890660ad' if args.workflow == 'r16'
-                        else '46e92fd9053a8c5e63619435e599496e023c669c'),
+        'base_commit': {
+            'r15': '46e92fd9053a8c5e63619435e599496e023c669c',
+            'r16': '0ae728e7e8eb478a7dc463c8b87dfbb0890660ad',
+            'r17': 'caddb08ef9f749c6a2e029d83538d8b1a3015506',
+        }[args.workflow],
         'git_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
         'source_hashes': source_hashes, 'source_fingerprint': digest(source_hashes),
@@ -114,11 +119,13 @@ def main():
             ['git', 'rev-parse', 'HEAD'], cwd=runtime_root / 'runtime-src', text=True).strip(),
         'development_only': True, 'regions': ['NSW1', 'QLD1', 'TAS1'],
         'origins_per_region': args.origins_per_region, 'sampling': 'uniform linspace over selection cache',
-        'training_calls': 0, 'max_kev_calls_per_origin': 1 if args.workflow == 'r16' else 2,
+        'training_calls': 0, 'max_kev_calls_per_origin': {'r15': 2, 'r16': 1, 'r17': 4}[args.workflow],
         'profiles': list(PROFILES), 'fixed_policy': 'lowest visible-day QS; change only for >2% reduction',
-        'agent_guard': ('route conflicting eligible profiles only; probability <.55 falls back to FIXED'
-                        if args.workflow == 'r16' else
-                        'choice probability >=.55 and >2% visible-day QS reduction; otherwise BASE'),
+        'agent_guard': {
+            'r15': 'choice probability >=.55 and >2% visible-day QS reduction; otherwise BASE',
+            'r16': 'route conflicting eligible profiles only; probability <.55 falls back to FIXED',
+            'r17': 'inspect fit before alternative commit; >2% visible-day QS support; probability <.55 or API failure uses FIXED; at most four decisions',
+        }[args.workflow],
         'interpretation': 'development subset, not main-table rank; no pretraining-contamination exclusion',
         'input_scope': 'same 72-hour common input pool; effective covariate profiles may differ',
         'historical_fit': '48-to-24 hindcast wholly inside each origin history; no parameter fitting'}
@@ -143,7 +150,8 @@ def main():
                 forecasts, hindcasts = forecast_profiles(snapshot, pipeline)
             evidence = diagnostics(snapshot, hindcasts)
             fixed = fixed_choice(evidence)
-            agent, trace = decision_function(snapshot, evidence, client)
+            kwargs = {'forecasts': forecasts} if args.workflow == 'r17' else {}
+            agent, trace = decision_function(snapshot, evidence, client, **kwargs)
             trace.update(region=region, origin_unix=snapshot.origin_unix,
                          recent_fit=evidence, ordinal=ordinal)
             for arm, profile in [('BASE', 'base'), ('FIXED', fixed), ('AGENT', agent)]:

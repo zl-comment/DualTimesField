@@ -1,0 +1,81 @@
+R17: bounded tool-using forecasting Agent
+
+Branch: research/kev-tool-agent-20261103-r17
+Base commit: caddb08ef9f749c6a2e029d83538d8b1a3015506
+Status: implemented; unit tests and one live integration check passed.
+No R17 batch accuracy experiment, formal evaluation, or main-table rank yet.
+
+Purpose
+R16's numerical gate controls when Kev chooses a profile. R17 adds an explicit
+bounded loop in which Kev chooses which registered diagnostic to inspect, receives
+its result, and then commits a profile. This is infrastructure for studying Agent
+decisions, not evidence that extra LLM calls improve forecasting.
+
+Execution
+1. Host creates the same immutable 72-hour Snapshot, with known future calendar.
+2. Frozen Chronos-2 computes the three existing candidate forecasts and hindcasts.
+3. Kev receives the task, default profile, remaining decision budget, and available
+   typed actions. It may stop immediately with FIXED or BASE.
+4. Host executes one requested tool and supplies its observation to the next call.
+5. Kev commits an available profile. Host returns that candidate's numeric array.
+6. Host records snapshot, forecast, skill and source fingerprints, requests,
+   responses, tool results, selected profile, stop reason, and any fallback.
+
+Tools (v1.0.0)
+inspect_recent_fit: all three profiles' errors on the last 24 observed hours,
+predicted using the preceding 48 observed hours.
+inspect_history: three observed days of price and standardized-demand summaries.
+inspect_forecast_disagreement: median differences and interval widths of candidate
+forecasts; these are explicitly predictions, not future observations.
+
+Skill
+forecasting/api_agent/skills/tool_agent_v1.txt, version 1.0.0.
+Kev is a typed decision model. It selects offered actions; this release does not
+depend on free-text reasoning, generated code, or automatic skill rewriting.
+
+Constraints
+At most four API decisions and three distinct tools per origin. Repeated tools
+are removed from the action space. The fourth decision offers only final actions.
+Alternative commits require inspection of recent fit and >2% improvement over
+BASE on the observed-day diagnostic. BASE and FIXED remain available.
+Final action probability below .55 uses FIXED; that threshold is an engineering
+guard, not calibrated forecast confidence. API failures and invalid actions also
+use FIXED, preserving the failed request in the trace when available.
+Invalid forecast arrays or mismatched diagnostic origin fail before API calls.
+No parameter training, cross-origin memory, network retrieval, shell tools,
+arbitrary file tools, future outcomes, or in-evaluation skill changes.
+Historical pretraining overlap cannot be excluded by this interface restriction.
+All candidates are still eagerly computed: no adaptive GPU compute-saving claim.
+
+Comparison contract
+The existing baseline table, frozen weights, input pool, targets, metrics, BASE,
+and FIXED policy are unchanged. The development runner accepts --workflow r17 and
+retains prediction-before-scoring separation for every origin in all regions.
+Before a new accuracy batch, follow AGENTS.md and create its independent research
+branch, recording this implementation's exact source fingerprint and base commit.
+Same-information FIXED and R16 are necessary controls for attributing LLM gain.
+A small development result must not be reported as a main-table rank.
+
+Verification on 2026-11-03
+18 tests passed across R15/R16/R17, including variable tool order, no repeated
+tools, unavailable commits, call budget, fallback audit, uncertain actions,
+corrupt forecasts, wrong origin, and the observed-history boundary.
+Real API + real Chronos smoke: first NSW1 selection-cache origin, no labels opened.
+Kev requested inspect_recent_fit and committed price_only in two calls; no
+fallback. Returned quantiles shape [24, 5]. This verifies execution only.
+Runtime source fingerprint:
+41fcb2f870f33cc7a185e94633e1f069639f1b3e6eb1786c17efc51616bbe541
+Artifacts: logs/forecasting/kev_r17_20261103/{manifest,trace,report}.json.
+Numeric array: outputs/forecasting/kev_r17_smoke_20261103/prediction.npz.
+Repeat with a fresh output directory:
+CUDA_VISIBLE_DEVICES=GPU-c931f386-8fcf-9f27-2526-47e12aac3145 \
+  /root/workspace/Code/DualTimesField-foundation-baselines/.venvs/chronos2/bin/python \
+  -m forecasting.api_agent.smoke_r17 --out outputs/forecasting/kev_r17_smoke_NEW
+
+Remaining research
+This first tool Agent still reasons over numerical evidence. News/event retrieval
+is not implemented. Before adding it, establish historical publication/availability
+timestamps and versioned source snapshots, then define and validate the bounded
+numeric effect of any event-derived action. A timestamp filter alone does not
+eliminate pretrained-model contamination. Demonstrate incremental development
+gain over same-information fixed controls before formal baseline ranking.
