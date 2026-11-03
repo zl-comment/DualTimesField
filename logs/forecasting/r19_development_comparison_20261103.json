@@ -1,0 +1,55 @@
+{
+  "r18_manifest_id": "509acbc7002bd30a90c53d8a8e529bb5126f7c1d4866ee6ccda9693a04e537e7",
+  "r19_manifest_id": "b510ef9916e1d5bf90e14c3f30cc7f748472f67bc4d33d9b1312c944554411b7",
+  "comparison_scope": "same72 selection origins, seed2026, equal-region; development only",
+  "matched_origins": 72,
+  "default_arrays_max_abs_difference": 0.0,
+  "qs_r18": 63.13235920396651,
+  "qs_r19": 61.08764122978847,
+  "qs_change_percent": -3.238779605197417,
+  "positive_improvement_percent": 3.238779605197417,
+  "regions": {
+    "NSW1": {
+      "r18_qs": 33.81738546225022,
+      "r19_qs": 27.416077962404955
+    },
+    "QLD1": {
+      "r18_qs": 110.28846970653127,
+      "r19_qs": 109.33558608129675
+    },
+    "TAS1": {
+      "r18_qs": 45.29122244311806,
+      "r19_qs": 46.51125964566369
+    }
+  },
+  "prediction_differs_from_base": 6,
+  "selected_candidates": {
+    "chronos:base:48": 5,
+    "chronos:base:72": 1,
+    "lightgbm:full:72": 66
+  },
+  "api_calls": 216,
+  "api_failure_count": 0,
+  "fallback_count": 0,
+  "llm_selected_tools": 141,
+  "protocol_required_tools": 72,
+  "latency": {
+    "count": 72,
+    "p50": 2.991945967078209,
+    "p95": 3.09980090521276,
+    "p99": 3.3272126860916638
+  },
+  "interpretation": "Whole workflow comparison; mandatory evidence is not autonomous discovery and this does not isolate the LLM from a numerical selection rule. No formal test ranking.",
+  "test_suite": {
+    "passed": 142,
+    "subtests_passed": 18
+  },
+  "synthetic_evidence_swap_checks_passed": 4,
+  "formal_test_started": false,
+  "news_data_available": false,
+  "next_stage": "Develop and compare decision rules/skills on development data; formal test requires frozen release.",
+  "all_protocol_mandated_tool_executions": 213,
+  "llm_choices_within_mandated_tool_stages": 141,
+  "automatic_protocol_tool_executions": 72,
+  "optional_autonomous_tool_executions": 0
+}

@@ -1,0 +1,128 @@
+{
+  "abstention_count": 0,
+  "api_calls": 216,
+  "api_failure_count": 0,
+  "api_latency_seconds": {
+    "count": 216,
+    "p50": 0.7478559836745262,
+    "p95": 0.9173640552908182,
+    "p99": 0.9247684646397829
+  },
+  "capabilities": {
+    "external_evidence": "real_data_unavailable",
+    "frozen_chronos": true,
+    "frozen_lightgbm": true,
+    "historical_analogs": true,
+    "mature_feedback": true,
+    "notice": "Enabled capability does not imply selected at every origin; see tool counts."
+  },
+  "coverage_fraction": 1.0,
+  "estimate_limit": "Serial origin latency only; excludes startup, file hashing, and environment changes. Not an accuracy estimate.",
+  "evidence_fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "expected_origins": 72,
+  "failed_origins": 0,
+  "fallback_count": 0,
+  "information_scope": "full_evidence",
+  "ledger_fingerprint": "8b0c5d22b577deb7cc37725e95ca0775d2cca5a9dd14327d97e3910d81306a3a",
+  "llm_selected_tools": 141,
+  "manifest_id": "b510ef9916e1d5bf90e14c3f30cc7f748472f67bc4d33d9b1312c944554411b7",
+  "origin_latency_seconds": {
+    "count": 72,
+    "p50": 2.991945967078209,
+    "p95": 3.09980090521276,
+    "p99": 3.3272126860916638
+  },
+  "origins": 72,
+  "policy": "r19_evidence_first",
+  "prediction_differs_from_base": 6,
+  "protocol_required_tools": 72,
+  "region_equal_mean": {
+    "AGENT": {
+      "coverage90": 0.8587962962962963,
+      "mae": 84.52411806453574,
+      "qs": 61.08764122978847,
+      "rmse": 454.1884474337066,
+      "width90": 355.03713658892406
+    },
+    "BASE": {
+      "coverage90": 0.875,
+      "mae": 89.40539355017087,
+      "qs": 63.13235920396651,
+      "rmse": 458.384397921375,
+      "width90": 406.5201084669941
+    }
+  },
+  "regions": {
+    "NSW1": {
+      "AGENT": {
+        "coverage90": 0.8211805555555556,
+        "mae": 40.2644879309191,
+        "qs": 27.416077962404955,
+        "rmse": 79.20538297889627,
+        "width90": 263.2409250113357
+      },
+      "BASE": {
+        "coverage90": 0.8524305555555556,
+        "mae": 49.88180334882851,
+        "qs": 33.81738546225022,
+        "rmse": 89.29234406024979,
+        "width90": 378.5174217133239
+      },
+      "count": 24
+    },
+    "QLD1": {
+      "AGENT": {
+        "coverage90": 0.9236111111111112,
+        "mae": 148.74741217184476,
+        "qs": 109.33558608129675,
+        "rmse": 925.7237399775192,
+        "width90": 672.7533603344298
+      },
+      "BASE": {
+        "coverage90": 0.9288194444444444,
+        "mae": 152.80406578948498,
+        "qs": 110.28846970653127,
+        "rmse": 927.8305735669865,
+        "width90": 703.8582394447427
+      },
+      "count": 24
+    },
+    "TAS1": {
+      "AGENT": {
+        "coverage90": 0.8315972222222222,
+        "mae": 64.56045409084336,
+        "qs": 46.51125964566369,
+        "rmse": 357.6362193447041,
+        "width90": 129.11712442100648
+      },
+      "BASE": {
+        "coverage90": 0.84375,
+        "mae": 65.53031151219916,
+        "qs": 45.29122244311806,
+        "rmse": 358.0302761368888,
+        "width90": 137.18466424291574
+      },
+      "count": 24
+    }
+  },
+  "selected_candidates": {
+    "chronos:base:48": 5,
+    "chronos:base:72": 1,
+    "lightgbm:full:72": 66
+  },
+  "selection_equals_default": 66,
+  "serial_full_grid_hours_estimate": 131.3225740306237,
+  "status": "COMPLETE",
+  "tool_count_semantics": "Counts trace tool attempts, including recorded errors; protocol-required coverage is not evidence of LLM benefit.",
+  "tools": {
+    "diagnose:lightgbm:full:72|chronos:base:48": 58,
+    "diagnose:lightgbm:full:72|chronos:base:72": 11,
+    "forecast:chronos:base:48": 58,
+    "forecast:chronos:base:72": 11,
+    "forecast:chronos:calendar:72": 1,
+    "forecast:chronos:price_only:72": 2,
+    "inspect_recent_fit": 3,
+    "retrieve_analogs:state": 69
+  },
+  "unclassified_tools": 0
+}
