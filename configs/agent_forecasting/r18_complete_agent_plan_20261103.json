@@ -1,0 +1,284 @@
+{
+  "kind": "design_plan_not_runner_configuration",
+  "design_id": "r18-complete-adaptive-agent-20261103",
+  "version": "0.1.0",
+  "state": "PLAN_ONLY",
+  "run_ready": false,
+  "base_commit": "a3a00e0e20bb88c5b554d4f05e2976c4f95090be",
+  "design_document": "docs/research/agent_forecasting/r18_complete_agent_design_20261103.txt",
+  "test_matrix": "docs/research/agent_forecasting/r18_test_matrix_20261103.csv",
+  "workflow_order": [
+    "complete_design",
+    "implement_and_engineering_test",
+    "full_loop_acceptance",
+    "whole_agent_evaluation",
+    "module_and_skill_optimization",
+    "freeze_and_confirm"
+  ],
+  "individual_module_accuracy_gain_required_before_build": false,
+  "regions": [
+    "NSW1",
+    "QLD1",
+    "TAS1"
+  ],
+  "horizon_hours": 24,
+  "common_history_hours": 72,
+  "quantile_levels": [
+    0.05,
+    0.1,
+    0.5,
+    0.9,
+    0.95
+  ],
+  "default_predictor_plan": "existing_frozen_lightgbm",
+  "alternative_predictor_plan": "frozen_chronos2",
+  "predictor_training": false,
+  "llm_training": false,
+  "new_residual_or_calibrator_fit": false,
+  "existing_lightgbm_was_task_trained": true,
+  "decision_api": {
+    "provider": "local_kev",
+    "base_url": "http://127.0.0.1:8009",
+    "path": "/v1/systemone",
+    "output_kind": "typed_choice",
+    "free_text_generation_assumed": false,
+    "sampling_seed_supported": false
+  },
+  "modules": [
+    {
+      "id": "M01",
+      "name": "asof_context",
+      "description": "时点快照与数据访问",
+      "implementation_status": "EXTEND_EXISTING"
+    },
+    {
+      "id": "M02",
+      "name": "state_diagnostics",
+      "description": "状态与数据质量诊断",
+      "implementation_status": "EXTEND_EXISTING"
+    },
+    {
+      "id": "M03",
+      "name": "evidence_retrieval",
+      "description": "数值及文档证据检索",
+      "implementation_status": "DATA_AUDIT_REQUIRED"
+    },
+    {
+      "id": "M04",
+      "name": "event_interpretation",
+      "description": "事件理解与版本关系",
+      "implementation_status": "NEW"
+    },
+    {
+      "id": "M05",
+      "name": "analog_retrieval",
+      "description": "历史相似样本与多样性检索",
+      "implementation_status": "NEW"
+    },
+    {
+      "id": "M06",
+      "name": "frozen_predictors",
+      "description": "冻结预测器与输入方案注册表",
+      "implementation_status": "EXTEND_EXISTING"
+    },
+    {
+      "id": "M07",
+      "name": "candidate_diagnostics",
+      "description": "成熟误差与候选诊断",
+      "implementation_status": "EXTEND_EXISTING"
+    },
+    {
+      "id": "M08",
+      "name": "controller",
+      "description": "Agent控制器",
+      "implementation_status": "NEW"
+    },
+    {
+      "id": "M09",
+      "name": "review_commit",
+      "description": "决策复核与提交",
+      "implementation_status": "NEW"
+    },
+    {
+      "id": "M10",
+      "name": "mature_feedback",
+      "description": "成熟反馈台账",
+      "implementation_status": "NEW"
+    },
+    {
+      "id": "M11",
+      "name": "execution_audit",
+      "description": "运行恢复与审计",
+      "implementation_status": "EXTEND_EXISTING"
+    }
+  ],
+  "planned_skills": [
+    {
+      "id": "plan_forecast",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "assess_state",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "interpret_evidence",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "retrieve_analogs",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "compose_forecast_request",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "compare_candidates",
+      "version": "0.1.0-planned",
+      "implemented": false
+    },
+    {
+      "id": "review_and_commit",
+      "version": "0.1.0-planned",
+      "implemented": false
+    }
+  ],
+  "candidate_registry_plan": {
+    "lightgbm": [
+      "original_full_schema"
+    ],
+    "chronos_profiles": [
+      "base",
+      "calendar",
+      "price_only"
+    ],
+    "chronos_window_hours": [
+      24,
+      48,
+      72
+    ],
+    "two_candidate_quantile_pool_weights": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "lightgbm_drop_or_zero_features_allowed": false
+  },
+  "limits_proposed": {
+    "api_calls_including_retries": 8,
+    "tool_executions": 12,
+    "current_candidate_forecasts": 5,
+    "retrieval_candidates": 32,
+    "returned_episodes": 8,
+    "historical_candidate_episode_evaluations": 40,
+    "request_bytes": 24000,
+    "api_timeout_seconds": 30,
+    "origin_deadline_seconds": 180,
+    "api_workers": 2
+  },
+  "evidence_policy": {
+    "availability_modes": [
+      "verified_asof",
+      "archive_proxy"
+    ],
+    "proxy_is_not_verified_publication": true,
+    "live_web_during_historical_evaluation": false,
+    "future_effective_event_allowed_if_already_published": true,
+    "real_historical_document_coverage": "UNKNOWN_REQUIRES_AUDIT",
+    "synthetic_provider_is_not_real_data_completion": true
+  },
+  "memory_policy": {
+    "release_only_mature_outcomes": true,
+    "per_origin_memory_watermark": true,
+    "isolated_arm_ledgers": true,
+    "prediction_immutable_after_commit": true,
+    "skills_immutable_during_evaluation": true,
+    "update_algorithm_immutable_during_evaluation": true
+  },
+  "information_scopes": [
+    "common_input",
+    "full_evidence"
+  ],
+  "engineering_stages": [
+    "T0_contracts",
+    "T1_unit_properties",
+    "T2_real_api_predictor_integration",
+    "T3_scenario_end_to_end",
+    "T4_development_replay_and_stability"
+  ],
+  "development_runs_plan": [
+    {
+      "regions": 3,
+      "origins_per_region": 24,
+      "purpose": "full-loop smoke"
+    },
+    {
+      "regions": 3,
+      "origins_per_region": 181,
+      "purpose": "complete-system development replay and cost estimate"
+    }
+  ],
+  "research_stages": [
+    "E0_full_agent_development",
+    "E1_whole_system_comparisons",
+    "E2_leave_one_module_out",
+    "E3_targeted_modules_and_skills",
+    "E4_frozen_confirmation"
+  ],
+  "ablation_dimensions": [
+    "event_interpretation",
+    "analog_retrieval",
+    "sample_diversity",
+    "mature_memory",
+    "input_scope_control",
+    "cross_predictor_routing",
+    "quantile_pooling",
+    "review",
+    "llm_planner"
+  ],
+  "baseline_policy": {
+    "reuse_existing_table": true,
+    "retrain": false,
+    "overwrite": false,
+    "same_information_controls_after_full_system_ready": true
+  },
+  "evaluation": {
+    "primary_metric": "quantile_score_proxy",
+    "secondary_metrics": [
+      "mae",
+      "region_mean_pooled_rmse",
+      "coverage_90",
+      "interval_width_90",
+      "cost",
+      "coverage_and_failures"
+    ],
+    "aggregation": "equal-region macro then repeat mean and sample SD ddof=1",
+    "historical_reference_years": [
+      2023,
+      2024
+    ],
+    "historical_reference_already_exposed": true,
+    "independent_confirmation_split": null,
+    "independent_confirmation_status": "REQUIRES_DATA_AND_EXPOSURE_INVENTORY",
+    "repeat_seeds": [
+      2026,
+      2027,
+      2028
+    ],
+    "repeats_are_not_independent_training": true
+  },
+  "implementation_root_plan": "forecasting/adaptive_agent",
+  "release_manifest": null,
+  "execution_this_change": {
+    "model_runs": 0,
+    "api_decision_calls": 0,
+    "training_calls": 0,
+    "experiments_started": 0
+  }
+}
