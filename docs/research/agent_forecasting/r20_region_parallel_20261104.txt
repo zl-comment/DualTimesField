@@ -1,0 +1,60 @@
+R20: three regional processes, chronological replay within each region
+
+User instruction: 三个地区 每个地区串行 三个地区并行.
+Base commit: d0446604abde9fd4ead850f009c98dcacdfae3c1.
+Branch: research/r20-test-region-parallel-20261104.
+Worktree: /root/workspace/Code/DualTimesField-worktrees/r20-test-region-parallel-20261104.
+Frozen forecasting/skills source SHA256:
+c7708f1d90c4df9c71775fba2a2ecc4cfb0f0fc8ce63b6a324ef65d1d35fe8ef
+
+Only the external process supervisor and reporting change. The original R20
+replay, policy, predictors, skills, budgets, 180-second deadline and 30-second
+API timeout are unchanged. Seed 2026; full test 2023–2024; each region has
+17,521 origins, total 52,563. Each origin forecasts the next 24 hours.
+
+NSW1, QLD1, TAS1 run in independent OS processes. Each executes the original
+single-region replay in chronological order with its own append-only ledger,
+model registry, committed bundles, process lock, progress and manifest. The
+original ledger snapshot already filters on region and outcome maturity.
+Historical analog cohorts also require the current region and mature targets.
+No region can access another region's output or future feedback.
+
+Three processes share the existing Kev service on GPU6 and place separate
+Chronos instances on GPU7. LightGBM retains four threads per process. No new
+GPU allocation or serving model changes. GPU sharing can limit speedup and
+change latency. Each region keeps its own original timeouts and fallback rules.
+Forecasting source is byte-identical; process scheduling is not a claim of
+universal numerical or LLM-response equivalence. Development verification
+compares predictions and decisions against the previous serial run.
+
+The small unfinished original serial run is stopped via SIGINT and retained at
+/root/workspace/Code/DualTimesField/outputs/forecasting/r20_formal_test_seed2026_20261104.
+Its FAILED/KeyboardInterrupt record indicates the intentional scheduling
+transition. No old outputs are deleted, relabeled as complete, or mixed into
+new results. New regional manifests and independent ledger IDs require a fresh
+start; the initial prefix is recomputed. Main new output:
+/root/workspace/Code/DualTimesField/outputs/forecasting/r20_test_region_parallel_seed2026_20261104.
+
+Validation output (selection, 24 origins per region, no new tuning):
+/root/workspace/Code/DualTimesField/outputs/forecasting/r20_parallel_validation_20261104.
+
+Start from this worktree:
+/root/workspace/Code/DualTimesField/.venv/bin/python -u scripts/run_r20_region_parallel.py --output /root/workspace/Code/DualTimesField/outputs/forecasting/r20_test_region_parallel_seed2026_20261104
+Resume: same command with --resume. Plan-only: same command with --plan-only.
+tmux: r20-test-parallel-20261104.
+
+Each region scores only after all its own requested predictions are committed.
+No metrics are fed to another worker. The supervisor audits completed regional
+artifacts, validates common frozen identities, and only then writes the final
+three-region report. Aggregation uses the same equal-region metric mean as the
+serial runner; percentile timings are never averaged across regional reports.
+An incomplete/missing/failed region cannot produce a complete aggregate.
+
+The parent progress.json has total and per-region counts and worker PIDs.
+Each region has report.json, run_manifest.json, progress.json, feedback.jsonl,
+origins/ and a unique execution_audit timestamp. Worker logs are at root as
+NSW1.log, QLD1.log, TAS1.log. A failed worker interrupts other owned workers;
+all committed prefixes remain recoverable, without automatic policy changes.
+
+Full-test reuse and model pretraining overlap limitations remain those of the
+original R20 experiment; this scheduling change does not create a new blind test.
