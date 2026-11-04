@@ -1,0 +1,34 @@
+R20 正式测试集单seed启动记录
+用户要求：开始跑测试集实验，三个地区，先一个seed。
+研究基准提交：2b2d92b6eb4f8e03966c25ba578795b732f58d56。
+实验分支：research/r20-test-seed2026-20261104。
+独立工作区：/root/workspace/Code/DualTimesField-worktrees/r20-test-seed2026-20261104。
+冻结源码/skills指纹：c7708f1d90c4df9c71775fba2a2ecc4cfb0f0fc8ce63b6a324ef65d1d35fe8ef。
+
+固定范围
+policy=r20_iterative_input，split=test，seed2026，NSW1/QLD1/TAS1，每地区17521个小时起点，
+共52563起点，每次预测未来24小时；使用缓存中完整2023–2024测试网格，不抽样。
+LightGBM、Chronos、Kev权重及R20 skills3.0.0均与已完成开发实验保持一致。
+预算继续为8 API/12工具/5候选/8历史片段/40历史推理单位，每起点180秒。
+Kev运行GPU6，Chronos运行GPU7；同一回放进程按时间串行，独立实验反馈ledger。
+基准LightGBM预测与R20最终预测均保存，整批预测完成后评分。
+本次不追加R19正式回放或其他seed；不根据测试误差调整skills、删点或选择地区。
+成熟历史反馈只在其24小时标签完全可见后释放，origin内cutoff与watermark固定。
+沿用现有测试协议；此前版本已使用过本项目测试数据，基础模型预训练重合未知，
+本次测试结果不得称为从未触及数据上的首次独立盲测。
+
+运行及恢复
+启动：/root/workspace/Code/DualTimesField/.venv/bin/python -u scripts/run_r20_formal_seed2026_20261104.py
+恢复：同一命令追加 --resume。恢复前核验全部模型/数据/代码/skills身份，不覆盖已完成预测。
+预览：同一命令追加 --plan-only，不启动推理。
+tmux会话：r20-test-seed2026-20261104。
+运行日志：logs/forecasting/r20_formal_test_seed2026_20261104.log。
+启动/完成状态：logs/forecasting/r20_formal_test_seed2026_20261104.launch.json。
+输出：/root/workspace/Code/DualTimesField/outputs/forecasting/r20_formal_test_seed2026_20261104。
+该目录progress.json是实际完成分母；run_manifest.json记录本次全部身份。
+全部52563个预测提交后，原runner生成report.json，launcher随后自动执行离线执行审计。
+发生异常时停止并记录FAILED，不修改策略或跳过失败起点后继续。
+
+耗时
+按开发回放约4.20秒/起点外推，纯逐起点预测约61.3小时；包含启动、文件写入、
+反馈规模增长及完整审计的实际耗时可能更长。这是估计，不是完成时间承诺。
