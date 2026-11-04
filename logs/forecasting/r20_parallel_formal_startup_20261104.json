@@ -1,0 +1,67 @@
+{
+  "checked_traces": {
+    "NSW1": {
+      "api_errors": 0,
+      "completed": 4,
+      "fallbacks": 0
+    },
+    "QLD1": {
+      "api_errors": 0,
+      "completed": 4,
+      "fallbacks": 0
+    },
+    "TAS1": {
+      "api_errors": 0,
+      "completed": 4,
+      "fallbacks": 0
+    }
+  },
+  "progress_snapshot": {
+    "branch": "research/r20-test-region-parallel-20261104",
+    "completed": 12,
+    "elapsed_this_invocation_seconds": 50.042358227074146,
+    "expected_origins": 52563,
+    "git_commit": "09e0d07abf81a04d200c39280f4a18826f97aa9b",
+    "pid": 1353327,
+    "regions": {
+      "NSW1": {
+        "completed": 4,
+        "elapsed_this_invocation_seconds": 27.2607093565166,
+        "last_origin": 1672506000,
+        "last_region": "NSW1",
+        "ledger_fingerprint": "52823c98b6b9c31652e52ce85a08b1c45a5ebe637190c01355c9e99d0dbd9213",
+        "status": "PREDICTING",
+        "total": 17521
+      },
+      "QLD1": {
+        "completed": 4,
+        "elapsed_this_invocation_seconds": 25.892952520400286,
+        "last_origin": 1672506000,
+        "last_region": "QLD1",
+        "ledger_fingerprint": "9e76f215cd7898a8d99c8491bb6e0f24e0ea3e99779e3e323208e08da0b8c04c",
+        "status": "PREDICTING",
+        "total": 17521
+      },
+      "TAS1": {
+        "completed": 4,
+        "elapsed_this_invocation_seconds": 26.821765765547752,
+        "last_origin": 1672506000,
+        "last_region": "TAS1",
+        "ledger_fingerprint": "53db4fbf383193e420370cc079adf932a77c8e283f23b6ac9c3fa2cebcdbe23d",
+        "status": "PREDICTING",
+        "total": 17521
+      }
+    },
+    "resume": false,
+    "started_utc": "2026-11-04T09:14:06.283985+00:00",
+    "status": "PREDICTING",
+    "updated_utc": "2026-11-04T09:14:56.326304+00:00",
+    "worker_pids": {
+      "NSW1": 1353431,
+      "QLD1": 1353432,
+      "TAS1": 1353433
+    },
+    "worktree": "/root/workspace/Code/DualTimesField-worktrees/r20-test-region-parallel-20261104"
+  },
+  "status": "RUNNING"
+}
