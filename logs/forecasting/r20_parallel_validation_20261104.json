@@ -1,0 +1,1694 @@
+{
+  "action_difference_count": 5,
+  "cohort_difference_count": 4,
+  "conservative_observed_speed_ratio": 1.3568546507010188,
+  "limitation": "Scheduling changes remaining_seconds in API requests and can alter service batching; unchanged source is not identical decision traces.",
+  "materialized_candidate_difference_count": 0,
+  "origins": 72,
+  "parallel": "/root/workspace/Code/DualTimesField/outputs/forecasting/r20_parallel_validation_20261104",
+  "parallel_report": {
+    "api_failure_count": 0,
+    "failed_origins": 0,
+    "fallback_count": 0,
+    "region_equal_mean": {
+      "AGENT": {
+        "coverage90": 0.8524305555555555,
+        "mae": 81.56642423990003,
+        "qs": 58.37109137906656,
+        "rmse": 453.71859157681905,
+        "width90": 293.49600579581175
+      },
+      "BASE": {
+        "coverage90": 0.875,
+        "mae": 89.40539355017087,
+        "qs": 63.13235920396651,
+        "rmse": 458.384397921375,
+        "width90": 406.5201084669941
+      }
+    }
+  },
+  "parallel_wall_seconds_including_startup_scoring_audits": 220.89217441529036,
+  "per_origin": [
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001640959200_NSW1",
+      "parallel_actions": [
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72",
+        "approve"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72",
+        "approve"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001641632400_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642309200_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642986000_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001643662800_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": false,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": false,
+      "materialized_candidates_equal": true,
+      "origin": "001644339600_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": false,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": false,
+      "materialized_candidates_equal": true,
+      "origin": "001645012800_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001645689600_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001646366400_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647043200_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647720000_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001648396800_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001649070000_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": false,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": false,
+      "materialized_candidates_equal": true,
+      "origin": "001649746800_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001650423600_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651100400_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651777200_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001652454000_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653127200_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653804000_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001654480800_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655157600_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655834400_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001656511200_NSW1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ],
+      "region": "NSW1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001640959200_QLD1",
+      "parallel_actions": [
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72",
+        "approve"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72",
+        "approve"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001641632400_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642309200_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642986000_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001643662800_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001644339600_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001645012800_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001645689600_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001646366400_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647043200_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647720000_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001648396800_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001649070000_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001649746800_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001650423600_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651100400_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651777200_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001652454000_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653127200_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653804000_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": false,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": false,
+      "materialized_candidates_equal": true,
+      "origin": "001654480800_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655157600_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655834400_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:chronos:price_only:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001656511200_QLD1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "QLD1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:price_only:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001640959200_TAS1",
+      "parallel_actions": [
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72",
+        "default"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72",
+        "default"
+      ]
+    },
+    {
+      "actions_equal": false,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001641632400_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642309200_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001642986000_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001643662800_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001644339600_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001645012800_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001645689600_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001646366400_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647043200_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001647720000_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001648396800_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001649070000_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001649746800_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001650423600_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651100400_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001651777200_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001652454000_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653127200_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001653804000_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:chronos:base:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001654480800_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:state",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655157600_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001655834400_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    },
+    {
+      "actions_equal": true,
+      "array_max_abs_difference": {
+        "agent": 0.0,
+        "base": 0.0,
+        "target_time_unix": 0.0
+      },
+      "cohort_equal": true,
+      "materialized_candidates_equal": true,
+      "origin": "001656511200_TAS1",
+      "parallel_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ],
+      "region": "TAS1",
+      "selected_equal": true,
+      "serial_actions": [
+        "retrieve_analogs:recent",
+        "forecast:chronos:base:72",
+        "commit:lightgbm:full:72"
+      ]
+    }
+  ],
+  "prediction_difference_count": 0,
+  "selected_candidate_difference_count": 0,
+  "serial": "/root/workspace/Code/DualTimesField/outputs/forecasting/r20_iterative_smoke_20261104",
+  "serial_sum_origin_seconds_excluding_startup_scoring_audits": 299.71857415884733,
+  "status": "COMPLETE"
+}

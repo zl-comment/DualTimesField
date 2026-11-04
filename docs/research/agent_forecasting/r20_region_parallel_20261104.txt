@@ -58,3 +58,27 @@ all committed prefixes remain recoverable, without automatic policy changes.
 
 Full-test reuse and model pretraining overlap limitations remain those of the
 original R20 experiment; this scheduling change does not create a new blind test.
+
+Validation completed before the formal parallel launch:
+- 41 regression tests and 5 subtests passed (replay, resume, feedback maturity,
+  region isolation, runtime, and new aggregate denominator/metric checks).
+- Three regions x 24 selection origins completed; every regional audit passed;
+  zero API errors, zero fallbacks, zero failed origins.
+- All 72 final forecasts and all materialized candidate arrays exactly equal
+  the previous serial R20 smoke run. Selected candidate IDs also all match.
+- Five origins have different LLM action sequences and four retrieve different
+  historical cohorts. This is explicitly NOT a bit-identical decision replay.
+  API payloads expose remaining_seconds, which changes with runtime timing;
+  parallel requests can also change Kev batching. No causal attribution to one
+  of these factors is claimed. We did not change frozen prompts to remove it.
+- Parallel validation: 220.892 seconds including worker startup, scoring and
+  three audits; original serial sum of origin durations: 299.719 seconds,
+  excluding its startup/scoring/audits. This conservative measured ratio is
+  1.357x; it is not a controlled steady-state throughput benchmark or a promise
+  of full-test completion time.
+- Original serial test stopped intentionally after 143 committed origins.
+  New regional test starts fresh, with separate provenance and no mixing.
+
+Saved evidence: logs/forecasting/r20_parallel_validation_20261104.json,
+logs/forecasting/r20_parallel_regression_20261104.log,
+logs/forecasting/r20_serial_to_parallel_transition_20261104.json.
