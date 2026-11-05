@@ -99,8 +99,9 @@ data:
    resolves to identity;
 3. distinguish the 24-hour and 48-hour hypotheses using recent demand-regime
    features and candidate disagreement;
-4. test these changes on a later untouched calibration holdout before opening
-   the formal test split;
+4. use predeclared blocked cross-validation for further calibration work; the
+   sampled 181 origins span 2022H2, so no later untouched calibration period
+   remains and any reuse must be disclosed;
 5. after the decision modules are fixed, run module and skill ablations.
 
 Run identities
@@ -110,6 +111,8 @@ Run identities
 - Base commit: 4f3aa6c.
 - Seed: 2026.
 - Split: calibration (2022H2 cache), 181 evenly spaced origins per region.
+- The formal 2023-2024 split was not read by R21 here, but it has prior project
+  exposure from earlier versions and cannot support an independent-blind claim.
 - NSW1 manifest: bb408bb7cad7398878940ccec7f10ace91e5a6b020b8a93ac6948dbc1badbe59.
 - QLD1 manifest: eedfa3be4eef9804860ed33580fc63594802b76f9d732665b26a2b1b3cea62f3.
 - TAS1 manifest: 4bde5970b21d679b9c3b184ccc32decedff777eae3cfe24a9860d4fac8bbbdfb.
