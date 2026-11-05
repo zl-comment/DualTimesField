@@ -1,0 +1,117 @@
+R21 single-LightGBM input Agent: 181-origin development result
+
+Status
+
+The R21 implementation and three-region seed-2026 development replay are
+complete. All 543 requested calibration origins were atomically committed and
+scored. There were zero failed origins, zero fallbacks and zero API failures.
+The 2023-2024 test split was not used.
+
+Result
+
+The primary region-equal five-quantile score did not improve:
+
+- frozen LightGBM identity: 39.27788454 QS;
+- R21 Agent: 39.27851438 QS;
+- paired delta, Agent minus identity: +0.00062983 QS, or +0.00160%;
+- seven-origin circular moving-block bootstrap 95% interval:
+  [-0.01251607, +0.01282443];
+- bootstrap probability that the Agent improves QS: 0.4401.
+
+This is a development result and does not justify a formal-test superiority
+claim. R21 v1 should not be promoted to the 2023-2024 evaluation yet.
+
+Regional results
+
+NSW1
+
+- Identity QS 34.78936500; Agent QS 34.78936500; delta 0.
+- Kev selected identity at all 181 origins.
+- The hindsight oracle among the three materialized candidates was
+  34.66454064, but that is an unattainable label-aware upper bound.
+
+QLD1
+
+- Identity QS 46.85119483; Agent QS 46.84823351; delta -0.00296132.
+- Kev selected identity 176 times and the 48-hour-demand operation 5 times.
+- On those five switches the mean paired delta was -0.10719967, with two wins
+  and three losses. One switch selected the exact hindsight oracle candidate.
+- Seven-origin block-bootstrap delta interval: [-0.00832858, +0.00070675].
+
+TAS1
+
+- Identity QS 36.19309380; Agent QS 36.19794461; delta +0.00485082.
+- Kev selected identity 143 times, the 48-hour-demand operation 33 times and
+  the 24-hour-demand operation 5 times.
+- The 48-hour switches had mean paired delta +0.06506065 and a 39.39% win
+  fraction. The 24-hour switches had mean paired delta -0.25380067 and a 60%
+  win fraction, but only five cases.
+- Seven-origin block-bootstrap delta interval: [-0.03449719, +0.04097927].
+
+Across all regions, Kev changed the canonical input at 43 of 543 origins
+(7.92%). The region-equal MAE improved by 0.02345 and RMSE improved by 0.01689,
+while 90% coverage fell by 0.000614 and interval width fell by 0.13086. QS is
+the declared primary metric, so these secondary changes do not overturn the
+primary result.
+
+What the result says about the architecture
+
+The one-predictor constraint now holds. Every numerical candidate uses the
+same frozen seed-2026 LightGBM checkpoints. Chronos is absent from the runtime,
+manifest and candidate registry. The only differences are the immutable input
+operation receipts. Kev cannot create a feature, retrain a model, read a future
+target or submit a candidate that was not diagnosed on the locked cohort.
+
+The two-stage gate also works as intended. The protocol first materializes the
+finite development-admitted operation set and recomputes all candidates on one
+fully mature cohort. Kev Stage A then chooses identity versus changing input.
+Only after Stage A authorizes a change does Kev Stage B select the 24-hour or
+48-hour demand-history operation. With no mature cohort, fewer than three
+common successful episodes or any diagnostic failure, identity is mandatory.
+
+The failure is now localized to selection quality. Across the 543 origins,
+the hindsight oracle selected a nonidentity candidate 284 times and achieved a
+region-equal QS of 39.06353576, 0.21434878 below identity. This oracle is not a
+valid policy, but it shows that the materialized candidates sometimes contain
+useful conditional alternatives. Kev matched the exact oracle candidate 245
+times, compared with 259 matches from always choosing identity. In QLD1 and
+TAS1, the learned choice head therefore reduced exact oracle agreement even
+though QLD1 happened to gain slightly through error magnitudes.
+
+Input-operation claim boundary
+
+The two nonidentity candidates are explicit training-normalization-mean
+counterfactuals. They neutralize older realized-demand cells while retaining
+the fixed 1,465-dimensional schema. They are not native missing-value masks,
+column deletion or literal shorter tensors. A stricter requirement for true
+mask/profile semantics needs one LightGBM trained once with explicit profile
+support and then frozen; this current experiment cannot make that claim.
+
+Next optimization target
+
+Keep the predictor, registry, cohort lock, replay, resume and operation set
+fixed. Improve only the versioned evidence and decision skills on development
+data:
+
+1. measure which paired cohort statistics actually predict current operation
+   benefit, instead of asking Kev to infer the mapping from verbose aggregates;
+2. add calibrated abstention thresholds so weak or contradictory evidence
+   resolves to identity;
+3. distinguish the 24-hour and 48-hour hypotheses using recent demand-regime
+   features and candidate disagreement;
+4. test these changes on a later untouched calibration holdout before opening
+   the formal test split;
+5. after the decision modules are fixed, run module and skill ablations.
+
+Run identities
+
+- Branch: research/r21-lightgbm-input-agent-20261105.
+- Executable commit: 65d570a.
+- Base commit: 4f3aa6c.
+- Seed: 2026.
+- Split: calibration (2022H2 cache), 181 evenly spaced origins per region.
+- NSW1 manifest: bb408bb7cad7398878940ccec7f10ace91e5a6b020b8a93ac6948dbc1badbe59.
+- QLD1 manifest: eedfa3be4eef9804860ed33580fc63594802b76f9d732665b26a2b1b3cea62f3.
+- TAS1 manifest: 4bde5970b21d679b9c3b184ccc32decedff777eae3cfe24a9860d4fac8bbbdfb.
+- Output root:
+  /root/workspace/Code/DualTimesField/outputs/forecasting/r21_dev_181_gate_v2_seed2026_20261105.

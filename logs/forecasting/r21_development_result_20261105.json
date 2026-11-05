@@ -1,0 +1,80 @@
+{
+  "status": "COMPLETE_NO_PRIMARY_GAIN",
+  "branch": "research/r21-lightgbm-input-agent-20261105",
+  "base_commit": "4f3aa6c",
+  "executable_commit": "65d570a",
+  "split": "calibration",
+  "test_labels_read": false,
+  "seed": 2026,
+  "origins_per_region": 181,
+  "total_origins": 543,
+  "failed_origins": 0,
+  "fallback_count": 0,
+  "api_failure_count": 0,
+  "operation_semantics": "training-normalization-mean counterfactual, not missingness or column deletion",
+  "region_equal": {
+    "base_qs": 39.27788454156944,
+    "agent_qs": 39.27851437544563,
+    "agent_minus_base_qs": 0.0006298338761858636,
+    "relative_percent": 0.0016035330913070002,
+    "block_bootstrap_ci95": [-0.012516074266648422, 0.01282443167489205],
+    "bootstrap_probability_improvement": 0.4401,
+    "base_mae": 68.48529362373262,
+    "agent_mae": 68.46184225602427,
+    "base_rmse": 210.62743187375375,
+    "agent_rmse": 210.61053703132896,
+    "base_coverage90": 0.7767034990791896,
+    "agent_coverage90": 0.7760896255371393,
+    "base_width90": 264.48361772183046,
+    "agent_width90": 264.3527610697823,
+    "hindsight_oracle_qs": 39.06353576319208,
+    "hindsight_oracle_gain_vs_base": 0.21434877837736366
+  },
+  "selections": {
+    "identity": 500,
+    "history_demand_last48_mean": 38,
+    "history_demand_last24_mean": 5,
+    "switch_fraction": 0.07918968692449356
+  },
+  "regions": {
+    "NSW1": {
+      "manifest_id": "bb408bb7cad7398878940ccec7f10ace91e5a6b020b8a93ac6948dbc1badbe59",
+      "base_qs": 34.789365001780226,
+      "agent_qs": 34.789365001780226,
+      "delta": 0.0,
+      "selected": {"identity": 181},
+      "hindsight_oracle_qs": 34.66454063954322,
+      "agent_exact_oracle_count": 110,
+      "identity_exact_oracle_count": 110
+    },
+    "QLD1": {
+      "manifest_id": "eedfa3be4eef9804860ed33580fc63594802b76f9d732665b26a2b1b3cea62f3",
+      "base_qs": 46.8511948278463,
+      "agent_qs": 46.84823351105068,
+      "delta": -0.0029613167956216583,
+      "block_bootstrap_ci95": [-0.008328581854813511, 0.0007067548657615718],
+      "selected": {"identity": 176, "history_demand_last48_mean": 5},
+      "hindsight_oracle_qs": 46.56274587081369,
+      "agent_exact_oracle_count": 73,
+      "identity_exact_oracle_count": 75
+    },
+    "TAS1": {
+      "manifest_id": "4bde5970b21d679b9c3b184ccc32decedff777eae3cfe24a9860d4fac8bbbdfb",
+      "base_qs": 36.1930937950818,
+      "agent_qs": 36.197944613505975,
+      "delta": 0.004850818424179249,
+      "block_bootstrap_ci95": [-0.03449718628269804, 0.04097927109264289],
+      "selected": {"identity": 143, "history_demand_last48_mean": 33, "history_demand_last24_mean": 5},
+      "hindsight_oracle_qs": 35.963320779219316,
+      "agent_exact_oracle_count": 62,
+      "identity_exact_oracle_count": 74
+    }
+  },
+  "bootstrap": {
+    "method": "independent circular moving-block",
+    "block_origins": 7,
+    "replicates": 10000,
+    "seed": 20261105
+  },
+  "conclusion": "R21 engineering contract passes, but the Kev decision skill does not improve primary development QS. Do not open the formal test split before decision-skill optimization and a later calibration holdout check."
+}
