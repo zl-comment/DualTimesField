@@ -46,3 +46,22 @@ not an unbiased validation result. The 2023-2024 formal split has prior project
 exposure and cannot support an independent-blind claim. The two operations
 remain training-normalization-mean counterfactuals, not missing-value masks or
 literal column deletion.
+
+Live API smoke result
+
+The committed v2 source was run on two evenly spaced NSW1 calibration origins.
+The output is under
+/root/workspace/Code/DualTimesField/outputs/forecasting/r21_v2_smoke_seed2026_20261105/NSW1.
+
+- Manifest: f56052ff0f572dab0c47961220abd5c1f07132e54cf3f80e985a96254337d22f.
+- Executable commit: cee26730f3d5dc6bc9a2e37d749d0fdcc6599c62.
+- Completed: 2/2; fallbacks: 0; API failures: 0.
+- Selection: identity at both origins; one origin had no mature cohort.
+- At the mature origin, the 24-hour operation had paired win fraction 0.125
+  and mean QS gain -0.21192487; the 48-hour operation had win fraction 0.375
+  and mean gain -0.04009384. Both were correctly withheld from Kev.
+- An exact --resume invocation reproduced the same manifest, predictions,
+  metrics and trace without performing new Kev decisions or forecasts.
+
+This two-origin run validates the live contract and rejection path. It is not
+an accuracy comparison and does not replace a predeclared development replay.
