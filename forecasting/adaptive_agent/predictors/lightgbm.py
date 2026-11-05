@@ -32,6 +32,22 @@ class FrozenLightGBMAdapter:
                              selection_end_unix=selection_end_unix,
                              frozen_in_memory=True)
 
+    def predict_matrix(self, matrix):
+        """Predict a validated canonical flattened matrix with frozen boosters."""
+        matrix = np.asarray(matrix)
+        expected = sum(int(np.prod(shape)) for shape in self.anchor.input_shapes.values())
+        if matrix.ndim != 2 or matrix.shape[1] != expected or not np.isfinite(matrix).all():
+            raise ValueError('Frozen LightGBM matrix violates its fixed finite schema')
+        result = np.empty((len(matrix), 24, 5), dtype=np.float64)
+        for (h, q), booster in self._boosters.items():
+            result[:, h, q] = booster.predict(
+                matrix, num_iteration=self.anchor.selected_rounds[h],
+                num_threads=self.anchor.threads)
+        result = result * self.anchor.target_std + self.anchor.target_mean
+        if not np.isfinite(result).all():
+            raise ValueError('Nonfinite frozen LightGBM output')
+        return np.sort(result, axis=-1)
+
     def predict(self, context, profile_id='full', window_hours=72):
         if profile_id != 'full' or window_hours != 72:
             raise ValueError('Frozen LightGBM requires original full 72-hour feature schema')
@@ -55,11 +71,4 @@ class FrozenLightGBMAdapter:
         if split.target_time_unix.shape != (1, self.anchor.horizon):
             raise ValueError('Frozen LightGBM horizon mismatch')
         matrix = flatten_inputs(split)
-        result = np.empty((24, 5), dtype=np.float64)
-        for (h, q), booster in self._boosters.items():
-            result[h, q] = booster.predict(matrix, num_iteration=self.anchor.selected_rounds[h],
-                                           num_threads=self.anchor.threads)[0]
-        result = result * self.anchor.target_std + self.anchor.target_mean
-        if not np.isfinite(result).all():
-            raise ValueError('Nonfinite frozen LightGBM output')
-        return np.sort(result, axis=-1)
+        return self.predict_matrix(matrix)[0]

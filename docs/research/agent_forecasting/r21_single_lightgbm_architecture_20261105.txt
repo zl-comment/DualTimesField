@@ -1,0 +1,429 @@
+R21 architecture: one frozen LightGBM, registered input operations, and a closed Agent loop
+
+Status and scope
+- Design date: 2026-11-05.
+- Branch: research/r21-lightgbm-input-agent-20261105.
+- Base commit recorded by the branch contract: 4f3aa6c.
+- This document specifies the implementation boundary. It does not admit a new
+  input operation, change a checkpoint, or authorize a test replay by itself.
+- The numerical predictor inside R21 is exactly one frozen LightGBM checkpoint
+  family per region and seed. Its 120 horizon/quantile booster components are one
+  predictor, not selectable competing models.
+- Chronos is absent from the R21 runtime, manifest, candidate set and diagnostic
+  path. It may remain an external table baseline, but it is not an Agent tool.
+- Kev is an API decision component. It is not trained or fine-tuned. Updating R21
+  means versioning the policy, skills or admitted input-operation registry.
+
+1. Question R21 answers
+
+The primary comparison is:
+
+  BASE  = frozen LightGBM + unchanged canonical input
+  AGENT = the same frozen LightGBM + an input operation selected and validated
+          by the R21 Agent, or the unchanged input when it abstains/reverts
+
+This isolates the value of input control. It does not mix input control with a
+choice between LightGBM and Chronos. The Agent is successful only if its policy
+selects useful legal transformations more often than harmful ones under paired,
+as-of evaluation. Merely calling Kev or materializing more forecasts is not gain.
+
+2. Existing R20 code that must not be carried forward unchanged
+
+The review found four structural Chronos dependencies:
+- ForecastRegistry registers only lightgbm:full:72 plus Chronos profile/window
+  candidates. It has no first-class input-operation identity.
+- iterative_policy.py forces one forecast:chronos:* candidate before any paired
+  comparison and later presents commit and eight Chronos revisions in one choice.
+- replay.py verifies, imports, loads and manifests Chronos for every live policy.
+- skills_r20/compose_forecast_request defines input changes exclusively as
+  Chronos profiles and 24/48/72-hour windows.
+
+R20's useful invariants should be retained: immutable contexts, a fixed mature
+cohort, common-success paired metrics, charged failures, bounded costs, atomic
+origin bundles, exact resume identity, and post-prediction label access.
+
+3. Input-operation registry and contract
+
+3.1 Registry boundary
+
+Create an R21-specific InputOperationRegistry. Kev never supplies array values,
+feature names, masks, replacement values or free-form parameters. It can choose
+only an operation_id already present in the frozen registry. Unknown, disabled,
+research-only and unversioned operations fail closed before numerical inference.
+
+Every registered operation has an immutable InputOperationSpec with at least:
+- operation_id and semantic_version;
+- candidate_id, deterministically derived as
+  lightgbm:input:<operation_id>@<semantic_version>;
+- admission_status, which must equal admitted for live availability;
+- hypothesis, stating the information change the operation tests;
+- applicable regions/checkpoint fingerprints and required input schema hash;
+- exact allowed blocks, coordinates and preserved coordinates;
+- transformation space and units (raw, standardized or encoded);
+- deterministic construction algorithm and frozen parameters;
+- parameter artifact path, SHA-256, fit split, fit cutoff and source lineage;
+- as-of availability rule for every replacement/source value;
+- required input/output shapes and dtypes;
+- invariants and validators;
+- admission evidence identity and known limitations.
+
+The operation function is pure:
+
+  apply(base_context, operation_spec, frozen_artifact) ->
+      transformed_model_inputs, OperationReceipt
+
+It cannot receive a repository, actual outcomes, feedback ledger, Kev response,
+test labels or wall-clock-dependent state. It must derive time-relative behavior
+from that context's own origin/cutoff. Therefore retrospective diagnosis applies
+the same operation separately to each historical context; it never copies the
+current origin's transformed values into historical episodes.
+
+3.2 Mandatory postconditions
+
+For every operation, including every historical diagnostic application:
+- the seven canonical blocks and their order remain exact;
+- shapes remain [72,2], [72,10], [24,10], [1], [24,11], [24,1], [24,3];
+- dtype is explicit and every value is finite;
+- region, 24-hour target axis, cutoff, memory watermark and checkpoint stay fixed;
+- only declared cells may change; preserved cells must be byte-identical;
+- no actual, target or label key can enter inputs, parameters or metadata;
+- all replacement values satisfy the operation's as-of availability rule;
+- any fitted statistic was fit on the declared training slice only;
+- output is immutable and deterministic;
+- a receipt binds source input hash, output input hash, operation spec/artifact
+  hashes, changed-cell mask/count, per-block hashes and validator results.
+
+The existing preprocessing_hash continues to identify the canonical training
+pipeline. It must not be falsified to imply the checkpoint was trained on a new
+pipeline. The separate operation receipt identifies the post-pipeline change.
+
+3.3 Admission states
+
+Keep three states separate:
+- research_only: a proposal that has not passed the contract;
+- technically_valid: deterministic, schema-valid, causal and reproducible, but
+  not yet approved for the Agent action set;
+- admitted: technically valid and passed the pre-registered development screen.
+
+The identity operation is mandatory and must reproduce the current adapter's
+prediction byte-for-byte. At the time of this design it is the only established
+valid operation. Zero filling, NaN masking, arbitrary scaling, column deletion,
+column reordering and shorter tensors are not admitted by shape compatibility.
+
+Before examining an operation's development results, its admission plan freezes:
+- exact algorithm/artifact and intended hypothesis;
+- development origins and fixed cohort selection rules;
+- paired metrics, adverse-case slices and support requirements;
+- minimum prediction-change requirement and rejection conditions;
+- decision rule for promotion from technically_valid to admitted.
+
+Admission uses development data only. It must report paired QS, MAE, RMSE,
+coverage90, width90, change frequency, failed transformations, distribution shift
+against training inputs, and adverse cases. Passing does not establish test-set
+superiority. If no non-identity operation passes, R21 must stop and record that
+this checkpoint does not currently support meaningful legal input control.
+
+4. R21 forecasting registry
+
+Use an R21ForecastRegistry rather than broadening R18-R20 candidate semantics.
+It owns exactly one FrozenLightGBMAdapter and the frozen InputOperationRegistry.
+Its default is the identity operation. Forecasting a candidate performs:
+
+  verify checkpoint and operation registry identities
+  -> apply operation to an immutable copy of this context's canonical inputs
+  -> validate OperationReceipt and transformed context
+  -> call the same FrozenLightGBMAdapter
+  -> return ForecastArtifact bound to the original context identity
+
+The artifact input_hash binds release, original context, transformed input hash,
+operation spec/artifact, receipt, and LightGBM identity. Provenance records
+training_performed=false and model_id=lightgbm for every candidate. Cache keys use
+that same binding. A changed operation, artifact, source input or checkpoint can
+never hit an old cache entry.
+
+The identity candidate is calculated once and serves as both BASE and the Agent
+fallback. R21 has no pooling action: pooling changes output rather than input and
+would confound the question being tested.
+
+5. Kev decision protocol
+
+R20 offered commit and every revision in one typed choice, causing each individual
+experiment to compete directly with a broad commit action. R21 separates them.
+Only host-registered choice IDs are accepted; Kev never emits prices or arrays.
+
+5.1 Preparation
+
+For each origin:
+1. Materialize and validate the identity forecast.
+2. Expose numerical state and fully mature selected-arm feedback.
+3. Retrieve at most eight mature historical episodes using one selected strategy.
+4. Lock the first cohort identity, episode order, inputs and outcomes for the
+   remainder of that origin.
+
+If no mature cohort exists, no input operation can be supported by paired evidence.
+R21 records unsupported_no_mature_cohort and submits identity. It does not create
+an operation merely to demonstrate Agent activity.
+
+5.2 Stage A: experiment gate
+
+Kev receives exactly the gate choices:
+- commit_incumbent: stop and publish the current incumbent;
+- run_input_experiment: spend budget to test one unresolved registered hypothesis.
+
+The gate state shows the incumbent, current numerical state, fixed-cohort summary,
+prior paired diagnostics, attempted operations, remaining budget and explicit
+limitations. It does not show operation choice IDs at this stage. The skill asks
+whether another experiment has decision value; it does not force activity.
+
+5.3 Stage B: operation choice
+
+Only after run_input_experiment does Kev receive one choice per admitted, applicable,
+untried operation. Each description contains the registry's fixed hypothesis,
+changed information, restrictions and prior diagnostic evidence. identity and
+free-form modifications are not choices in this stage. Selecting an operation
+materializes exactly one new same-LightGBM candidate.
+
+5.4 Mandatory diagnosis, retain/revert and continuation
+
+Every new candidate is diagnosed before it can become the incumbent or be
+published. Diagnosis evaluates identity, the incumbent and every tried operation
+on the same locked mature cohort, reusing cached candidate/episode results. Metrics
+use the common successful episode intersection. Failed and interrupted attempts
+remain charged and cannot be retried silently.
+
+After diagnosis the next Stage A gate has concrete choices whose descriptions
+name the legal incumbent candidates and their paired evidence:
+- commit:<candidate_id> for identity or a fully diagnosed operation candidate;
+- run_input_experiment if another admitted, untried operation fits all reserves.
+
+Choosing an operation candidate retains it. Choosing identity or the previous
+incumbent reverts the proposed change. Choosing another experiment returns to
+Stage B. The trace records attempted, retained and reverted operations separately.
+An undiagnosed candidate is never committable.
+
+5.5 Failure behavior and budgets
+
+Suggested R21 limits retain the existing hard ceilings:
+- API calls: 8;
+- tool calls: 12;
+- current candidates: 5, including identity;
+- cohort episodes: 8;
+- historical candidate/episode evaluations: 40;
+- API timeout: 30 seconds; origin deadline: 180 seconds.
+
+Before run_input_experiment is offered, reserve one operation forecast, its
+mandatory incremental diagnosis and a final gate decision. With eight episodes,
+identity plus four operation candidates exactly fills 40 historical units, though
+the API budget normally limits the number attempted. Resource reservations are
+upper bounds; actual attempts are charged before inference. Timeout, malformed
+Kev output, invalid operation, invalid receipt, diagnosis failure or exhausted
+review budget falls back to the already validated identity forecast. The reason
+and all consumed resources remain in the trace.
+
+6. Mature cohort and no-future boundary
+
+For current origin t, visible time is min(cutoff, memory_watermark), both no later
+than t. A historical episode is eligible only when:
+- its region matches;
+- its origin is earlier than t;
+- its entire 24-hour target and declared outcome availability are no later than
+  visible time;
+- its historical context itself satisfies its own cutoff contract.
+
+The first retrieved cohort is immutable. Candidate comparisons use identical
+episode IDs and the common successful intersection. Changing an operation never
+changes the cohort. The API-visible diagnostic contains aggregate paired metrics,
+support, failures and IDs; complete rows remain in the local audit.
+
+The following are forbidden before publication of the current forecast:
+- reading the current origin's actual.npy target row;
+- using later origins, later feedback, future news/source versions or future
+  availability metadata;
+- fitting operation parameters on selection/test data;
+- choosing/tuning an operation after observing current test outcomes;
+- embedding hidden evaluation labels in operation artifacts or metadata.
+
+Repository evaluation_actual remains callable only after every requested forecast
+bundle is atomically committed. Mature earlier outcomes reach the Agent only
+through the broker/locked diagnostic path. Tests must inject sentinel future
+values and assert they cannot change decisions, forecasts, hashes or traces.
+
+7. Audit and exact recovery
+
+The run manifest binds:
+- R21 release, policy, skills and complete source fingerprint;
+- LightGBM checkpoint/manifest/component hashes for every region;
+- input cache and canonical preprocessing hashes;
+- complete InputOperationRegistry plus every artifact SHA-256 and fit cutoff;
+- Kev model/service identity and typed-choice transport configuration;
+- regions, seed, split, exact schedule hash, budgets and information scope;
+- package versions actually required by R21;
+- Git base, branch, worktree and tracked changes.
+
+Chronos weights, Chronos package identity, GPU UUID and Chronos capability must be
+absent from an R21 manifest. Importing or constructing Chronos in an R21 run is a
+test failure. source_identity must include skills_r21 and operation artifacts that
+are part of executable semantics.
+
+Each committed origin bundle contains:
+- BASE identity quantiles and AGENT selected quantiles;
+- all materialized LightGBM operation candidates;
+- operation receipts and transformed-input hashes;
+- Kev request/choice records, available actions and request byte counts;
+- fixed cohort ID, complete local diagnostic audit and charged costs;
+- selected candidate, stop/fallback reason and file checksums.
+
+Bundles are staged and atomically renamed. Resume verifies the manifest, bundle
+checksums, context/forecast/operation identities, chronological-prefix schedule
+and ledger fingerprint. A valid committed origin is never recomputed. An incomplete
+staging directory can be discarded and recomputed; a committed corrupted bundle
+fails closed. Operation applications and failed diagnostic attempts must be
+idempotent across recovery.
+
+8. Fair comparison and evaluation
+
+BASE and AGENT share checkpoint bytes, seed, region, origin schedule, canonical
+input source, target horizon, quantiles and scoring code. BASE always uses identity.
+AGENT may retain an admitted operation or return identity. Report paired per-origin
+deltas as the primary evidence, plus region metrics and equal-region means for QS,
+MAE, RMSE, coverage90 and width90.
+
+Also report:
+- identity/operation selection rates and prediction-change rates;
+- each operation's attempt, retain, revert and failure counts;
+- paired win/loss/tie counts against identity;
+- gate decisions, cohort support and operation-conditioned metrics;
+- API/tool/historical cost and latency;
+- fallback and invalid-operation counts.
+
+Development selects/admit operations and freezes R21. The formal replay cannot
+change the registry, skills, checkpoint or gate after seeing test outcomes. The
+previously inspected R20 test prefix must be disclosed as test exposure; a later
+R21 replay is not described as the first untouched blind test. Chronos may appear
+as a separately run external baseline, but R21's causal comparison remains the
+same-LightGBM identity arm.
+
+Recommended execution gates:
+- Gate A: identity parity and all contract/adversarial tests pass.
+- Gate B: at least one non-identity operation is admitted by a pre-registered
+  development protocol. Otherwise stop and report no legal useful operation.
+- Gate C: three-region x 24-origin engineering smoke, including forced retain and
+  forced revert fixtures, passes exact resume/audit checks.
+- Gate D: three-region x 181 development replay, seed 2026, demonstrates that the
+  two-stage gate actually attempts operations and records paired evidence.
+- Gate E: freeze commit/source/skills/registry; only then consider a formal replay.
+
+9. Minimal implementation file list
+
+New production files
+- forecasting/adaptive_agent/input_operations.py
+  InputOperationSpec, registry loading/hashing, pure application, receipt and
+  admission/status validation.
+- forecasting/adaptive_agent/r21_registry.py
+  Same-LightGBM candidate registry, transformed-context inference and cache/input
+  identities.
+- forecasting/adaptive_agent/r21_runtime.py
+  R21 host actions, immutable cohort diagnosis, no pools/Chronos routes, receipt
+  audit and expected-input binding.
+- forecasting/adaptive_agent/r21_policy.py
+  two-stage gate/operation loop, budget reserves, retain/revert and default fallback.
+- forecasting/adaptive_agent/skills_r21/<seven existing skill IDs>/{instructions.txt,
+  schema.json,examples.jsonl,version}
+  Versioned R21 language. plan_forecast defines the binary gate;
+  compose_forecast_request defines admitted-operation choice; compare_candidates
+  and review_and_commit define paired retain/revert semantics.
+- scripts/audit_r21_replay.py
+  Offline manifest, receipt, budget, cohort, no-Chronos and bundle audit.
+
+Modified production files
+- forecasting/adaptive_agent/replay.py
+  register r21_lightgbm_input, route its policy/host, include skills_r21 in source
+  identity, construct only LightGBM for R21, bind operation registry/artifacts in
+  the manifest, archive R21 materialized candidates/receipts, and report R21
+  operation/gate counts. Preserve R18-R20 behavior.
+
+No change is required to the checkpoint or FrozenLightGBMAdapter if R21ForecastRegistry
+creates a validated transformed ForecastContext and calls the existing full/72
+adapter path. Change the adapter only if testing proves that clean separation is
+impossible; any such change needs parity tests for existing policies.
+
+New tests
+- tests/test_adaptive_agent_r21_input_operations.py
+- tests/test_adaptive_agent_r21_registry.py
+- tests/test_adaptive_agent_r21_runtime.py
+- tests/test_adaptive_agent_r21_policy.py
+- tests/test_adaptive_agent_r21_replay.py
+
+10. Required test matrix
+
+ID   Layer                 Required assertion
+T01  Default parity        Identity input and 24x5 output are byte-identical to
+                           the current frozen adapter across all regions.
+T02  Registry allowlist    Unknown, research_only, disabled, wrong-region and
+                           wrong-checkpoint operations fail before inference.
+T03  Schema invariants     Every admitted operation preserves seven keys, order,
+                           shape, dtype, finiteness, region and target axis.
+T04  Declared-cell scope   Mutation outside declared coordinates fails; unchanged
+                           cells are byte-identical.
+T05  Determinism           Reapplication yields identical arrays, receipt, input
+                           hash and forecast; registry/artifact version changes hash.
+T06  Training-only fit     Artifact fit cutoff and source lineage exclude selection
+                           and test rows; altered future files cannot affect output.
+T07  No labels             actual/target/labels in inputs, artifacts or operation
+                           metadata are rejected.
+T08  As-of operation       Current and historical transformations use their own
+                           origins; future availability and source versions fail.
+T09  Two-stage isolation   Gate never contains operation IDs; operation choices
+                           appear only after run_input_experiment.
+T10  Abstention            commit_incumbent runs no non-identity inference and BASE
+                           equals AGENT exactly.
+T11  Mandatory diagnosis  A new operation candidate cannot be committed before its
+                           paired diagnostic completes.
+T12  Retain/revert         Fixtures force both decisions; selected forecast and
+                           trace accurately bind the retained or reverted candidate.
+T13  No cohort support     Empty/immature cohort submits identity and records the
+                           unsupported reason without pretending to compare.
+T14  Cohort immutability   Retrieval replacement/reordering or historical outcome
+                           mutation after lock fails before more inference.
+T15  Common intersection  Candidate failures reduce all compared metrics to the
+                           same episode intersection; failures charge once.
+T16  Incremental cache     Adding one operation evaluates only its unattempted
+                           candidate/episode pairs; repeat diagnosis costs zero.
+T17  Budget reserves       No offered experiment can exceed API/tool/candidate/
+                           episode/historical/deadline limits.
+T18  Failure fallback      API timeout, malformed choice, operator error, invalid
+                           receipt and inference error return validated identity
+                           with honest costs and error trace.
+T19  No Chronos runtime    R21 plan/live fixtures fail if Chronos is imported,
+                           loaded, manifested, registered or offered as an action.
+T20  Manifest closure      Source, skills_r21, operation specs/artifacts, inputs,
+                           checkpoint, Kev and schedule changes refuse resume.
+T21  Atomic resume         Committed origins are not rerun; incomplete staging is
+                           recoverable; committed corruption fails checksum checks.
+T22  Label barrier         Evaluation labels are not opened before all predictions;
+                           interrupted replay has no valid accuracy report.
+T23  Schedule fairness     BASE and AGENT use identical region/origin indices and
+                           exact checkpoint seed; identity BASE matches standalone
+                           frozen LightGBM output.
+T24  Archive completeness All candidates, receipts, traces and full local diagnosis
+                           survive save/load with identical hashes.
+T25  Report semantics      Attempt/retain/revert, changed-prediction, paired wins,
+                           costs, fallbacks and capabilities equal source traces.
+T26  Adversarial Kev       Free-form IDs, invented parameters, candidate IDs from
+                           another origin and oversized requests are rejected.
+T27  Source mutation       Runtime change to policy, skills or operation registry
+                           marks an in-progress run invalidated.
+T28  Three-region smoke    24 origins per region completes with zero hidden model
+                           changes and a bit-identical second resume audit.
+T29  Development replay   181 origins per region, seed 2026, produces paired
+                           operation evidence; it is not a formal ranking result.
+T30  Legacy regression    Existing R18, R19 and R20 tests, manifests and resume
+                           semantics remain unchanged.
+
+11. Definition of R21 ready
+
+R21 is ready for a frozen experiment only when the implementation and T01-T28 pass,
+at least one non-identity operation is admitted, T29 shows the two-stage mechanism
+can actually execute and diagnose it, and the release/skills/registry are committed
+with a recorded source fingerprint. If Kev again selects no experiments, that is
+reported as policy behavior; the runtime must not silently force modifications.

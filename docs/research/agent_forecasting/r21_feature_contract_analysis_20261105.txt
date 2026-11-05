@@ -1,0 +1,389 @@
+R21 frozen LightGBM feature contract audit
+Date: 2026-11-05
+Branch: research/r21-lightgbm-input-agent-20261105
+Scope: seed-2026 frozen LightGBM checkpoints for NSW1, QLD1, TAS1
+
+Conclusion
+==========
+
+The 1,465 inputs have been reconstructed exactly. They are seven float32 blocks,
+flattened in a fixed block order and in NumPy C order (time first, feature second).
+The current seed-2026 predictor is a grid of 24 forecast horizons x 5 quantiles per
+region, but those 120 boosters are one frozen predictor interface, not 120 actions.
+
+The only currently admitted input operation is identity: preserve every cached value.
+Deleting columns, shortening 72 hours to 24/48 hours, reordering columns, or inserting
+NaN violates the validated predictor contract. Replacing standardized values by zero
+passes the shape/finite checks, but zero means the marginal training mean for most
+standardized variables; it is not an information mask and can create joint patterns
+that were not present during training. No non-identity operation should enter Kev's
+action set until it passes a separate semantic and development-data admission test.
+
+This is not merely a conservative interpretation. Every historical price and demand
+column, the gas context, every net-load and scarcity-shortfall column, and nearly all
+future forecast columns are actually split on by the frozen seed-2026 trees. Arbitrary
+replacement can therefore change a forecast. The 179 columns unused by all three
+regional seed-2026 predictors are prediction-inert for these exact checkpoints, but
+changing them cannot improve the forecast and does not establish an input-selection
+mechanism.
+
+Frozen-run identity and evidence boundary
+=========================================
+
+The authoritative run is:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012
+
+Its jobs manifest records source hash
+6f67f928f9689fb48e9943a1f0ddc4db797a324d1fa8cbd4aaf5c1cc48c650dd,
+config hash 59acc7cda472bb556e34475d2b77d91007ddaffde03371476bf6b5fd4871fb86,
+git commit af546fa3b1fd75852075460015810f745fd2fd74, and scope
+aligned_full_data_fixed_configuration_not_hpo_not_blind:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/jobs.json:4
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/jobs.json:5
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/jobs.json:55
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/jobs.json:1149
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/jobs.json:1150
+
+The archived source, rather than later refactors, is the authority for how the model
+was trained. The current aligned_inputs.py is byte-identical to the archived copy.
+The later datasets.py change only fixes configuration-path resolution; the numerical
+dataset construction is unchanged. The later aligned_baselines.py extracts model code
+into modules but does not change the frozen artifacts.
+
+The NSW1 model manifest explicitly records feature_count=1465, LightGBM 4.7.0,
+the canonical block order, target scaler, preprocessing identity, and 120 model files:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json:15
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json:29
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json:32556
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json:33638
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json:33647
+
+The same schema and file count were verified in QLD1 and TAS1. Model/cache hashes are
+region-specific. For example, the NSW1 cache manifest SHA-256 is
+0c6fbd7b057e32e31871731a334b8e57b83632536add1890c4fd8526997fdbb1 and
+the seed-2026 NSW1 model manifest SHA-256 is
+699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d.
+
+Exact 1,465-column layout
+=========================
+
+All ranges below are inclusive. The zero-based range is the LightGBM feature index;
+the one-based range is included for spreadsheet/readability use.
+
+Block                 Shape      Width   Zero-based range   One-based range
+history_values        [72, 2]      144       0..143             1..144
+history_calendar      [72, 10]     720     144..863           145..864
+future_calendar       [24, 10]     240     864..1103          865..1104
+origin_context        [1]            1    1104..1104         1105..1105
+future_exogenous      [24, 11]     264    1105..1368         1106..1369
+ctf_exogenous         [24, 1]       24    1369..1392         1370..1393
+quantile_exogenous    [24, 3]       72    1393..1464         1394..1465
+TOTAL                               1465
+
+The seven-block order is declared at archived aligned_inputs.py:23-26. Each block is
+reshaped and concatenated in that order at aligned_inputs.py:52-59:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/aligned_inputs.py:23
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/aligned_inputs.py:52
+
+NumPy reshape uses C order here. Thus, for a [time, feature] block, all features of
+the earliest time are followed by all features of the next time. Exact formulas are:
+
+  history_values index       = 0    + lag_slot * 2  + feature_slot
+  history_calendar index     = 144  + lag_slot * 10 + feature_slot
+  future_calendar index      = 864  + lead * 10     + feature_slot
+  future_exogenous index     = 1105 + lead * 11     + feature_slot
+  ctf_exogenous index        = 1369 + lead
+  quantile_exogenous index   = 1393 + lead * 3      + feature_slot
+
+lag_slot 0..71 means origin-72h through origin-1h. lead 0..23 means target delivery
+origin through origin+23h. Those rows are constructed explicitly at archived
+aligned_inputs.py:201-220. The actual target is separate and is never concatenated.
+
+All four cached splits and all three regions were read directly with mmap. Their block
+shapes and float32 dtypes match the table exactly. Counts per region are 61,273 train,
+4,321 selection, 4,393 calibration, and 17,521 test origins. The cache metadata records
+train_zscore and an archive-proxy availability audit:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/test/metadata.json:7
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/test/metadata.json:11
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/data_cache/NSW1/test/metadata.json:22
+
+Column names, units, transforms, and time meaning
+=================================================
+
+1. history_values, 144 columns
+
+Feature order for each lag:
+
+  slot 0: rrp_aud_per_mwh, underlying unit AUD/MWh
+  slot 1: total_demand_mw, underlying unit MW
+
+Both are transformed to (value - regional 2015-2021 training mean) / regional
+training standard deviation and stored as float32. The configured price transform is
+identity, so there is no asinh transform or cap. For example, NSW1 uses price mean
+70.45967659583641 and standard deviation 164.87342388310856; demand mean
+7891.077584707579 and standard deviation 1255.663351542199.
+
+The source columns, identity price transform, and 72-hour window are frozen at:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:8
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:12
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:38
+
+Archived datasets.py fits means/std only on train rows and applies them to all rows:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:303
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:312
+
+2. history_calendar, 720 columns; future_calendar, 240 columns
+
+Feature order at every lag/lead:
+
+  hour_sin, hour_cos,
+  day_of_week_sin, day_of_week_cos,
+  day_of_year_sin, day_of_year_cos,
+  month_sin, month_cos,
+  is_weekend,
+  year_standardized
+
+All are dimensionless. Cyclic encodings follow the local Australia/Brisbane delivery
+timestamp. is_weekend is 0/1. year_standardized uses the mean and standard deviation
+of year numbers in the training fold. The formulas are at archived datasets.py:202-236;
+the frozen order is at config.yaml:42-52. Brisbane/AEST is fixed in config.yaml:3.
+
+History calendar uses origin-72h..origin-1h; future calendar uses target lead 0..23.
+Future calendar is deterministic and known at origin. It is not an uncertain source
+for Kev to choose between.
+
+3. origin_context, one column at index 1104
+
+Name: dwgm_gas_price_7day_log. It is log(mean of the previous seven completed gas-day
+mean Price values), followed by a region-independent train z-score. A gas day begins at
+06:00 AEST; shift(1) excludes the current, not-yet-completed gas day. The input unit
+after log and z-score is dimensionless. The raw CSV column is named Price, but neither
+the frozen config nor loader declares its physical/currency unit, so this audit does
+not infer one. NSW1 reconstruction gives pre-zscore log mean 1.8886225280157125 and
+std 0.3938571121160592.
+
+Evidence:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:106
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:260
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:340
+
+4. future_exogenous, 264 columns
+
+Feature order at every target lead is:
+
+   0 max_spare_capacity_mw
+   1 predispatch_rrp
+   2 predispatch_total_demand_mw
+   3 predispatch_available_generation_mw
+   4 predispatch_net_interchange_mw
+   5 predispatch_covered
+   6 ic_net_import_mw
+   7 ic_import_room_mw
+   8 ic_export_room_mw
+   9 ic_main_import_room_mw
+  10 ic_covered
+
+Underlying units are MW for names ending _mw and AUD/MWh for predispatch_rrp.
+The two *_covered fields are coverage indicators before standardization. Each source
+block is independently train-zscored, then concatenated in this order: regional PD
+PASA max spare, five predispatch fields, five interconnector fields. The predispatch
+price first passes the target price transform, which is identity in this run.
+
+Evidence for feature names and append order:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:111
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:150
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:166
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:39
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:348
+
+5. ctf_exogenous, 24 columns
+
+Name: net_load_mw = demand50_mw - uigf_mw. Underlying unit is MW. It is train-zscored.
+Values inside the training 0.5%-99.5% standardized range stay linear; excess outside
+that interval is compressed by log1p rather than hard clipped. Therefore the stored
+dimensionless value is not globally affine in raw MW.
+
+Evidence:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:122
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:177
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:498
+
+6. quantile_exogenous, 72 columns
+
+Feature order at each lead:
+
+  max_spare_capacity_mw_shortfall_q0.01
+  max_spare_capacity_mw_shortfall_q0.05
+  max_spare_capacity_mw_shortfall_q0.1
+
+For each training-only raw max-spare knot k_q, the pre-standardization feature is
+max(k_q - max_spare_capacity_mw, 0). Its underlying unit is MW; each derived feature
+is then independently train-zscored and stored dimensionless. The operation replaces
+the raw max-spare feature within this block; it does not append raw max spare here.
+
+Evidence:
+
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/config.yaml:136
+  /root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/source/forecasting/datasets.py:481
+
+Training and inference preprocessing
+====================================
+
+The model is trained on train targets from 2015-01-01 through 2021-12-31. The
+2022-01-01 through 2022-06-30 selection fold chooses a boosting prefix independently
+for each of the 24 horizons. The LightGBM itself does not use the 2022H2 calibration
+fold. Test is 2023-2024. Boundaries are config.yaml:19-31.
+
+The target is regional train-zscored raw RRP. There are five quantile objectives
+(0.05, 0.10, 0.50, 0.90, 0.95) for every horizon. LightGBM training and independent
+per-horizon prefix selection are implemented at archived aligned_baselines.py:250-304.
+The flattened inputs and target scaler are bound at aligned_baselines.py:339-352.
+Frozen parameters are 2,000 max rounds, learning rate .05, 31 leaves, minimum 50
+samples per leaf, .8 row/feature fractions, and seed 2026; see config.yaml:236-246.
+
+Inference validates exact region, protocol, preprocessing hash, seven-block schema,
+finite values, and target scaler. It requires 1,465 features and the fixed shapes.
+It applies each saved horizon/quantile booster, reverses target z-scoring, and sorts
+the five outputs to correct crossing:
+
+  /root/workspace/Code/DualTimesField-worktrees/r21-lightgbm-input-agent-20261105/forecasting/lightgbm/predictor.py:37
+  /root/workspace/Code/DualTimesField-worktrees/r21-lightgbm-input-agent-20261105/forecasting/lightgbm/predictor.py:87
+  /root/workspace/Code/DualTimesField-worktrees/r21-lightgbm-input-agent-20261105/forecasting/lightgbm/predictor.py:133
+
+As-of availability
+==================
+
+Observed history is causally available under the dataset proxy. Every raw observation
+is marked available one hour after its delivery start. At an origin, the final history
+row is origin-1h and becomes available exactly at the origin. Validation checks both
+the hourly grid and this equality at archived datasets.py:84-95 and valid-origin logic
+at datasets.py:239-257.
+
+Calendar inputs are deterministic from local timestamps. Gas context uses only gas
+days that ended before the delivery hour, as described above.
+
+Every forecast archive row is keyed by forecast origin. Before constructing the cache,
+the loader checks source_run_unix <= origin, source_stpasa_run_unix <= origin, and
+source_last_changed_unix <= origin. It also requires one row for every forecast origin.
+These checks are archived datasets.py:403-457. The configured vintage policies are
+latest_available_pdpasa_with_stpasa_tail for PD PASA features and
+latest_predispatch_run_published_by_origin for predispatch/interconnector features,
+at config.yaml:117, 131, 145, 161 and 175.
+
+Boundary: this is an archive-timestamp proxy audit, not a source-publication audit.
+The cache metadata explicitly says availability_audit=archive_timestamp_proxies_only.
+R21 must preserve that qualification. A replacement source is not legal merely because
+its file row timestamp is old; it needs the same source-run/last-changed checks.
+
+Checkpoint feature-use audit
+============================
+
+All 120 boosters in every seed-2026 regional manifest were loaded with LightGBM 4.7.0.
+A column is counted as used if any booster has positive split count. This is checkpoint
+inspection, not causal importance and not a license to remove a feature.
+
+Block                 NSW1 used     QLD1 used     TAS1 used       width
+history_values          144           144           144           144
+history_calendar        621           626           628           720
+future_calendar         190           187           189           240
+origin_context            1             1             1             1
+future_exogenous        224           224           224           264
+ctf_exogenous            24            24            24            24
+quantile_exogenous       72            72            72            72
+TOTAL                   1276          1278          1282          1465
+
+Across the union of all three regional predictors, 1,286 columns are used and 179 are
+unused. Every one of the 144 historical price/demand columns is used in every region.
+All future hour_sin/hour_cos columns (48) are unused because each horizon has its own
+booster and these fields are redundant with the origin/time layout. In each of the two
+coverage fields, only leads 17, 19, 21, and 23 are used; the other 20 leads are unused.
+The remaining globally unused columns are redundant lag/lead calendar coordinates.
+
+Changing a globally unused column is exactly prediction-inert for these checkpoint
+files because no tree branches on it. This is the only non-identity numerical change
+that can be proven not to change predictions without an experiment. It is useless for
+optimization, tied to these exact checkpoint hashes, and must not be presented to Kev.
+
+Operation safety classification
+===============================
+
+Approved now
+------------
+
+identity
+  Keep all seven cached blocks unchanged. This is the sole operation that preserves
+  schema, as-of source, transform, training semantics, and the known baseline result.
+
+Prediction-equivalent but not useful
+------------------------------------
+
+unused_checkpoint_columns
+  Any finite change to a feature unused by all trees for the applicable region is
+  prediction-equivalent for the exact model files. It is not an optimization action,
+  may cease to be inert after any weight/version change, and weakens input provenance.
+
+Schema-valid candidates that are not admitted
+----------------------------------------------
+
+train_mean replacement (standardized zero)
+  Shape-valid and finite for z-scored numeric fields. It is a marginal mean, not a
+  missing token. A whole masked time/group can be a joint pattern unsupported by train.
+
+historical truncation by replacement
+  Actual deletion/24h/48h shape is invalid. Replacing older lags by zero, persistence,
+  seasonal values, or sampled analogues changes the data-generating semantics and must
+  be specified and tested. All 144 history value columns are actively used.
+
+future forecast block removal
+  Zero/replacement is not equivalent to absence. Coverage flags and forecast values
+  have coupled meaning. The cache contains one selected as-of vintage per origin, not
+  an approved menu of interchangeable vintages.
+
+scaling/clipping/noising
+  Finite and shape-preserving but not the fitted transform. It can cross tree thresholds
+  without a physical meaning and is not a legal information-selection action.
+
+calendar withholding
+  Technically replaceable but semantically unjustified: calendar is exact at origin.
+  Future hour sin/cos are inert already; changing other calendar fields creates a false
+  date rather than removing uncertain information.
+
+Forbidden by the current predictor contract
+-------------------------------------------
+
+  column deletion; 24h/48h tensors; row/column permutation; NaN/Inf; a different
+  region's scaler/cache; a different preprocessing hash; future actual values;
+  forecast vintages whose source run or last change exceeds the origin.
+
+Implication for the five-step R21 plan
+======================================
+
+Step 1 is complete: the exact feature contract is now known.
+
+For step 2, a meaningful operator needs one of two designs:
+
+  A. Keep the current frozen weights and admit only carefully specified counterfactual
+     replacements after development testing. Claims must be phrased as sensitivity to
+     a replacement rule, not literal feature removal. Candidate rules need train-only
+     construction, as-of inputs, joint-support diagnostics, and a stable operation ID.
+
+  B. Train a new LightGBM of the same family with explicit input-control support, such
+     as mask indicators plus train-time masked variants or a finite family of input
+     profiles. Freeze it before Agent evaluation and compare its default-input arm with
+     its Agent-controlled arm using the same weights. This is the clean route if the
+     scientific claim is that Kev selects how much information enters the predictor.
+
+The current checkpoint cannot honestly support literal data reduction through the
+existing adapter. If option A yields no robust admitted operation on development data,
+that is a valid negative result and should trigger option B rather than relabeling zero
+fill as information removal.
