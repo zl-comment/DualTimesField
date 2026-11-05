@@ -73,7 +73,7 @@ class RegistryTests(unittest.TestCase):
             path = Path(directory) / 'admission.json'
             path.write_text(json.dumps(record))
             loaded = load_operator_admission(path, seed=2026)
-            self.assertEqual(loaded['admitted_operation_ids'], ('identity', 'origin_gas_mean'))
+            self.assertEqual(loaded['admitted_operation_ids'], ['identity', 'origin_gas_mean'])
             record['operations']['origin_gas_mean']['spec']['hypothesis'] = 'changed'
             path.write_text(json.dumps(record))
             with self.assertRaises(ValueError):

@@ -53,7 +53,9 @@ def load_operator_admission(path, *, seed):
     return {
         'path': str(path.resolve()),
         'sha256': hashlib.sha256(raw).hexdigest(),
-        'admitted_operation_ids': tuple(admitted),
+        # Keep manifest-facing values JSON-native so a saved manifest compares
+        # identically with the reconstructed in-memory resume identity.
+        'admitted_operation_ids': list(admitted),
         'screen_source': record['source'],
         'semantics': record['semantics'],
         'selection_rule_fixed_before_scores': record['selection_rule_fixed_before_scores'],
