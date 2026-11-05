@@ -1,0 +1,79 @@
+R21 direction: one frozen LightGBM predictor with validated input operations
+
+User decision: create a new branch; keep LightGBM as the predictor.
+Branch: research/r21-lightgbm-input-agent-20261105.
+Base: 4f3aa6c (R20 regional concurrency implementation and startup record).
+Workspace: /root/workspace/Code/DualTimesField-worktrees/r21-lightgbm-input-agent-20261105.
+The R20 regional experiment remains paused with 28,105 committed forecasts.
+Its source, output, unfinished status, and diagnostic reports remain intact.
+
+Scope fixed for the next implementation
+- LightGBM is the only numerical forecasting family inside the new Agent.
+  Existing per-region, per-horizon and per-quantile checkpoint components remain
+  one predictor interface; they are not LLM-selectable competing models.
+- Kev uses the existing API to propose and evaluate input operations; no LLM
+  training or fine-tuning. No LightGBM training has been performed in this branch.
+- Main comparison: same LightGBM checkpoints with default input versus those
+  same checkpoints with Agent-controlled, validated input operations.
+- Chronos is not part of the planned R21 runtime. Its existing R20 source is
+  retained unchanged for reproducibility; removing it from a new runtime has
+  not yet been implemented. Do not claim R21 is ready or launch a full test yet.
+
+Observed constraints of the current seed-2026 checkpoint
+- Three regional manifests declare 1,465 input features, seven input blocks,
+  quantiles [0.05,0.1,0.5,0.9,0.95], and 120 stored horizon/quantile components.
+- The saved manifests omit input_shapes; the existing validated reader uses
+  its legacy shape contract: history_values [72,2], history_calendar [72,10],
+  future_calendar [24,10], origin_context [1], future_exogenous [24,11],
+  ctf_exogenous [24,1], quantile_exogenous [24,3].
+- The current adapter allows only profile full and window_hours 72; all input
+  values must be finite and retain column order, preprocessing, and region.
+- Direct column deletion, a shorter input tensor, arbitrary column reordering,
+  and NaN masking are not supported by this adapter.
+- Filling with zero or scaling values is not equivalent to hiding a feature.
+  Do not call those operations legal information removal simply because their
+  arrays satisfy the shape check. Do not reinterpret tree inference as using
+  sample weights; selecting diagnostic episodes does not change model input.
+
+Input-operation admission procedure
+1. Map each feature block to meaning, units, timestamps, publication availability,
+   and training preprocessing. Reproduce default predictions without change.
+2. For each proposed operation specify exact allowed cells, cutoff restrictions,
+   replacement/source construction if any, preserved invariants and identity.
+   All fitted replacement statistics must come from training data only.
+3. Establish that an operation changes the information intended, retains valid
+   time/feature semantics, and is reasonably supported by the training inputs.
+   Schema-valid, causally available, and empirically useful are separate claims.
+4. Evaluate admissible candidates on development data and identical mature
+   historical cohorts, including adverse cases. An operator is not assumed useful
+   because it can run. Reject unsupported operators instead of weakening checks.
+5. Only admitted operators enter the Kev action set. Log operation provenance,
+   input hashes, all forecasts, paired evidence, hypothesis and stopping reason.
+
+At present the original unchanged input is the only established valid operation.
+Potential finite, schema-preserving transformations or alternate as-of sources
+are research candidates, not approved operations or implemented features.
+If this checkpoint cannot support meaningful input control, document that result.
+A separately trained, then frozen, input-aware LightGBM would be a distinct
+predictor version and require its own matched default-input baseline. Do not
+silently replace weights or bypass the existing finite-value/schema validation.
+
+Planned control loop
+Observe current available evidence -> identify a testable input hypothesis ->
+decide whether an additional experiment is warranted -> choose one admitted
+operation -> run the same frozen LightGBM -> compare against default/previous
+inputs on a fixed mature historical cohort -> retain/revert/continue -> publish.
+Do not equate the best current candidate with proof that every untested input
+operation is unhelpful. Do not force revisions merely to demonstrate activity.
+No future truth for the current origin is available to Kev or input operators.
+
+Evaluation scope
+Use the existing development selection interval for design and operator checks.
+The already inspected R20 test prefix must not be represented as untouched blind
+data. Lock a new version before any subsequent full replay; preserve all R20
+results and report this test exposure. No new experiment was launched here.
+
+Read-only R20 evidence remains in the previous worktree's logs/forecasting:
+r20_parallel_interim_20261105T045605Z.json
+r20_commit_diagnosis_20261105T050443Z.json
+r20_parallel_pause_20261105T045851Z.json

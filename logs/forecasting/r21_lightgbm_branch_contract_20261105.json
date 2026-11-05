@@ -1,0 +1,62 @@
+{
+  "approved_input_operations": [
+    "identity"
+  ],
+  "base_commit": "4f3aa6c80d71831bb2b6e9a78aefcdf99f91f46a",
+  "branch": "research/r21-lightgbm-input-agent-20261105",
+  "checkpoint_seed_reference": 2026,
+  "models": {
+    "NSW1": {
+      "component_count": 120,
+      "feature_count": 1465,
+      "input_block_order": [
+        "history_values",
+        "history_calendar",
+        "future_calendar",
+        "origin_context",
+        "future_exogenous",
+        "ctf_exogenous",
+        "quantile_exogenous"
+      ],
+      "manifest_path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/NSW1/models/manifest.json",
+      "manifest_sha256": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d"
+    },
+    "QLD1": {
+      "component_count": 120,
+      "feature_count": 1465,
+      "input_block_order": [
+        "history_values",
+        "history_calendar",
+        "future_calendar",
+        "origin_context",
+        "future_exogenous",
+        "ctf_exogenous",
+        "quantile_exogenous"
+      ],
+      "manifest_path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/QLD1/models/manifest.json",
+      "manifest_sha256": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c"
+    },
+    "TAS1": {
+      "component_count": 120,
+      "feature_count": 1465,
+      "input_block_order": [
+        "history_values",
+        "history_calendar",
+        "future_calendar",
+        "origin_context",
+        "future_exogenous",
+        "ctf_exogenous",
+        "quantile_exogenous"
+      ],
+      "manifest_path": "/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012/runs/lightgbm/seed2026/TAS1/models/manifest.json",
+      "manifest_sha256": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9"
+    }
+  },
+  "new_experiment_started": false,
+  "new_training_performed": false,
+  "note": "Read-only manifest inspection; this step does not revalidate/load all numerical model weights or establish any input intervention.",
+  "planned_runtime_chronos": false,
+  "predictor_family": "lightgbm",
+  "source_sha256": "c7708f1d90c4df9c71775fba2a2ecc4cfb0f0fc8ce63b6a324ef65d1d35fe8ef",
+  "status": "BRANCH_AND_INPUT_CONTRACT_RECORDED_NOT_IMPLEMENTED"
+}
