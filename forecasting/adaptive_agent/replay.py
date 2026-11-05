@@ -58,7 +58,7 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    for directory in ('skills', 'skills_r19', 'skills_r20'):
+    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
@@ -66,14 +66,15 @@ def source_identity(root=ROOT):
 
 def policy_module(policy):
     modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy',
-               'r20_iterative_input': '.iterative_policy'}
+               'r20_iterative_input': '.iterative_policy',
+               'r21_single_lightgbm_input': '.input_policy'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
 
 
 def policy_host_factory(policy):
-    if policy == 'r20_iterative_input':
+    if policy in ('r20_iterative_input', 'r21_single_lightgbm_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
     if policy in ('r18', 'r19_evidence_first'):
         return importlib.import_module('.runtime', package=__package__).ToolHost
@@ -277,7 +278,9 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                          'registry_stats': dict(registry.stats),
                          'feedback_before_publish': ledger.fingerprint}
                 initial_reads[region] = len(repo.outcome_reads)
-                materialized = getattr(host, 'artifacts', None) if policy == 'r20_iterative_input' else None
+                materialized = (getattr(host, 'artifacts', None)
+                                if policy in ('r20_iterative_input', 'r21_single_lightgbm_input')
+                                else None)
                 save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
                             materialized=materialized)
             key = ledger.append_forecast(context, agent)
@@ -464,11 +467,14 @@ def main(argv=None):
     parser.add_argument('--execute', action='store_true', help='Explicitly execute live model/API inference')
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--output', required=True)
-    parser.add_argument('--split', choices=('selection', 'test'), default='selection')
+    parser.add_argument('--split', choices=('selection', 'calibration', 'test'), default='selection')
     parser.add_argument('--origins-per-region', '--origins', default='24', help='Positive count or all; evenly spaced existing origins')
     parser.add_argument('--regions', nargs='+', choices=('NSW1', 'QLD1', 'TAS1'), default=['NSW1', 'QLD1', 'TAS1'])
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
-    parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input'), default='r18')
+    parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input',
+                                             'r21_single_lightgbm_input'), default='r18')
+    parser.add_argument('--operator-admission',
+                        help='R21 development operation-admission JSON; required by the R21 policy')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
     parser.add_argument('--evidence', help='Frozen evidence JSONL; absent means real_data_unavailable')
     parser.add_argument('--api-calls', type=int, default=8)
@@ -484,7 +490,11 @@ def main(argv=None):
                      'api_calls': args.api_calls, 'origin_deadline_seconds': args.origin_deadline_seconds,
                      'gpu_uuid': GPU_UUID, 'kev_url': 'http://127.0.0.1:8009/v1/systemone',
                      'baseline_root': str(Path(args.baseline_root).resolve()),
-                     'evidence_path': str(Path(args.evidence).resolve()) if args.evidence else None}
+                     'evidence_path': str(Path(args.evidence).resolve()) if args.evidence else None,
+                     'operator_admission_path': (str(Path(args.operator_admission).resolve())
+                                                 if args.operator_admission else None)}
+    if args.policy == 'r21_single_lightgbm_input' and not args.operator_admission:
+        parser.error('--operator-admission is required for r21_single_lightgbm_input')
     if not args.execute:
         print(json.dumps({'status': 'PLAN_ONLY', 'configuration': configuration,
                           'instruction': 'Add --execute to run; no model/API/output modification performed.'}, indent=2))
@@ -495,18 +505,16 @@ def main(argv=None):
     selected_policy = policy_module(args.policy)
     release, load_skills = selected_policy.RELEASE, selected_policy.load_skills
     from .evidence import EvidenceStore
-    from .registry import ForecastRegistry
-    from .predictors.chronos import FrozenChronosAdapter
-    from .predictors.lightgbm import FrozenLightGBMAdapter
     from ..api_agent.transport import KevClient
-    from chronos import Chronos2Pipeline
     limits = BudgetLimits(api_calls=args.api_calls, origin_deadline_seconds=args.origin_deadline_seconds)
     base_root = Path(args.baseline_root)
     repositories = {region: ContextRepository(base_root / 'data_cache' / region / args.split)
                     for region in configuration['regions']}
     schedule = build_schedule(repositories, args.origins_per_region)
     inputs = {region: verify_input_files(repo) for region, repo in repositories.items()}
-    if sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA:
+    r21 = args.policy == 'r21_single_lightgbm_input'
+    if not r21 and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
+                    or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA):
         raise ValueError('Pinned Chronos weights/config checksum mismatch')
     kev_identity = verify_kev_files()
     client = KevClient(timeout=limits.api_timeout_seconds)
@@ -514,24 +522,43 @@ def main(argv=None):
     kev_identity['serve_script_sha256'] = sha_file(KEV_ROOT / 'serve.sh')
     kev_identity['requirements_sha256'] = sha_file(KEV_ROOT / 'requirements.freeze.txt')
     evidence = EvidenceStore.from_jsonl(args.evidence) if args.evidence else EvidenceStore()
-    chronos_identity = {'sha256': CHRONOS_SHA, 'config_sha256': CHRONOS_CONFIG_SHA,
-                        'revision': CHRONOS_SNAPSHOT.name, 'path': str(CHRONOS_SNAPSHOT),
-                        'pretraining_overlap': 'unknown'}
+    chronos_identity = ({'sha256': CHRONOS_SHA, 'config_sha256': CHRONOS_CONFIG_SHA,
+                         'revision': CHRONOS_SNAPSHOT.name, 'path': str(CHRONOS_SNAPSHOT),
+                         'pretraining_overlap': 'unknown'} if not r21 else None)
+    admission = None
+    if r21:
+        from .input_registry import load_operator_admission
+        admission = load_operator_admission(args.operator_admission, seed=args.seed)
     adapters = {}
     for region in repositories:
-        adapters[region] = FrozenLightGBMAdapter(base_root / 'runs/lightgbm' / f'seed{args.seed}' / region,
-                                                region=region, seed=args.seed, threads=4)
-    manifest = {'schema': 'r18-sequential-replay-v1', 'release': release,
+        directory = base_root / 'runs/lightgbm' / f'seed{args.seed}' / region
+        if r21:
+            from .predictors.lightgbm_input import FrozenLightGBMInputAdapter
+            adapters[region] = FrozenLightGBMInputAdapter(
+                directory, admitted_operation_ids=admission['admitted_operation_ids'],
+                region=region, seed=args.seed, threads=4)
+        else:
+            from .predictors.lightgbm import FrozenLightGBMAdapter
+            adapters[region] = FrozenLightGBMAdapter(
+                directory, region=region, seed=args.seed, threads=4)
+    model_manifest = {'kev': kev_identity,
+                      'lightgbm': {region: adapter.identity for region, adapter in adapters.items()}}
+    if not r21:
+        model_manifest['chronos'] = chronos_identity
+    package_names = ('numpy', 'torch', 'lightgbm', 'transformers')
+    if not r21:
+        package_names += ('chronos-forecasting',)
+    manifest = {'schema': ('r21-single-lightgbm-replay-v1' if r21 else 'r18-sequential-replay-v1'),
+                'release': release,
                 'configuration': configuration, 'budgets': asdict(limits), 'source': source_identity(),
-                'inputs': inputs, 'models': {'chronos': chronos_identity, 'kev': kev_identity,
-                'lightgbm': {region: adapter.identity for region, adapter in adapters.items()}},
+                'inputs': inputs, 'models': model_manifest,
+                'operation_admission': admission,
                 'skills': {name: {'version': value['version'], 'sha256': value['sha256']}
                            for name, value in load_skills().items()},
                 'evidence': {'fingerprint': evidence.fingerprint,
                              'file_sha256': sha_file(args.evidence) if args.evidence else None,
                              'status': 'configured_frozen_warehouse' if args.evidence else 'real_data_unavailable'},
-                'packages': {name: importlib.metadata.version(name) for name in
-                             ('numpy', 'torch', 'chronos-forecasting', 'lightgbm', 'transformers')},
+                'packages': {name: importlib.metadata.version(name) for name in package_names},
                 'schedule_sha256': digest(schedule), 'expected_origins': len(schedule),
                 'scoring_rule': 'Only after every requested prediction has been atomically committed.',
                 'seed_semantics': 'LightGBM checkpoint seed; Kev argmax does not sample a random seed.',
@@ -555,11 +582,22 @@ def main(argv=None):
         write_json(invocations / (str(time.time_ns()) + '-' + uuid.uuid4().hex + '.json'),
                    {'current_git': invocation_git, 'resume': args.resume,
                     'manifest_id': digest(manifest), 'configuration': configuration})
-        pipeline = Chronos2Pipeline.from_pretrained(str(CHRONOS_SNAPSHOT), device_map='cuda:0', local_files_only=True)
-        chronos = FrozenChronosAdapter(pipeline, chronos_identity)
-        registries = {region: ForecastRegistry({'lightgbm': adapter, 'chronos': chronos},
-                                               release, max_current_candidates=limits.candidates)
-                      for region, adapter in adapters.items()}
+        if r21:
+            from .input_registry import InputForecastRegistry
+            registries = {region: InputForecastRegistry(
+                adapter, release, max_current_candidates=limits.candidates)
+                for region, adapter in adapters.items()}
+        else:
+            from .registry import ForecastRegistry
+            from .predictors.chronos import FrozenChronosAdapter
+            from chronos import Chronos2Pipeline
+            pipeline = Chronos2Pipeline.from_pretrained(
+                str(CHRONOS_SNAPSHOT), device_map='cuda:0', local_files_only=True)
+            chronos = FrozenChronosAdapter(pipeline, chronos_identity)
+            registries = {region: ForecastRegistry(
+                {'lightgbm': adapter, 'chronos': chronos}, release,
+                max_current_candidates=limits.candidates)
+                for region, adapter in adapters.items()}
         report = run_replay(output, manifest, repositories, registries, client, evidence, limits,
                             information_scope=args.information_scope, agent_runner=selected_policy.run)
         if source_identity() != manifest['source']:
