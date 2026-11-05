@@ -1,0 +1,48 @@
+R21 v2 decision-layer update
+
+Scope
+
+This update stays on branch research/r21-lightgbm-input-agent-20261105 at the
+user's direction. Its parent implementation commit is 031ec94. It does not
+change the frozen seed-specific LightGBM checkpoints, the 1,465-column input
+contract, or the development-admitted operation registry. Chronos remains
+absent. The runtime release becomes r21-single-lightgbm-input-agent-v2 and all
+R21 skills become version 5.0.0.
+
+Source identity before a live v2 run
+
+- Source SHA256: f83c6673aaa289c7fdc6386b7daa3ba0a886f90e3edbc63e7f43c829581edb9b.
+- The replay manifest must bind this source identity, the Git state, model
+  hashes, input files, operation-admission artifact and runtime configuration.
+- Existing R21 v1 bundles are immutable and are not resumable under v2.
+
+Decision protocol
+
+For every origin, the protocol still locks one mature historical cohort and
+recomputes identity plus every registered operation with the same frozen
+LightGBM. It now computes per-episode QS gains against identity. An operation
+is exposed to Kev only if all of these fixed checks pass:
+
+1. at least five common fully mature episodes;
+2. positive mean identity-minus-operation QS gain;
+3. positive median identity-minus-operation QS gain;
+4. paired win fraction at least 0.625;
+5. positive QS gain in both the first and last 12 forecast hours;
+6. nonzero current forecast disagreement from identity.
+
+If no operation passes, the protocol commits identity without asking Kev to
+override the result. If one or more pass, Kev Stage A may still choose identity
+after reviewing the current numerical state. Stage B can name only an admitted
+operation. The decision record also supplies a registered demand-regime
+contrast: latest 24 hours versus the older 48 hours for the 24-hour profile,
+or recent 48 hours versus the oldest 24 hours for the 48-hour profile.
+
+Claim boundary
+
+The thresholds are transparent engineering guardrails. They are not a trained
+classifier and do not establish causal benefit. The 2022H2 calibration origins
+were already used by R21 v1, so any v2 result on them is iterative development,
+not an unbiased validation result. The 2023-2024 formal split has prior project
+exposure and cannot support an independent-blind claim. The two operations
+remain training-normalization-mean counterfactuals, not missing-value masks or
+literal column deletion.

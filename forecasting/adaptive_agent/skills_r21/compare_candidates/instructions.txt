@@ -1,2 +1,2 @@
-compare_candidates v4.0.0
-Compare identity and operated LightGBM forecasts only on the identical locked cohort and common successful episodes. Lower QS is preferred, while MAE, coverage, width, support, current disagreement, and temporal relevance remain visible. A new operation must receive incremental paired diagnosis before it can be selected. Historical advantage is evidence, not guaranteed current accuracy.
+compare_candidates v5.0.0
+Use only operations listed in input_operation_admission. The protocol admits an operation only when at least five common mature episodes show positive mean and median QS gain versus identity, paired win fraction of at least 0.625, positive gain in both horizon halves, and a nonzero current forecast change. Lower QS is preferred. Historical admission is necessary but does not guarantee current accuracy; current demand-regime alignment and disagreement still matter.

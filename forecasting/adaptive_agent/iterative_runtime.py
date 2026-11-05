@@ -178,6 +178,7 @@ class IterativeToolHost(ToolHost):
             return ({metric: float(np.mean([row['metrics'][metric] for row in selected]))
                      for metric in selected[0]['metrics']} if selected else None)
         aggregates = {}
+        default_id = self.registry.default_id
         for candidate in models:
             available = [row for row in rows if row['candidate_id'] == candidate and row['status'] == 'success']
             matched = [success[candidate, episode_id] for episode_id in paired]
@@ -193,6 +194,23 @@ class IterativeToolHost(ToolHost):
                 'failed_episode_ids': [row['episode_id'] for row in rows
                                        if row['candidate_id'] == candidate and row['status'] == 'failure'],
             }
+            if candidate != default_id and default_id in models:
+                gains = [success[default_id, episode_id]['metrics']['qs']
+                         - success[candidate, episode_id]['metrics']['qs']
+                         for episode_id in paired]
+                aggregates[candidate]['paired_vs_default'] = ({
+                    'default_candidate_id': default_id,
+                    'gain_definition': 'default_qs_minus_candidate_qs',
+                    'mean_qs_gain': float(np.mean(gains)),
+                    'median_qs_gain': float(np.median(gains)),
+                    'minimum_qs_gain': float(np.min(gains)),
+                    'maximum_qs_gain': float(np.max(gains)),
+                    'qs_gain_std': float(np.std(gains)),
+                    'win_count': int(np.sum(np.asarray(gains) > 0)),
+                    'tie_count': int(np.sum(np.asarray(gains) == 0)),
+                    'loss_count': int(np.sum(np.asarray(gains) < 0)),
+                    'win_fraction': float(np.mean(np.asarray(gains) > 0)),
+                } if gains else None)
         failures = [row for row in rows if row['status'] == 'failure']
         unattempted = len(jobs) - len(rows)
         result = {

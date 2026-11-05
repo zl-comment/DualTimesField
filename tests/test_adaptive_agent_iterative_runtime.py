@@ -85,6 +85,10 @@ def test_incremental_cache_counts_real_model_calls_and_compares_all_candidates()
     assert observation['cache_hit_count'] == 8
     assert observation['cumulative_logical_inference_units'] == 16
     assert set(observation['candidates']) == {DEFAULT, ALTERNATIVE}
+    paired = observation['candidates'][ALTERNATIVE]['paired_vs_default']
+    assert paired['default_candidate_id'] == DEFAULT
+    assert paired['mean_qs_gain'] < 0 and paired['win_fraction'] == 3 / 8
+    assert paired['win_count'] + paired['tie_count'] + paired['loss_count'] == 8
     assert len(default.calls) == len(alternative.calls) == 9
     assert observation['current_forecast_comparison']['pairs'][0]['median_absolute_difference'] == 100
     repeated = diagnose(runtime, ctx, 16)

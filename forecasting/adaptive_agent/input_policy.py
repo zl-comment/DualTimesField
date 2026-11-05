@@ -11,11 +11,12 @@ from forecasting.agent_forecasting.execution import call_with_deadline
 
 from .contracts import BudgetLimits
 from .controller import SKILL_IDS, clone, _costs, _request_state
+from .decision_evidence import build_decision_evidence
 from .iterative_policy import compact_request_state
 from .review import validate_artifact
 
 
-RELEASE = 'r21-single-lightgbm-input-agent-v1'
+RELEASE = 'r21-single-lightgbm-input-agent-v2'
 SKILL_ROOT = Path(__file__).parent / 'skills_r21'
 
 
@@ -26,8 +27,8 @@ def load_skills():
                  for filename in ('instructions.txt', 'schema.json', 'examples.jsonl', 'version')}
         schema = json.loads(files['schema.json'])
         if schema.get('skill_id') != name or schema.get('policy') != 'r21_single_lightgbm_input' \
-                or files['version'].strip() != '4.0.0':
-            raise ValueError('R21 requires its registered version 4.0.0 skills')
+                or files['version'].strip() != '5.0.0':
+            raise ValueError('R21 requires its registered version 5.0.0 skills')
         for line in files['examples.jsonl'].splitlines():
             if line.strip():
                 json.loads(line)
@@ -67,11 +68,13 @@ def run(context, host, client, limits=None):
         'skills': {key: {field: value[field] for field in ('version', 'sha256')}
                    for key, value in skills.items()},
         'protocol': {
-            'id': 'single_frozen_lightgbm_two_stage_input_control_v1',
+            'id': 'single_frozen_lightgbm_evidence_admission_v2',
             'predictor_families': ['lightgbm'],
             'chronos_runtime': False,
             'stage_a': 'decide whether paired evidence warrants changing the canonical input',
             'stage_b': 'choose one already diagnosed registered input operation',
+            'operation_admission': ('deterministic paired evidence gate before Kev; '
+                                    'Kev cannot override a rejected operation'),
             'cohort_policy': 'first_retrieval_fixed_for_this_origin',
             'new_operation_requires_incremental_paired_diagnosis': True,
             'no_mature_cohort_policy': 'submit identity',
@@ -280,16 +283,30 @@ def run(context, host, client, limits=None):
         if support < 3 or failures:
             return finish(default, 'identity_insufficient_paired_support')
 
+        numerical_state = initial.get('numerical_state', {})
+        decision_evidence = build_decision_evidence(
+            latest_diagnostic, default.candidate_id, numerical_state)
+        trace['decision_admission'] = clone(decision_evidence)
+        state['observations'].append({
+            'action': 'input_operation_admission', 'status': 'ok',
+            'execution_mode': 'protocol_required',
+            'observation': clone(decision_evidence),
+        })
+        eligible = decision_evidence['eligible_candidate_ids']
+        if not eligible:
+            return finish(default, 'identity_no_operation_passed_evidence_gate')
+
         gate = choose({
             'use_identity': 'Keep the complete canonical input and submit the default forecast.',
-            'use_operated_input': ('The paired cohort and current disagreement justify changing the input; '
-                                   'continue to a separate operation choice.'),
+            'use_operated_input': ('At least one protocol-admitted operation has stable paired historical '
+                                   'benefit and changes the current forecast; continue to choose only among '
+                                   'the admitted operation IDs recorded in input_operation_admission.'),
         }, prompt('plan_forecast', 'assess_state', 'compare_candidates'),
             phase='decide_whether_to_change_input', stage='A')
         if gate == 'use_identity':
             return finish(default, 'agent_commit_identity')
-        criteria = {'commit:' + key: 'Submit diagnosed candidate ' + key
-                    for key in state['candidate_ids'] if key != default.candidate_id}
+        criteria = {'commit:' + key: 'Submit evidence-admitted diagnosed candidate ' + key
+                    for key in eligible}
         selected = choose(criteria, prompt('compose_forecast_request', 'compare_candidates',
                                             'review_and_commit'),
                           phase='select_input_operation', stage='B')
