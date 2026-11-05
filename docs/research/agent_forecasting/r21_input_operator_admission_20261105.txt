@@ -1,0 +1,173 @@
+R21 frozen LightGBM input-operator admission
+
+Conclusion
+
+The current seed-2026 frozen LightGBM does not admit any prediction-changing
+input operation that is simultaneously schema-preserving, causal, semantically
+truthful, and supported by its training contract. The runtime action set for
+this checkpoint therefore contains identity only. A train-envelope
+canonicalizer is admitted as an audit invariant because it changes some
+out-of-envelope numeric values while provably preserving every tree route and
+every prediction; it must not be offered to Kev as an optimization action.
+
+This is a structural result, not evidence that input selection is useless. The
+checkpoint was trained on one deterministic complete-input representation and
+was never taught what a missing block, short history, or alternative vintage
+means. A meaningful R21 input-selection Agent needs an input-aware LightGBM
+contract trained first and then frozen.
+
+Scope and provenance
+
+- Branch: research/r21-lightgbm-input-agent-20261105.
+- Inspected source commit: 1e6cbe53d9799faf858b7750332453bdceb11fc5.
+- Frozen predictor: LightGBM 4.7.0, seed 2026, 120 components per region
+  (24 horizons x 5 quantiles), NSW1/QLD1/TAS1.
+- The config SHA256 is
+  7afbcd26ce5c94f4c8418114501f0ed34ef90ef31944c848f2316617afac42ba.
+- No test labels were opened. The empirical probe used 2022H2 calibration
+  data, 181 origins per region at 24-hour spacing.
+- Machine-readable evidence is in
+  logs/forecasting/r21_input_operator_admission_20261105.json.
+
+What the 1,465 columns mean
+
+The model receives seven blocks in a fixed flatten order:
+
+1. [0, 144): 72 hours x 2 observed history variables, RRP and total demand.
+2. [144, 864): the same 72 historical timestamps x 10 deterministic calendar
+   variables (hour/day/week/year sine-cosine terms, weekend, standardized year).
+3. [864, 1104): 24 target timestamps x the same 10 calendar variables.
+4. [1104, 1105): the as-of-origin, trailing seven-day log gas price.
+5. [1105, 1369): 24 horizons x 11 forecast variables: max spare capacity,
+   five predispatch variables, and five interconnector variables, each from the
+   configured latest causal vintage and standardized on train.
+6. [1369, 1393): 24-horizon PD PASA net-load forecast, with the configured
+   train-only range treatment and standardization.
+7. [1393, 1465): three train-quantile shortfall transforms of max spare
+   capacity for each of the 24 horizons.
+
+The observed history and exogenous arrays are z-scored using 2015-2021 training
+statistics. Calendar values are deterministic functions of their timestamps.
+Forecast source timestamps are checked not to exceed the forecast origin, but
+the repository labels this an archive-timestamp proxy audit rather than a full
+publication-time audit.
+
+Why zero is not deletion
+
+All three training sets contain 61,273 rows. Across every region, exact
+standardized zero occurs zero times in history_values, origin_context,
+future_exogenous, ctf_exogenous, and quantile_exogenous. In those blocks, zero
+means a synthetic exact training mean, not unavailable information. Calendar
+features do sometimes equal zero individually, but setting a calendar row to
+zero destroys the sine/cosine timestamp identity.
+
+The selected tree ensembles actively use 1,275 features in NSW1, 1,275 in QLD1,
+and 1,281 in TAS1; 1,285 of 1,465 features are used by at least one region. All
+144 historical-value columns, the gas context, all 24 CTF columns, and all 72
+quantile-exogenous columns are used in every region. Future exogenous inputs
+account for 43.2%-47.0% of selected split nodes and 43.5%-71.2% of gain.
+History values account for 33.2%-38.8% of splits and 21.1%-47.5% of gain.
+
+Every selected split is a numeric <= split. The model files contain no trained
+missing-value semantics (missing_type None; finite training arrays). The audit
+walked 1,029,750 selected split nodes for NSW1, 878,100 for QLD1, and 1,768,650
+for TAS1. Every threshold lies within that feature's recorded training range.
+Passing NaN would therefore follow an implementation default route that was not
+learned from missing examples; the current validated adapter correctly rejects it.
+
+The 180 columns unused in all three selected ensembles are mostly redundant
+calendar coordinates and constant forecast-coverage positions. Their values
+still belong to the frozen schema. Changing them cannot improve predictions,
+and deleting them changes the contract, so they are not Kev actions.
+
+Admission decisions
+
+identity
+  ADMIT as the only runtime operation. It preserves all source, timestamp,
+  transform, region, shape, and availability semantics.
+
+train_envelope_canonicalization
+  ADMIT for audit only. Clamp each flattened feature to its 2015-2021 observed
+  min/max. Because every split threshold lies inside that interval, values
+  outside it remain on the same side of every threshold. On 543 paired 2022H2
+  origins it changed 55,922 input cells but changed zero predictions; maximum
+  absolute prediction difference was exactly 0. This operation cannot improve
+  the Agent and must not consume an action or API budget.
+
+zero or training-mean masking
+  REJECT. It is not missingness, is unsupported as a joint input state, and
+  falsifies observations or forecasts. As deliberately inadmissible probes,
+  zeroing the oldest 48 hours of observed history changed every one of the 543
+  predictions and increased equal-region mean QS from 19.5919 to 21.5314.
+  Zeroing all future exogenous inputs increased it to 28.6833. Zeroing the gas
+  context produced 19.9295. These scores are diagnostic only; an occasional
+  regional gain does not repair the semantic violation.
+
+NaN masking
+  REJECT. The adapter requires finite values, the training matrices are finite,
+  and the trees were not trained with a missingness indicator or missing inputs.
+
+shortening to 24 or 48 hours
+  REJECT for this checkpoint. Deleting cells gives the wrong dimension.
+  Padding with zero, a mean, a repeated last value, or a seasonal copy makes a
+  different synthetic observation sequence and supplies no mask that tells the
+  tree which part is absent.
+
+column deletion, reorder, arbitrary scaling, attenuation, carry-forward,
+seasonal substitution, and cross-region substitution
+  REJECT. They violate shape, units, timestamp identity, region-specific
+  standardizers, or the truth of the observed values.
+
+alternative causal forecast vintages
+  DEFER, not admit. An earlier vintage could in principle be available by the
+  origin and retain the variable's unit, but the frozen model's contract is the
+  configured latest vintage. The current cache contains the selected vintage,
+  not a registered action set of alternate vintages with matched training
+  examples. This needs an explicit source registry, availability proof, and a
+  newly trained input-aware contract before it becomes a legal action.
+
+Development admission protocol for a new input-aware LightGBM
+
+Use train 2015-2021 only to fit preprocessing and the predictor. Use the 2022H2
+calibration interval as R21 development, keeping 2023-2024 out of operator
+design. The complete interval has 4,393 hourly origins per region. Split it
+chronologically into policy construction and a later operator holdout before
+looking at results. At every replay origin, a diagnostic cohort may contain
+only predictions whose complete 24-hour labels have matured before that origin.
+
+For every proposed operation, require these gates in order:
+
+1. Contract gate: fixed dimensionality; exact cell mask; feature units,
+   timestamps, source vintage, region scaler, and replacement provenance.
+2. Causality gate: every value and operation decision available by origin; no
+   current-origin target or later source revision.
+3. Semantic gate: the predictor was trained to distinguish the operation. A
+   missing block needs explicit mask/profile features or native missing examples;
+   a different vintage needs matching training vintages and a vintage identity.
+4. Support gate: report per-feature training range/quantiles, profile frequency,
+   joint invariants, tree routes changed, and unsupported rows. Being finite or
+   individually in range is insufficient.
+5. Paired value gate: same origins, labels, checkpoints, and scoring for default
+   versus operation. Primary metric is five-quantile QS; report MAE, RMSE,
+   90% coverage and width, each region and equal-region mean. Use a predeclared
+   seven-day block bootstrap on origin-level paired differences. A conditional
+   action also needs a later chronological holdout; it cannot be admitted from
+   the same episodes used to discover its trigger.
+
+The minimum useful new predictor contract remains LightGBM but must be trained
+to consume explicit input profiles. A practical single-model design is a fixed
+1,465-value tensor plus explicit per-block/per-history-age availability masks
+and a profile ID. During training, generate only predeclared causal profiles
+(for example full 72h, observed-value 48h, observed-value 24h, and registered
+forecast-vintage profiles), include their masks, and ensure each profile has
+training support. Freeze that one checkpoint and its transforms before Kev is
+connected. Kev may then choose among profile IDs; it may not invent arbitrary
+cell edits.
+
+Immediate consequence for R21
+
+Do not implement a Kev loop around the current checkpoint with fake zero/NaN
+masking. With identity as the sole meaningful action, an Agent loop has no
+decision value. The next implementation milestone is the explicit masked/profile
+LightGBM training contract and its paired 2022H2 admission test. Only profiles
+that pass all five gates should enter the versioned R21 skill.

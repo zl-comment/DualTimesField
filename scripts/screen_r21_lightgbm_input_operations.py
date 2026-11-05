@@ -22,6 +22,7 @@ from forecasting.aligned_inputs import INPUT_KEYS
 
 BASELINE = Path('/root/workspace/Code/DualTimesField/outputs/forecasting/aligned_baselines_20261012')
 REGIONS = ('NSW1', 'QLD1', 'TAS1')
+DEVELOPMENT_SPLIT = 'calibration'
 
 
 def flatten(blocks):
@@ -92,7 +93,7 @@ def main():
             'lightgbm_adapter_sha256': sha_file(
                 ROOT / 'forecasting/adaptive_agent/predictors/lightgbm.py'),
         },
-        'split': 'selection', 'seed': 2026, 'origins_per_region': args.origins,
+        'split': DEVELOPMENT_SPLIT, 'seed': 2026, 'origins_per_region': args.origins,
         'design_origins_per_region': 120, 'validation_origins_per_region': args.origins - 120,
         'selection_rule_fixed_before_scores': {
             'structural': 'all replacement zeros within training per-feature min/max and >=95% within q0.5%-q99.5%',
@@ -105,7 +106,7 @@ def main():
     }
     predictions, actuals = {}, {}
     for region in REGIONS:
-        repository = ContextRepository(BASELINE / 'data_cache' / region / 'selection')
+        repository = ContextRepository(BASELINE / 'data_cache' / region / DEVELOPMENT_SPLIT)
         indices = select_indices(len(repository.origins), str(args.origins))
         actual = np.load(repository.directory / 'actual.npy', mmap_mode='r')[indices].copy()
         adapter = FrozenLightGBMAdapter(

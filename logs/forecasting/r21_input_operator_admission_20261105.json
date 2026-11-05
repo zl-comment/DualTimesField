@@ -1,0 +1,116 @@
+{
+  "status": "COMPLETE",
+  "conclusion": "current_frozen_checkpoint_has_no_admitted_prediction_changing_input_operation",
+  "generated_utc": "2026-11-05T10:32:36Z",
+  "branch": "research/r21-lightgbm-input-agent-20261105",
+  "source_commit": "1e6cbe53d9799faf858b7750332453bdceb11fc5",
+  "test_labels_read": false,
+  "source_identity": {
+    "config_sha256": "7afbcd26ce5c94f4c8418114501f0ed34ef90ef31944c848f2316617afac42ba",
+    "aligned_inputs_sha256": "62cd65377ce76f732df01c7da9863f276edf5805504f813c52d418774f96cdb1",
+    "datasets_sha256": "f7af541c3ac51f89b964b7501ef3dacc262124b1e8a4827204a5a1745485dae2",
+    "predictor_sha256": "7f46fc5a5b7ec08796fc4676f5246384a2ff3100bdd857b9aa39c5f64b430c60"
+  },
+  "model_manifest_sha256": {
+    "NSW1": "699063ca7a164519643b96e7b73c06fa326c665f3a3c7b2dbdb600c21b3ea66d",
+    "QLD1": "e4ed7d83399daa3b28ac57bcf43bb0c216f16bb8d56bfdbfc8d7f33060cdc51c",
+    "TAS1": "f0f35e9a394ac4a0c14c0ff73b2092094f40bf0a06f556c167d25e4f19a905d9"
+  },
+  "input_layout": [
+    {"name": "history_values", "start": 0, "stop_exclusive": 144, "shape": [72, 2]},
+    {"name": "history_calendar", "start": 144, "stop_exclusive": 864, "shape": [72, 10]},
+    {"name": "future_calendar", "start": 864, "stop_exclusive": 1104, "shape": [24, 10]},
+    {"name": "origin_context", "start": 1104, "stop_exclusive": 1105, "shape": [1]},
+    {"name": "future_exogenous", "start": 1105, "stop_exclusive": 1369, "shape": [24, 11]},
+    {"name": "ctf_exogenous", "start": 1369, "stop_exclusive": 1393, "shape": [24, 1]},
+    {"name": "quantile_exogenous", "start": 1393, "stop_exclusive": 1465, "shape": [24, 3]}
+  ],
+  "training_rows_per_region": 61273,
+  "zero_support": {
+    "statement": "No exact standardized zero occurs in any training cell of history_values, origin_context, future_exogenous, ctf_exogenous, or quantile_exogenous in any of the three regions.",
+    "calendar_exception": "Calendar blocks contain legitimate zeros for individual deterministic calendar features; zeroing whole rows violates the paired sine/cosine timestamp construction."
+  },
+  "selected_tree_audit": {
+    "NSW1": {"split_nodes": 1029750, "features_used": 1275, "thresholds_outside_training_feature_range": 0, "decision_type_codes": [2]},
+    "QLD1": {"split_nodes": 878100, "features_used": 1275, "thresholds_outside_training_feature_range": 0, "decision_type_codes": [2]},
+    "TAS1": {"split_nodes": 1768650, "features_used": 1281, "thresholds_outside_training_feature_range": 0, "decision_type_codes": [2]},
+    "features_used_by_any_region": 1285,
+    "features_used_by_all_regions": 1265,
+    "features_unused_by_all_regions": 180,
+    "missing_semantics": "decision_type code 2 corresponds to numeric <=, default-left, missing_type None; training inputs are finite and contain no NaN"
+  },
+  "feature_usage_by_region_percent": {
+    "NSW1": {
+      "history_values": {"split": 33.205, "gain": 21.088},
+      "history_calendar": {"split": 9.347, "gain": 3.620},
+      "future_calendar": {"split": 2.019, "gain": 0.709},
+      "origin_context": {"split": 1.360, "gain": 0.816},
+      "future_exogenous": {"split": 46.955, "gain": 71.152},
+      "ctf_exogenous": {"split": 6.081, "gain": 2.376},
+      "quantile_exogenous": {"split": 1.035, "gain": 0.240}
+    },
+    "QLD1": {
+      "history_values": {"split": 35.431, "gain": 23.317},
+      "history_calendar": {"split": 9.876, "gain": 3.803},
+      "future_calendar": {"split": 2.236, "gain": 0.754},
+      "origin_context": {"split": 1.279, "gain": 0.598},
+      "future_exogenous": {"split": 44.581, "gain": 68.638},
+      "ctf_exogenous": {"split": 5.638, "gain": 2.665},
+      "quantile_exogenous": {"split": 0.959, "gain": 0.226}
+    },
+    "TAS1": {
+      "history_values": {"split": 38.828, "gain": 47.504},
+      "history_calendar": {"split": 7.877, "gain": 4.022},
+      "future_calendar": {"split": 1.612, "gain": 0.801},
+      "origin_context": {"split": 1.446, "gain": 1.252},
+      "future_exogenous": {"split": 43.214, "gain": 43.485},
+      "ctf_exogenous": {"split": 5.843, "gain": 2.268},
+      "quantile_exogenous": {"split": 1.181, "gain": 0.667}
+    }
+  },
+  "paired_development_probe": {
+    "split": "calibration",
+    "period": "2022H2",
+    "origins": "first 181 origins at 24-hour spacing per region",
+    "origins_per_region": 181,
+    "seed": 2026,
+    "operations": {
+      "identity": {
+        "admission": "runtime_control",
+        "qs": {"NSW1": 17.19072981479232, "QLD1": 23.63779685500037, "TAS1": 17.94704320992455}
+      },
+      "train_envelope_canonicalization": {
+        "admission": "audit_only_exact_noop",
+        "changed_input_cells": {"NSW1": 18480, "QLD1": 19005, "TAS1": 18437},
+        "changed_prediction_origins": {"NSW1": 0, "QLD1": 0, "TAS1": 0},
+        "max_abs_prediction_difference": 0.0
+      },
+      "zero_oldest_48h_history_values": {
+        "admission": "rejected_inadmissible_probe",
+        "qs": {"NSW1": 18.807590066827725, "QLD1": 24.525252747080838, "TAS1": 21.26148541345832},
+        "mean_abs_prediction_difference": {"NSW1": 13.221638230534513, "QLD1": 51.38590520984389, "TAS1": 17.38321211164139}
+      },
+      "zero_future_exogenous": {
+        "admission": "rejected_inadmissible_probe",
+        "qs": {"NSW1": 34.17325076640691, "QLD1": 28.80024100246872, "TAS1": 23.076427223336278},
+        "mean_abs_prediction_difference": {"NSW1": 58.02668916592505, "QLD1": 85.92447040022745, "TAS1": 25.49004087321544}
+      },
+      "zero_origin_context": {
+        "admission": "rejected_inadmissible_probe",
+        "qs": {"NSW1": 17.917513851440876, "QLD1": 23.601034220249517, "TAS1": 18.269844070240968},
+        "mean_abs_prediction_difference": {"NSW1": 7.968338120640247, "QLD1": 9.65670839722757, "TAS1": 3.1948768350781847}
+      }
+    }
+  },
+  "admitted_runtime_operations": ["identity"],
+  "audit_only_operations": ["train_envelope_canonicalization"],
+  "rejected_operations": [
+    "column deletion or reorder",
+    "24h or 48h tensor truncation",
+    "NaN masking",
+    "zero or training-mean masking",
+    "arbitrary scaling or attenuation",
+    "carry-forward, seasonal copy, or cross-region substitution",
+    "unregistered alternative forecast vintage"
+  ]
+}
