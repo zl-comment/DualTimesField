@@ -97,15 +97,14 @@ class Host:
 
 class InputPolicyTests(unittest.TestCase):
     def test_stage_a_and_stage_b_are_separate_and_candidate_is_diagnosed(self):
-        client = Client(['retrieve_analogs:recent', 'experiment',
-                         'forecast:lightgbm-input:history_demand_last48_mean',
-                         'commit_now', 'commit:lightgbm-input:history_demand_last48_mean'])
+        client = Client(['retrieve_analogs:recent', 'use_operated_input',
+                         'commit:lightgbm-input:history_demand_last48_mean'])
         selected, trace = run(context(), Host(), client)
         self.assertEqual(selected.candidate_id, 'lightgbm-input:history_demand_last48_mean')
         self.assertEqual([row['action'] for row in trace['stage_a_decisions']],
-                         ['experiment', 'commit_now'])
+                         ['use_operated_input'])
         self.assertEqual([row['action'] for row in trace['stage_b_decisions']],
-                         ['forecast:lightgbm-input:history_demand_last48_mean'])
+                         ['commit:lightgbm-input:history_demand_last48_mean'])
         self.assertEqual(len(trace['iterations']), 1)
         self.assertIn(selected.candidate_id, trace['iterations'][0]['candidate_ids'])
 
@@ -117,8 +116,7 @@ class InputPolicyTests(unittest.TestCase):
         self.assertEqual(trace['stop_reason'], 'identity_no_mature_cohort')
 
     def test_diagnostic_failure_prevents_nonidentity_commit(self):
-        client = Client(['retrieve_analogs:recent', 'experiment',
-                         'forecast:lightgbm-input:history_demand_last48_mean', 'commit_now'])
+        client = Client(['retrieve_analogs:recent'])
         selected, trace = run(context(), Host(diagnostic_failures=True), client)
         self.assertEqual(selected.candidate_id, 'lightgbm-input:identity')
         self.assertEqual(trace['stop_reason'], 'identity_insufficient_paired_support')

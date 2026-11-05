@@ -70,8 +70,8 @@ def run(context, host, client, limits=None):
             'id': 'single_frozen_lightgbm_two_stage_input_control_v1',
             'predictor_families': ['lightgbm'],
             'chronos_runtime': False,
-            'stage_a': 'decide whether another input experiment is warranted',
-            'stage_b': 'choose one registered unmaterialized input operation',
+            'stage_a': 'decide whether paired evidence warrants changing the canonical input',
+            'stage_b': 'choose one already diagnosed registered input operation',
             'cohort_policy': 'first_retrieval_fixed_for_this_origin',
             'new_operation_requires_incremental_paired_diagnosis': True,
             'no_mature_cohort_policy': 'submit identity',
@@ -256,48 +256,43 @@ def run(context, host, client, limits=None):
         if not cohort_ids or len(cohort_ids) != len(set(cohort_ids)):
             return fallback('invalid_or_empty_mature_cohort')
 
-        latest_diagnostic = None
-        while True:
-            nonidentity = {key: spec for key, spec in offered_actions().items()
-                           if key.startswith('forecast:')
-                           and key != 'forecast:' + default.candidate_id}
-            stage_a = {'commit_now': 'Stop experimenting and select among diagnosed candidates.'}
-            if (nonidentity and state['costs']['api_calls'] + 2 <= limits.api_calls
-                    and state['costs']['tool_calls'] + 2 <= limits.tool_calls):
-                stage_a['experiment'] = (
-                    'Run one more admitted training-mean counterfactual through the same frozen LightGBM, '
-                    'then diagnose it on the locked cohort.')
-            decision = choose(stage_a, prompt('plan_forecast', 'assess_state', 'compare_candidates'),
-                              phase='decide_whether_to_experiment', stage='A')
-            if decision == 'commit_now':
-                break
-            available = offered_actions()
-            operations = {key: spec['description'] for key, spec in available.items()
-                          if key.startswith('forecast:')
-                          and key != 'forecast:' + default.candidate_id}
-            action = choose(operations, prompt('compose_forecast_request', 'assess_state'),
-                            phase='select_input_operation', stage='B')
+        # Materialize the small, development-admitted operation set under the
+        # protocol, then diagnose every candidate once on the same locked
+        # cohort.  Kev receives comparative evidence before its gate decision;
+        # it is not asked whether to buy evidence it has never seen.
+        operations = sorted(key for key in offered_actions()
+                            if key.startswith('forecast:')
+                            and key != 'forecast:' + default.candidate_id)
+        if not operations:
+            return finish(default, 'identity_no_admitted_operation')
+        for action in operations:
             before = list(state['candidate_ids'])
-            result = execute(action, mandatory=False)
+            result = execute(action, mandatory=True)
             new_id = action[len('forecast:'):]
             if new_id not in result.get('candidate_ids', []) or new_id in before:
-                raise ValueError('R21 input experiment did not materialize its requested candidate')
+                raise ValueError('R21 protocol did not materialize its admitted candidate')
             trace['revisions'].append({'action': action, 'from_candidate_ids': before,
                                        'new_candidate_id': new_id,
-                                       'execution_mode': 'llm_selected'})
-            latest_diagnostic = diagnose_current(cohort_ids)
-
-        selectable = [default.candidate_id]
-        if latest_diagnostic is not None:
-            support = latest_diagnostic.get('sample_count', 0)
-            failures = latest_diagnostic.get('failures', [])
-            if support >= 3 and not failures:
-                selectable = list(state['candidate_ids'])
-        if len(selectable) == 1:
+                                       'execution_mode': 'protocol_required'})
+        latest_diagnostic = diagnose_current(cohort_ids)
+        support = latest_diagnostic.get('sample_count', 0)
+        failures = latest_diagnostic.get('failures', [])
+        if support < 3 or failures:
             return finish(default, 'identity_insufficient_paired_support')
-        criteria = {'commit:' + key: 'Submit diagnosed candidate ' + key for key in selectable}
-        selected = choose(criteria, prompt('compare_candidates', 'review_and_commit'),
-                          phase='select_final_forecast', stage='commit')
+
+        gate = choose({
+            'use_identity': 'Keep the complete canonical input and submit the default forecast.',
+            'use_operated_input': ('The paired cohort and current disagreement justify changing the input; '
+                                   'continue to a separate operation choice.'),
+        }, prompt('plan_forecast', 'assess_state', 'compare_candidates'),
+            phase='decide_whether_to_change_input', stage='A')
+        if gate == 'use_identity':
+            return finish(default, 'agent_commit_identity')
+        criteria = {'commit:' + key: 'Submit diagnosed candidate ' + key
+                    for key in state['candidate_ids'] if key != default.candidate_id}
+        selected = choose(criteria, prompt('compose_forecast_request', 'compare_candidates',
+                                            'review_and_commit'),
+                          phase='select_input_operation', stage='B')
         return finish(artifact(selected[len('commit:'):]), 'agent_commit')
     except TimeoutError as exc:
         return fallback('timeout', str(exc))
