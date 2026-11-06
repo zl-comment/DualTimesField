@@ -1,0 +1,89 @@
+R21 v2 single-LightGBM input Agent: 181-origin development result
+
+Status
+
+The three-region seed-2026 calibration replay is complete. All 543 requested
+origins were atomically committed and scored. There were zero failed origins,
+zero fallbacks and zero API failures. The 2023-2024 test split was not used.
+The run used executable commit fd7d84c and source fingerprint
+f83c6673aaa289c7fdc6386b7daa3ba0a886f90e3edbc63e7f43c829581edb9b.
+
+Primary result
+
+The region-equal five-quantile score improved on this reused development set:
+
+- frozen LightGBM identity: 39.27788454 QS;
+- R21 v1: 39.27851438 QS;
+- R21 v2: 39.25851663 QS;
+- v2 minus identity: -0.01936791 QS, or -0.04931%;
+- v2 minus v1: -0.01999775 QS.
+
+A seven-origin independent circular moving-block bootstrap with 10,000
+replicates gave [-0.05334248, +0.01198699] for v2 minus identity, with 0.8815
+probability of improvement. Against v1 the interval was
+[-0.05013652, +0.01025982], with 0.9038 improvement probability. Both intervals
+cross zero. The result is encouraging but does not establish a reliable overall
+gain.
+
+Regional results
+
+NSW1 regressed: identity and v1 were 34.78936500 QS, while v2 was 34.81974066,
+a +0.03037566 delta. The 95% interval was [-0.01260872, +0.08944190]. V2
+switched at 17 origins. The 48-hour operation helped on average (-0.16719 QS
+across 8 switches), but the 24-hour operation harmed (+0.75951 across 9
+switches). This is the principal remaining selector failure.
+
+QLD1 improved reliably: identity was 46.85119483, v1 was 46.84823351 and v2
+was 46.80095968. V2 minus identity was -0.05023514, with interval
+[-0.10097652, -0.01321688]. It switched at 34 origins; the 24-hour operation
+won at 10/12 switches and the 48-hour operation at 15/22 switches. Primary QS
+improved even though MAE and RMSE increased slightly.
+
+TAS1 improved directionally: identity was 36.19309380, v1 was 36.19794461 and
+v2 was 36.15484954. V2 minus identity was -0.03824425, with interval
+[-0.11263276, +0.02183324]. It switched at 43 origins. The 24-hour operation
+provided most of the gain; the 48-hour operation was nearly neutral on average
+and won only 8/22 switches.
+
+Decision behavior
+
+V2 selected identity 449 times, the 48-hour operation 52 times and the 24-hour
+operation 42 times, for a 17.31% switch rate. Across the 94 switches, the mean
+QS delta versus identity was -0.11188 and the win fraction was 57.45%.
+
+The deterministic gate committed identity at 418 origins because no operation
+passed. Six origins lacked enough paired support and three had no mature
+cohort. At 116 gate-passing origins, Kev committed an operation 94 times and
+kept identity 22 times. V2 matched the exact hindsight-oracle candidate at
+266/543 origins, compared with 245 for v1 and 259 for always-identity. The
+selector therefore improved over v1, but NSW1 24-hour choices and TAS1 48-hour
+choices remain weak.
+
+Cost and engineering checks
+
+V2 used 750 API calls versus 1,117 for v1, a 32.86% reduction. Regional median
+origin latency fell from roughly 6.3-6.5 seconds to 3.2-3.5 seconds. All
+candidates used the same frozen LightGBM weights; Chronos was absent. No source
+changed during execution, and all three manifests bound the same source,
+operation-admission artifact, skills v5.0.0 and seed-2026 checkpoints.
+
+Claim boundary and next target
+
+This is iterative development on 2022H2 origins already exposed to R21 v1. It
+is not unbiased validation. The 2023-2024 split also has prior project exposure
+and cannot support an independent-blind claim. The hindsight oracle is
+label-aware and unattainable at prediction time.
+
+Keep the predictor, operations and evidence gate frozen. The next decision-layer
+target is current-state alignment: reject NSW1-like 24-hour changes and
+TAS1-like 48-hour changes when their demand-regime contrast does not support
+the historical cohort result. Any threshold or skill update must use blocked
+cross-validation and report this repeated development exposure.
+
+Artifacts
+
+- Output root: /root/workspace/Code/DualTimesField/outputs/forecasting/r21_v2_dev_181_seed2026_20261105
+- Paired comparison: comparison_with_r21_v1.json in that output root.
+- NSW1 manifest: 03b176895dc1984afebfbf2a15a490aa40aa5e8614274a6847a989be5ccd5347.
+- QLD1 manifest: e5710384f107cff4373655a3d01b359581250a35261977f51d1d6267327fcb64.
+- TAS1 manifest: f0920160f20d7872881a4141e065ae24d2f461715ef26c20eddd22f8de84d274.

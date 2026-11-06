@@ -1,0 +1,359 @@
+{
+  "status": "COMPLETE_PAIRED_R21_DEVELOPMENT_COMPARISON",
+  "split": "calibration_2022H2",
+  "seed": 2026,
+  "origins_per_region": 181,
+  "regions": {
+    "NSW1": {
+      "base": {
+        "qs": 34.789365001780226,
+        "mae": 63.994655656471686,
+        "rmse": 117.70492151124505,
+        "coverage90": 0.7472375690607734,
+        "width90": 193.2747324984035
+      },
+      "r21_v1": {
+        "qs": 34.789365001780226,
+        "mae": 63.994655656471686,
+        "rmse": 117.70492151124505,
+        "coverage90": 0.7472375690607734,
+        "width90": 193.2747324984035
+      },
+      "r21_v2": {
+        "qs": 34.81974066399103,
+        "mae": 63.982784355666425,
+        "rmse": 117.71835068363428,
+        "coverage90": 0.7465469613259669,
+        "width90": 192.38164659524557
+      },
+      "hindsight_oracle": {
+        "qs": 34.66454063954322,
+        "mae": 64.00786581457413,
+        "rmse": 117.71782228764566,
+        "coverage90": 0.746316758747698,
+        "width90": 190.3702999430378
+      },
+      "v2_minus_base_qs": 0.030375662210802793,
+      "v2_minus_v1_qs": 0.030375662210802793,
+      "v2_vs_base_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261106,
+        "ci95": [
+          -0.012608716937921502,
+          0.08944190222126687
+        ],
+        "probability_improvement": 0.1077
+      },
+      "v2_vs_v1_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261107,
+        "ci95": [
+          -0.014705722621602533,
+          0.08913064057800313
+        ],
+        "probability_improvement": 0.1162
+      },
+      "selected": {
+        "lightgbm-input:identity": 164,
+        "lightgbm-input:history_demand_last48_mean": 8,
+        "lightgbm-input:history_demand_last24_mean": 9
+      },
+      "stop_reasons": {
+        "identity_no_mature_cohort": 1,
+        "identity_insufficient_paired_support": 2,
+        "identity_no_operation_passed_evidence_gate": 159,
+        "agent_commit": 17,
+        "agent_commit_identity": 2
+      },
+      "eligible_counts": {
+        "lightgbm-input:history_demand_last48_mean": 13,
+        "lightgbm-input:history_demand_last24_mean": 13
+      },
+      "selection_changed_vs_v1": 17,
+      "exact_oracle_count": {
+        "v2": 108,
+        "v1": 110,
+        "identity": 110
+      },
+      "switches": {
+        "lightgbm-input:history_demand_last48_mean": {
+          "count": 8,
+          "mean_qs_delta_vs_identity": -0.16719381257225296,
+          "win_fraction": 0.625
+        },
+        "lightgbm-input:history_demand_last24_mean": {
+          "count": 9,
+          "mean_qs_delta_vs_identity": 0.759505040081481,
+          "win_fraction": 0.3333333333333333
+        }
+      },
+      "manifest_id": "03b176895dc1984afebfbf2a15a490aa40aa5e8614274a6847a989be5ccd5347"
+    },
+    "QLD1": {
+      "base": {
+        "qs": 46.8511948278463,
+        "mae": 76.2403310167523,
+        "rmse": 271.48942389149784,
+        "coverage90": 0.8678637200736649,
+        "width90": 453.6342739486133
+      },
+      "r21_v1": {
+        "qs": 46.84823351105068,
+        "mae": 76.25123473994572,
+        "rmse": 271.4930354576988,
+        "coverage90": 0.8680939226519337,
+        "width90": 453.5512707183294
+      },
+      "r21_v2": {
+        "qs": 46.80095968401241,
+        "mae": 76.29999027840653,
+        "rmse": 271.5289728435324,
+        "coverage90": 0.8690147329650092,
+        "width90": 451.9322990161114
+      },
+      "hindsight_oracle": {
+        "qs": 46.562745870813686,
+        "mae": 76.47140750010138,
+        "rmse": 271.5845137436589,
+        "coverage90": 0.869475138121547,
+        "width90": 445.55150855483936
+      },
+      "v2_minus_base_qs": -0.05023514383389187,
+      "v2_minus_v1_qs": -0.04727382703827021,
+      "v2_vs_base_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261106,
+        "ci95": [
+          -0.10097651817554143,
+          -0.013216880325743714
+        ],
+        "probability_improvement": 0.9987
+      },
+      "v2_vs_v1_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261107,
+        "ci95": [
+          -0.09841607203907585,
+          -0.00969260838945951
+        ],
+        "probability_improvement": 0.9981
+      },
+      "selected": {
+        "lightgbm-input:identity": 147,
+        "lightgbm-input:history_demand_last24_mean": 12,
+        "lightgbm-input:history_demand_last48_mean": 22
+      },
+      "stop_reasons": {
+        "identity_no_mature_cohort": 1,
+        "identity_insufficient_paired_support": 2,
+        "identity_no_operation_passed_evidence_gate": 131,
+        "agent_commit": 34,
+        "agent_commit_identity": 13
+      },
+      "eligible_counts": {
+        "lightgbm-input:history_demand_last24_mean": 32,
+        "lightgbm-input:history_demand_last48_mean": 29
+      },
+      "selection_changed_vs_v1": 37,
+      "exact_oracle_count": {
+        "v2": 84,
+        "v1": 73,
+        "identity": 75
+      },
+      "switches": {
+        "lightgbm-input:history_demand_last24_mean": {
+          "count": 12,
+          "mean_qs_delta_vs_identity": -0.4124831943176754,
+          "win_fraction": 0.8333333333333334
+        },
+        "lightgbm-input:history_demand_last48_mean": {
+          "count": 22,
+          "mean_qs_delta_vs_identity": -0.18830739555101472,
+          "win_fraction": 0.6818181818181818
+        }
+      },
+      "manifest_id": "e5710384f107cff4373655a3d01b359581250a35261977f51d1d6267327fcb64"
+    },
+    "TAS1": {
+      "base": {
+        "qs": 36.1930937950818,
+        "mae": 65.22089419797386,
+        "rmse": 242.6879502185184,
+        "coverage90": 0.7150092081031307,
+        "width90": 146.54184671847455
+      },
+      "r21_v1": {
+        "qs": 36.197944613505975,
+        "mae": 65.13963637165543,
+        "rmse": 242.63365412504302,
+        "coverage90": 0.7129373848987108,
+        "width90": 146.232279992614
+      },
+      "r21_v2": {
+        "qs": 36.15484954180966,
+        "mae": 64.97842868854714,
+        "rmse": 242.5602059351547,
+        "coverage90": 0.7131675874769797,
+        "width90": 145.88336160212464
+      },
+      "hindsight_oracle": {
+        "qs": 35.963320779219316,
+        "mae": 64.74735699539926,
+        "rmse": 242.46665504526592,
+        "coverage90": 0.7166206261510129,
+        "width90": 145.652580123587
+      },
+      "v2_minus_base_qs": -0.03824425327213977,
+      "v2_minus_v1_qs": -0.043095071696319015,
+      "v2_vs_base_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261106,
+        "ci95": [
+          -0.11263276274700867,
+          0.0218332383978869
+        ],
+        "probability_improvement": 0.8663
+      },
+      "v2_vs_v1_bootstrap": {
+        "method": "independent circular moving block",
+        "block_origins": 7,
+        "replicates": 10000,
+        "seed": 20261107,
+        "ci95": [
+          -0.10309695654804565,
+          0.007847132794024084
+        ],
+        "probability_improvement": 0.9466
+      },
+      "selected": {
+        "lightgbm-input:identity": 138,
+        "lightgbm-input:history_demand_last24_mean": 21,
+        "lightgbm-input:history_demand_last48_mean": 22
+      },
+      "stop_reasons": {
+        "identity_no_mature_cohort": 1,
+        "identity_insufficient_paired_support": 2,
+        "identity_no_operation_passed_evidence_gate": 128,
+        "agent_commit": 43,
+        "agent_commit_identity": 7
+      },
+      "eligible_counts": {
+        "lightgbm-input:history_demand_last24_mean": 38,
+        "lightgbm-input:history_demand_last48_mean": 38
+      },
+      "selection_changed_vs_v1": 60,
+      "exact_oracle_count": {
+        "v2": 74,
+        "v1": 62,
+        "identity": 74
+      },
+      "switches": {
+        "lightgbm-input:history_demand_last24_mean": {
+          "count": 21,
+          "mean_qs_delta_vs_identity": -0.3157879865304715,
+          "win_fraction": 0.6190476190476191
+        },
+        "lightgbm-input:history_demand_last48_mean": {
+          "count": 22,
+          "mean_qs_delta_vs_identity": -0.013211914778063443,
+          "win_fraction": 0.36363636363636365
+        }
+      },
+      "manifest_id": "f0920160f20d7872881a4141e065ae24d2f461715ef26c20eddd22f8de84d274"
+    }
+  },
+  "selections": {
+    "lightgbm-input:identity": 449,
+    "lightgbm-input:history_demand_last48_mean": 52,
+    "lightgbm-input:history_demand_last24_mean": 42
+  },
+  "gate": {
+    "eligible_counts": {
+      "lightgbm-input:history_demand_last48_mean": 80,
+      "lightgbm-input:history_demand_last24_mean": 83
+    },
+    "stop_reasons": {
+      "identity_no_mature_cohort": 3,
+      "identity_insufficient_paired_support": 6,
+      "identity_no_operation_passed_evidence_gate": 418,
+      "agent_commit": 94,
+      "agent_commit_identity": 22
+    }
+  },
+  "switches": {
+    "count": 94,
+    "fraction": 0.1731123388581952,
+    "mean_qs_delta_vs_identity": -0.11188059591528109,
+    "win_fraction": 0.574468085106383
+  },
+  "limitations": [
+    "R21 v2 reuses development origins previously exposed to R21 v1; this is iterative development, not unbiased validation.",
+    "The 2023-2024 formal split has prior project exposure and cannot support an independent-blind claim.",
+    "Hindsight oracle uses current labels and is an unattainable diagnostic upper bound."
+  ],
+  "region_equal": {
+    "base": {
+      "qs": 39.27788454156944,
+      "mae": 68.48529362373262,
+      "rmse": 210.62743187375375,
+      "coverage90": 0.7767034990791896,
+      "width90": 264.48361772183046
+    },
+    "r21_v1": {
+      "qs": 39.27851437544563,
+      "mae": 68.46184225602427,
+      "rmse": 210.61053703132896,
+      "coverage90": 0.7760896255371393,
+      "width90": 264.3527610697823
+    },
+    "r21_v2": {
+      "qs": 39.2585166299377,
+      "mae": 68.42040110754003,
+      "rmse": 210.6025098207738,
+      "coverage90": 0.7762430939226519,
+      "width90": 263.3991024044939
+    },
+    "hindsight_oracle": {
+      "qs": 39.06353576319207,
+      "mae": 68.40887677002492,
+      "rmse": 210.58966369219016,
+      "coverage90": 0.7774708410067527,
+      "width90": 260.5247962071547
+    },
+    "v2_minus_base_qs": -0.019367911631739787,
+    "v2_minus_v1_qs": -0.01999774550792921,
+    "relative_percent_vs_base": -0.04930996630239062,
+    "v2_vs_base_bootstrap": {
+      "method": "independent circular moving block",
+      "block_origins": 7,
+      "replicates": 10000,
+      "seed": 20261106,
+      "ci95": [
+        -0.05334247986665464,
+        0.0119869914656867
+      ],
+      "probability_improvement": 0.8815
+    },
+    "v2_vs_v1_bootstrap": {
+      "method": "independent circular moving block",
+      "block_origins": 7,
+      "replicates": 10000,
+      "seed": 20261107,
+      "ci95": [
+        -0.05013652372803273,
+        0.01025981705079654
+      ],
+      "probability_improvement": 0.9038
+    }
+  }
+}
