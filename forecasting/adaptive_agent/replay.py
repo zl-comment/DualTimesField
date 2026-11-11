@@ -58,7 +58,7 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22'):
+    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22', 'skills_r23'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
@@ -68,14 +68,15 @@ def policy_module(policy):
     modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy',
                'r20_iterative_input': '.iterative_policy',
                'r21_single_lightgbm_input': '.input_policy',
-               'r22_state_aligned_input': '.input_policy_r22'}
+               'r22_state_aligned_input': '.input_policy_r22',
+               'r23_state_aware_input': '.input_policy_r23'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
 
 
 def policy_host_factory(policy):
-    if policy == 'r22_state_aligned_input':
+    if policy in ('r22_state_aligned_input', 'r23_state_aware_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).R22IterativeToolHost
     if policy in ('r20_iterative_input', 'r21_single_lightgbm_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
@@ -283,7 +284,7 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                 initial_reads[region] = len(repo.outcome_reads)
                 materialized = (getattr(host, 'artifacts', None)
                                 if policy in ('r20_iterative_input', 'r21_single_lightgbm_input',
-                                              'r22_state_aligned_input')
+                                              'r22_state_aligned_input', 'r23_state_aware_input')
                                 else None)
                 save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
                             materialized=materialized)
@@ -489,9 +490,9 @@ def main(argv=None):
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
     parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input',
                                              'r21_single_lightgbm_input',
-                                             'r22_state_aligned_input'), default='r18')
+                                             'r22_state_aligned_input', 'r23_state_aware_input'), default='r18')
     parser.add_argument('--operator-admission',
-                        help='Development operation-admission JSON; required by R21 and R22')
+                        help='Development operation-admission JSON; required by R21, R22 and R23')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
     parser.add_argument('--evidence', help='Frozen evidence JSONL; absent means real_data_unavailable')
     parser.add_argument('--api-calls', type=int, default=8)
@@ -510,7 +511,7 @@ def main(argv=None):
                      'evidence_path': str(Path(args.evidence).resolve()) if args.evidence else None,
                      'operator_admission_path': (str(Path(args.operator_admission).resolve())
                                                  if args.operator_admission else None)}
-    if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input') \
+    if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input', 'r23_state_aware_input') \
             and not args.operator_admission:
         parser.error('--operator-admission is required for the selected single-LightGBM input policy')
     if not args.execute:
@@ -530,7 +531,7 @@ def main(argv=None):
                     for region in configuration['regions']}
     schedule = build_schedule(repositories, args.origins_per_region)
     inputs = {region: verify_input_files(repo) for region, repo in repositories.items()}
-    single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input')
+    single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input', 'r23_state_aware_input')
     if not single_lightgbm and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
                     or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA):
         raise ValueError('Pinned Chronos weights/config checksum mismatch')
@@ -566,7 +567,8 @@ def main(argv=None):
     package_names = ('numpy', 'torch', 'lightgbm', 'transformers')
     if not single_lightgbm:
         package_names += ('chronos-forecasting',)
-    replay_schema = ('r22-state-aligned-replay-v1' if args.policy == 'r22_state_aligned_input'
+    replay_schema = ('r23-state-aware-replay-v1' if args.policy == 'r23_state_aware_input'
+                     else 'r22-state-aligned-replay-v1' if args.policy == 'r22_state_aligned_input'
                      else 'r21-single-lightgbm-replay-v1' if single_lightgbm
                      else 'r18-sequential-replay-v1')
     manifest = {'schema': replay_schema,
@@ -586,6 +588,8 @@ def main(argv=None):
                 'historical_evaluation_limit': 'Selection/test exposure retained; no independent-blind-test claim.'}
     if args.policy == 'r22_state_aligned_input':
         manifest['r22_decision_contract'] = selected_policy.manifest_contract()
+    if args.policy == 'r23_state_aware_input':
+        manifest['r23_decision_contract'] = selected_policy.manifest_contract()
     manifest['git'] = {
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
