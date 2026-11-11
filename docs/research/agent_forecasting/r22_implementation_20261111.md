@@ -55,10 +55,15 @@ These limits are host-side constants. Kev cannot alter or override them.
 
 Smoke scores are engineering evidence only and are not the R22 development result.
 
-## Evaluation boundary
+## Development evaluation
 
-The next run uses 181 evenly spaced 2022H2 calibration origins per region, seed
-2026, the same R21 admitted operations, and six contiguous reporting blocks. The
-period was already exposed to earlier project iterations. The result is therefore
-a repeated-exposure fixed-policy blocked development evaluation, not independent
-cross-validation and not a blind test. No 2023-2024 labels are opened.
+The run used 181 evenly spaced 2022H2 calibration origins per region, seed 2026, the
+same R21 admitted operations, and six contiguous reporting blocks. All 543 origins
+completed with zero fallback and zero API failure. R22 improved region-equal QS over
+identity by 0.016859 but was 0.002509 worse than R21; QLD1 was 0.038656 worse than
+R21 and caused the primary promotion gates to fail. R22 is therefore frozen but not
+promoted. See `r22_blocked_cv_result_20261111.md` for the complete result.
+
+The period was already exposed to earlier project iterations. The result is a
+repeated-exposure fixed-policy blocked development evaluation, not independent
+cross-validation and not a blind test. No 2023-2024 labels were opened.
