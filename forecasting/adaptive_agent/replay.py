@@ -58,7 +58,7 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21'):
+    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
@@ -67,13 +67,16 @@ def source_identity(root=ROOT):
 def policy_module(policy):
     modules = {'r18': '.controller', 'r19_evidence_first': '.evidence_policy',
                'r20_iterative_input': '.iterative_policy',
-               'r21_single_lightgbm_input': '.input_policy'}
+               'r21_single_lightgbm_input': '.input_policy',
+               'r22_state_aligned_input': '.input_policy_r22'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
 
 
 def policy_host_factory(policy):
+    if policy == 'r22_state_aligned_input':
+        return importlib.import_module('.iterative_runtime', package=__package__).R22IterativeToolHost
     if policy in ('r20_iterative_input', 'r21_single_lightgbm_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
     if policy in ('r18', 'r19_evidence_first'):
@@ -279,7 +282,8 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                          'feedback_before_publish': ledger.fingerprint}
                 initial_reads[region] = len(repo.outcome_reads)
                 materialized = (getattr(host, 'artifacts', None)
-                                if policy in ('r20_iterative_input', 'r21_single_lightgbm_input')
+                                if policy in ('r20_iterative_input', 'r21_single_lightgbm_input',
+                                              'r22_state_aligned_input')
                                 else None)
                 save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
                             materialized=materialized)
@@ -390,6 +394,18 @@ def _score_completed(output, manifest, repositories, registries, evidence,
     summary['origins_with_revision'] = sum(bool(trace.get('revisions')) for trace in traces)
     summary['optional_evidence_action_count'] = sum(len(trace.get('optional_evidence_actions', [])) for trace in traces)
     summary['iteration_semantics'] = 'Candidate comparison rounds and optional LLM revisions are counted from explicit trace lists; missing legacy fields count as zero.'
+    stage_c = [decision for trace in traces for decision in trace.get('stage_c_decisions', [])]
+    summary['risk_review_count'] = len(stage_c)
+    summary['risk_review_approve_count'] = sum(
+        decision.get('action') == 'approve_selected' for decision in stage_c)
+    summary['risk_review_revert_count'] = sum(
+        decision.get('action') == 'revert_to_identity' for decision in stage_c)
+    risk_reasons = {}
+    for trace in traces:
+        reason = trace.get('final_commit_reason')
+        if reason:
+            risk_reasons[reason] = risk_reasons.get(reason, 0) + 1
+    summary['risk_commit_reasons'] = risk_reasons
     summary['origin_trace_costs'] = [{
         'region': row['region'], 'origin_unix': row['origin_unix'],
         'trace_path': 'origins/' + bundle_name(row['region'], row['origin_unix']) + '/trace.json',
@@ -472,9 +488,10 @@ def main(argv=None):
     parser.add_argument('--regions', nargs='+', choices=('NSW1', 'QLD1', 'TAS1'), default=['NSW1', 'QLD1', 'TAS1'])
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
     parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input',
-                                             'r21_single_lightgbm_input'), default='r18')
+                                             'r21_single_lightgbm_input',
+                                             'r22_state_aligned_input'), default='r18')
     parser.add_argument('--operator-admission',
-                        help='R21 development operation-admission JSON; required by the R21 policy')
+                        help='Development operation-admission JSON; required by R21 and R22')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
     parser.add_argument('--evidence', help='Frozen evidence JSONL; absent means real_data_unavailable')
     parser.add_argument('--api-calls', type=int, default=8)
@@ -493,8 +510,9 @@ def main(argv=None):
                      'evidence_path': str(Path(args.evidence).resolve()) if args.evidence else None,
                      'operator_admission_path': (str(Path(args.operator_admission).resolve())
                                                  if args.operator_admission else None)}
-    if args.policy == 'r21_single_lightgbm_input' and not args.operator_admission:
-        parser.error('--operator-admission is required for r21_single_lightgbm_input')
+    if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input') \
+            and not args.operator_admission:
+        parser.error('--operator-admission is required for the selected single-LightGBM input policy')
     if not args.execute:
         print(json.dumps({'status': 'PLAN_ONLY', 'configuration': configuration,
                           'instruction': 'Add --execute to run; no model/API/output modification performed.'}, indent=2))
@@ -512,8 +530,8 @@ def main(argv=None):
                     for region in configuration['regions']}
     schedule = build_schedule(repositories, args.origins_per_region)
     inputs = {region: verify_input_files(repo) for region, repo in repositories.items()}
-    r21 = args.policy == 'r21_single_lightgbm_input'
-    if not r21 and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
+    single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input')
+    if not single_lightgbm and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
                     or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA):
         raise ValueError('Pinned Chronos weights/config checksum mismatch')
     kev_identity = verify_kev_files()
@@ -524,15 +542,15 @@ def main(argv=None):
     evidence = EvidenceStore.from_jsonl(args.evidence) if args.evidence else EvidenceStore()
     chronos_identity = ({'sha256': CHRONOS_SHA, 'config_sha256': CHRONOS_CONFIG_SHA,
                          'revision': CHRONOS_SNAPSHOT.name, 'path': str(CHRONOS_SNAPSHOT),
-                         'pretraining_overlap': 'unknown'} if not r21 else None)
+                         'pretraining_overlap': 'unknown'} if not single_lightgbm else None)
     admission = None
-    if r21:
+    if single_lightgbm:
         from .input_registry import load_operator_admission
         admission = load_operator_admission(args.operator_admission, seed=args.seed)
     adapters = {}
     for region in repositories:
         directory = base_root / 'runs/lightgbm' / f'seed{args.seed}' / region
-        if r21:
+        if single_lightgbm:
             from .predictors.lightgbm_input import FrozenLightGBMInputAdapter
             adapters[region] = FrozenLightGBMInputAdapter(
                 directory, admitted_operation_ids=admission['admitted_operation_ids'],
@@ -543,12 +561,15 @@ def main(argv=None):
                 directory, region=region, seed=args.seed, threads=4)
     model_manifest = {'kev': kev_identity,
                       'lightgbm': {region: adapter.identity for region, adapter in adapters.items()}}
-    if not r21:
+    if not single_lightgbm:
         model_manifest['chronos'] = chronos_identity
     package_names = ('numpy', 'torch', 'lightgbm', 'transformers')
-    if not r21:
+    if not single_lightgbm:
         package_names += ('chronos-forecasting',)
-    manifest = {'schema': ('r21-single-lightgbm-replay-v1' if r21 else 'r18-sequential-replay-v1'),
+    replay_schema = ('r22-state-aligned-replay-v1' if args.policy == 'r22_state_aligned_input'
+                     else 'r21-single-lightgbm-replay-v1' if single_lightgbm
+                     else 'r18-sequential-replay-v1')
+    manifest = {'schema': replay_schema,
                 'release': release,
                 'configuration': configuration, 'budgets': asdict(limits), 'source': source_identity(),
                 'inputs': inputs, 'models': model_manifest,
@@ -563,6 +584,8 @@ def main(argv=None):
                 'scoring_rule': 'Only after every requested prediction has been atomically committed.',
                 'seed_semantics': 'LightGBM checkpoint seed; Kev argmax does not sample a random seed.',
                 'historical_evaluation_limit': 'Selection/test exposure retained; no independent-blind-test claim.'}
+    if args.policy == 'r22_state_aligned_input':
+        manifest['r22_decision_contract'] = selected_policy.manifest_contract()
     manifest['git'] = {
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
@@ -582,7 +605,7 @@ def main(argv=None):
         write_json(invocations / (str(time.time_ns()) + '-' + uuid.uuid4().hex + '.json'),
                    {'current_git': invocation_git, 'resume': args.resume,
                     'manifest_id': digest(manifest), 'configuration': configuration})
-        if r21:
+        if single_lightgbm:
             from .input_registry import InputForecastRegistry
             registries = {region: InputForecastRegistry(
                 adapter, release, max_current_candidates=limits.candidates)

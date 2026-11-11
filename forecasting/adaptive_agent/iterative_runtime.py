@@ -7,6 +7,7 @@ never an invitation to silently retry until the model produces a favorable row.
 from __future__ import annotations
 
 from dataclasses import asdict
+import math
 
 import numpy as np
 
@@ -104,6 +105,9 @@ class IterativeToolHost(ToolHost):
                        'episode_id': episode['episode_id'],
                        'historical_context': episode['context'].identity()})
 
+    def _score_episode(self, actual, quantiles):
+        return scores(actual, quantiles)
+
     def actions(self, context, state):
         offered = super().actions(context, state)
         offered = {key: value for key, value in offered.items() if not key.startswith('diagnose:')
@@ -158,7 +162,7 @@ class IterativeToolHost(ToolHost):
                        'forecast_id': artifact.identity(), 'input_hash': artifact.input_hash,
                        'data_role': _role(episode, model_identity), 'status': 'success',
                        'diagnostic_kind': 'retrospective_frozen_recompute',
-                       'metrics': scores(episode['actual'], artifact.quantiles)}
+                       'metrics': self._score_episode(episode['actual'], artifact.quantiles)}
                 self._diagnostic_cache[key] = row
             except Exception as exc:
                 self._diagnostic_cache[key] = {'candidate_id': candidate, 'episode_id': episode['episode_id'],
@@ -238,3 +242,168 @@ class IterativeToolHost(ToolHost):
         self.audit.append({'action': action_id, 'observation': observation})
         return {'status': result['status'], 'observation': observation, 'candidate_ids': [],
                 'costs': {'historical_evaluations': attempted}}
+
+
+class R22IterativeToolHost(IterativeToolHost):
+    """R22-only bounded diagnostic aggregates; R20/R21 output stays unchanged."""
+
+    def __init__(self, *args, bootstrap_seed=20261111, bootstrap_replicates=2000,
+                 material_qs_loss_threshold=.01, **kwargs):
+        super().__init__(*args, **kwargs)
+        if (isinstance(bootstrap_seed, bool) or not isinstance(bootstrap_seed, int)
+                or isinstance(bootstrap_replicates, bool) or not isinstance(bootstrap_replicates, int)
+                or bootstrap_replicates < 100
+                or isinstance(material_qs_loss_threshold, bool)
+                or not isinstance(material_qs_loss_threshold, (int, float))
+                or not math.isfinite(material_qs_loss_threshold)
+                or material_qs_loss_threshold < 0):
+            raise ValueError('Invalid R22 diagnostic uncertainty configuration')
+        self.bootstrap_seed = bootstrap_seed
+        self.bootstrap_replicates = bootstrap_replicates
+        self.material_qs_loss_threshold = float(material_qs_loss_threshold)
+        self._r22_retrieval = None
+
+    def _score_episode(self, actual, quantiles):
+        from ..api_agent.workflow import quantile_loss
+
+        actual = np.asarray(actual, dtype=float)
+        quantiles = np.sort(np.asarray(quantiles, dtype=float), axis=-1)
+        result = scores(actual, quantiles)
+        for index, (start, stop) in enumerate(((0, 6), (6, 12), (12, 18), (18, 24)), 1):
+            result[f'qs_bucket_{index}'] = quantile_loss(actual[start:stop], quantiles[start:stop])
+        return result
+
+    @staticmethod
+    def _summary(values):
+        values = np.asarray(values, dtype=float)
+        return {'mean': float(values.mean()), 'median': float(np.median(values)),
+                'minimum': float(values.min()), 'maximum': float(values.max()),
+                'std': float(values.std())}
+
+    def _paired_summary(self, default_rows, candidate_rows):
+        episode_ids = sorted(set(default_rows) & set(candidate_rows))
+        gains = np.asarray([default_rows[key]['metrics']['qs']
+                            - candidate_rows[key]['metrics']['qs'] for key in episode_ids])
+        if not len(gains):
+            return None
+        coverage_deltas = np.asarray([
+            candidate_rows[key]['metrics']['coverage90'] - default_rows[key]['metrics']['coverage90']
+            for key in episode_ids])
+        width_deltas = np.asarray([
+            candidate_rows[key]['metrics']['width90'] - default_rows[key]['metrics']['width90']
+            for key in episode_ids])
+        mae_gains = np.asarray([default_rows[key]['metrics']['mae']
+                                - candidate_rows[key]['metrics']['mae'] for key in episode_ids])
+        calibration_damage = np.asarray([
+            abs(candidate_rows[key]['metrics']['coverage90'] - .9)
+            - abs(default_rows[key]['metrics']['coverage90'] - .9) for key in episode_ids])
+        bucket_gains = {
+            f'hours_{start}_{stop}': self._summary([
+                default_rows[key]['metrics'][f'qs_bucket_{index}']
+                - candidate_rows[key]['metrics'][f'qs_bucket_{index}'] for key in episode_ids])
+            for index, (start, stop) in enumerate(((1, 6), (7, 12), (13, 18), (19, 24)), 1)
+        }
+        lower_count = max(1, int(math.ceil(len(gains) * .25)))
+        sorted_gains = np.sort(gains)
+        material_losses = gains < -self.material_qs_loss_threshold
+        rng = np.random.default_rng(self.bootstrap_seed)
+        bootstrap_means = gains[rng.integers(0, len(gains),
+                                              size=(self.bootstrap_replicates, len(gains)))].mean(axis=1)
+        if len(gains) == 1:
+            leave_one_out = gains.copy()
+        else:
+            leave_one_out = np.asarray([np.delete(gains, index).mean() for index in range(len(gains))])
+        distances = {item['episode_id']: float(item['distance'])
+                     for item in (self._r22_retrieval or {}).get('items', [])}
+        if set(episode_ids) <= set(distances):
+            weights = np.asarray([1 / (1 + distances[key]) for key in episode_ids])
+            weighted_mean = float(np.average(gains, weights=weights))
+            effective_support = float(weights.sum() ** 2 / np.square(weights).sum())
+            weighted_available = True
+        else:
+            weighted_mean = effective_support = None
+            weighted_available = False
+        return {
+            'common_support': len(gains),
+            'horizon_qs_gain': bucket_gains,
+            'mae_gain': self._summary(mae_gains),
+            'coverage90_delta': self._summary(coverage_deltas),
+            'width90_delta': self._summary(width_deltas),
+            'calibration_damage': self._summary(calibration_damage),
+            'downside': {
+                'worst_paired_qs_loss': float(max(0., -gains.min())),
+                'lower_tail_mean_qs_gain': float(sorted_gains[:lower_count].mean()),
+                'loss_fraction': float(np.mean(gains < 0)),
+                'material_loss_fraction': float(material_losses.mean()),
+                'material_qs_loss_threshold': self.material_qs_loss_threshold,
+            },
+            'similarity_weighted': {
+                'available': weighted_available, 'mean_qs_gain': weighted_mean,
+                'effective_support': effective_support,
+                'sign_agreement_with_unweighted': (
+                    bool(np.sign(weighted_mean) == np.sign(gains.mean()))
+                    if weighted_available else None),
+            },
+            'bootstrap_mean_qs_gain': {
+                'role': 'small_sample_supporting_evidence_not_significance_test',
+                'seed': self.bootstrap_seed, 'replicates': self.bootstrap_replicates,
+                'percentiles': [2.5, 97.5],
+                'interval': [float(value) for value in np.percentile(bootstrap_means, [2.5, 97.5])],
+            },
+            'leave_one_episode_out': {
+                'minimum_mean_qs_gain': float(leave_one_out.min()),
+                'maximum_mean_qs_gain': float(leave_one_out.max()),
+                'sign_stable': bool(np.all(np.sign(leave_one_out) == np.sign(gains.mean()))),
+            },
+        }
+
+    def _current_comparison(self, observation):
+        comparison = observation['current_forecast_comparison']
+        artifacts = list(self.artifacts.values())
+        comparison['candidates'] = {
+            artifact.candidate_id: {
+                'q05_mean': float(artifact.quantiles[:, 0].mean()),
+                'median_mean': float(artifact.quantiles[:, 2].mean()),
+                'q95_mean': float(artifact.quantiles[:, -1].mean()),
+                'width90_mean': float((artifact.quantiles[:, -1] - artifact.quantiles[:, 0]).mean()),
+            } for artifact in artifacts
+        }
+        comparison['pairs'] = [{
+            'a': first.candidate_id, 'b': second.candidate_id,
+            'median_absolute_difference': float(np.abs(
+                first.quantiles[:, 2] - second.quantiles[:, 2]).mean()),
+            'q05_absolute_difference': float(np.abs(
+                first.quantiles[:, 0] - second.quantiles[:, 0]).mean()),
+            'q95_absolute_difference': float(np.abs(
+                first.quantiles[:, -1] - second.quantiles[:, -1]).mean()),
+            'width90_absolute_difference': float(np.abs(
+                (first.quantiles[:, -1] - first.quantiles[:, 0])
+                - (second.quantiles[:, -1] - second.quantiles[:, 0])).mean()),
+        } for index, first in enumerate(artifacts) for second in artifacts[index + 1:]]
+
+    def execute(self, context, action_id, state):
+        result = super().execute(context, action_id, state)
+        if action_id.startswith('retrieve_analogs:'):
+            self._r22_retrieval = plain(result['observation'])
+            return result
+        if not action_id.startswith('diagnose:'):
+            return result
+        complete = next(item['complete_diagnostic'] for item in reversed(self.audit)
+                        if item.get('action') == action_id and 'complete_diagnostic' in item)
+        rows = [row for row in complete['rows'] if row['status'] == 'success']
+        by_candidate = {}
+        for row in rows:
+            by_candidate.setdefault(row['candidate_id'], {})[row['episode_id']] = row
+        default_id = self.registry.default_id
+        for candidate_id, candidate in result['observation']['candidates'].items():
+            if candidate_id == default_id or default_id not in by_candidate:
+                continue
+            summary = self._paired_summary(by_candidate[default_id], by_candidate.get(candidate_id, {}))
+            if summary is not None:
+                candidate['paired_vs_default'].update(summary)
+        self._current_comparison(result['observation'])
+        result['observation']['r22_aggregate_schema'] = 'r22-paired-diagnostic-v1'
+        observation = plain(result['observation'])
+        result['observation'] = observation
+        self.audit.append({'action': action_id, 'r22_observation': observation})
+        return result

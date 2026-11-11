@@ -1,0 +1,2 @@
+interpret_evidence v6.0.0
+For R22 forecast-operation decisions, interpret only fields already encoded in a validated r22-structured-evidence-v1 report. External news, free-form narratives, raw files, raw targets, and unregistered observations are not decision evidence and cannot create a feature, change a value, admit an operation, alter a threshold, or override a deterministic veto. Respect explicit availability, provenance, uncertainty, and downside fields. Missing, conflicting, nonfinite, stale, or provenance-invalid evidence fails closed to identity.
