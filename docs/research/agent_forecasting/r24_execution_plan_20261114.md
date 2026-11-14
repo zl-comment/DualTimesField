@@ -82,8 +82,11 @@ Using only the saved R23 development run (materialized candidates, traces,
 actuals), per region and region-equal, with QS as the primary metric:
 
 - G (generation headroom) = QS(identity) − QS(oracle over all materialized candidates)
-- A (admission loss)     = QS(oracle materialized) − QS(oracle over evidence-eligible)
-- S (selection+risk loss) = QS(oracle eligible) − QS(committed)
+- A (admission loss)      = QS(oracle over identity plus eligible) − QS(oracle materialized)
+- S (selection+risk loss) = QS(committed) − QS(oracle over identity plus eligible)
+
+so that QS(identity) − QS(committed) = G − A − S. Sign correction applied
+before any diagnosis run; no results had been observed.
 
 Oracle selection is per-origin post-hoc minimization. It is a diagnostic upper
 bound with selection bias, not a deployable score, and must never enter any
