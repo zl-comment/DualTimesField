@@ -121,13 +121,14 @@ def _load_parent(root):
     return manifests, reports, rows
 
 
-def _check_paired_runs(r21_manifests, r22_manifests, r21_rows, r22_rows, split):
+def _check_paired_runs(r21_manifests, r22_manifests, r21_rows, r22_rows, split,
+                       right_policy='r22_state_aligned_input'):
     if set(r21_rows) != set(r22_rows):
         raise ValueError('R21 and R22 origin schedules must match exactly')
     for region in REGIONS:
         r21_manifest, r22_manifest = r21_manifests[region], r22_manifests[region]
         expected_policies = ((r21_manifest, 'R21', 'r21_single_lightgbm_input'),
-                             (r22_manifest, 'R22', 'r22_state_aligned_input'))
+                             (r22_manifest, 'comparison', right_policy))
         for manifest, label, expected_policy in expected_policies:
             configuration = manifest.get('configuration', {})
             if configuration.get('split') != split:

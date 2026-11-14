@@ -9,17 +9,17 @@ Research branch: `research/r23-state-aware-admission`.
 The objective is improved forecasting accuracy in each of NSW1, QLD1 and TAS1.
 A region-equal average alone cannot establish success. Report per-region QS, MAE,
 RMSE, coverage90 and width90 on identical origins, forecast horizons and price units.
-Compare identity LightGBM, R21, R22 and the frozen traditional controls: linear,
-LASSO-ARX and XGBoost. Point-only controls must be evaluated on point metrics;
-do not invent probabilistic scores for them.
+Compare identity LightGBM, R21 and R22 during development. Comparison against
+traditional methods is reserved for the formal test after the development gate
+passes and the complete policy is frozen.
 
 R23 is an implementation hypothesis, not a demonstrated accuracy improvement.
 Promotion requires improvement in QS and MAE against identity and R21 in all three
 regions, with no regional RMSE regression or coverage90 loss exceeding 0.005.
-Claims against other traditional controls require complete matched predictions and
-their per-region comparisons. Missing controls mean incomplete evaluation, not a
-win. Report six chronological block deltas and paired uncertainty alongside pooled
-metrics; numerical improvement alone does not imply statistical significance.
+Development improvement qualifies the policy for formal evaluation; it cannot
+establish superiority over traditional methods. Traditional development predictions
+are not a prerequisite for this gate. Report six chronological block deltas;
+numerical improvement alone does not imply statistical significance.
 
 ## Implemented hypothesis
 
@@ -71,8 +71,9 @@ operation is introduced in this increment.
 4. Run preregistered admission ablations on identical locked cohorts: R22 admission,
    half-day admission, and half-day plus similarity admission. Offline candidate
    outcomes are diagnostic and must not be used to choose each origin's action.
-5. Export matched development predictions from frozen traditional controls before
-   claiming three-region superiority; keep the 2023-2024 evaluation split closed.
+5. Only after the development gate passes, freeze models, policy, thresholds and
+   evaluation protocol, then compare against traditional methods on the 2023-2024
+   formal test. If development fails, continue development without opening that split.
 
 The existing aligned baseline directory currently contains test prediction artifacts
 but no selection/calibration NPZ exports for linear, LASSO-ARX, LightGBM or XGBoost.
@@ -119,5 +120,6 @@ reading evaluation labels or changing cohorts, produces the following diagnostic
 
 This confirms that the rule opens additional decisions for the agent. It is not a
 fresh R23 replay or an accuracy estimate; retrieval, selection and risk review can
-still change the final actions. Full R23 paired accuracy evaluation and matched
-traditional development baselines remain pending.
+still change the final actions. Full R23 paired development evaluation remains
+pending at this implementation checkpoint. Traditional-method superiority must be
+assessed separately on the formal test after passing the development gate.
