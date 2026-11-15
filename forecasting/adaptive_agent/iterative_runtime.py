@@ -407,3 +407,208 @@ class R22IterativeToolHost(IterativeToolHost):
         result['observation'] = observation
         self.audit.append({'action': action_id, 'r22_observation': observation})
         return result
+
+
+class R24IterativeToolHost(R22IterativeToolHost):
+    """R24a incremental diagnosis: per-candidate diagnosis and cohort appends.
+
+    R20-R22 hosts and outputs stay unchanged. Cache keys bind the (registry,
+    candidate input, forecast identity, episode) tuple without the cohort id,
+    so appending episodes to the locked cohort never invalidates or recomputes
+    already-charged pairs; appends are audit-recorded and comparisons remain
+    paired on the common successful episode intersection.
+    """
+
+    def _candidate_binding(self, context, candidate_id):
+        current = validate_artifact(context, self.artifacts[candidate_id])
+        spec = self.registry.specs[candidate_id]
+        expected_input = digest({'release': self.registry.release_id, 'context': context.identity(),
+                                 'spec': asdict(spec), 'model': self.registry.model_identities[spec.model_id]})
+        if current.input_hash != expected_input:
+            raise ValueError('Current candidate input identity does not match frozen registry')
+        binding = digest({'registry': self._registry_binding, 'current_input': current.input_hash,
+                          'current_forecast': current.identity(), 'spec': asdict(spec)})
+        if candidate_id in self._candidate_bindings and self._candidate_bindings[candidate_id] != binding:
+            raise ValueError('A previously diagnosed candidate/input changed')
+        return binding
+
+    def _cache_key(self, context, candidate_id, episode):
+        return digest({'candidate': self._candidate_binding(context, candidate_id),
+                       'episode_id': episode['episode_id'],
+                       'historical_context': episode['context'].identity()})
+
+    def _pending_pairs(self, context, candidate_id):
+        return sum(self._cache_key(context, candidate_id, episode) not in self._diagnostic_cache
+                   for episode in self._cohort)
+
+    def actions(self, context, state):
+        offered = super().actions(context, state)
+        if self._cohort_locked and self._cohort:
+            for candidate_id in self._models():
+                pending = self._pending_pairs(context, candidate_id)
+                if pending:
+                    offered['diagnose_one:' + candidate_id] = {
+                        'description': 'Incrementally diagnose ' + candidate_id
+                                       + ' on the locked cohort; charge only previously '
+                                       + 'unattempted episode pairs.',
+                        'kind': 'compare_candidates', 'costs': {'historical_evaluations': pending}}
+            for strategy in ('recent', 'seasonal', 'state', 'diverse'):
+                offered['augment:' + strategy] = {
+                    'description': 'Append up to eight new mature episodes from the ' + strategy
+                                   + ' retrieval to the locked cohort; existing diagnoses are '
+                                   + 'reused, not recomputed.',
+                    'kind': 'retrieve_analogs', 'costs': {'episodes': 8}}
+        return offered
+
+    def _execute_augment(self, context, action_id, state):
+        offered = self.actions(context, state)
+        if action_id not in offered:
+            raise ValueError('R24 augmentation is unavailable for this snapshot')
+        strategy = action_id[len('augment:'):]
+        retrieval = self.analogs.retrieve(context, strategy=strategy, limit=8,
+                                          event_tags=[record['event_type'] for record in self.event_facts])
+        new_ids = [item['episode_id'] for item in retrieval['items']
+                   if item['episode_id'] not in self._locked_episode_ids]
+        if not new_ids or len(set(new_ids)) != len(new_ids):
+            raise ValueError('R24 augmentation produced no new unique mature episodes')
+        rows, visible = list(self._cohort), min(context.cutoff, context.memory_watermark)
+        for key in new_ids:
+            row = self.analogs.get_episode(context, key)
+            historical, available = row['context'], row['outcome_available_at']
+            if (historical.region != context.region or historical.origin_unix >= context.origin_unix
+                    or available > visible or available < int(historical.snapshot.target_time_unix[-1]) + 3600
+                    or historical.cutoff > visible):
+                raise ValueError('R24 augmentation cohort contains an immature/foreign episode')
+            actual = np.asarray(row['actual'], dtype=float).copy()
+            if actual.shape != (24,) or not np.isfinite(actual).all():
+                raise ValueError('R24 augmentation requires 24 finite mature targets')
+            actual.setflags(write=False)
+            row['actual'] = actual
+            rows.append(row)
+        episodes_field = list(self._locked_episode_ids) + list(new_ids)
+        self._cohort = tuple(rows)
+        self._locked_episode_ids = tuple(episodes_field)
+        self._cohort_binding = self._episode_binding(context, rows)
+        self._cohort_id = digest({'registry': self._registry_binding, 'cohort': self._cohort_binding})
+        self.episode_ids = list(episodes_field)
+        merged = {item['episode_id']: item for item in (self._r22_retrieval or {}).get('items', [])}
+        for item in retrieval['items']:
+            merged.setdefault(item['episode_id'], item)
+        if self._r22_retrieval is not None:
+            self._r22_retrieval = {**self._r22_retrieval, 'items': list(merged.values())}
+        observation = plain({
+            'status': 'cohort_appended', 'strategy': strategy,
+            'new_episode_ids': list(new_ids), 'cohort_size': len(rows),
+            'cohort_id': self._cohort_id, 'reused_diagnoses_preserved': True,
+            'retrieval_observation': {
+                'items': list(merged.values()), 'cohort_id': self._cohort_id,
+                'cohort_locked': True, 'cohort_size': len(rows),
+                'strategy': (self._r22_retrieval or {}).get('strategy', strategy)
+                            + '+' + strategy,
+                'warehouse_fingerprint': digest({'items': list(merged.values()),
+                                                 'cohort_id': self._cohort_id}),
+            },
+        })
+        self.audit.append({'action': action_id, 'observation': observation,
+                           'augmented_cohort': {'cohort_id': self._cohort_id,
+                                                'episodes': list(episodes_field)}})
+        return {'status': 'ok', 'observation': observation, 'candidate_ids': [],
+                'costs': {'episodes': len(new_ids)}}
+
+    def _execute_diagnose_one(self, context, action_id, state):
+        offered = self.actions(context, state)
+        if action_id not in offered:
+            raise ValueError('R24 single-candidate diagnosis is unavailable for this snapshot')
+        candidate_id = action_id[len('diagnose_one:'):]
+        models = self._models()
+        if candidate_id not in models:
+            raise ValueError('R24 diagnosis targets an unknown current candidate')
+        jobs = [(candidate_id, episode, self._cache_key(context, candidate_id, episode))
+                for episode in self._cohort]
+        pending = [job for job in jobs if job[2] not in self._diagnostic_cache]
+        external_used = state.get('costs', {}).get('historical_evaluations', 0)
+        if len(pending) > min(40 - self._charged_diagnostic_units, 40 - external_used):
+            raise ValueError('R24 historical inference budget exhausted before execution')
+        numeric_before = self._diagnostic_registry.stats['numeric_inferences']
+        newly_successful = 0
+        for candidate, episode, key in pending:
+            binding = self._candidate_binding(context, candidate)
+            self._candidate_bindings[candidate] = binding
+            # Record/charge before touching the numerical model; the default
+            # unresolved entry prevents silent retry after interruption.
+            self._diagnostic_cache[key] = {'candidate_id': candidate,
+                                           'episode_id': episode['episode_id'],
+                                           'status': 'failure', 'reason': 'InterruptedAttempt'}
+            self._charged_diagnostic_units += 1
+            try:
+                artifact = self._diagnostic_registry.forecast(episode['context'], candidate)
+                model_identity = self.registry.model_identities[self.registry.specs[candidate].model_id]
+                row = {'candidate_id': candidate, 'episode_id': episode['episode_id'],
+                       'forecast_id': artifact.identity(), 'input_hash': artifact.input_hash,
+                       'data_role': _role(episode, model_identity), 'status': 'success',
+                       'diagnostic_kind': 'r24_incremental_frozen_recompute',
+                       'metrics': self._score_episode(episode['actual'], artifact.quantiles)}
+                self._diagnostic_cache[key] = row
+                newly_successful += 1
+            except Exception as exc:
+                self._diagnostic_cache[key] = {'candidate_id': candidate,
+                                               'episode_id': episode['episode_id'],
+                                               'status': 'failure', 'reason': type(exc).__name__,
+                                               'detail': str(exc)[:200]}
+                if isinstance(exc, TimeoutError):
+                    break
+        rows = [self._diagnostic_cache[job[2]] for job in jobs]
+        successful = [row for row in rows if row['status'] == 'success']
+        by_candidate = {}
+        for row in self._diagnostic_cache.values():
+            if row.get('status') == 'success':
+                by_candidate.setdefault(row['candidate_id'], {})[row['episode_id']] = row
+        default_id = self.registry.default_id
+        candidate_block = {
+            'candidate_id': candidate_id,
+            'metrics': ({metric: float(np.mean([row['metrics'][metric] for row in successful]))
+                         for metric in successful[0]['metrics']} if successful else None),
+            'sample_count': len(successful),
+            'episode_ids': [row['episode_id'] for row in successful],
+            'failed_episode_ids': [row['episode_id'] for row in rows if row['status'] == 'failure'],
+            'cache_hit_count': len(jobs) - len(pending),
+            'cache_miss_count': len(pending),
+            'newly_successful_count': newly_successful,
+        }
+        if candidate_id != default_id and default_id in by_candidate:
+            summary = self._paired_summary(by_candidate[default_id],
+                                           by_candidate.get(candidate_id, {}))
+            if summary is not None:
+                candidate_block['paired_vs_default'] = {
+                    'default_candidate_id': default_id,
+                    'gain_definition': 'default_qs_minus_candidate_qs',
+                    **summary,
+                }
+        observation = plain({
+            'status': 'available' if successful else 'unavailable',
+            'diagnostic_kind': 'r24_incremental_frozen_recompute', 'horizon_hours': 24,
+            'cohort_id': self._cohort_id, 'cohort_size': len(self._cohort),
+            'episodes': list(self._locked_episode_ids),
+            'newly_diagnosed_count': newly_successful,
+            'candidates': {candidate_id: candidate_block},
+            'current_forecast_comparison': compare_candidates(self.artifacts),
+            'logical_inference_units': len(pending),
+            'cumulative_logical_inference_units': self._charged_diagnostic_units,
+            'numeric_inferences': self._diagnostic_registry.stats['numeric_inferences'] - numeric_before,
+            'cumulative_numeric_inferences': self._diagnostic_registry.stats['numeric_inferences'],
+            'comparison_semantics': 'paired on commonly successful episodes only',
+            'limitation': 'Incremental single-candidate aggregate; the complete paired '
+                          'diagnostic is produced by the protocol completion step.',
+        })
+        self.audit.append({'action': action_id, 'observation': observation})
+        return {'status': 'available' if successful else 'unavailable',
+                'observation': observation, 'candidate_ids': [],
+                'costs': {'historical_evaluations': len(pending)}}
+
+    def execute(self, context, action_id, state):
+        self._check(context)
+        if action_id.startswith('augment:'):
+            return self._execute_augment(context, action_id, state)
+        if action_id.startswith('diagnose_one:'):
+            return self._execute_diagnose_one(context, action_id, state)
+        return super().execute(context, action_id, state)

@@ -171,7 +171,9 @@ def _current_regime(context, numerical_state, diagnostic):
 
 def _cohort_quality(context, diagnostic, retrieval, current_regime):
     items = retrieval.get('items')
-    _require(isinstance(items, list) and len(items) <= 8, 'Invalid retrieval items')
+    # R24a loop appends may extend a locked cohort beyond the first retrieval;
+    # R22/R23 retrieval stays bounded by its own limit of eight.
+    _require(isinstance(items, list) and len(items) <= 16, 'Invalid retrieval items')
     episode_ids = [row.get('episode_id') for row in items]
     _require(all(isinstance(value, str) and value for value in episode_ids)
              and len(set(episode_ids)) == len(episode_ids), 'Invalid retrieval episode IDs')
@@ -422,7 +424,7 @@ def validate_evidence_report(report):
     _require(isinstance(provenance['episode_ids'], list)
              and all(isinstance(value, str) and value for value in provenance['episode_ids'])
              and len(set(provenance['episode_ids'])) == len(provenance['episode_ids'])
-             and len(provenance['episode_ids']) <= 8, 'Invalid provenance episode IDs')
+             and len(provenance['episode_ids']) <= 16, 'Invalid provenance episode IDs')
     current = report['current_regime']
     _exact_keys(current, {'price_latest_24h', 'demand_latest_24h', 'state_tags',
                           'exogenous_quality', 'data_quality', 'current_forecasts'},

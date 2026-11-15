@@ -58,7 +58,8 @@ def write_json(path, value):
 
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
-    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22', 'skills_r23'):
+    for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22',
+                      'skills_r23', 'skills_r24'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
@@ -69,7 +70,8 @@ def policy_module(policy):
                'r20_iterative_input': '.iterative_policy',
                'r21_single_lightgbm_input': '.input_policy',
                'r22_state_aligned_input': '.input_policy_r22',
-               'r23_state_aware_input': '.input_policy_r23'}
+               'r23_state_aware_input': '.input_policy_r23',
+               'r24_iterative_loop_input': '.input_policy_r24'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
@@ -78,6 +80,8 @@ def policy_module(policy):
 def policy_host_factory(policy):
     if policy in ('r22_state_aligned_input', 'r23_state_aware_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).R22IterativeToolHost
+    if policy == 'r24_iterative_loop_input':
+        return importlib.import_module('.iterative_runtime', package=__package__).R24IterativeToolHost
     if policy in ('r20_iterative_input', 'r21_single_lightgbm_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
     if policy in ('r18', 'r19_evidence_first'):
@@ -284,7 +288,8 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                 initial_reads[region] = len(repo.outcome_reads)
                 materialized = (getattr(host, 'artifacts', None)
                                 if policy in ('r20_iterative_input', 'r21_single_lightgbm_input',
-                                              'r22_state_aligned_input', 'r23_state_aware_input')
+                                              'r22_state_aligned_input', 'r23_state_aware_input',
+                                              'r24_iterative_loop_input')
                                 else None)
                 save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
                             materialized=materialized)
