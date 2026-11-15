@@ -495,7 +495,8 @@ def main(argv=None):
     parser.add_argument('--seed', type=int, choices=(2026, 2027, 2028), default=2026)
     parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input',
                                              'r21_single_lightgbm_input',
-                                             'r22_state_aligned_input', 'r23_state_aware_input'), default='r18')
+                                             'r22_state_aligned_input', 'r23_state_aware_input',
+                                             'r24_iterative_loop_input'), default='r18')
     parser.add_argument('--operator-admission',
                         help='Development operation-admission JSON; required by R21, R22 and R23')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
@@ -516,7 +517,8 @@ def main(argv=None):
                      'evidence_path': str(Path(args.evidence).resolve()) if args.evidence else None,
                      'operator_admission_path': (str(Path(args.operator_admission).resolve())
                                                  if args.operator_admission else None)}
-    if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input', 'r23_state_aware_input') \
+    if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input',
+                       'r23_state_aware_input', 'r24_iterative_loop_input') \
             and not args.operator_admission:
         parser.error('--operator-admission is required for the selected single-LightGBM input policy')
     if not args.execute:
@@ -536,7 +538,8 @@ def main(argv=None):
                     for region in configuration['regions']}
     schedule = build_schedule(repositories, args.origins_per_region)
     inputs = {region: verify_input_files(repo) for region, repo in repositories.items()}
-    single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input', 'r23_state_aware_input')
+    single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input',
+                                      'r23_state_aware_input', 'r24_iterative_loop_input')
     if not single_lightgbm and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
                     or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA):
         raise ValueError('Pinned Chronos weights/config checksum mismatch')
@@ -572,7 +575,8 @@ def main(argv=None):
     package_names = ('numpy', 'torch', 'lightgbm', 'transformers')
     if not single_lightgbm:
         package_names += ('chronos-forecasting',)
-    replay_schema = ('r23-state-aware-replay-v1' if args.policy == 'r23_state_aware_input'
+    replay_schema = ('r24a-iterative-loop-replay-v1' if args.policy == 'r24_iterative_loop_input'
+                     else 'r23-state-aware-replay-v1' if args.policy == 'r23_state_aware_input'
                      else 'r22-state-aligned-replay-v1' if args.policy == 'r22_state_aligned_input'
                      else 'r21-single-lightgbm-replay-v1' if single_lightgbm
                      else 'r18-sequential-replay-v1')
@@ -595,6 +599,8 @@ def main(argv=None):
         manifest['r22_decision_contract'] = selected_policy.manifest_contract()
     if args.policy == 'r23_state_aware_input':
         manifest['r23_decision_contract'] = selected_policy.manifest_contract()
+    if args.policy == 'r24_iterative_loop_input':
+        manifest['r24_decision_contract'] = selected_policy.manifest_contract()
     manifest['git'] = {
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
