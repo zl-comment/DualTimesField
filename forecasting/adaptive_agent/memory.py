@@ -55,8 +55,10 @@ class FeedbackLedger:
         if event['kind'] == 'forecast':
             expected = {'forecast_id', 'candidate_id', 'context_id', 'model_id', 'region',
                         'origin_unix', 'issued_at', 'target_time_unix', 'quantiles', 'input_hash', 'provenance'}
-            if set(payload) != expected:
+            if set(payload) not in (expected, expected | {'state_bucket'}):
                 raise ValueError('Malformed forecast payload schema')
+            if 'state_bucket' in payload and not isinstance(payload['state_bucket'], str):
+                raise ValueError('Forecast state bucket must be a string')
             if key in self._forecasts:
                 raise ValueError('Repeated immutable forecast record')
             for field in ('origin_unix', 'issued_at'):
@@ -127,7 +129,7 @@ class FeedbackLedger:
                 self._disk_size, self._disk_mtime_ns = stat.st_size, stat.st_mtime_ns
         self._accept(event)
 
-    def append_forecast(self, context, artifact):
+    def append_forecast(self, context, artifact, state_bucket=None):
         if artifact.context_id != context.identity():
             raise ValueError('Forecast does not belong to this context')
         quantiles = np.asarray(artifact.quantiles, dtype=float)
@@ -143,6 +145,8 @@ class FeedbackLedger:
                    'issued_at': context.cutoff, 'target_time_unix': target.tolist(),
                    'quantiles': quantiles.tolist(), 'input_hash': artifact.input_hash,
                    'provenance': plain(artifact.provenance)}
+        if state_bucket is not None:
+            payload['state_bucket'] = state_bucket
         with self._lock:
             if key in self._forecasts:
                 if self._forecasts[key] != payload:
@@ -183,6 +187,8 @@ class FeedbackLedger:
                     continue
                 rows.append({k: deepcopy(forecast[k]) for k in
                              ('forecast_id', 'candidate_id', 'context_id', 'model_id', 'region', 'origin_unix')})
+                if 'state_bucket' in forecast:
+                    rows[-1]['state_bucket'] = forecast['state_bucket']
                 rows[-1].update({'outcome_available_at': outcome['outcome_available_at'],
                                  'metrics': deepcopy(outcome['metrics']), 'arm_id': self.arm_id})
         return sorted(rows, key=lambda r: (r['origin_unix'], r['forecast_id']))
@@ -190,3 +196,14 @@ class FeedbackLedger:
     @property
     def fingerprint(self):
         return self._events[-1]['event_hash'] if self._events else _digest({'arm_id': self.arm_id})
+
+
+def demand_state_bucket(context):
+    """Sign of the standardized demand regime shift at this origin.
+
+    Same definition as the evidence report's current-demand-regime contrast:
+    latest-24h mean minus older-48h mean of the demand history column.
+    """
+    demand = np.asarray(context.model_inputs['history_values'])[:, 1]
+    shift = demand[-24:].mean() - demand[:-24].mean()
+    return 'demand_warming' if shift > 0 else 'demand_cooling'

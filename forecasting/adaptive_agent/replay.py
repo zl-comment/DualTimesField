@@ -59,7 +59,7 @@ def write_json(path, value):
 def source_identity(root=ROOT):
     paths = sorted((root / 'forecasting').rglob('*.py'))
     for directory in ('skills', 'skills_r19', 'skills_r20', 'skills_r21', 'skills_r22',
-                      'skills_r23', 'skills_r24'):
+                      'skills_r23', 'skills_r24', 'skills_r24b'):
         paths += sorted(p for p in (root / 'forecasting/adaptive_agent' / directory).rglob('*') if p.is_file())
     files = {str(path.relative_to(root)): sha_file(path) for path in paths}
     return {'sha256': digest(files), 'files': files}
@@ -71,7 +71,8 @@ def policy_module(policy):
                'r21_single_lightgbm_input': '.input_policy',
                'r22_state_aligned_input': '.input_policy_r22',
                'r23_state_aware_input': '.input_policy_r23',
-               'r24_iterative_loop_input': '.input_policy_r24'}
+               'r24_iterative_loop_input': '.input_policy_r24',
+               'r24b_candidate_ledger_input': '.input_policy_r24b'}
     if policy not in modules:
         raise ValueError('Unregistered replay policy')
     return importlib.import_module(modules[policy], package=__package__)
@@ -80,7 +81,7 @@ def policy_module(policy):
 def policy_host_factory(policy):
     if policy in ('r22_state_aligned_input', 'r23_state_aware_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).R22IterativeToolHost
-    if policy == 'r24_iterative_loop_input':
+    if policy in ('r24_iterative_loop_input', 'r24b_candidate_ledger_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).R24IterativeToolHost
     if policy in ('r20_iterative_input', 'r21_single_lightgbm_input'):
         return importlib.import_module('.iterative_runtime', package=__package__).IterativeToolHost
@@ -237,7 +238,7 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                *, information_scope='full_evidence', agent_runner=None, host_factory=None):
     """Dependency-injected core shared by real replay and fault/resume tests."""
     from .analogs import AnalogStore
-    from .memory import FeedbackLedger
+    from .memory import FeedbackLedger, demand_state_bucket
     policy = manifest['configuration'].get('policy', 'r18')
     if agent_runner is None:
         agent_runner = policy_module(policy).run
@@ -289,13 +290,24 @@ def run_replay(output, manifest, repositories, registries, client, evidence, lim
                 materialized = (getattr(host, 'artifacts', None)
                                 if policy in ('r20_iterative_input', 'r21_single_lightgbm_input',
                                               'r22_state_aligned_input', 'r23_state_aware_input',
-                                              'r24_iterative_loop_input')
+                                              'r24_iterative_loop_input', 'r24b_candidate_ledger_input')
                                 else None)
                 save_bundle(output, context, index, base, agent, trace, audit, manifest_id,
                             materialized=materialized)
-            key = ledger.append_forecast(context, agent)
+            candidate_ledger = policy == 'r24b_candidate_ledger_input'
+            bucket = demand_state_bucket(context) if candidate_ledger else None
+            key = ledger.append_forecast(context, agent, state_bucket=bucket)
             pending.append({'region': region, 'index': index, 'forecast_id': key,
                             'available_at': origin + 86400})
+            if candidate_ledger:
+                # Same payload for the committed artifact is idempotent; every
+                # materialized candidate matures as counterfactual evidence.
+                for artifact in sorted(host.artifacts.values(), key=lambda a: a.candidate_id):
+                    candidate_key = ledger.append_forecast(context, artifact, state_bucket=bucket)
+                    if candidate_key != key:
+                        pending.append({'region': region, 'index': index,
+                                        'forecast_id': candidate_key,
+                                        'available_at': origin + 86400})
             finished.append({'region': region, 'index': index, 'origin_unix': origin,
                              'base': base, 'agent': agent})
             traces.append(trace)
@@ -496,7 +508,7 @@ def main(argv=None):
     parser.add_argument('--policy', choices=('r18', 'r19_evidence_first', 'r20_iterative_input',
                                              'r21_single_lightgbm_input',
                                              'r22_state_aligned_input', 'r23_state_aware_input',
-                                             'r24_iterative_loop_input'), default='r18')
+                                             'r24_iterative_loop_input', 'r24b_candidate_ledger_input'), default='r18')
     parser.add_argument('--operator-admission',
                         help='Development operation-admission JSON; required by R21, R22 and R23')
     parser.add_argument('--information-scope', choices=('full_evidence', 'common_input'), default='full_evidence')
@@ -518,7 +530,8 @@ def main(argv=None):
                      'operator_admission_path': (str(Path(args.operator_admission).resolve())
                                                  if args.operator_admission else None)}
     if args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input',
-                       'r23_state_aware_input', 'r24_iterative_loop_input') \
+                       'r23_state_aware_input', 'r24_iterative_loop_input',
+                       'r24b_candidate_ledger_input') \
             and not args.operator_admission:
         parser.error('--operator-admission is required for the selected single-LightGBM input policy')
     if not args.execute:
@@ -539,7 +552,8 @@ def main(argv=None):
     schedule = build_schedule(repositories, args.origins_per_region)
     inputs = {region: verify_input_files(repo) for region, repo in repositories.items()}
     single_lightgbm = args.policy in ('r21_single_lightgbm_input', 'r22_state_aligned_input',
-                                      'r23_state_aware_input', 'r24_iterative_loop_input')
+                                      'r23_state_aware_input', 'r24_iterative_loop_input',
+                                      'r24b_candidate_ledger_input')
     if not single_lightgbm and (sha_file(CHRONOS_SNAPSHOT / 'model.safetensors') != CHRONOS_SHA
                     or sha_file(CHRONOS_SNAPSHOT / 'config.json') != CHRONOS_CONFIG_SHA):
         raise ValueError('Pinned Chronos weights/config checksum mismatch')
@@ -575,7 +589,8 @@ def main(argv=None):
     package_names = ('numpy', 'torch', 'lightgbm', 'transformers')
     if not single_lightgbm:
         package_names += ('chronos-forecasting',)
-    replay_schema = ('r24a-iterative-loop-replay-v1' if args.policy == 'r24_iterative_loop_input'
+    replay_schema = ('r24b-candidate-ledger-replay-v1' if args.policy == 'r24b_candidate_ledger_input'
+                     else 'r24a-iterative-loop-replay-v1' if args.policy == 'r24_iterative_loop_input'
                      else 'r23-state-aware-replay-v1' if args.policy == 'r23_state_aware_input'
                      else 'r22-state-aligned-replay-v1' if args.policy == 'r22_state_aligned_input'
                      else 'r21-single-lightgbm-replay-v1' if single_lightgbm
@@ -601,6 +616,8 @@ def main(argv=None):
         manifest['r23_decision_contract'] = selected_policy.manifest_contract()
     if args.policy == 'r24_iterative_loop_input':
         manifest['r24_decision_contract'] = selected_policy.manifest_contract()
+    if args.policy == 'r24b_candidate_ledger_input':
+        manifest['r24b_decision_contract'] = selected_policy.manifest_contract()
     manifest['git'] = {
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'branch': subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip(),
