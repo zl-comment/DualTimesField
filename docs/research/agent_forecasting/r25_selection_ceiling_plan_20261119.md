@@ -1,136 +1,74 @@
-# R25 selection-ceiling pre-screen: pre-registered plan (2026-11-19)
+# R25 选择天花板：完整实验与消融设计（2026-11-19，v2 简化版）
 
-Status: pre-registered; not implemented, not run. Research branch
-`research/r25-selection-ceiling`, baseline commit `a126e03` (parent:
-`research/r24-iterative-loop` after the R24b close-out and the gas
-origin-boundary verification). Run-time source and config fingerprints must
-be recorded with the results before any number below is read.
+状态：预注册，未实施未运行。分支 `research/r25-selection-ceiling`，
+基准提交 `a126e03`。运行时只需随结果目录保存当时的 git 提交号和所用的
+配置文件副本，不做额外的代码哈希、冒烟流程或清单机制。
 
-## Motivation
+## 研究问题
 
-The R24 programme closed with the conclusion that the remaining accuracy is
-upstream of decision policy: the operation space (two demand-window mean
-replacements) capped every selector, and R23's deterministic admission rule
-remained the best measured configuration (region-equal QS 39.2503 on the
-2022H2 development fold). The candidate direction is now model selection /
-routing over the existing model zoo — hard routing (choose one model per
-origin), soft combination (weight models), or a jointly trained MoE.
+R24 收尾结论：决策层不是剩余精度所在，价值在上游。候选方向是模型
+选择/路由（含 MoE 式）。在造任何路由器之前，先测天花板：**完美选择器
+在开发折上比"永远用 LightGBM"能多赚多少（区域等权 QS）？** 天花板小
+则方向关闭；大则继续。
 
-Before any router is built, the ceiling must be measured: how much would a
-perfect selector gain over always-LightGBM on development folds? If the
-ceiling is small, no routing mechanism — learned, agentic, or MoE — can pay,
-and the direction should be abandoned in favour of candidate-model quality.
-This step is a frozen-prediction diagnostic plus a bounded set of new
-development-fold baseline runs; it trains no router and touches no test data.
+## 完整实验
 
-## Development folds
+**流程**：每个候选模型 × 每个开发折 × 每个区域，训练（或推理）一次，
+对评估期做一次预测并保存；对每条预测按起点评分，得到逐起点分数表。
+模型用完即释放，全程无模型常驻。
 
-Two chronological folds over the same regions (NSW1/QLD1/TAS1), protocol and
-inputs identical to the production aligned configs (72h history, 24h
-horizon, stride 1, common five quantiles, raw-RRP scoring):
+**开发折**（两个，评估期互不重叠）：
+- 折 A：训练 2015→2021-01，选择 2021H1，评估 2021H2
+- 折 B：训练 2015→2022-01，选择 2022H1，评估 2022H2
 
-- Fold A: train 2015-01-01 → 2021-01-01, selection 2021H1,
-  evaluation 2021H2.
-- Fold B: train 2015-01-01 → 2022-01-01, selection 2022H1,
-  evaluation 2022H2.
+**候选模型**（开发方法一律不参与）：
+- 必跑：baseline_lightgbm、baseline_xgboost（每折重训，生产超参，
+  seed 2026）；persistence-24h、周季节 naive（零成本参照）；
+  chronos2_zeroshot（免训练推理）
+- 算力允许时加（固定优先级）：patchtst → dlinear → gatets →
+  timexer → linear → mlp
 
-Guards: no configuration in this step may contain a `test` split or load any
-row at or after 2023-01-01 (`load_end_exclusive` caps at the fold's
-evaluation end); the closed 2023–2024 test split is neither predicted on nor
-scored. Fold B's evaluation period coincides with the production calibration
-split; that is acceptable for a development diagnostic.
+**评分**：逐起点 QS（2×五分位平均 pinball，24 小时）与 MAE（排序后
+q50）；先区域内平均、再区域等权。对照 R0 做逐起点配对差，按天做
+bootstrap 95% 置信区间。
 
-## Candidates
+**判定门 G1**（数字先于结果固定）：C1（逐起点上帝视角最优）比 R0
+（永远 LightGBM）的改善，折 A、B **同时为正**才算数：
+- C1 − R0 < 0.30 → 方向关闭，写回顾收档
+- C1 − R0 ≥ 0.30 → 路由方向成立，进入消融结论决定做硬路由还是软组合
 
-Development methods (Full_joint and variants) are excluded by decision; only
-static baselines and foundation models participate. Candidate inclusion is
-mechanical, fixed before any development-fold number exists:
+门槛依据：LightGBM 宏 QS 约 24.2，R23 全部贡献只有 0.028；路由方案
+至少要有一个数量级以上的余量（0.30 ≈ 1.2% 相对）才值得造新机器。
 
-1. Tier 1 (trained per fold; cheap trees): `baseline_lightgbm`,
-   `baseline_xgboost`. Production hyperparameters and seed 2026, no re-tuning.
-2. Tier 1b (no training; computed directly): persistence-24h (last 24
-   observed hours as the forecast for all five quantiles) and weekly
-   seasonal-naive (same hour one week earlier, quantiles from a trailing
-   empirical window). These cost nothing and are legitimate oracle
-   candidates in spike hours.
-3. Tier 1c (no training; inference only): `chronos2_zeroshot`, the only
-   foundation model that is Q-table comparable with published macro QS < 35.
-   `tabpfn_v3` (39.48) is excluded by that threshold; `moirai2_zeroshot` and
-   `timesfm25_xreg` are excluded as P-table point-only outputs.
-4. Tier 2 (trained per fold; neural, subject to explicit compute budget,
-   priority order fixed as patchtst → dlinear → gatets → timexer → linear →
-   mlp). The minimum viable analysis is Tiers 1, 1b, 1c; whichever Tier 2
-   models complete must be recorded, and ceilings must be reported both with
-   and without Tier 2 so the candidate set's influence is visible.
+**纪律**：所有配置不含 test 折，数据加载截在评估期末；2023–2024
+正式测试集不预测、不评分；主表与既有冻结档案不动。
 
-Exclusion by published test-table QS is a compute-bound resource decision
-made before any development-fold measurement; it cannot inflate the reported
-ceilings.
+## 消融实验
 
-## Metrics
+全部消融在同一张逐起点分数表（及必要时读预测数组）上进行，**不重跑
+任何模型**。每个消融回答一个问题：
 
-Per (fold, region, origin): QS = 2 × mean pinball over the five common
-quantiles and 24 horizon hours; MAE on the sorted q50. Aggregation mirrors
-the main table: per-seed scoring, region-equal macro first, then the two
-folds reported separately and as their mean. Primary endpoint: region-equal
-QS. Paired per-origin deltas against always-LightGBM with bootstrap 95% CIs
-over origins (cluster bootstrap by day).
+1. **候选集消融**——天花板来自哪里？
+   最小集 {LightGBM + 两个 naive + chronos2} vs 加入神经基线 vs 全集，
+   分别重算 C1。若最小集已拿到大部分天花板，说明余量来自便宜参照
+   （尖峰时段 naive 常胜），路由器不必追求大候选集。
+2. **路由粒度消融**——多细的路由才拿得到天花板？
+   阶梯：R0 永远 LightGBM → R1 逐区域固定最优 → R3 区域×需求状态
+   分桶最优（分桶沿用 R23/R24b 账本定义，只用 as-of 预测需求特征）
+   → C2 区域×月最优 → C1 逐起点最优。每一级的增量就是该粒度的价值。
+   R3−R0 ≥ 0.15（两折同正）→ 硬路由原型立项；否则只保留软组合方向。
+3. **选择 vs 组合消融**——同候选集下，最优选择（R3/C1）与简单组合
+   （逐分位均值、逐分位中位数、按选择期 top-3 组合）谁强？
+   若中位数组合两折都胜 R0，组合优先记为更便宜的默认路线（G3）。
+4. **时间稳定性消融**——折 A vs 折 B 各自的天花板与各级增量是否
+   同号、同量级。一折有一折无 → 视为不稳定，只写回顾不下结论。
+5. **区域分解消融**——逐区域的天花板与 R3 增量。对照已知异质性
+   （TAS1 有余量、NSW1 历来无、QLD1 是 QS/MAE 权衡），若余量仍只
+   在少数区域，路由器按区域开/关即可，不必全区域统一机制。
 
-## References (implementable policies)
+## 产物
 
-- R0 always-LightGBM.
-- R1 per-region static best: model chosen on fold A applied unchanged to
-  fold B (and separately, chosen on each fold's selection split — both
-  reported, labelled by where the choice was made).
-- R2 simple ensembles: per-quantile mean and per-quantile median over all
-  candidates; and over the top-3 by selection-split QS.
-- R3 state-bucket routing ceiling: best fixed model per (region ×
-  demand-regime state bucket), buckets defined exactly as in the R23/R24b
-  ledger (as-of predispatch demand features only), chosen on the selection
-  split, applied to the evaluation split. This is the strongest policy that
-  a hard router could plausibly implement.
-
-## Ceilings (hindsight; not implementable)
-
-- C1 per-origin oracle: best model per origin.
-- C2 per-(region × month) oracle.
-- C3 per-origin oracle restricted to {LightGBM, persistence, chronos2}: how
-  much of C1 survives with only one strong model plus free references.
-
-## Pre-registered decision gates
-
-All deltas are region-equal QS versus R0 on the same fold; a gate counts as
-passed only if the delta is positive in BOTH folds A and B (point estimate;
-CI overlap does not rescue a negative fold).
-
-- G1 (stop/go for routing): C1 − R0 < 0.30 → stop; the direction is closed
-  and the retrospective records it. C1 − R0 ≥ 0.30 → the router direction
-  proceeds to G2.
-- G2 (hard vs soft): R3 − R0 ≥ 0.15 → a hard-router prototype is justified
-  as R25 proper. R3 − R0 < 0.15 while C1 − R0 ≥ 0.30 → the gap between
-  implementable and perfect routing is too large for hard routing; only
-  soft combination is carried forward.
-- G3 (informational): if R2 (median ensemble) beats R0 in both folds,
-  combination-first is flagged as the cheaper default regardless of G2.
-
-Threshold rationale: LightGBM's published macro QS is ≈24.2 on test and
-R23's entire contribution was 0.028 QS; a routing programme must show at
-least an order of magnitude more headroom (0.30 ≈ 1.2% relative) to justify
-new machinery, and the implementable variant must capture at least half of
-whatever smaller margin survives.
-
-## What this step does not do
-
-No router, gate, or agent is trained; no prompt or threshold is tuned on
-evaluation folds; the main comparison table and all frozen archives stay
-untouched; the 2023–2024 test split stays closed. Results are development
-diagnostics only and cannot be represented as method improvements.
-
-## Planned artefacts
-
-`outputs/forecasting/r25_ceiling_<fold>_<seed>_202611xx/` per fold with
-per-origin prediction artifacts (candidate set as executed, fingerprints),
-plus `scripts/analyze_r25_ceiling.py` producing: per-origin score table,
-references R0–R3, ceilings C1–C3, paired deltas with CIs, gate outcomes, and
-a result document `r25_selection_ceiling_result_<date>.md` in this
-directory.
+每折一个结果目录（各候选的评估期预测与所用配置副本），加
+`scripts/analyze_r25_ceiling.py` 产出：逐起点分数表、R0/R1/R3、
+C1/C2、集成结果、五个消融的汇总表、G1/G2/G3 判定，以及结果文档
+`r25_selection_ceiling_result_<日期>.md`。
