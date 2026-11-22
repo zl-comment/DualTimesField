@@ -119,16 +119,23 @@ def run_tree(kind, splits, out_dir, seed):
                          model_directory=model_dir)
     eval_quantiles = result.quantiles
     # Selection-period predictions from the saved boosters at their selected rounds.
-    import lightgbm as lgb
     mean, std = float(train.metadata["target_mean"]), float(train.metadata["target_std"])
     x_select = flatten_inputs(selection)
     selected = result.metadata["selected_rounds"]
-    columns = []
-    for h in range(train.target.shape[1]):
-        levels = [lgb.Booster(model_file=str(model_dir / f"h{h:02d}_q{i:02d}.txt")).predict(
-            x_select, num_iteration=int(selected[h]), num_threads=4)
-            for i in range(len(QUANTILE_LEVELS))]
-        columns.append(np.column_stack(levels))
+    horizons = train.target.shape[1]
+    if kind == "lightgbm":
+        import lightgbm as lgb
+        columns = []
+        for h in range(horizons):
+            levels = [lgb.Booster(model_file=str(model_dir / f"h{h:02d}_q{i:02d}.txt")).predict(
+                x_select, num_iteration=int(selected[h]), num_threads=4)
+                for i in range(len(QUANTILE_LEVELS))]
+            columns.append(np.column_stack(levels))
+    else:
+        import xgboost as xgb
+        dmat = xgb.DMatrix(x_select)
+        columns = [xgb.Booster(model_file=str(model_dir / f"h{h:02d}.ubj")).predict(
+            dmat, iteration_range=(0, int(selected[h]))) for h in range(horizons)]
     selection_quantiles = np.stack(columns, axis=1) * std + mean
     return eval_quantiles, selection_quantiles
 
