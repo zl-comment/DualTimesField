@@ -197,6 +197,13 @@ def main():
             seeds = np.stack([qs_t[f"lightgbm:{s}"].to_numpy() for s in SEEDS])
             month = pd.to_datetime(origins, unit="s", utc=True).tz_convert(
                 "Australia/Brisbane").strftime("%Y-%m")
+            # group oracles: choose the best candidate per group, take its per-origin scores
+            best_by_month = qs_t.groupby(month).mean().idxmin(axis=1)
+            c2_qs = float(pd.concat([qs_t[month == m][k] for m, k in best_by_month.items()]).mean())
+            best_by_bucket = pd.DataFrame(qs_t.to_numpy()).groupby(buckets).mean()
+            best_by_bucket.columns = qs_t.columns
+            r3_qs = float(pd.concat([qs_t[buckets == b][k]
+                                     for b, k in best_by_bucket.idxmin(axis=1).items()]).mean())
             # S3: per-bucket admitted members, per-quantile median
             s3_qs = np.empty(len(origins))
             s3_mae = np.empty(len(origins))
@@ -221,10 +228,10 @@ def main():
                 "s3_qs": float(s3_qs.mean()), "s3_mae": float(s3_mae.mean()),
                 "c1_qs": float(qs_t.min(axis=1).mean()),
                 "c1_null_qs": float(seeds.min(axis=0).mean()),
-                "c2_qs": float(qs_t.min(axis=1).groupby(month).mean().mean()),
+                "c2_qs": c2_qs,
                 "r1_impl_qs": float(qs_t[sel_best_key(sel_f, region)].mean()),
                 "r1_hindsight_qs": float(qs_t[qs_t.mean().idxmin()].mean()),
-                "r3_hindsight_qs": float(pd.Series(qs_t.min(axis=1).values).groupby(buckets).mean().mean()),
+                "r3_hindsight_qs": r3_qs,
                 "seed_qs_sd": float(np.std(seed_qs_agg, ddof=1)),
                 "seed_mae_sd": float(np.std(seed_mae_agg, ddof=1)),
                 "s2_choices": pd.Series(choices).value_counts().to_dict(),
