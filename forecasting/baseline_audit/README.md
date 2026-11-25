@@ -8,6 +8,10 @@
 
 后续已完成 [Moirai 真实权重全测试集修前/修后对照](MOIRAI_REPLAY.md)：三地区52,563个起点的九个原生分位数逐元素一致，原生预测日期已纠正；主表分数无需改变。
 
+2026-11-25 已重新评分并刷新[主表](../../logs/forecasting/main_comparison_20261023/README.md)：核验全部243个来源格，发布25行/225格，另保留18格历史对照。主表数值、模型排序及预测来源均不变，最大数值差为0。旧版完整备份与[刷新清单](../../outputs/forecasting/main_table_refresh_20261125/manifest.json)、[差异核验](../../outputs/forecasting/main_table_refresh_20261125/comparison.json)保存在 `outputs/forecasting/main_table_refresh_20261125/`。
+
+需要连同最新修复证据再次刷新主表时，提交代码并保持工作区干净，运行 `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. .venv/bin/python -m forecasting.baseline_audit.refresh_main_table --output-dir outputs/forecasting/main_table_refresh_NEW`，使用不存在的新输出目录。该入口先独立生成和验证，再发布主表；不会改写原训练档案，也不会将R27组合结果插入基线行。
+
 ## 范围与不做的事
 
 - 共用排序后五分位评分；重新执行 R25/R27 选择期规则及最终评价。
