@@ -34,6 +34,7 @@ from ..common.foundation_api import PredictionView
 
 
 class Adapter:
+    auxiliary_levels = (0.1, 0.5, 0.9)
     output_type = "point_only"
     deterministic = True  # frozen weights, dropout forced to zero, no sampling
 
@@ -50,7 +51,8 @@ class Adapter:
             "HF_HOME", str(Path(context.config["project_root"]) / "weights" / "hf_home"))
         self.forecast = native.load_forecast(
             prediction_length=24, target_dim=1, feat_dynamic_real_dim=10,
-            past_feat_dynamic_real_dim=1, context_length=72, device=context.device)
+            past_feat_dynamic_real_dim=1, context_length=72, device=context.device,
+            hf_home=self.hf_home)
         self.predictor = native.create_predictor(
             self.forecast, batch_size=self.batch_origins, device=context.device)
         self._identity = None
@@ -68,7 +70,8 @@ class Adapter:
                 "packages": native.package_versions(),
                 "config": {"prediction_length": 24, "context_length": 72,
                            "batch_origins": self.batch_origins, "target_dim": 1,
-                           "feat_dynamic_real_dim": 10, "past_feat_dynamic_real_dim": 1},
+                           "feat_dynamic_real_dim": 10, "past_feat_dynamic_real_dim": 1,
+                           "start_policy": "origin_minus_history_length"},
                 "input_mapping": {
                     "history_values.price": "past_target_raw_rrp_72x1",
                     "history_values.demand": "past_feat_dynamic_real_72x1",
@@ -81,11 +84,12 @@ class Adapter:
                            "native_quantile_levels": list(native.NATIVE_QUANTILE_LEVELS),
                            "q05_q95": "not available natively; no extrapolation or "
                                       "endpoint copying; therefore P table, not Q5",
-                           "auxiliary": "native q10/q90/q20/.../q80 exported to "
+                           "auxiliary": "native q10/q50/q90 exported to "
                                         "auxiliary_quantiles.npz, excluded from the "
                                         "artifact's quantile contract"},
                 "seed_scope": "no_randomness_frozen_weights_zero_shot",
                 "zero_shot": True,
+                "auxiliary_schema": "native_diagnostics_n_h_q_v1",
             }
         return self._identity
 
@@ -105,7 +109,8 @@ class Adapter:
         for start in range(0, len(indices), self.batch_origins):
             stop = min(start + self.batch_origins, len(indices))
             entries = [{
-                "start": pd.Timestamp(int(origin), unit="s", tz="Australia/Brisbane"),
+                "start": pd.Timestamp(int(origin) - price_raw.shape[1] * 3600,
+                                      unit="s", tz="Australia/Brisbane"),
                 "target": price_raw[row],
                 "feat_dynamic_real": calendar[row].T,        # [10, 96]
                 "past_feat_dynamic_real": demand[row][None, :],  # [1, 72]
@@ -122,7 +127,7 @@ class Adapter:
         return {"point": point}
 
     def auxiliary_quantiles(self) -> np.ndarray:
-        """Native q10/q50/q90 from the most recent chunk prediction [n, 3, 24]."""
+        """Native q10/q50/q90 from the most recent chunk prediction [n, 24, 3]."""
         if getattr(self, "_last_auxiliary", None) is None:
             raise ValueError("No chunk prediction has run yet")
-        return self._last_auxiliary
+        return self._last_auxiliary.transpose(0, 2, 1)

@@ -37,7 +37,9 @@ from forecasting.aligned_scoring import load_prediction_artifact, score_predicti
 from forecasting.common.cache import load_split
 from forecasting.common.foundation_api import PredictionView
 from forecasting.common.foundation_registry import FOUNDATION_REGISTRY
-from forecasting.foundation_experiment import FoundationContext, _identity_hash, _predict_indices, _verify_chunk
+from forecasting.foundation_experiment import (
+    FoundationContext, PREDICTION_ARRAY_KEYS, _identity_hash, _predict_indices, _verify_chunk,
+)
 
 REPLAY_SAMPLE = 96
 EXTREME_SAMPLE = 20
@@ -46,6 +48,35 @@ EXTREME_SAMPLE = 20
 # the zero-shot models replay to ~1e-6 relative.
 REPLAY_TOLERANCE = {"tabpfn_v3": 5e-3, "chronos2_zeroshot": 1e-3,
                     "moirai2_zeroshot": 1e-3, "timesfm25_xreg": 1e-3}
+
+
+def _audit_auxiliary(directory, artifact, identity, status, rebuilt, chunk_levels):
+    """Check diagnostic arrays independently of the primary scoring contract."""
+    path = directory / 'auxiliary_quantiles.npz'
+    required = identity.get('auxiliary_schema') == 'native_diagnostics_n_h_q_v1'
+    any_chunks = any('auxiliary_quantiles' in part for part in rebuilt)
+    if not path.exists():
+        if required or any_chunks:
+            raise ValueError(f'Missing declared auxiliary diagnostics: {path}')
+        return 'legacy_missing'
+    if sha(path) != status.get('artifact_hashes', {}).get(path.name):
+        raise ValueError(f'Auxiliary diagnostic hash mismatch: {path}')
+    if not rebuilt or not all('auxiliary_quantiles' in part for part in rebuilt):
+        raise ValueError(f'Auxiliary diagnostics missing from chunks: {path}')
+    with np.load(path, allow_pickle=False) as saved:
+        meta = json.loads(saved['metadata_json'].item())
+        levels = json.loads(saved['levels_json'].item())
+        if meta.get('identity_hash') != _identity_hash(identity):
+            raise ValueError(f'Auxiliary diagnostic identity mismatch: {path}')
+        if not levels or any(values != levels for values in chunk_levels):
+            raise ValueError(f'Auxiliary diagnostic levels mismatch: {path}')
+        if (not np.array_equal(saved['origin_unix'], artifact.origin_unix) or
+                not np.array_equal(saved['target_time_unix'], artifact.target_time_unix)):
+            raise ValueError(f'Auxiliary diagnostic time axis mismatch: {path}')
+        joined = np.concatenate([part['auxiliary_quantiles'] for part in rebuilt], axis=0)
+        if not np.array_equal(joined, saved['quantiles']):
+            raise ValueError(f'Auxiliary diagnostic chunk reassembly mismatch: {path}')
+    return 'verified'
 
 
 def _sample_indices(n: int, actual_rows: np.ndarray) -> np.ndarray:
@@ -88,6 +119,7 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
                 raise ValueError(f"{job['id']}: missing prediction chunks")
             rebuilt = []
             all_indices = []
+            chunk_levels = []
             for path in chunks:
                 with np.load(path, allow_pickle=False) as archive:
                     indices = np.asarray(archive['indices'])
@@ -99,7 +131,8 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
                         raise ValueError(f"{job['id']}: chunk identity mismatch {path.name}")
                     if meta.get('reuse_of_seed') is not None:
                         cell['reuse_of_seed'] = meta['reuse_of_seed']
-                    rebuilt.append({k: archive[k] for k in ('quantiles', 'point') if k in archive})
+                    chunk_levels.append(meta.get('auxiliary_levels'))
+                    rebuilt.append({k: archive[k] for k in PREDICTION_ARRAY_KEYS if k in archive})
             if not np.array_equal(np.concatenate(all_indices), np.arange(len(artifact.origin_unix))):
                 raise ValueError(f"{job['id']}: chunk indices do not cover origins exactly once")
             arrays = [k for k in ('quantiles', 'point') if rebuilt and k in rebuilt[0]]
@@ -109,6 +142,10 @@ def audit_model(model: str, run_root: Path, *, replay=True, device="cuda:0") -> 
                 if not np.array_equal(joined, reference):
                     raise ValueError(f"{job['id']}: chunks do not reassemble the artifact ({key})")
             cell['chunk_reassembly_ok'] = True
+            if (model in ('moirai2_zeroshot', 'timesfm25_xreg') or
+                    any('auxiliary_quantiles' in part for part in rebuilt)):
+                cell['auxiliary_diagnostics'] = _audit_auxiliary(
+                    directory, artifact, identity, status, rebuilt, chunk_levels)
             budget = metadata['model_metadata'].get('budget', {})
             if budget.get('seed_reuse') != 'independent_inference':
                 cell['seed_reuse'] = budget.get('seed_reuse')

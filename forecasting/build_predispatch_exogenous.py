@@ -16,8 +16,8 @@ hour and are flagged by ``predispatch_covered`` = 0.
 AEMO's archive has no run history for October 2022 (only the final-run
 ``_D`` tables, which are not point-in-time). Origins whose latest available run
 is more than six hours old are marked uncovered for all 24 hours and take the
-region's 2015-2021 median of each field, so they carry no predispatch
-information and no future information.
+missing raw values plus an explicit stale-origin mask. The dataset reader fits
+their replacement values on the configured training fold, not in this archive.
 
 Usage::
 
@@ -182,7 +182,6 @@ def _read_month(cache_dir: Path, year: int, month: int) -> pd.DataFrame:
 
 
 STALE_SECONDS = 6 * 3600
-TRAIN_END = pd.Timestamp("2022-01-01")
 
 
 def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str], covered_name: str,
@@ -190,6 +189,8 @@ def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str]
     """Writes, for every hourly origin, the 24 hourly values of the latest run
     available at the origin (``rows``: PREDISPATCHSEQNO, period_end, changed,
     and the value ``columns`` for one region)."""
+    if output.exists():
+        raise FileExistsError(f"Preserve existing forecast archive; use a new output path: {output}")
     # Some monthly archives repeat the first days of the next month (e.g.
     # 2016-08 holds the runs of 1-7 September); keep one copy of each row.
     duplicates = int(rows.duplicated(["PREDISPATCHSEQNO", "period_end"]).sum())
@@ -224,7 +225,8 @@ def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str]
     if np.any(period_end[row_index][covered] != ends[covered]):
         raise RuntimeError(f"{region}: predispatch lookup mismatch")
     half = np.where(covered[..., None], values[row_index], np.nan)
-    hourly = np.nanmean(half.reshape(len(origins), 24, 2, len(columns)), axis=2)
+    # Both half hours are required below; a partial pair is not a valid mean.
+    hourly = half.reshape(len(origins), 24, 2, len(columns)).mean(axis=2)
     hour_covered = covered.reshape(len(origins), 24, 2).all(axis=2)
     hourly[~hour_covered] = np.nan
     stale = origins - run_available[latest] > STALE_SECONDS
@@ -234,13 +236,14 @@ def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str]
     filled = np.stack(
         [pd.DataFrame(hourly[..., f]).ffill(axis=1).to_numpy() for f in range(len(columns))], axis=-1
     )
-    train = (origins < (TRAIN_END - AEST_OFFSET - pd.Timestamp("1970-01-01")).total_seconds()) & ~stale
-    medians = np.nanmedian(filled[train].reshape(-1, len(columns)), axis=0)
-    filled[stale] = medians
-    complete = np.isfinite(filled).all(axis=(1, 2))
+    # Keep stale origins, with their raw missing values, for fold-local fitting.
+    # Non-stale incomplete windows remain excluded as before.
+    complete = np.isfinite(filled).all(axis=(1, 2)) | stale
     np.savez_compressed(
         output,
         forecast_origin_unix=origins[complete],
+        target_time_unix=origins[complete, None] + np.arange(24)[None, :] * 3600,
+        stale_origin_mask=stale[complete],
         **{name: filled[complete][..., i].astype(np.float32) for i, name in enumerate(names)},
         **{covered_name: hour_covered[complete].astype(np.float32)},
         source_run_unix=run_available[latest][complete],
@@ -250,7 +253,7 @@ def _align(region: str, rows: pd.DataFrame, columns: list[str], names: list[str]
     summary = {
         "origins": int(complete.sum()),
         "dropped_origins": int((~complete).sum()),
-        "stale_origins_filled": int((stale & complete).sum()),
+        "stale_origins_pending_fold_imputation": int((stale & complete).sum()),
         "duplicate_rows_dropped": duplicates,
         "covered_hours_share": float(hour_covered[complete].mean()),
         "first_origin": str(pd.to_datetime(origins[complete][0], unit="s") + AEST_OFFSET),

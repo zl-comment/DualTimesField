@@ -54,7 +54,7 @@ class Adapter:
 
         self.hf_home = os.environ.get(
             "HF_HOME", str(Path(context.config["project_root"]) / "weights" / "hf_home"))
-        self.pipeline = native.load_pipeline(context.device)
+        self.pipeline = native.load_pipeline(context.device, hf_home=self.hf_home)
         self._identity = None
 
     def fit(self) -> None:  # zero-shot: nothing to fit, nothing to persist

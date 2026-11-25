@@ -18,12 +18,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from forecasting.aligned_scoring import per_origin_scores as aligned_per_origin_scores
+from forecasting.common.statistics import block_bootstrap_and_jackknife
 FOLDS = ("A", "B", "C")
 REGIONS = ("NSW1", "QLD1", "TAS1")
 Q = np.array([0.05, 0.10, 0.50, 0.90, 0.95])
@@ -37,21 +41,19 @@ QS_HARM, MAE_HARM, QS_FLOOR, MAE_FLOOR = 0.05, 0.15, 2.0, 2.0
 JACKKNIFE_MAX_SHARE = 0.25
 NET_HEADROOM_TRIGGER = 1.00
 BOOTSTRAP_REPS = 2000
-RNG = np.random.default_rng(2026)
 DISTINCT_MODELS = ("lightgbm:2026", "persistence", "snaive", "chronos2", "xgboost")
 CANDIDATE_ORDER = ("lightgbm:2026", "lightgbm:2027", "lightgbm:2028",
                    "persistence", "snaive", "chronos2", "xgboost")
 
 
 def per_origin_scores(actual: np.ndarray, quantiles: np.ndarray):
-    err = actual[..., None] - quantiles
-    pinball = np.maximum(Q * err, (Q - 1) * err).mean(axis=(1, 2))
-    q50 = np.sort(quantiles, axis=-1)[..., 2]
-    return 2 * pinball, np.abs(actual - q50).mean(axis=1)
+    scores = aligned_per_origin_scores(actual, quantiles)
+    return scores["quantile_score_proxy"], scores["mae"]
 
 
 def load_scores(run_dir: Path) -> pd.DataFrame:
     rows = []
+    references = {}
     for fold_dir in sorted(p for p in run_dir.iterdir() if p.name in FOLDS):
         for region_dir in sorted(fold_dir.iterdir()):
             for cell in sorted(region_dir.iterdir()):
@@ -59,6 +61,16 @@ def load_scores(run_dir: Path) -> pd.DataFrame:
                     with np.load(period_file) as z:
                         qs, mae = per_origin_scores(z["actual"], z["quantiles"])
                         origins = z["origin_unix"]
+                        if len(origins) != len(qs) or np.any(np.diff(origins) <= 0):
+                            raise ValueError(f"Unordered or misaligned origins: {period_file}")
+                        reference_key = (fold_dir.name, region_dir.name, period_file.stem)
+                        current = (origins.copy(), z["actual"].copy())
+                        if reference_key in references:
+                            if not all(np.array_equal(a, b) for a, b in
+                                       zip(current, references[reference_key])):
+                                raise ValueError(f"Candidate sample/label mismatch: {period_file}")
+                        else:
+                            references[reference_key] = current
                         cell_name = cell.name
                         if "_seed" in cell_name:
                             model, seed = cell_name.rsplit("_seed", 1)
@@ -127,35 +139,18 @@ def region_equal(series: dict) -> float:
 
 
 def bootstrap_and_jackknife(per_region_paired: dict[str, pd.DataFrame]):
-    """7-day-block bootstrap p and leave-one-day-out max contribution share."""
-    days = None
-    for frame in per_region_paired.values():
-        d = pd.to_datetime(frame.origin, unit="s", utc=True).dt.tz_convert(
-            "Australia/Brisbane").dt.date
-        days = set(d) if days is None else days | set(d)
-    days = np.array(sorted(days))
-    region_day = {}
-    for region, frame in per_region_paired.items():
-        region_day[region] = pd.to_datetime(frame.origin, unit="s", utc=True).dt.tz_convert(
-            "Australia/Brisbane").dt.date.to_numpy()
+    """Synchronous 7-day blocks, preserving resampled multiplicities.
 
-    def delta(day_mask):
-        means = []
-        for region, frame in per_region_paired.items():
-            take = np.isin(region_day[region], days[day_mask])
-            means.append(frame.diff_qs.to_numpy()[take].mean() if take.any() else np.nan)
-        return np.nanmean(means)
-
-    full = delta(np.ones(len(days), dtype=bool))
-    resampled = np.array([delta(RNG.integers(0, len(days), len(days))) for _ in range(BOOTSTRAP_REPS)])
-    p_value = float((resampled <= 0).mean())
-    shares = []
-    for i in range(len(days)):
-        mask = np.ones(len(days), dtype=bool)
-        mask[i] = False
-        shares.append(abs(full - delta(mask)) / abs(full) if full else 0.0)
-    return {"delta": float(full), "bootstrap_p_leq0": p_value,
-            "jackknife_max_day_share": float(np.nanmax(shares))}
+    The historical ``bootstrap_p_leq0`` name denotes an empirical bootstrap
+    tail fraction, not a null-centred hypothesis-test p-value.
+    """
+    days = {region: pd.to_datetime(frame.origin, unit="s", utc=True).dt.tz_convert(
+                "Australia/Brisbane").dt.date.to_numpy()
+            for region, frame in per_region_paired.items()}
+    values = {region: frame.diff_qs.to_numpy() for region, frame in per_region_paired.items()}
+    return block_bootstrap_and_jackknife(values, days, block_days=7,
+                                        repetitions=BOOTSTRAP_REPS, seed=2026,
+                                        alternative="greater")
 
 
 def main():
@@ -163,9 +158,20 @@ def main():
     parser.add_argument("--run-dir", type=Path,
                         default=ROOT / "outputs/forecasting/r25_ceiling_20261119")
     parser.add_argument("--label", default="preliminary")
+    parser.add_argument("--output", type=Path, help="New corrected report; never overwrite a frozen report")
     args = parser.parse_args()
+    out = args.output or args.run_dir / f"analysis_{args.label}.json"
+    if out.exists():
+        raise FileExistsError(f"Preserve the existing analysis; choose a new output: {out}")
 
     scores = load_scores(args.run_dir)
+    expected_candidates = {*(f"lightgbm:{s}" for s in SEEDS), "xgboost:2026",
+                           "chronos2", "persistence", "snaive"}
+    expected_cells = {(f, r, k, p) for f in FOLDS for r in REGIONS
+                      for k in expected_candidates for p in ("selection", "evaluation")}
+    observed_cells = set(scores[["fold", "region", "key", "period"]].itertuples(index=False, name=None))
+    if observed_cells != expected_cells:
+        raise ValueError("R25 requires the complete frozen three-fold, three-region, seven-candidate grid")
     evaluation, selection = scores[scores.period == "evaluation"], scores[scores.period == "selection"]
     present = sorted(evaluation.key.unique())
     quantile_cache = {}
@@ -235,6 +241,7 @@ def main():
                 "seed_qs_sd": float(np.std(seed_qs_agg, ddof=1)),
                 "seed_mae_sd": float(np.std(seed_mae_agg, ddof=1)),
                 "s2_choices": pd.Series(choices).value_counts().to_dict(),
+                "selected_by_bucket": {str(b): policy[(region, b)][0] for b in range(4)},
                 "admitted_by_bucket": {str(b): policy[(region, b)][1] for b in range(4)},
                 "bucket_bounds": bounds[region].tolist(),
             }
@@ -268,7 +275,8 @@ def main():
         }
     def c_pass(key):
         return (sum(g[key]["bootstrap_p_leq0"] < 0.05 for g in gate.values()) >= 2
-                and all(g[key]["jackknife_max_day_share"] < JACKKNIFE_MAX_SHARE
+                and all(g[key]["jackknife_max_day_share"] is not None
+                        and g[key]["jackknife_max_day_share"] < JACKKNIFE_MAX_SHARE
                         for g in gate.values()))
     verdict = {
         "G1_a": all(g["a_pass"] for g in gate.values()),
@@ -296,18 +304,24 @@ def main():
             g["delta_s2"] > 0 or g["s1"] < g["r0"] or g["s3"] < g["r0"] for g in gate.values()),
     }
 
-    out = args.run_dir / f"analysis_{args.label}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"candidates": present, "gate": gate, "verdict": verdict,
-                               "trigger_5_4": trigger, "folds": folds_out},
-                              indent=2, default=str))
+                               "trigger_5_4": trigger, "folds": folds_out,
+                               "correction": {"scoring": "shared_sorted_five_quantile_score",
+                                   "selection_recomputed": True,
+                                   "statistics": "synchronous_nonoverlapping_7_calendar_day_blocks",
+                                   "bootstrap_note": "Empirical tail fractions are not null-centred p-values; historical gate thresholds unchanged."}},
+                              indent=2, default=str, allow_nan=False))
     print(f"wrote {out}")
     print("candidates:", present)
     for fold, g in gate.items():
+        jackknife = g['robust_s3']['jackknife_max_day_share']
+        jackknife_text = "undefined" if jackknife is None else f"{jackknife:.1%}"
         print(f"fold {fold}: R0={g['r0']:.2f} S2={g['s2']:.2f} Δ={g['delta_s2']:+.3f} "
               f"({g['delta_rel']:+.2%}) S3={g['s3']:.2f} Δ3={g['delta_s3']:+.3f} "
               f"({g['delta_s3_rel']:+.2%}) net={g['net_headroom']:+.2f} "
               f"p2={g['robust']['bootstrap_p_leq0']:.3f} p3={g['robust_s3']['bootstrap_p_leq0']:.3f} "
-              f"jk3={g['robust_s3']['jackknife_max_day_share']:.1%}")
+              f"jk3={jackknife_text}")
     print("verdict:", verdict, "| §5.4 trigger:", trigger)
 
 

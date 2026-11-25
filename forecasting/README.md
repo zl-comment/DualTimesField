@@ -4,6 +4,8 @@
 
 当前 19 个基线（15 个静态基线及 4 个基础模型）的[论文链接与引用总索引](CITATIONS.md)提供代码入口及各目录可复制的 `CITATIONS.bib`；引用用途和本地适配范围见对应 `source.json`。
 
+2026-11-25 的[必要修复与最小重算](baseline_audit/README.md)记录统一评分、统计检验、基础模型接口及输入数据约束的修复；原冻结结果保留，修正结果单独归档。
+
 当前结果见[主比较入口](../logs/forecasting/main_comparison_20261023/README.md)：新版 Full_joint 已完成三神经种子同协议评估，当前主表为 25 个输出、225 格，包含 15 个静态基线、4 个基础模型和联合方法的 6 个输出。旧静态 Full/no_fields 的 18 格移入历史附表。原 17 模型、153 格静态基线档案保留不变。
 
 当前 Full_joint 使用[平衡损失与非对称 Anchor 尺度头](full_v5_anchor_balance/README.md)，通过 `forecasting.full_v5_anchor_balance.aligned_final` 训练/评估；下方 `full/` 为历史静态结构，不是当前完整方法。
