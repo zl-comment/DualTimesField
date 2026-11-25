@@ -26,6 +26,16 @@ INPUT_KEYS = (
 )
 
 
+def annotate_cached_input_contracts(metadata: Mapping) -> dict:
+    """Do not invent timestamp or imputation provenance for frozen old caches."""
+    result = copy.deepcopy(dict(metadata))
+    result.setdefault("exogenous_delivery_time_contracts", {
+        "status": "unverified_legacy_cache_no_recorded_delivery_time_contract"})
+    result.setdefault("exogenous_imputation_contracts", {
+        "status": "unverified_legacy_cache_no_recorded_imputation_contract"})
+    return result
+
+
 def _array_hash(arrays: Mapping[str, np.ndarray]) -> str:
     digest = hashlib.sha256()
     for name, values in arrays.items():
@@ -234,6 +244,8 @@ def build_aligned_splits(
             "input_block_order": list(INPUT_KEYS),
             "load_end_exclusive": config["data"]["load_end_exclusive"],
             "availability_audit": "archive_timestamp_proxies_only",
+            "exogenous_delivery_time_contracts": dict(dataset.exogenous_time_contracts),
+            "exogenous_imputation_contracts": dict(dataset.exogenous_imputation_contracts),
         }
         result[name] = AlignedSplit(inputs, actual, origins, target_times, metadata, target, dataset)
     return result

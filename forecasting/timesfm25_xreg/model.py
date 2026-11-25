@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from ..common.foundation_weights import verified_checkpoint
 
 WEIGHT_REPO = "google/timesfm-2.5-200m-pytorch"
 FORECAST_CONFIG = dict(
@@ -43,16 +44,18 @@ QUANTILE_CHANNEL_LEVELS = ("mean", 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 MEDIAN_CHANNEL = 5  # index of q50 in the 10-channel output
 
 
-def load_model(device: str):
+def load_model(device: str, hf_home=None):
     """Frozen TimesFM-2.5-200M pytorch checkpoint via the official 2.5 API.
 
     torch_compile stays off (official flag): eager kernels keep per-chunk
     inference deterministic across resume boundaries and avoid a JIT dependency
     inside offline workers.
     """
+    snapshot, _ = verified_checkpoint(__file__, hf_home)
     import timesfm
 
-    model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(WEIGHT_REPO, torch_compile=False)
+    model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(
+        str(snapshot), local_files_only=True, torch_compile=False)
     model.model.to(device)
     return model
 
@@ -98,18 +101,8 @@ def predict_with_xreg(model, *, inputs: list[np.ndarray],
 
 
 def weight_identity(hf_home: str | Path) -> dict[str, Any]:
-    import hashlib
     import json
-
-    root = Path(hf_home) / "hub" / "models--google--timesfm-2.5-200m-pytorch"
-    revision = (root / "refs" / "main").read_text().strip()
-    snapshot = root / "snapshots" / revision
-    weights = snapshot / "model.safetensors"
-    digest = hashlib.sha256()
-    with weights.open("rb") as stream:
-        for block in iter(lambda: stream.read(1 << 20), b""):
-            digest.update(block)
+    snapshot, identity = verified_checkpoint(__file__, hf_home)
     config = json.loads((snapshot / "config.json").read_text())
-    return {"repo": WEIGHT_REPO, "revision": revision, "file": "model.safetensors",
-            "sha256": digest.hexdigest(), "size_bytes": weights.stat().st_size,
+    return {**identity,
             "config_keys": sorted(config)}

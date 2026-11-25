@@ -273,6 +273,8 @@ def _write_region(
     stpasa_runs: dict[int, dict[str, object]],
     output: Path,
 ) -> dict:
+    if output.exists():
+        raise FileExistsError(f"Preserve existing forecast archive; use a new output path: {output}")
     origins = []
     values = []
     source_pdpasa_run = []
@@ -375,6 +377,7 @@ def _write_region(
     np.savez_compressed(
         output,
         forecast_origin_unix=np.asarray(origins, dtype=np.int64),
+        target_time_unix=np.asarray(origins, dtype=np.int64)[:, None] + np.arange(24)[None, :] * 3600,
         **{name: stacked[..., index] for index, (name, _, _) in enumerate(FIELDS)},
         source_run_unix=np.asarray(source_pdpasa_run, dtype=np.int64),
         source_stpasa_run_unix=np.asarray(source_stpasa_run, dtype=np.int64),
@@ -441,6 +444,8 @@ def merge_yearly(shard_root: Path, start_year: int, end_year: int, output_dir: P
     end = _unix_seconds(datetime(end_year + 1, 1, 1, tzinfo=AEST))
     for region in REGIONS:
         name = f"{region.lower()}_pdpasa.npz"
+        if (output_dir / name).exists():
+            raise FileExistsError(f"Preserve existing forecast archive; use a new output directory: {output_dir}")
         parts = []
         for year in range(start_year, end_year + 1):
             with np.load(shard_root / str(year) / name) as archive:

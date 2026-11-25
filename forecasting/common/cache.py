@@ -1,6 +1,6 @@
 """Read and verify a single frozen aligned split without loading other periods."""
 import numpy as np
-from ..aligned_inputs import INPUT_KEYS, AlignedSplit
+from ..aligned_inputs import INPUT_KEYS, AlignedSplit, annotate_cached_input_contracts
 from ..aligned_experiment import sha, read_json
 
 
@@ -19,4 +19,4 @@ def load_split(root, manifest, region, name):
         return np.load(cache / name / f'{key}.npy', mmap_mode='r', allow_pickle=False)
     return AlignedSplit({key: array(f'input__{key}') for key in INPUT_KEYS}, array('actual'),
                         array('origin_unix'), array('target_time_unix'),
-                        read_json(cache / name / 'metadata.json'), array('target'))
+                        annotate_cached_input_contracts(read_json(cache / name / 'metadata.json')), array('target'))

@@ -47,6 +47,7 @@ CALENDAR_NAMES = tuple(f"cal_{index}" for index in range(10))
 
 
 class Adapter:
+    auxiliary_levels = ("mean", 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
     output_type = "point_only"
     deterministic = True  # frozen weights; deterministic kernels + LS fit given hardware
 
@@ -64,7 +65,7 @@ class Adapter:
 
         self.hf_home = os.environ.get(
             "HF_HOME", str(Path(context.config["project_root"]) / "weights" / "hf_home"))
-        self.model = native.load_model(context.device)
+        self.model = native.load_model(context.device, hf_home=self.hf_home)
         self.config = native.compile_model(self.model)
         self._identity = None
 
@@ -109,6 +110,7 @@ class Adapter:
                                           "outputs on nonneg-history origins only",
                 "seed_scope": "no_randomness_frozen_weights_deterministic_ls_fit",
                 "zero_shot_backbone": True,
+                "auxiliary_schema": "native_diagnostics_n_h_q_v1",
             }
             if "maintenance_selection" in self.context.config:
                 self._identity["external_development_selection"] = self.context.config["maintenance_selection"]

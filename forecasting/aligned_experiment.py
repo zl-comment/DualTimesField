@@ -25,7 +25,7 @@ import traceback
 import numpy as np
 import yaml
 
-from .aligned_inputs import AlignedSplit, INPUT_KEYS, build_aligned_splits
+from .aligned_inputs import AlignedSplit, INPUT_KEYS, build_aligned_splits, annotate_cached_input_contracts
 from .aligned_runner import NEURAL_MODELS, fit_neural
 from .aligned_scoring import (QUANTILE_LEVELS, make_prediction_artifact,
                               save_prediction_artifact, score_predictions, load_prediction_artifact)
@@ -143,7 +143,7 @@ def load_cache(root, expected_hashes_hash):
             return np.load(folder / f'{key}.npy', mmap_mode='r', allow_pickle=False)
         result[name] = AlignedSplit(
             {k: array(f'input__{k}') for k in INPUT_KEYS}, array('actual'), array('origin_unix'),
-            array('target_time_unix'), read_json(folder / 'metadata.json'), array('target'))
+            array('target_time_unix'), annotate_cached_input_contracts(read_json(folder / 'metadata.json')), array('target'))
     return result
 
 

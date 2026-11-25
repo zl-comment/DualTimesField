@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from ..common.foundation_weights import verified_checkpoint
 
 WEIGHT_REPO = "amazon/chronos-2"
 NATIVE_QUANTILES = (0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
@@ -28,19 +29,17 @@ NATIVE_QUANTILES = (0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
 COMMON_LEVELS = (0.05, 0.1, 0.5, 0.9, 0.95)
 
 
-def load_pipeline(device: str):
+def load_pipeline(device: str, hf_home=None):
     """Frozen Chronos-2 pipeline on the pinned public checkpoint."""
+    snapshot, _ = verified_checkpoint(__file__, hf_home)
     from chronos import Chronos2Pipeline
 
-    return Chronos2Pipeline.from_pretrained(WEIGHT_REPO, device_map=device)
+    return Chronos2Pipeline.from_pretrained(str(snapshot), device_map=device, local_files_only=True)
 
 
 def snapshot_files(hf_home: str | Path) -> list[str]:
-    root = Path(hf_home) / "hub" / "models--amazon--chronos-2" / "snapshots"
-    if not root.exists():
-        raise FileNotFoundError("amazon/chronos-2 not downloaded; see ENVIRONMENT.md")
-    latest = sorted(root.iterdir())[-1]
-    return [str(p.relative_to(latest)) for p in sorted(latest.rglob("*")) if p.is_file()]
+    snapshot, _ = verified_checkpoint(__file__, hf_home)
+    return [str(p.relative_to(snapshot)) for p in sorted(snapshot.rglob("*")) if p.is_file()]
 
 
 def package_versions() -> dict[str, str]:
@@ -76,21 +75,10 @@ def predict_common_quantiles(pipeline, inputs: list[dict], *, batch_size: int,
 
 
 def weight_identity(hf_home: str | Path) -> dict[str, Any]:
-    import hashlib
     import json
-
-    root = Path(hf_home) / "hub" / "models--amazon--chronos-2"
-    revision = (root / "refs" / "main").read_text().strip()
-    snapshot = root / "snapshots" / revision
-    weights = snapshot / "model.safetensors"
-    digest = hashlib.sha256()
-    with weights.open("rb") as stream:
-        for block in iter(lambda: stream.read(1 << 20), b""):
-            digest.update(block)
+    snapshot, identity = verified_checkpoint(__file__, hf_home)
     config = json.loads((snapshot / "config.json").read_text())["chronos_config"]
-    return {"repo": WEIGHT_REPO, "revision": revision,
-            "file": "model.safetensors", "sha256": digest.hexdigest(),
-            "size_bytes": weights.stat().st_size,
+    return {**identity,
             "native_quantile_levels": config["quantiles"],
             "use_arcsinh": config["use_arcsinh"],
             "context_length_limit": config["context_length"]}

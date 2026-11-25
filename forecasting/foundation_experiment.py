@@ -59,6 +59,7 @@ from .common.foundation_registry import (
 )
 
 SPLITS = ('train', 'selection', 'calibration', 'test')
+PREDICTION_ARRAY_KEYS = ('quantiles', 'point', 'auxiliary_quantiles')
 
 # Crash-safe resume: chunk ledgers and fit state must survive worker restarts;
 # only transient outputs of an unfinished attempt are archived away.
@@ -304,7 +305,8 @@ def _save_chunk(directory: Path, index: int, meta: dict, payload: dict) -> None:
     atomic_json(ledger_path, ledger)
 
 
-def _verify_chunk(path: Path, identity_hash: str, indices: np.ndarray) -> dict | None:
+def _verify_chunk(path: Path, identity_hash: str, indices: np.ndarray,
+                  *, require_auxiliary: bool = False) -> dict | None:
     """Return stored payload if the chunk matches identity, ledger and rows."""
     try:
         ledger_path = path.parent / 'chunks_manifest.json'
@@ -319,12 +321,21 @@ def _verify_chunk(path: Path, identity_hash: str, indices: np.ndarray) -> dict |
             if not np.array_equal(archive['indices'], indices):
                 return None
             payload = {'indices': archive['indices']}
-            for key in ('quantiles', 'point'):
+            for key in PREDICTION_ARRAY_KEYS:
                 if key in archive:
                     payload[key] = archive[key]
-            expected = {'quantiles', 'point'} & set(meta.get('outputs', []))
-            if expected != set(k for k in ('quantiles', 'point') if k in payload):
+            expected = set(PREDICTION_ARRAY_KEYS) & set(meta.get('outputs', []))
+            if expected != set(k for k in PREDICTION_ARRAY_KEYS if k in payload):
                 return None
+            auxiliary = payload.get('auxiliary_quantiles')
+            if require_auxiliary and auxiliary is None:
+                return None
+            if auxiliary is not None:
+                primary = payload.get('point', payload.get('quantiles'))
+                levels = meta.get('auxiliary_levels', [])
+                if (primary is None or not levels or
+                        auxiliary.shape != (len(indices), primary.shape[1], len(levels))):
+                    return None
             if not all(np.isfinite(payload[key]).all() for key in expected):
                 return None
             return payload
@@ -414,6 +425,9 @@ def worker(root, job_id, device, *, allow_download=False):
             raise ValueError(f"{job['model']} adapter output_type disagrees with the registry")
         identity = adapter.identity()
         identity_hash = _identity_hash(identity)
+        require_auxiliary = callable(getattr(adapter, 'auxiliary_quantiles', None))
+        auxiliary_meta = ({'auxiliary_levels': list(adapter.auxiliary_levels)}
+                          if require_auxiliary else {})
         fit_started = time.monotonic()
         adapter.fit()
         fit_seconds = time.monotonic() - fit_started
@@ -465,13 +479,15 @@ def worker(root, job_id, device, *, allow_download=False):
                 copied = True
                 for index, (start, stop) in enumerate(boundaries):
                     source = reference_dir / 'predictions' / 'chunks' / f'chunk_{index:05d}.npz'
-                    payload = _verify_chunk(source, identity_hash, np.arange(start, stop))
+                    payload = _verify_chunk(source, identity_hash, np.arange(start, stop),
+                                            require_auxiliary=require_auxiliary)
                     if payload is None:
                         copied = False
                         break
                     meta = {'job_id': job_id, 'seed': job['seed'], 'chunk': index,
                             'start': start, 'stop': stop, 'identity_hash': identity_hash,
-                            'outputs': sorted(k for k in ('quantiles', 'point') if payload.get(k) is not None),
+                            'outputs': sorted(k for k in PREDICTION_ARRAY_KEYS if payload.get(k) is not None),
+                            **auxiliary_meta,
                             'reuse_of_seed': first_seed,
                             'input_slice_hash': view.input_slice_hash(np.arange(start, stop))}
                     _save_chunk(directory / 'predictions', index, meta, payload)
@@ -490,7 +506,8 @@ def worker(root, job_id, device, *, allow_download=False):
             for index, (start, stop) in enumerate(boundaries):
                 indices = np.arange(start, stop)
                 path = chunks_dir / f'chunk_{index:05d}.npz'
-                payload = _verify_chunk(path, identity_hash, indices)
+                payload = _verify_chunk(path, identity_hash, indices,
+                                        require_auxiliary=require_auxiliary)
                 if payload is None:
                     if path.exists():
                         archive = directory / 'attempts' / str(time.time_ns())
@@ -502,7 +519,8 @@ def worker(root, job_id, device, *, allow_download=False):
                     predict_seconds += time.monotonic() - chunk_started
                     meta = {'job_id': job_id, 'seed': job['seed'], 'chunk': index,
                             'start': start, 'stop': stop, 'identity_hash': identity_hash,
-                            'outputs': sorted(k for k in ('quantiles', 'point') if payload.get(k) is not None),
+                            'outputs': sorted(k for k in PREDICTION_ARRAY_KEYS if payload.get(k) is not None),
+                            **auxiliary_meta,
                             'input_slice_hash': view.input_slice_hash(indices)}
                     _save_chunk(directory / 'predictions', index, meta, payload)
                     progress({'event': 'chunk_done', 'chunk': index, 'start': start, 'stop': stop,
@@ -513,7 +531,7 @@ def worker(root, job_id, device, *, allow_download=False):
         payloads = []
         for index, (start, stop) in enumerate(boundaries):
             payload = _verify_chunk(chunks_dir / f'chunk_{index:05d}.npz', identity_hash,
-                                    np.arange(start, stop))
+                                    np.arange(start, stop), require_auxiliary=require_auxiliary)
             if payload is None:
                 raise ValueError(f'Chunk {index} missing or invalid after prediction pass')
             payloads.append(payload)
@@ -562,12 +580,28 @@ def worker(root, job_id, device, *, allow_download=False):
             metadata=metadata, quantiles=quantiles, point=point,
             quantile_levels=QUANTILE_LEVELS if quantiles is not None else None)
         save_prediction_artifact(directory / 'test.npz', artifact)
+        auxiliary_path = directory / 'auxiliary_quantiles.npz'
+        if require_auxiliary:
+            auxiliary = np.concatenate([p['auxiliary_quantiles'] for p in payloads], axis=0)
+            temporary = auxiliary_path.with_suffix('.tmp.npz')
+            with temporary.open('wb') as stream:
+                np.savez_compressed(
+                    stream, quantiles=auxiliary,
+                    levels_json=np.asarray(json.dumps(auxiliary_meta['auxiliary_levels'])),
+                    origin_unix=view.origin_unix, target_time_unix=view.target_time_unix,
+                    metadata_json=np.asarray(json.dumps({
+                        'schema': 'native_diagnostics_n_h_q_v1',
+                        'identity_hash': identity_hash, 'seed': job['seed'],
+                        'model': job['model'], 'scoring_use': 'diagnostic_only',
+                        'reuse': reuse_evidence or 'independent_inference'}, allow_nan=False)))
+            temporary.replace(auxiliary_path)
         atomic_json(directory / 'metrics.json', score_predictions(artifact))
         verify_snapshot(root, manifest)
         chunk_files = sorted(chunks_dir.glob('chunk_*.npz'))
         status.update(state='completed', ended_at=_now(), seconds=total_seconds,
                       artifact_hashes={str(path.relative_to(directory)): sha(path)
                                        for path in [directory / 'test.npz', directory / 'metrics.json',
+                                                    *([auxiliary_path] if require_auxiliary else []),
                                                     *[f for f in chunk_files],
                                                     *([directory / 'models' / 'fit_state.json']
                                                       if (directory / 'models' / 'fit_state.json').exists() else [])]
@@ -593,6 +627,15 @@ def _predict_indices(adapter, view: PredictionView, indices: np.ndarray, note: s
         if not np.isfinite(array).all():
             raise FloatingPointError(f"Non-finite {key} from adapter ({note})")
         result[key] = array
+    if callable(getattr(adapter, 'auxiliary_quantiles', None)):
+        auxiliary = np.asarray(adapter.auxiliary_quantiles(), dtype=np.float64)
+        levels = tuple(adapter.auxiliary_levels)
+        shape = (len(indices), view.target_time_unix.shape[1], len(levels))
+        if not levels or auxiliary.shape != shape:
+            raise ValueError(f'Auxiliary prediction shape {auxiliary.shape}, expected {shape}')
+        if not np.isfinite(auxiliary).all():
+            raise FloatingPointError(f'Non-finite auxiliary quantiles ({note})')
+        result['auxiliary_quantiles'] = auxiliary
     return result
 
 
@@ -612,6 +655,16 @@ def _load_completed_predictions(reference_dir: Path, indices: np.ndarray) -> dic
             result['quantiles'] = artifact.quantiles[indices]
         if artifact.native_point is not None:
             result['point'] = artifact.native_point[indices]
+        auxiliary_path = reference_dir / 'auxiliary_quantiles.npz'
+        if auxiliary_path.exists():
+            with np.load(auxiliary_path, allow_pickle=False) as auxiliary:
+                meta = json.loads(auxiliary['metadata_json'].item())
+                if meta['identity_hash'] != result['identity_hash']:
+                    return None
+                if (not np.array_equal(auxiliary['origin_unix'], artifact.origin_unix) or
+                        not np.array_equal(auxiliary['target_time_unix'], artifact.target_time_unix)):
+                    return None
+                result['auxiliary_quantiles'] = auxiliary['quantiles'][indices]
         return result
     except Exception:
         return None
@@ -625,13 +678,17 @@ def _reuse_compare(subset: dict, reference: dict, tolerance: float) -> tuple[boo
     adapter identity must still match exactly.
     """
     worst = 0.0
-    for key in ('quantiles', 'point'):
+    for key in PREDICTION_ARRAY_KEYS:
         left, right = subset.get(key), reference.get(key)
         if (left is None) != (right is None):
             return False, float('inf')
         if left is None:
             continue
+        if np.shape(left) != np.shape(right):
+            return False, float('inf')
         diff = float(np.abs(np.asarray(left) - np.asarray(right)).max())
+        if not np.isfinite(diff):
+            return False, float('inf')
         worst = max(worst, diff)
     return bool(worst <= tolerance), worst
 

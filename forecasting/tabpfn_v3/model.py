@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from ..common.foundation_weights import verified_checkpoint
 
 WEIGHT_REPO = "Prior-Labs/tabpfn_3"
 WEIGHT_FILE = "tabpfn-v3-regressor-v3_default.ckpt"
@@ -33,13 +34,8 @@ WEIGHT_FILE = "tabpfn-v3-regressor-v3_default.ckpt"
 
 def resolve_checkpoint_path(hf_home: str | Path) -> Path:
     """Locate the pinned V3 regressor checkpoint inside the shared HF cache."""
-    pattern = Path(hf_home) / "hub" / "models--Prior-Labs--tabpfn_3" / "snapshots"
-    matches = sorted(pattern.rglob(WEIGHT_FILE))
-    if not matches:
-        raise FileNotFoundError(
-            f"TabPFN V3 checkpoint not downloaded under {pattern}. "
-            "Run the download step in ENVIRONMENT.md once; workers run offline.")
-    return matches[0].resolve()
+    snapshot, identity = verified_checkpoint(__file__, hf_home)
+    return (snapshot / identity["file"]).resolve()
 
 
 def create_regressor(checkpoint: Path, *, device: str, random_state: int):
@@ -92,7 +88,5 @@ def sha256_file(path: Path) -> str:
 
 
 def weight_identity(hf_home: str | Path) -> dict[str, Any]:
-    checkpoint = resolve_checkpoint_path(hf_home)
-    return {"repo": WEIGHT_REPO, "file": WEIGHT_FILE,
-            "path": str(checkpoint), "sha256": sha256_file(checkpoint),
-            "size_bytes": checkpoint.stat().st_size}
+    snapshot, identity = verified_checkpoint(__file__, hf_home)
+    return {**identity, "path": str((snapshot / identity["file"]).resolve())}

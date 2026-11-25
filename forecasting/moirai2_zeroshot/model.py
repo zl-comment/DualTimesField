@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from ..common.foundation_weights import verified_checkpoint
 
 WEIGHT_REPO = "Salesforce/moirai-2.0-R-small"
 SOURCE_COMMIT = "cfd46d4510ed8896f263116f32928eede05b0a75"
@@ -36,11 +37,12 @@ NATIVE_QUANTILE_LEVELS = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 
 def load_forecast(*, prediction_length: int, target_dim: int,
                   feat_dynamic_real_dim: int, past_feat_dynamic_real_dim: int,
-                  context_length: int, device: str):
+                  context_length: int, device: str, hf_home=None):
     """Frozen Moirai-2.0-R-small wrapped in the official forecast wrapper."""
+    snapshot, _ = verified_checkpoint(__file__, hf_home)
     from uni2ts.model.moirai2 import Moirai2Forecast, Moirai2Module
 
-    module = Moirai2Module.from_pretrained(WEIGHT_REPO)
+    module = Moirai2Module.from_pretrained(str(snapshot), local_files_only=True)
     forecast = Moirai2Forecast(
         prediction_length=prediction_length, target_dim=target_dim,
         feat_dynamic_real_dim=feat_dynamic_real_dim,
@@ -94,19 +96,9 @@ def package_versions() -> dict[str, str]:
 
 
 def weight_identity(hf_home: str | Path) -> dict[str, Any]:
-    import hashlib
     import json
-
-    root = Path(hf_home) / "hub" / "models--Salesforce--moirai-2.0-R-small"
-    revision = (root / "refs" / "main").read_text().strip()
-    snapshot = root / "snapshots" / revision
-    weights = snapshot / "model.safetensors"
-    digest = hashlib.sha256()
-    with weights.open("rb") as stream:
-        for block in iter(lambda: stream.read(1 << 20), b""):
-            digest.update(block)
+    snapshot, identity = verified_checkpoint(__file__, hf_home)
     config = json.loads((snapshot / "config.json").read_text())
-    return {"repo": WEIGHT_REPO, "revision": revision, "file": "model.safetensors",
-            "sha256": digest.hexdigest(), "size_bytes": weights.stat().st_size,
+    return {**identity,
             "config": {key: config[key] for key in
                        ("quantile_levels", "patch_size", "max_seq_len", "d_model", "num_layers")}}

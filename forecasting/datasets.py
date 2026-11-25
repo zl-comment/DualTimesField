@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Mapping, Sequence
 
@@ -38,6 +39,65 @@ class PriceTransform:
 
 # Forecast blocks appended to the future exogenous inputs, in this order.
 APPENDED_FUTURE_BLOCKS = ("predispatch_exogenous", "interconnector_exogenous")
+
+# Audited against aligned_baselines_20261012/jobs.json data_hashes and its
+# frozen builder (TRAIN_END=2022-01-01). Only these exact legacy bytes may keep
+# their original float64-derived, float32-archived fills for that same fold.
+_LEGACY_PREDISPATCH_2015_2021_HASHES = frozenset({
+    "51d73fd24db3b881b78bd0763df421859d2b84383a7bf85ccf44674faf3697c3",
+    "9c3d1cb6a78870c4768de86c0131d4a55279bbbf2723cf63f20ddc90eecc4ab2",
+    "79ba498e6e86551b79109188671bbb288687f72b068f23caae6aa2b896bfc573",
+    "b2860934f779a1d25011847e42ec290f66685d8cf9e429c9e49eb42121af67c6",
+    "c5d0cefe3a17ce7d89a926fd5b6fbc6b2884dc99dc09a2b8056f8f9bef888b18",
+    "9fcb09b617bf6b68d90eb5b0fededcc2fbff14ec85864f7183ceb3ae58d09c4c",
+})
+
+
+def _legacy_imputation_matches_fold(path, config):
+    data = config["data"]
+    bounds = data["split_boundaries"]["train"]
+    for name, expected in (("start", "2015-01-01"), ("end_exclusive", "2022-01-01")):
+        stamp = pd.Timestamp(bounds[name])
+        if stamp.tzinfo is None:
+            stamp = stamp.tz_localize(data["timezone"])
+        if stamp != pd.Timestamp(expected, tz="Australia/Brisbane"):
+            return False
+    with Path(path).open("rb") as stream:
+        digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    return digest in _LEGACY_PREDISPATCH_2015_2021_HASHES
+
+
+def _impute_stale_forecasts(raw_values, origins, stale, feature_names, config):
+    """Replace stale forecast vintages using only this fold's training origins.
+
+    The archive's older format already contains fixed-2015--2021 replacements;
+    these are deliberately ignored at stale origins. Coverage flags stay zero.
+    Fit before target transforms, using all training-period forecast origins,
+    matching the historical formal-fold statistic (rather than target windows).
+    """
+    if not stale.any():
+        return raw_values
+    data = config["data"]
+    bounds = data["split_boundaries"]["train"]
+    def unix(value):
+        stamp = pd.Timestamp(value)
+        if stamp.tzinfo is None:
+            stamp = stamp.tz_localize(data["timezone"])
+        return int(stamp.timestamp())
+    train = (origins >= unix(bounds["start"])) & (origins < unix(bounds["end_exclusive"])) & ~stale
+    if not train.any():
+        raise ValueError("No non-stale training forecasts for fold-local imputation")
+    result = raw_values.copy()
+    for index, name in enumerate(feature_names):
+        if name in {"predispatch_covered", "ic_covered"}:
+            result[stale, :, index] = 0.0
+            continue
+        values = raw_values[train, :, index]
+        if not np.isfinite(values).all():
+            raise ValueError(f"Non-finite training forecast values for {name}")
+        # Archive precision is float32; preserve it before downstream transforms.
+        result[stale, :, index] = np.float32(np.median(values))
+    return result
 
 
 def _fit_price_transform(kind: str, train_prices: np.ndarray) -> PriceTransform:
@@ -350,6 +410,8 @@ class AEMOForecastDataset(Dataset):
             frame[data_config["delivery_column"]]
         )
         self.origin_indices = _valid_origins(frame, config, split)
+        self.exogenous_time_contracts: dict[str, str] = {}
+        self.exogenous_imputation_contracts: dict[str, str] = {}
         self.future_exogenous_feature_names: tuple[str, ...] = ()
         self.future_exogenous_standardizer = None
         self.future_exogenous_by_origin: dict[int, np.ndarray] = {}
@@ -417,6 +479,8 @@ class AEMOForecastDataset(Dataset):
                 else np.zeros_like(source_runs)
             )
             source_last_changed = archive["source_last_changed_unix"].astype(np.int64)
+            target_times = archive["target_time_unix"].copy() if "target_time_unix" in archive.files else None
+            stale_mask = archive["stale_origin_mask"].copy() if "stale_origin_mask" in archive.files else None
         # Exclude later forecast vintages before validation or fitting. Reading
         # an NPZ container is distinct from using its later rows in development.
         cutoff = config["data"].get("load_end_exclusive")
@@ -429,6 +493,10 @@ class AEMOForecastDataset(Dataset):
             source_runs = source_runs[keep]
             source_stpasa_runs = source_stpasa_runs[keep]
             source_last_changed = source_last_changed[keep]
+            if target_times is not None:
+                target_times = target_times[keep]
+            if stale_mask is not None:
+                stale_mask = stale_mask[keep]
         if raw_values.shape != (len(origins), self.output_hours, len(feature_names)):
             raise ValueError(
                 f"{block} values for {region} must have shape "
@@ -436,6 +504,24 @@ class AEMOForecastDataset(Dataset):
             )
         if len(np.unique(origins)) != len(origins):
             raise ValueError(f"Duplicate future exogenous origins for {region}")
+        if target_times is not None:
+            expected = origins[:, None] + np.arange(self.output_hours)[None, :] * 3600
+            if target_times.shape != expected.shape or not np.array_equal(target_times, expected):
+                raise ValueError(f"Misaligned external forecast delivery timestamps for {region}/{block}")
+            self.exogenous_time_contracts[block] = "verified_archive_target_time_unix"
+        else:
+            self.exogenous_time_contracts[block] = "unverified_legacy_archive_no_delivery_timestamps"
+        if block in APPENDED_FUTURE_BLOCKS:
+            inferred_stale = origins - source_last_changed > 6 * 3600
+            if stale_mask is not None and (stale_mask.dtype != np.bool_
+                    or stale_mask.shape != origins.shape or not np.array_equal(stale_mask, inferred_stale)):
+                raise ValueError(f"Invalid stale-origin mask for {region}/{block}")
+            if stale_mask is None and _legacy_imputation_matches_fold(path, config):
+                self.exogenous_imputation_contracts[block] = "verified_legacy_2015_2021_fill_preserved_by_sha256"
+            else:
+                raw_values = _impute_stale_forecasts(
+                    raw_values, origins, inferred_stale, feature_names, config)
+                self.exogenous_imputation_contracts[block] = "fold_train_raw_median_float32"
         price_features = exogenous_config.get("price_features", [])
         for name in price_features:
             # Forecast prices (e.g. AEMO predispatch) go through the target's

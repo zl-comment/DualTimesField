@@ -180,6 +180,42 @@ def _point_metrics(point: np.ndarray, actual: np.ndarray) -> dict[str, float]:
     return {"mae": float(np.abs(error).mean()), "rmse_pooled": float(np.sqrt(np.square(error).mean()))}
 
 
+def _quantile_cell_scores(actual: Any, quantiles: Any) -> dict[str, np.ndarray]:
+    """The single raw-price/rearrangement implementation for all aggregations."""
+    y = _finite_array(actual, "actual")
+    raw = _finite_array(quantiles, "quantiles")
+    if y.ndim != 2 or 0 in y.shape:
+        raise ValueError("actual must have nonempty shape [N,H]")
+    if raw.shape != (*y.shape, len(QUANTILE_LEVELS)):
+        raise ValueError("quantiles must have shape [N,H,5]")
+    q = np.sort(raw, axis=-1)
+    error = y[..., None] - q
+    pinball = np.maximum(QUANTILE_LEVELS * error, (QUANTILE_LEVELS - 1) * error)
+    result = {"mae": np.abs(q[..., 2] - y), "mse": np.square(q[..., 2] - y),
+              "pinball_by_quantile": pinball,
+              "crossing_rate": np.any(np.diff(raw, axis=-1) < 0, axis=-1)}
+    for coverage, low, high in ((80, 1, 3), (90, 0, 4)):
+        result[f"coverage_{coverage}"] = (y >= q[..., low]) & (y <= q[..., high])
+        result[f"interval_width_{coverage}"] = q[..., high] - q[..., low]
+    return result
+
+
+def per_origin_scores(actual: Any, quantiles: Any) -> dict[str, np.ndarray]:
+    """Score raw-price five-quantile forecasts, averaging each origin's horizons.
+
+    Input shapes are [N,H] and [N,H,5], in the fixed QUANTILE_LEVELS order.
+    Quantile crossings are rearranged before every loss and interval metric,
+    exactly as in score_predictions. This function does not establish sample
+    provenance or alignment; callers must check those before paired analyses.
+    All outputs have shape [N], except pinball_by_quantile, which is [N,5].
+    Average mse before taking its square root to obtain pooled RMSE.
+    """
+    cells = _quantile_cell_scores(actual, quantiles)
+    result = {key: value.mean(axis=1) for key, value in cells.items()}
+    result["quantile_score_proxy"] = 2 * cells["pinball_by_quantile"].mean(axis=(1, 2))
+    return result
+
+
 def score_predictions(artifact: PredictionArtifact) -> dict[str, Any]:
     """Equal weight for all origin/horizon cells; no clipping or tail reweighting."""
     artifact = _validated(artifact)
@@ -189,20 +225,17 @@ def score_predictions(artifact: PredictionArtifact) -> dict[str, Any]:
         result.update(_point_metrics(artifact.native_point, artifact.actual))
         result["point_definition"] = "native_point"
         return result
-    raw = artifact.quantiles
-    quantiles = np.sort(raw, axis=-1)
-    result["crossing_rate"] = float(np.any(np.diff(raw, axis=-1) < 0, axis=-1).mean())
+    cells = _quantile_cell_scores(artifact.actual, artifact.quantiles)
+    result["crossing_rate"] = float(cells["crossing_rate"].mean())
     result["point_definition"] = "rearranged_q50"
-    result.update(_point_metrics(quantiles[..., 2], artifact.actual))
-    error = artifact.actual[..., None] - quantiles
-    pinball = np.maximum(QUANTILE_LEVELS * error, (QUANTILE_LEVELS - 1) * error)
+    result.update(mae=float(cells["mae"].mean()), rmse_pooled=float(np.sqrt(cells["mse"].mean())))
+    pinball = cells["pinball_by_quantile"]
     result["pinball_by_quantile"] = {str(float(level)): float(pinball[..., i].mean())
                                       for i, level in enumerate(QUANTILE_LEVELS)}
     result["quantile_score_proxy"] = float(2 * pinball.mean())
     for coverage, low, high in ((80, 1, 3), (90, 0, 4)):
-        result[f"coverage_{coverage}"] = float(((artifact.actual >= quantiles[..., low]) &
-                                               (artifact.actual <= quantiles[..., high])).mean())
-        result[f"interval_width_{coverage}"] = float((quantiles[..., high] - quantiles[..., low]).mean())
+        result[f"coverage_{coverage}"] = float(cells[f"coverage_{coverage}"].mean())
+        result[f"interval_width_{coverage}"] = float(cells[f"interval_width_{coverage}"].mean())
     if artifact.native_point is not None:
         result["native_point_diagnostic"] = _point_metrics(artifact.native_point, artifact.actual)
     return result

@@ -7,6 +7,7 @@ G-C1 / G-C2 verdict. Reads frozen archives only; assertion failures abort.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import subprocess
@@ -18,18 +19,19 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from forecasting.aligned_scoring import make_prediction_artifact, score_predictions
+from forecasting.aligned_scoring import (make_prediction_artifact, score_predictions,
+    save_prediction_artifact, per_origin_scores)
+from forecasting.common.statistics import block_bootstrap_and_jackknife, holm_adjust
 
 REGIONS = ("NSW1", "QLD1", "TAS1")
 Q = np.array([0.05, 0.10, 0.50, 0.90, 0.95])
 MEMBERS = ("lightgbm:2026", "lightgbm:2027", "lightgbm:2028", "xgboost:2026", "chronos2")
 R0_KEY = "lightgbm:2026"
 ADMIT_BAND = 1.25
-OUT = ROOT / "outputs/forecasting/r27_s3_confirmation_20261125"
+OUT = ROOT / "outputs/forecasting/r27_s3_confirmation_corrected_20261125"
 MAIN_PER_SEED = ROOT / "logs/forecasting/main_comparison_20261023/per_seed.csv"
 FOUNDATION = ROOT.parent / "DualTimesField-foundation-baselines"
 BOOT_REPS, BLOCK_DAYS, DM_H, NW_LAG = 2000, 7, 24, 23
-RNG = np.random.default_rng(2026)
 GIT = subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
                               text=True).strip()
 
@@ -47,8 +49,28 @@ def r25_selection_path(key, region):
 
 
 def per_origin_qs(actual, quantiles):
-    err = actual[..., None] - quantiles
-    return 2 * np.maximum(Q * err, (Q - 1) * err).mean(axis=(1, 2))
+    return per_origin_scores(actual, quantiles)["quantile_score_proxy"]
+
+
+def load_selection_scores(region):
+    """Load aligned selection losses without silently collapsing origins."""
+    scores, reference = {}, None
+    for key in MEMBERS:
+        path = r25_selection_path(key, region)
+        with np.load(path) as z:
+            origins, actual = z["origin_unix"], z["actual"]
+            qs = per_origin_qs(actual, z["quantiles"])
+        if (origins.ndim != 1 or len(origins) != len(qs)
+                or origins.dtype.kind not in "iu"
+                or np.any(origins[1:] <= origins[:-1])):
+            raise ValueError(f"Selection origins must be strictly increasing integer timestamps aligned with losses: {path}")
+        if reference is None:
+            reference = (origins, actual)
+        elif not (np.array_equal(origins, reference[0])
+                  and np.array_equal(actual, reference[1])):
+            raise ValueError(f"Selection candidate sample/label mismatch: {path}")
+        scores[key] = dict(zip(origins, qs))
+    return scores
 
 
 def bucket_feature(region, origins):
@@ -71,7 +93,8 @@ def dm_hln_one_sided(diff):
     var = gamma[0] + 2 * sum((1 - l / (NW_LAG + 1)) * gamma[l] for l in range(1, NW_LAG + 1))
     t_stat = diff.mean() / math.sqrt(var / n)
     hln = t_stat * math.sqrt((n + 1 - 2 * DM_H + DM_H * (DM_H - 1) / n) / n)
-    return t_stat, hln, 0.5 * (1 + math.erf(hln / math.sqrt(2)))
+    # erfc avoids cancellation to exactly zero in the negative tail.
+    return t_stat, hln, 0.5 * math.erfc(-hln / math.sqrt(2))
 
 
 def _day_codes(diff_by_region):
@@ -83,24 +106,21 @@ def _day_codes(diff_by_region):
 
 
 def block_bootstrap(diff_by_region):
-    """7-day-block bootstrap on integer day codes; per-day sums make resampling O(blocks)."""
-    all_days, codes = _day_codes(diff_by_region)
-    n_days = len(all_days)
-    arrays = {r: s.to_numpy() for r, s in diff_by_region.items()}
-    day_sum = {r: np.bincount(codes[r], weights=arrays[r], minlength=n_days) for r in arrays}
-    day_cnt = {r: np.bincount(codes[r], minlength=n_days) for r in arrays}
-    blocks = [np.arange(i, min(i + BLOCK_DAYS, n_days)) for i in range(0, n_days, BLOCK_DAYS)]
-    means = []
-    for _ in range(BOOT_REPS):
-        sel = np.concatenate([blocks[i] for i in RNG.integers(0, len(blocks), len(blocks))])
-        means.append(np.mean([day_sum[r][sel].sum() / day_cnt[r][sel].sum() for r in arrays]))
-    means = np.array(means)
-    return float((means >= 0).mean()), (float(np.percentile(means, 2.5)),
-                                        float(np.percentile(means, 97.5)))
+    """Historical non-overlapping 7-day blocks, with explicit independent RNG."""
+    result = block_bootstrap_and_jackknife(
+        {r: s.to_numpy() for r, s in diff_by_region.items()},
+        {r: local_dates(s.index) for r, s in diff_by_region.items()},
+        block_days=BLOCK_DAYS, repetitions=BOOT_REPS, seed=2026, alternative="less")
+    return result["bootstrap_tail_probability"], (result["ci_low"], result["ci_high"])
 
 
-def main():
-    OUT.mkdir(parents=True, exist_ok=True)
+def main(argv=None):
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, default=OUT)
+    args = parser.parse_args(argv)
+    OUT = args.output_dir.resolve()
+    OUT.mkdir(parents=True, exist_ok=False)
     print(f"[R27] git={GIT}", flush=True)
 
     # ---- step 1: archives and alignment ----
@@ -142,7 +162,7 @@ def main():
                     & (table.region == region)].iloc[0]
         assert abs(s["quantile_score_proxy"] - row.quantile_score_proxy) <= 1e-9, (region, s)
         assert abs(s["mae"] - row.mae) <= 1e-9, (region, s)
-    print("[2] scorer consistency: 9/9 cells match per_seed.csv within 1e-9", flush=True)
+    print("[2] scorer consistency: 3/3 region cells (MAE and QS) match per_seed.csv within 1e-9", flush=True)
 
     # ---- step 3: freeze rules ----
     rules = {"git_commit": GIT,
@@ -158,11 +178,7 @@ def main():
         iso = np.array([d.isoformat() for d in local_dates(all_origin)])
         mask = (iso >= "2022-01-01") & (iso < "2022-07-01")
         bounds = np.quantile(all_demand[mask], [0.25, 0.5, 0.75])
-        sel_qs = {}
-        for key in MEMBERS:
-            with np.load(r25_selection_path(key, region)) as z:
-                sel_qs[key] = dict(zip(z["origin_unix"].astype(np.int64),
-                                       per_origin_qs(z["actual"], z["quantiles"])))
+        sel_qs = load_selection_scores(region)
         sel_origins = np.array(sorted(sel_qs[R0_KEY]))
         demand_of = dict(zip(all_origin, all_demand))
         sel_feat = np.array([demand_of[t] for t in sel_origins])
@@ -218,9 +234,7 @@ def main():
                 metadata=dict(data[region]["meta"], model=f"r27_{arm}", seed=2026,
                               source=f"r27:{GIT}", arm=arm, frozen_rules="frozen_rules.json"),
                 quantiles=quantiles, point=None, quantile_levels=tuple(Q))
-            np.savez_compressed(OUT / f"{region}_{arm}.npz", quantiles=quantiles,
-                                actual=ref["actual"], origin_unix=ref["origin_unix"],
-                                metadata_json=np.asarray(json.dumps(artifact.metadata, sort_keys=True)))
+            save_prediction_artifact(OUT / f"{region}_{arm}.npz", artifact)
             s = score_predictions(artifact)
             rows.append({"arm": arm, "region": region,
                          **{k: s[k] for k in ("quantile_score_proxy", "mae", "rmse_pooled",
@@ -228,13 +242,15 @@ def main():
             losses[(arm, region)] = per_origin_qs(ref["actual"], quantiles)
             if arm == "s3":
                 s3_quantiles[region] = quantiles
-        q50 = np.sort(ref["quantiles"], axis=-1)[..., 2]
+        r0_artifact = make_prediction_artifact(
+            actual=ref["actual"], origin_unix=ref["origin_unix"],
+            target_time_unix=ref["target_time_unix"], metadata=data[region]["meta"],
+            quantiles=ref["quantiles"], quantile_levels=tuple(Q))
+        r0_scores = score_predictions(r0_artifact)
         losses[("r0", region)] = per_origin_qs(ref["actual"], ref["quantiles"])
         rows.append({"arm": "r0", "region": region,
-                     "quantile_score_proxy": losses[("r0", region)].mean(),
-                     "mae": np.abs(ref["actual"] - q50).mean(),
-                     "rmse_pooled": float(np.sqrt(np.mean((ref["actual"] - q50) ** 2))),
-                     "coverage_80": None, "coverage_90": None})
+                     **{k: r0_scores[k] for k in ("quantile_score_proxy", "mae", "rmse_pooled",
+                                                 "coverage_80", "coverage_90")}})
     scores = pd.DataFrame(rows)
     scores.to_csv(OUT / "scores.csv", index=False)
     print("[4] arms scored:", flush=True)
@@ -249,8 +265,7 @@ def main():
     boot_p, boot_ci = block_bootstrap(diff)
     _, boot2_ci = block_bootstrap(diff2)
     per_region_p = {r: dm_hln_one_sided(diff[r].to_numpy())[2] for r in REGIONS}
-    ranked = sorted(per_region_p.items(), key=lambda kv: kv[1])
-    holm = {r: min(1.0, p * (3 - i)) for i, (r, p) in enumerate(ranked)}
+    holm = holm_adjust(per_region_p)
     delta_full = float(np.mean([s.mean() for s in diff.values()]))
     all_days, codes = _day_codes(diff)
     arrays = {r: s.to_numpy() for r, s in diff.items()}
@@ -266,11 +281,12 @@ def main():
         for r in REGIONS:
             actual = data[r][R0_KEY]["actual"]
             mask = (actual >= lo) & (actual < hi)
-            err0 = actual[..., None] - data[r][R0_KEY]["quantiles"]
-            err3 = actual[..., None] - s3_quantiles[r]
-            cell0 = 2 * np.maximum(Q * err0, (Q - 1) * err0)
-            cell3 = 2 * np.maximum(Q * err3, (Q - 1) * err3)
-            per_region.append(cell0[mask].mean() - cell3[mask].mean())
+            if not mask.any():
+                raise ValueError(f"Empty price band {name} in {r}")
+            cell_actual = actual[mask][:, None]
+            cell0 = per_origin_qs(cell_actual, data[r][R0_KEY]["quantiles"][mask][:, None, :])
+            cell3 = per_origin_qs(cell_actual, s3_quantiles[r][mask][:, None, :])
+            per_region.append(cell0.mean() - cell3.mean())
         bands[name] = float(np.mean(per_region))
     win_rate = float((pooled < 0).mean())
     trimmed = float(np.sort(pooled)[int(0.1 * len(pooled)):int(0.9 * len(pooled))].mean())
@@ -290,11 +306,18 @@ def main():
         "G_C2": bool(delta2 >= 0.05),
         "delta_qs": delta_qs, "delta_rel": rel, "delta2_cross_family": delta2,
         "dm_p": dm_p, "dm_t": t_stat, "dm_hln_t": hln, "boot_p": boot_p, "boot_ci": boot_ci,
+        "bootstrap_tail_probability": boot_p,
         "boot2_ci": boot2_ci, "win_rate": win_rate, "trimmed_mean_delta": trimmed,
         "jackknife_max_day_share": jk, "price_bands": bands, "holm_per_region_dm": holm,
         "region_equal_qs": {arm: re(arm) for arm in list(ARMS) + ["r0"]},
         "per_region_qs": {f"{arm}|{r}": float(losses[(arm, r)].mean())
                           for arm in list(ARMS) + ["r0"] for r in REGIONS},
+        "correction": {"scoring": "shared_sorted_five_quantile_score",
+                       "selection_recomputed": True,
+                       "bootstrap": "nonoverlapping_7_calendar_day_blocks_2000_draws_seed2026_per_comparison",
+                       "bootstrap_note": "boot_p is an empirical bootstrap tail fraction, not a null-centred hypothesis-test p-value; zero means 0/2000 draws, not zero uncertainty.",
+                       "dm_reference": "normal CDF, unchanged; evaluated with erfc for numerical stability",
+                       "gates": "Original numerical thresholds retained; no test-driven tuning."},
     }
     verdict["G_C1_pass"] = verdict["G_C1_a"] and verdict["G_C1_b"] and verdict["G_C1_c"]
     verdict["outcome"] = ("pass_cross_family" if verdict["G_C1_pass"] and verdict["G_C2"]
